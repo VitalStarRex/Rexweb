@@ -2,140 +2,507 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#071126">
+<!-- width=1280 makes phones show the desktop layout.
+     For a normal phone layout instead, use: width=device-width, initial-scale=1.0 -->
+<meta name="viewport" content="width=1280">
+<meta name="theme-color" content="#040815">
 <meta name="description" content="RexWeb creates responsive websites, converts websites into Android apps, builds custom web apps, and designs logos and digital flyers for growing businesses.">
-<meta property="og:title" content="RexWeb — Build Your Digital Future">
+<meta property="og:title" content="RexWeb — Build · Design · Grow">
 <meta property="og:description" content="Web design, website-to-app conversion, web apps, logo design and digital flyers.">
 <meta property="og:url" content="https://rexweb.web.app/">
-<title>RexWeb — Build Your Digital Future</title>
+<title>RexWeb — Build · Design · Grow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050914;--surface:#0b1426;--surface2:#0e1b32;--text:#f4f7ff;--muted:#a7b4cc;--line:rgba(164,190,255,.16);--blue:#4f7cff;--cyan:#22d3ee;--purple:#a855f7;--green:#21d4a4;--pink:#ff4fa3;--orange:#ffab48;--radius:22px;--shadow:0 22px 70px rgba(0,0,0,.32)}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;scroll-padding-top:100px}body{font-family:'DM Sans',sans-serif;background:radial-gradient(ellipse at 15% 0%,rgba(50,93,220,.17),transparent 34%),radial-gradient(ellipse at 90% 25%,rgba(130,45,190,.13),transparent 30%),var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button,a{-webkit-tap-highlight-color:transparent}.container{width:min(1160px,calc(100% - 36px));margin:auto}.eyebrow{display:inline-flex;align-items:center;gap:9px;color:#8ab8ff;font-size:.76rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}.eyebrow:before{content:'';width:22px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:9px}.gradient{background:linear-gradient(100deg,#67e8f9 0%,#7c9cff 45%,#d58bff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid transparent;border-radius:999px;padding:13px 19px;font-weight:800;font-size:.92rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}.btn:hover{transform:translateY(-2px)}.btn-primary{background:linear-gradient(110deg,#596dff,#248dff 62%,#21c9ee);color:#fff;box-shadow:0 9px 28px rgba(53,117,255,.28)}.btn-outline{border-color:var(--line);background:rgba(255,255,255,.035);color:var(--text)}.btn-outline:hover{border-color:rgba(107,167,255,.65)}
-/* Header and service shortcuts */
-.header{position:sticky;top:0;z-index:100;background:rgba(5,9,20,.86);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.header-inner{min-height:78px;display:flex;align-items:center;gap:22px}.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}.brand-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#526dff,#20d6e9);box-shadow:0 8px 25px rgba(67,118,255,.25);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.55rem;color:white}.brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.35rem;letter-spacing:-.06em}.brand-name span{color:#78a9ff}.brand-tag{display:block;color:var(--muted);font-size:.62rem;letter-spacing:.11em;text-transform:uppercase;margin-top:-3px}.service-nav{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;overflow-x:auto;scrollbar-width:none}.service-nav::-webkit-scrollbar{display:none}.service-pill{white-space:nowrap;display:inline-flex;align-items:center;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025);font-size:.76rem;font-weight:700;color:#dbe7ff;transition:.2s}.service-pill:hover{border-color:var(--accent,var(--blue));background:color-mix(in srgb,var(--accent,var(--blue)) 12%,transparent);transform:translateY(-1px)}.service-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--accent,var(--blue));box-shadow:0 0 12px var(--accent,var(--blue))}.header-cta{flex-shrink:0;padding:11px 16px;font-size:.8rem}.menu-toggle{display:none;border:1px solid var(--line);background:var(--surface);color:white;border-radius:12px;padding:10px;font-size:1.1rem}
-/* Hero */
-.hero{padding:78px 0 66px;position:relative}.hero-grid{display:grid;grid-template-columns:1.03fr .97fr;align-items:center;gap:46px}.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.8rem,5.6vw,5.25rem);line-height:1.03;letter-spacing:-.065em;margin:18px 0 22px;max-width:700px}.hero-copy{max-width:590px;color:var(--muted);font-size:1.08rem}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 30px}.trust-row{display:flex;gap:22px;flex-wrap:wrap;color:#dce7ff;font-size:.82rem}.trust-item{display:flex;align-items:center;gap:9px}.trust-icon{width:33px;height:33px;display:grid;place-items:center;border:1px solid var(--line);border-radius:11px;background:rgba(87,132,255,.1);color:#7ccfff}.hero-visual{min-height:410px;position:relative;display:grid;place-items:center}.orb{position:absolute;width:320px;height:320px;border-radius:50%;background:linear-gradient(140deg,rgba(55,112,255,.27),rgba(174,68,255,.18),rgba(34,211,238,.1));filter:blur(2px);box-shadow:0 0 100px rgba(73,99,255,.16)}.screen{position:relative;width:min(100%,480px);border:1px solid rgba(144,177,255,.32);border-radius:24px;padding:14px;background:linear-gradient(145deg,rgba(18,34,64,.97),rgba(6,13,28,.98));box-shadow:0 30px 90px rgba(0,0,0,.45),0 0 45px rgba(71,106,255,.14);transform:rotate(1.3deg)}.screen-top{height:27px;display:flex;align-items:center;gap:6px;padding:0 7px 12px;border-bottom:1px solid var(--line)}.window-dot{height:7px;width:7px;border-radius:50%;background:#ff6c88}.window-dot:nth-child(2){background:#ffca65}.window-dot:nth-child(3){background:#2cddb0}.screen-label{margin-left:auto;color:#8296bb;font-size:.65rem}.screen-body{padding:23px 18px 18px}.screen-kicker{font-size:.68rem;color:#7dd3fc;letter-spacing:.16em;font-weight:800}.screen-title{font-family:'Space Grotesk',sans-serif;font-size:2.05rem;line-height:1.1;letter-spacing:-.05em;margin:11px 0}.screen-sub{font-size:.78rem;color:#9fb0ce;max-width:260px}.mock-bars{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:25px}.mock-card{min-height:104px;border:1px solid rgba(137,164,255,.19);border-radius:15px;padding:13px;background:linear-gradient(145deg,rgba(44,73,133,.28),rgba(13,25,49,.5))}.mock-card strong{display:block;font-size:.75rem;margin-bottom:10px}.bar{height:6px;border-radius:8px;background:rgba(173,198,255,.16);margin-top:7px;overflow:hidden}.bar:after{content:'';display:block;height:100%;width:75%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--cyan))}.mock-card:nth-child(2) .bar:after{width:56%;background:linear-gradient(90deg,var(--purple),var(--pink))}.float-tag{position:absolute;display:flex;align-items:center;gap:9px;padding:12px 14px;border:1px solid rgba(160,188,255,.2);border-radius:15px;background:rgba(9,18,37,.93);box-shadow:var(--shadow);font-size:.76rem;font-weight:800;animation:float 5s ease-in-out infinite}.float-tag span{font-size:1.15rem}.tag-one{left:-4px;top:62px}.tag-two{right:-10px;bottom:52px;animation-delay:-2s}@keyframes float{50%{transform:translateY(-9px)}}
-/* Sections */
-.section{padding:74px 0}.section-heading{text-align:center;max-width:730px;margin:0 auto 38px}.section-heading h2,.about-copy h2,.contact-copy h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,4vw,3.15rem);line-height:1.1;letter-spacing:-.05em;margin:14px 0}.section-heading p,.muted{color:var(--muted)}.section-heading p{max-width:630px;margin:auto}.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.service-card{--accent:var(--blue);position:relative;overflow:hidden;padding:25px;border-radius:var(--radius);border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 8%,var(--surface)),rgba(8,15,30,.9));transition:transform .25s,border-color .25s,box-shadow .25s}.service-card:before{content:'';position:absolute;right:-48px;top:-58px;width:145px;height:145px;border-radius:50%;background:var(--accent);opacity:.08;filter:blur(2px)}.service-card:hover{transform:translateY(-5px);border-color:color-mix(in srgb,var(--accent) 75%,white);box-shadow:0 18px 40px rgba(0,0,0,.23)}.service-icon{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:color-mix(in srgb,var(--accent) 17%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);font-size:1.55rem;margin-bottom:20px}.service-card h3{font-family:'Space Grotesk',sans-serif;font-size:1.18rem;margin-bottom:9px}.service-card p{font-size:.9rem;color:var(--muted);min-height:68px}.card-link{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-weight:800;font-size:.84rem;margin-top:18px}.card-link:hover{gap:13px}.service-card .small-tag{position:absolute;right:17px;top:17px;font-size:.63rem;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);padding:5px 8px;border-radius:99px}
-.about-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:55px;align-items:center}.about-copy p{color:var(--muted);margin:15px 0 24px}.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.feature{display:flex;gap:13px;padding:17px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.025)}.feature-icon{width:39px;height:39px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;background:rgba(76,126,255,.13);color:#8ec5ff;font-size:1.15rem}.feature h3{font-size:.91rem;margin-bottom:4px}.feature p{font-size:.8rem;color:var(--muted);line-height:1.5}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;counter-reset:step}.step{padding:23px;border:1px solid var(--line);border-radius:19px;background:rgba(255,255,255,.025)}.step:before{counter-increment:step;content:'0' counter(step);display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,rgba(77,111,255,.25),rgba(34,211,238,.12));border:1px solid rgba(113,160,255,.3);color:#9ddcff;font-family:'Space Grotesk',sans-serif;font-weight:700;margin-bottom:18px}.step h3{font-size:1rem;margin-bottom:8px}.step p{font-size:.87rem;color:var(--muted)}
-.cta-band{padding:34px;border-radius:27px;border:1px solid rgba(123,153,255,.24);background:radial-gradient(ellipse at 100% 0%,rgba(136,73,255,.23),transparent 45%),linear-gradient(120deg,rgba(27,55,108,.55),rgba(10,20,41,.92));display:flex;align-items:center;justify-content:space-between;gap:25px}.cta-band h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.6rem,3vw,2.5rem);letter-spacing:-.04em;line-height:1.15;margin:8px 0}.cta-band p{color:var(--muted);max-width:600px}.contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:42px;align-items:start}.contact-copy p{color:var(--muted);margin:15px 0 22px}.contact-note{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:.9rem}.contact-note span{color:#86b9ff;font-size:1.2rem}.contact-form{padding:25px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,rgba(15,29,55,.92),rgba(8,15,30,.95));box-shadow:var(--shadow)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}.field.full{grid-column:1/-1}.field label{font-size:.8rem;font-weight:700;color:#dce7ff}.field input,.field textarea,.field select{width:100%;border:1px solid rgba(160,183,230,.2);background:#071124;color:white;border-radius:12px;padding:13px 14px;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:#6797ff;box-shadow:0 0 0 3px rgba(77,124,255,.12)}.field textarea{min-height:105px;resize:vertical}.field select option{background:#071124}.form-submit{width:100%}.form-help{font-size:.72rem;color:var(--muted);text-align:center;margin-top:11px}.footer{padding:28px 0;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.footer-links{display:flex;gap:16px}.footer a:hover{color:white}.back-top{position:fixed;right:18px;bottom:18px;z-index:50;width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:#14254a;border:1px solid rgba(143,175,255,.3);color:white;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s}.back-top.visible{opacity:1;pointer-events:auto}.reveal{opacity:0;transform:translateY(18px);transition:opacity .65s,transform .65s}.reveal.show{opacity:1;transform:translateY(0)}
-/* Wide desktop presentation */
-@media(min-width:1200px){
-  .container{width:min(1360px,calc(100% - 80px))}
-  .header-inner{min-height:88px;gap:24px}
-  .brand-mark{width:48px;height:48px;border-radius:16px;font-size:1.7rem}
-  .brand-name{font-size:1.55rem}
-  .brand-tag{font-size:.66rem}
-  .service-nav{gap:9px;overflow:visible}
-  .service-pill{font-size:.81rem;padding:11px 13px;border-radius:12px}
-  .header-cta{font-size:.88rem;padding:13px 20px}
-  .hero{padding:96px 0 88px}
-  .hero-grid{grid-template-columns:1.05fr .95fr;gap:72px}
-  .hero h1{font-size:clamp(4.3rem,5vw,5.8rem);max-width:760px}
-  .hero-copy{font-size:1.16rem;max-width:650px}
-  .hero-visual{min-height:500px}
-  .screen{width:min(100%,560px);padding:17px}
-  .screen-body{padding:30px 25px 24px}
-  .screen-title{font-size:2.45rem}
-  .mock-card{min-height:120px;padding:16px}
-  .section{padding:94px 0}
-  .section-heading{margin-bottom:48px}
-  .services-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
-  .service-card{padding:32px;min-height:300px}
-  .service-card h3{font-size:1.35rem}
-  .service-card p{font-size:.98rem;min-height:76px}
-  .service-icon{width:60px;height:60px;font-size:1.75rem}
-  .about-wrap{gap:80px}
-  .feature{padding:22px}
-  .steps{gap:22px}
-  .contact-grid{gap:70px}
+/* ---------- Colours and basics ---------- */
+:root{
+  --bg:#040815; --surface:#0a1226; --surface2:#0e1a35;
+  --text:#f4f7ff; --muted:#a3b1cc; --line:rgba(130,165,255,.18);
+  --blue:#4f7cff; --cyan:#22d3ee; --purple:#a855f7; --green:#21d4a4; --pink:#ff4fa3; --orange:#ffab48;
+  --radius:18px;
 }
-@media(min-width:781px) and (max-width:1199px){
-  .container{width:min(1120px,calc(100% - 48px))}
-  .header-inner{gap:12px}
-  .brand-name{font-size:1.2rem}
-  .service-nav{gap:5px}
-  .service-pill{font-size:.68rem;padding:8px 8px}
-  .hero{padding:68px 0 60px}
-  .hero-grid{gap:26px}
-  .hero h1{font-size:clamp(3.2rem,5vw,4.5rem)}
+body.light{
+  --bg:#f3f6ff; --surface:#ffffff; --surface2:#eaf0ff;
+  --text:#0b1426; --muted:#52627f; --line:rgba(30,60,120,.16);
 }
-@media(max-width:1050px){.header-inner{gap:12px}.service-nav{justify-content:flex-start}.service-pill{font-size:.7rem;padding:8px 9px}.header-cta{display:none}.hero-grid{gap:22px}.hero-visual{min-height:360px}.tag-one{left:-2px}.tag-two{right:-2px}}
-@media(max-width:780px){.container{width:min(100% - 28px,600px)}.header-inner{min-height:70px;justify-content:space-between;flex-wrap:wrap;padding:12px 0}.menu-toggle{display:block}.service-nav{display:none;order:3;flex-basis:100%;padding:3px 0 7px;flex-wrap:wrap;overflow:visible}.service-nav.open{display:flex}.service-pill{flex:1 1 calc(50% - 8px);justify-content:center;font-size:.76rem}.hero{padding:52px 0 42px}.hero-grid{grid-template-columns:1fr;gap:10px}.hero h1{font-size:clamp(2.65rem,12vw,4.1rem)}.hero-copy{font-size:1rem}.hero-visual{min-height:340px;margin-top:8px}.screen{width:min(94%,450px)}.tag-one{left:0;top:32px}.tag-two{right:0;bottom:22px}.section{padding:55px 0}.services-grid{grid-template-columns:repeat(2,1fr);gap:12px}.service-card{padding:19px}.service-card p{min-height:unset}.about-wrap,.contact-grid{grid-template-columns:1fr;gap:28px}.feature-grid{gap:10px}.steps{grid-template-columns:1fr}.cta-band{align-items:flex-start;flex-direction:column;padding:25px}.contact-form{padding:18px}}
-@media(max-width:470px){.brand-name{font-size:1.2rem}.brand-mark{width:38px;height:38px}.brand-tag{font-size:.55rem}.hero-actions .btn{width:100%}.trust-row{gap:12px}.trust-item{font-size:.75rem}.hero-visual{min-height:300px}.screen-body{padding:18px 12px 13px}.screen-title{font-size:1.7rem}.mock-bars{margin-top:18px}.float-tag{font-size:.68rem;padding:9px 11px}.services-grid{grid-template-columns:1fr}.service-card{padding:22px}.service-card p{min-height:0}.feature-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.footer-inner{align-items:flex-start;flex-direction:column}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{font-family:'DM Sans',sans-serif;color:var(--text);line-height:1.6;overflow-x:hidden;
+  background:radial-gradient(ellipse at 10% 0%,rgba(60,90,255,.22),transparent 40%),
+             radial-gradient(ellipse at 95% 20%,rgba(150,60,255,.16),transparent 35%),var(--bg)}
+a{color:inherit;text-decoration:none}
+button,input,textarea,select{font:inherit}
+.container{width:min(1280px,calc(100% - 64px));margin:auto}
+.gradient{background:linear-gradient(90deg,#4f8cff,#9b6bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em;line-height:1.15}
+.badge{display:inline-block;padding:6px 14px;border:1px solid rgba(110,150,255,.5);border-radius:999px;background:rgba(79,124,255,.12);color:#8fb4ff;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+body.light .badge{color:#2a55c9}
+.kicker{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#7aa8ff;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:12px;border:1px solid transparent;font-weight:700;font-size:.92rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(110deg,#5a5cff,#2a7bff 60%,#22b6f0);color:#fff;box-shadow:0 8px 26px rgba(55,110,255,.35)}
+.btn-outline{border-color:var(--line);background:rgba(255,255,255,.04);color:var(--text)}
+.btn-outline:hover{border-color:rgba(110,160,255,.7)}
+.btn-sm{padding:10px 18px;font-size:.85rem}
+.section{padding:70px 0}
+.section-head{max-width:640px;margin-bottom:34px}
+.section-head h2,.intro h2{font-size:clamp(1.8rem,3vw,2.5rem);margin-bottom:12px}
+.section-head p,.intro p{color:var(--muted)}
+
+/* ---------- Header ---------- */
+.header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.header-inner{min-height:80px;display:flex;align-items:center;gap:24px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand-mark{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(140deg,#7a4dff,#20c9f0);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;color:#fff;box-shadow:0 8px 24px rgba(90,100,255,.35)}
+.brand-name{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;letter-spacing:-.04em;line-height:1.1}
+.brand-name span{color:#78a9ff}
+.brand-tag{display:block;color:var(--muted);font-size:.68rem;letter-spacing:.08em}
+.main-nav{flex:1;display:flex;justify-content:center;gap:34px}
+.main-nav a{position:relative;font-size:.9rem;font-weight:600;color:var(--muted);padding:6px 0;transition:color .2s}
+.main-nav a:hover,.main-nav a.active{color:var(--text)}
+.main-nav a:after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan));transform:scaleX(0);transition:transform .2s}
+.main-nav a:hover:after,.main-nav a.active:after{transform:scaleX(1)}
+.header-actions{display:flex;align-items:center;gap:12px}
+.theme-toggle,.menu-toggle{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:12px;width:42px;height:42px;cursor:pointer;font-size:1.05rem}
+.menu-toggle{display:none}
+
+/* ---------- Hero ---------- */
+.hero{padding:64px 0 54px}
+.hero-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:30px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,4.6vw,4.2rem);margin:20px 0 20px;letter-spacing:-.05em}
+.hero p.lead{color:var(--muted);font-size:1.08rem;max-width:520px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin:28px 0 32px}
+.trust-row{display:grid;grid-template-columns:repeat(4,auto);gap:22px;justify-content:start}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:.78rem;line-height:1.3}
+.trust-item i{font-style:normal;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:rgba(79,124,255,.12)}
+.trust-item small{display:block;color:var(--muted);font-size:.7rem}
+.stage{position:relative;min-height:440px}
+.stage:before{content:'';position:absolute;inset:8% 6%;border-radius:50%;background:radial-gradient(circle,rgba(90,100,255,.35),rgba(170,70,255,.15) 55%,transparent 70%);filter:blur(30px)}
+.laptop{position:absolute;left:0;top:34px;width:76%;transform:perspective(1200px) rotateY(-10deg) rotateX(3deg)}
+.lscreen{aspect-ratio:16/10;border:2px solid rgba(150,180,255,.45);border-radius:14px 14px 4px 4px;background:linear-gradient(145deg,#10224a,#060d1f);padding:14px 18px;overflow:hidden;color:#f4f7ff;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 40px rgba(80,110,255,.2)}
+.lbar{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.lbar i{width:7px;height:7px;border-radius:50%;background:#ff6c88}.lbar i:nth-child(2){background:#ffca65}.lbar i:nth-child(3){background:#2cddb0}
+.lbar b{margin-left:auto;font-size:.6rem;color:#8aa0c8;font-weight:500}
+.lscreen h4{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;line-height:1.15;letter-spacing:-.03em;max-width:60%}
+.lscreen h4 span{background:linear-gradient(90deg,#67e8f9,#8aa2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lscreen .mini-btn{display:inline-block;margin-top:12px;padding:5px 12px;border-radius:7px;background:linear-gradient(110deg,#5a5cff,#22b6f0);font-size:.62rem;font-weight:700}
+.lscreen svg{position:absolute;right:14px;bottom:12px;width:46%;opacity:.95}
+.lscreen{position:relative}
+.lbase{height:12px;margin:0 -5%;border-radius:0 0 16px 16px;background:linear-gradient(#2c3858,#0f1626)}
+.phone{position:absolute;left:44%;bottom:0;width:27%;aspect-ratio:9/17;z-index:2;border:3px solid #3b4c7a;border-radius:26px;padding:16px 12px;background:linear-gradient(160deg,#12234d,#070e22);color:#f4f7ff;box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 30px rgba(90,110,255,.25)}
+.phone small{font-size:.5rem;color:#8aa0c8;letter-spacing:.1em}
+.phone h5{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;line-height:1.15;margin:8px 0 10px}
+.phone .line{height:5px;border-radius:5px;background:rgba(170,195,255,.2);margin-bottom:6px}
+.phone .line.s{width:70%}
+.phone .mini-btn{display:inline-block;margin-top:10px;padding:5px 11px;border-radius:7px;background:linear-gradient(110deg,#5a5cff,#22b6f0);font-size:.55rem;font-weight:700}
+.vtags{position:absolute;right:0;top:10px;width:35%;display:grid;gap:10px;z-index:3}
+.vtag{--c:var(--blue);display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);background:rgba(8,16,36,.88);color:#f4f7ff;font-weight:700;font-size:.84rem;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:float 6s ease-in-out infinite}
+.vtag:nth-child(even){animation-delay:-3s;margin-left:14px}
+.vtag i{font-style:normal;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 22%,transparent)}
+@keyframes float{50%{transform:translateY(-6px)}}
+
+/* ---------- Services ---------- */
+.svc-wrap{display:grid;grid-template-columns:290px 1fr;gap:34px;align-items:start}
+.intro .btn{margin-top:22px}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{--c:var(--blue);position:relative;overflow:hidden;padding:24px;border-radius:var(--radius);border:1px solid color-mix(in srgb,var(--c) 35%,transparent);background:linear-gradient(150deg,color-mix(in srgb,var(--c) 9%,var(--surface)),var(--surface));transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-5px);border-color:var(--c);box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.card .ico{width:52px;height:52px;display:grid;place-items:center;border-radius:15px;font-size:1.5rem;margin-bottom:16px;background:color-mix(in srgb,var(--c) 20%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.card h3{font-size:1.08rem;margin-bottom:8px}
+.card p{font-size:.87rem;color:var(--muted);min-height:84px}
+.card .more{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:9px 14px;border-radius:10px;font-size:.8rem;font-weight:700;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.card .more:hover{background:color-mix(in srgb,var(--c) 18%,transparent)}
+
+/* ---------- Showcase (sample concepts) ---------- */
+.shots{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.shot{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.shot-art{height:150px;display:grid;place-items:center;padding:14px;background:linear-gradient(145deg,#10224a,#070e22);color:#f4f7ff}
+.shot-cap{padding:12px 14px}
+.shot-cap strong{display:block;font-size:.88rem}
+.shot-cap span{font-size:.75rem;color:var(--muted)}
+.mock-site{width:100%;border:1px solid rgba(150,180,255,.3);border-radius:8px;padding:8px;background:rgba(255,255,255,.04)}
+.mock-site b{display:block;height:34px;border-radius:5px;background:linear-gradient(110deg,#4f7cff,#a855f7);margin-bottom:7px}
+.mock-site i,.mock-app i{display:block;height:5px;border-radius:4px;background:rgba(170,195,255,.25);margin-bottom:5px}
+.mock-app{width:62px;height:120px;border:2px solid #3b4c7a;border-radius:14px;padding:9px 7px;background:#0a1530}
+.mock-app b{display:block;height:36px;border-radius:7px;background:linear-gradient(140deg,#21d4a4,#22d3ee);margin-bottom:7px}
+.mock-logo{width:76px;height:76px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(140deg,#7a4dff,#20c9f0);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.9rem;box-shadow:0 0 40px rgba(110,100,255,.5)}
+.mock-flyer{width:92px;height:128px;border-radius:8px;padding:10px 8px;text-align:center;background:linear-gradient(160deg,#ffab48,#ff4fa3);color:#1a0b2e;display:flex;flex-direction:column;justify-content:center;gap:4px;transform:rotate(-4deg);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.mock-flyer b{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;line-height:1}
+.mock-flyer small{font-size:.5rem;font-weight:700;letter-spacing:.1em}
+.mock-dash{width:100%;display:flex;align-items:flex-end;gap:7px;height:96px;padding:0 6px}
+.mock-dash i{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#a855f7,#4f7cff)}
+.note{margin-top:16px;font-size:.78rem;color:var(--muted)}
+
+/* ---------- Why us + Process ---------- */
+.why-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:center}
+.why-copy p{color:var(--muted);margin:14px 0 22px}
+.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.feature{display:flex;gap:13px;padding:16px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.feature i{font-style:normal;width:40px;height:40px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;background:rgba(79,124,255,.15);font-size:1.15rem}
+.feature h3{font-size:.92rem;margin-bottom:3px}
+.feature p{font-size:.8rem;color:var(--muted);line-height:1.45}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step{position:relative;padding:22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.step .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;margin-bottom:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;color:#9ddcff;background:linear-gradient(140deg,rgba(77,111,255,.28),rgba(34,211,238,.12));border:1px solid rgba(113,160,255,.35)}
+.step h3{font-size:1.02rem;margin-bottom:6px}
+.step p{font-size:.85rem;color:var(--muted)}
+.step:not(:last-child):after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:12px;color:#7aa8ff;z-index:1}
+
+/* ---------- Pricing ---------- */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
+.price{position:relative;display:flex;flex-direction:column;padding:28px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface)}
+.price.pop{border-color:rgba(110,150,255,.8);background:linear-gradient(160deg,color-mix(in srgb,var(--blue) 14%,var(--surface)),var(--surface));box-shadow:0 20px 60px rgba(60,100,255,.2)}
+.price .tag{position:absolute;top:-12px;right:22px;padding:4px 12px;border-radius:999px;background:linear-gradient(110deg,#a855f7,#4f7cff);color:#fff;font-size:.68rem;font-weight:700}
+.price h3{font-size:1.2rem}
+.price .for{font-size:.8rem;color:var(--muted);margin-bottom:16px}
+.price .from{font-size:.75rem;color:var(--muted)}
+.price .amount{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-.04em;margin-bottom:16px}
+.price ul{list-style:none;display:grid;gap:9px;margin-bottom:24px;flex:1}
+.price li{font-size:.88rem;color:var(--muted);display:flex;gap:9px}
+.price li:before{content:'✓';color:var(--green);font-weight:700}
+.price .btn{width:100%}
+
+/* ---------- Contact ---------- */
+.contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start}
+.contact-copy h2{font-size:clamp(1.9rem,3.2vw,2.7rem);margin-bottom:14px}
+.contact-copy p{color:var(--muted);margin-bottom:20px}
+.contact-note{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.contact-note span{font-size:1.2rem}
+.contact-note small{color:var(--muted)}
+.contact-form{padding:26px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(150deg,var(--surface2),var(--surface));box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:15px}
+.field.full{grid-column:1/-1}
+.field label{font-size:.8rem;font-weight:700}
+.field input,.field textarea,.field select{width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--line);background:var(--bg);color:var(--text);outline:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#6797ff;box-shadow:0 0 0 3px rgba(77,124,255,.15)}
+.field textarea{min-height:110px;resize:vertical}
+.btn-wa{width:100%;background:linear-gradient(110deg,#1fb85a,#25d366);color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.25)}
+.form-help{font-size:.74rem;color:var(--muted);text-align:center;margin-top:11px}
+
+/* ---------- Footer + floating button ---------- */
+.footer{padding:30px 0;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footer-links{display:flex;gap:20px}
+.footer a:hover{color:var(--text)}
+.wa-float{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:center;gap:9px;padding:12px 18px;border-radius:999px;background:#25d366;color:#fff;font-weight:700;font-size:.85rem;box-shadow:0 10px 30px rgba(37,211,102,.4)}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
+.reveal.show{opacity:1;transform:none}
+
+/* ---------- Smaller screens (used if you switch to width=device-width) ---------- */
+@media(max-width:1000px){
+  .main-nav{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;padding:8px 24px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+  .main-nav.open{display:flex}
+  .main-nav a{padding:12px 0}
+  .menu-toggle{display:block}
+  .header-inner{justify-content:space-between}
+  .header-actions .btn{display:none}
+  .hero-grid,.svc-wrap,.why-grid,.contact-grid{grid-template-columns:1fr}
+  .trust-row{grid-template-columns:repeat(2,auto)}
+  .stage{min-height:400px}
+  .svc-grid{grid-template-columns:repeat(2,1fr)}
+  .shots{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .step:after{display:none}
+  .price-grid{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .container{width:calc(100% - 32px)}
+  .svc-grid,.shots,.steps,.feature-grid,.form-grid{grid-template-columns:1fr}
+  .vtags{position:static;width:100%;grid-template-columns:1fr 1fr;margin-top:430px}
+  .vtag:nth-child(even){margin-left:0}
+  .stage{min-height:0}
+  .hero-actions .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+
+<!-- ================= HEADER ================= -->
 <header class="header">
   <div class="container header-inner">
-    <a class="brand" href="#home" aria-label="RexWeb home"><span class="brand-mark">R</span><span><span class="brand-name">Rex<span>Web</span></span><span class="brand-tag">Design · Technology · Growth</span></span></a>
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle service menu" aria-expanded="false">☰</button>
-    <nav class="service-nav" id="serviceNav" aria-label="Jump to a service">
-      <a class="service-pill" style="--accent:#4f8cff" href="#web-design"><span class="dot"></span>Web Design</a>
-      <a class="service-pill" style="--accent:#20d6b0" href="#web-to-app"><span class="dot"></span>Web-to-App</a>
-      <a class="service-pill" style="--accent:#a855f7" href="#web-apps"><span class="dot"></span>Web Apps</a>
-      <a class="service-pill" style="--accent:#ff4fa3" href="#logo-design"><span class="dot"></span>Logo Design</a>
-      <a class="service-pill" style="--accent:#ffab48" href="#flyer-design"><span class="dot"></span>Flyer Design</a>
-      <a class="service-pill" style="--accent:#22d3ee" href="#digital-solutions"><span class="dot"></span>Digital Solutions</a>
+    <a class="brand" href="#home" aria-label="RexWeb home">
+      <span class="brand-mark">RW</span>
+      <span><span class="brand-name">Rex<span>Web</span></span><span class="brand-tag">Build · Design · Grow</span></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <nav class="main-nav" id="mainNav" aria-label="Main">
+      <a href="#home" class="active">Home</a>
+      <a href="#services">Services</a>
+      <a href="#showcase">Showcase</a>
+      <a href="#about">About</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
     </nav>
-    <a class="btn btn-primary header-cta" href="#contact">Get a Quote <span>↗</span></a>
+    <div class="header-actions">
+      <a class="btn btn-primary btn-sm" href="#contact">Get Started →</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch between dark and light theme">🌙</button>
+    </div>
   </div>
 </header>
+
 <main>
-<section class="hero" id="home"><div class="container hero-grid">
-  <div class="hero-content reveal"><span class="eyebrow">Your ideas, built for the digital world</span><h1>We build <span class="gradient">digital experiences</span> that move you forward.</h1><p class="hero-copy">From professional websites to Android app conversions and standout graphics, RexWeb helps businesses, creators and entrepreneurs show up confidently online.</p><div class="hero-actions"><a class="btn btn-primary" href="#contact">Start Your Project <span>→</span></a><a class="btn btn-outline" href="#services">Explore Our Services <span>↓</span></a></div><div class="trust-row"><div class="trust-item"><span class="trust-icon">⚡</span><span><strong>Responsive by design</strong><br><small class="muted">Mobile-first experiences</small></span></div><div class="trust-item"><span class="trust-icon">✦</span><span><strong>Made for your brand</strong><br><small class="muted">Your goals come first</small></span></div></div></div>
-  <div class="hero-visual reveal" aria-label="Illustration of a modern digital workspace"><div class="orb"></div><div class="screen"><div class="screen-top"><i class="window-dot"></i><i class="window-dot"></i><i class="window-dot"></i><span class="screen-label">rexweb.web.app / preview</span></div><div class="screen-body"><div class="screen-kicker">YOUR NEXT CHAPTER STARTS HERE</div><div class="screen-title">Better ideas.<br><span class="gradient">Bigger possibilities.</span></div><p class="screen-sub">Digital tools and creative design to help your business stand out.</p><div class="mock-bars"><div class="mock-card"><strong>Build your presence</strong><div class="bar"></div><div class="bar"></div><div class="bar"></div></div><div class="mock-card"><strong>Grow with purpose</strong><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div></div></div><div class="float-tag tag-one"><span>✦</span> Design that feels like you</div><div class="float-tag tag-two"><span>↗</span> Ideas into reality</div></div>
-</div></section>
-<section class="section" id="services"><div class="container"><div class="section-heading reveal"><span class="eyebrow">What we do</span><h2>Everything you need to <span class="gradient">show up online.</span></h2><p>Choose a service below to learn more or jump straight to the enquiry form to tell us what you have in mind.</p></div>
-<div class="services-grid">
-  <article class="service-card reveal" id="web-design" style="--accent:#4f8cff"><span class="small-tag">Popular</span><div class="service-icon">⌘</div><h3>Website Design & Development</h3><p>Modern, responsive websites and online stores designed to present your brand clearly and make it easy for customers to reach you.</p><a class="card-link" href="#contact" data-service="Website Design & Development">Discuss this service <span>→</span></a></article>
-  <article class="service-card reveal" id="web-to-app" style="--accent:#20d6b0"><div class="service-icon">▣</div><h3>Website-to-Android App</h3><p>Turn an existing website into an Android app experience, with installation guidance and a setup tailored to your project.</p><a class="card-link" href="#contact" data-service="Website-to-Android App Conversion">Discuss this service <span>→</span></a></article>
-  <article class="service-card reveal" id="web-apps" style="--accent:#a855f7"><div class="service-icon">⌘</div><h3>Custom Web Applications</h3><p>Interactive browser-based tools, dashboards, portals and business features built around the way you need to work.</p><a class="card-link" href="#contact" data-service="Custom Web Application">Discuss this service <span>→</span></a></article>
-  <article class="service-card reveal" id="logo-design" style="--accent:#ff4fa3"><div class="service-icon">✧</div><h3>Logo & Brand Identity</h3><p>Distinctive logo concepts and cohesive visual direction to help your business look consistent and memorable.</p><a class="card-link" href="#contact" data-service="Logo and Brand Identity Design">Discuss this service <span>→</span></a></article>
-  <article class="service-card reveal" id="flyer-design" style="--accent:#ffab48"><div class="service-icon">▧</div><h3>Digital Flyer Design</h3><p>Eye-catching promotional graphics for launches, offers, events and social media campaigns, designed around your message.</p><a class="card-link" href="#contact" data-service="Digital Flyer Design">Discuss this service <span>→</span></a></article>
-  <article class="service-card reveal" id="digital-solutions" style="--accent:#22d3ee"><div class="service-icon">✦</div><h3>Digital Solutions</h3><p>Practical digital support to connect your ideas, improve your online presence and help your next project take shape.</p><a class="card-link" href="#contact" data-service="Digital Solutions">Discuss this service <span>→</span></a></article>
-</div></div></section>
-<section class="section"><div class="container about-wrap"><div class="about-copy reveal"><span class="eyebrow">Why RexWeb</span><h2>Creative thinking.<br><span class="gradient">Practical solutions.</span></h2><p>Your business is unique, so your digital presence should be too. We focus on clear communication, useful features and designs that work on phones as well as computers.</p><a class="btn btn-primary" href="#contact">Let's Build Together <span>→</span></a></div><div class="feature-grid">
-  <div class="feature reveal"><span class="feature-icon">📱</span><div><h3>Mobile-first</h3><p>Layouts designed to feel natural on smaller screens.</p></div></div>
-  <div class="feature reveal"><span class="feature-icon">🎯</span><div><h3>Goal-focused</h3><p>We start with what you want your project to achieve.</p></div></div>
-  <div class="feature reveal"><span class="feature-icon">💬</span><div><h3>Clear communication</h3><p>Discuss your needs directly before work begins.</p></div></div>
-  <div class="feature reveal"><span class="feature-icon">🧩</span><div><h3>Tailored approach</h3><p>Solutions shaped around your brief and audience.</p></div></div>
-</div></div></section>
-<section class="section" id="process"><div class="container"><div class="section-heading reveal"><span class="eyebrow">A simple process</span><h2>From first message to <span class="gradient">finished project.</span></h2><p>A clear path helps us understand your needs and agree on the right next step.</p></div><div class="steps"><article class="step reveal"><h3>Tell us your idea</h3><p>Share your goals, the service you need, your timeline and any examples you like.</p></article><article class="step reveal"><h3>Plan the solution</h3><p>We discuss the scope, design direction, deliverables and price before starting.</p></article><article class="step reveal"><h3>Build and review</h3><p>We work through the agreed plan, share progress and make agreed refinements.</p></article></div></div></section>
-<section class="section"><div class="container"><div class="cta-band reveal"><div><span class="eyebrow">Have a project in mind?</span><h2>Your next big idea deserves a <span class="gradient">great beginning.</span></h2><p>Tell RexWeb what you want to create. We’ll discuss your requirements and the next steps with you.</p></div><a class="btn btn-primary" href="#contact">Request a Quote <span>↗</span></a></div></div></section>
-<section class="section" id="contact"><div class="container contact-grid"><div class="contact-copy reveal"><span class="eyebrow">Let's talk</span><h2>Tell us what you want to <span class="gradient">bring to life.</span></h2><p>Fill in the short form and continue to WhatsApp with your project details ready to send. You can also message us directly.</p><div class="contact-note"><span>✉</span><div><strong>Simple project enquiry</strong><br><small class="muted">No account or sign-up required</small></div></div><div class="contact-note"><span>◷</span><div><strong>Share your timeline</strong><br><small class="muted">Let us know when you hope to start</small></div></div><div class="contact-note"><span>↗</span><div><strong>Direct WhatsApp contact</strong><br><small class="muted">Your message opens in WhatsApp for you to send</small></div></div></div>
-<form class="contact-form reveal" id="contactForm"><div class="form-grid"><div class="field"><label for="name">Your name *</label><input id="name" name="name" autocomplete="name" placeholder="e.g. Alex Johnson" required></div><div class="field"><label for="business">Business / brand</label><input id="business" name="business" placeholder="Your business name"></div><div class="field full"><label for="service">Which service do you need? *</label><select id="service" name="service" required><option value="" disabled selected>Select a service</option><option>Website Design & Development</option><option>Website-to-Android App Conversion</option><option>Custom Web Application</option><option>Logo and Brand Identity Design</option><option>Digital Flyer Design</option><option>Digital Solutions</option><option>I'm not sure yet — help me choose</option></select></div><div class="field"><label for="budget">Estimated budget</label><select id="budget" name="budget"><option value="Not specified">Choose if known</option><option>Under ₦25,000</option><option>₦25,000–₦75,000</option><option>₦75,000–₦150,000</option><option>₦150,000+</option><option>Let's discuss</option></select></div><div class="field"><label for="timeline">When do you need it?</label><select id="timeline" name="timeline"><option>Flexible</option><option>As soon as possible</option><option>Within 1–2 weeks</option><option>Within a month</option><option>Planning for later</option></select></div><div class="field full"><label for="details">Tell us a little about the project *</label><textarea id="details" name="details" placeholder="What do you want to create? Include any important features or ideas." required></textarea></div></div><button class="btn btn-primary form-submit" type="submit">Continue to WhatsApp <span>↗</span></button><p class="form-help">Your message is not sent automatically. WhatsApp opens so you can review and send it.</p></form></div></section>
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <span class="badge">Professional Digital Solutions</span>
+      <h1>Turn Your Ideas Into Powerful <span class="gradient">Digital Products</span></h1>
+      <p class="lead">RexWeb creates modern websites, web applications, Android app conversions, logos and promotional designs that help businesses, creators and brands grow online.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#contact">Get Started Now →</a>
+        <a class="btn btn-outline" href="#services">◎ Explore Our Services</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-item"><i>⚡</i><span><strong>Fast Delivery</strong><small>On time, every time</small></span></div>
+        <div class="trust-item"><i>🛡️</i><span><strong>Clear Pricing</strong><small>Agreed before we start</small></span></div>
+        <div class="trust-item"><i>🚀</i><span><strong>Expert Team</strong><small>Skilled &amp; passionate</small></span></div>
+        <div class="trust-item"><i>📱</i><span><strong>Mobile-first</strong><small>Works on every screen</small></span></div>
+      </div>
+    </div>
+
+    <div class="stage reveal" aria-label="Illustration of a laptop and phone showing a website">
+      <div class="laptop">
+        <div class="lscreen">
+          <div class="lbar"><i></i><i></i><i></i><b>rexweb.web.app</b></div>
+          <h4>Modern Websites. Powerful Apps. <span>Bigger Opportunities.</span></h4>
+          <span class="mini-btn">Get Started</span>
+          <svg viewBox="0 0 200 90" fill="none" aria-hidden="true"><polyline points="0,80 30,60 55,68 90,30 120,45 160,12 200,22" stroke="#7c9cff" stroke-width="3" stroke-linejoin="round"/><polyline points="0,86 40,74 80,78 120,56 160,48 200,40" stroke="#c084fc" stroke-width="2" opacity=".7"/></svg>
+        </div>
+        <div class="lbase"></div>
+      </div>
+      <div class="phone">
+        <small>REXWEB</small>
+        <h5>Your Vision.<br><span class="gradient">Our Mission.</span></h5>
+        <div class="line"></div><div class="line s"></div><div class="line"></div>
+        <span class="mini-btn">Get Started</span>
+      </div>
+      <div class="vtags">
+        <div class="vtag" style="--c:#4f8cff"><i>🖥️</i>Web Design</div>
+        <div class="vtag" style="--c:#20d6b0"><i>📲</i>Web-to-App</div>
+        <div class="vtag" style="--c:#a855f7"><i>&lt;/&gt;</i>Web Applications</div>
+        <div class="vtag" style="--c:#ff4fa3"><i>✏️</i>Logo Design</div>
+        <div class="vtag" style="--c:#ffab48"><i>🖼️</i>Flyer Design</div>
+        <div class="vtag" style="--c:#22d3ee"><i>⚙️</i>Digital Solutions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section" id="services">
+  <div class="container svc-wrap">
+    <div class="intro reveal">
+      <span class="kicker">Our Services</span>
+      <h2>Everything You Need, All in <span class="gradient">One Place</span></h2>
+      <p>From stunning websites to powerful apps and creative designs, we provide complete digital support to bring your vision to life.</p>
+      <a class="btn btn-outline btn-sm" href="#pricing">View Pricing →</a>
+    </div>
+    <div class="svc-grid">
+      <article class="card reveal" style="--c:#4f8cff"><div class="ico">🌐</div><h3>Website Design &amp; Development</h3><p>Modern, responsive websites and online stores designed to turn visitors into customers.</p><a class="more" href="#contact" data-service="Website Design & Development">Learn More <span>→</span></a></article>
+      <article class="card reveal" style="--c:#20d6b0"><div class="ico">📱</div><h3>Web-to-App Conversion</h3><p>Turn your website into a powerful Android app with a smooth user experience.</p><a class="more" href="#contact" data-service="Website-to-Android App Conversion">Learn More <span>→</span></a></article>
+      <article class="card reveal" style="--c:#a855f7"><div class="ico">&lt;/&gt;</div><h3>Web App Development</h3><p>Custom web applications, dashboards and portals built around how you work.</p><a class="more" href="#contact" data-service="Custom Web Application">Learn More <span>→</span></a></article>
+      <article class="card reveal" style="--c:#ff4fa3"><div class="ico">✏️</div><h3>Logo Design</h3><p>Unique and memorable logos that represent your brand's identity.</p><a class="more" href="#contact" data-service="Logo and Brand Identity Design">Learn More <span>→</span></a></article>
+      <article class="card reveal" style="--c:#ffab48"><div class="ico">🖼️</div><h3>Online Flyer Design</h3><p>Eye-catching flyers for products, events and social media campaigns.</p><a class="more" href="#contact" data-service="Digital Flyer Design">Learn More <span>→</span></a></article>
+      <article class="card reveal" style="--c:#22d3ee"><div class="ico">⚙️</div><h3>Digital Solutions</h3><p>Custom digital support for businesses, creators and individuals with unique needs.</p><a class="more" href="#contact" data-service="Digital Solutions">Learn More <span>→</span></a></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOWCASE =================
+     These tiles are sample concepts drawn with CSS.
+     Replace them with screenshots of your real projects when you have them. -->
+<section class="section" id="showcase">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">What We Build</span>
+      <h2>A Glimpse of What's <span class="gradient">Possible</span></h2>
+      <p>Sample concepts that show the kind of work RexWeb creates for clients.</p>
+    </div>
+    <div class="shots">
+      <div class="shot reveal"><div class="shot-art"><div class="mock-site"><b></b><i></i><i></i><i style="width:60%"></i></div></div><div class="shot-cap"><strong>Business Website</strong><span>Corporate · Responsive</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><div class="mock-app"><b></b><i></i><i></i><i style="width:60%"></i></div></div><div class="shot-cap"><strong>Mobile App</strong><span>Android · Modern UI</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><div class="mock-logo">RW</div></div><div class="shot-cap"><strong>Brand Logo</strong><span>Unique · Professional</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><div class="mock-flyer"><small>YOUR OFFER</small><b>BIG<br>SALE</b><small>COMING SOON</small></div></div><div class="shot-cap"><strong>Promotional Flyer</strong><span>Creative · Eye-catching</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><div class="mock-dash"><i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i><i style="height:85%"></i><i style="height:70%"></i><i style="height:95%"></i></div></div><div class="shot-cap"><strong>Web App Dashboard</strong><span>Powerful · Interactive</span></div></div>
+    </div>
+    <p class="note">Concept illustrations. Real project examples can be shared on request.</p>
+  </div>
+</section>
+
+<!-- ================= WHY US ================= -->
+<section class="section" id="about">
+  <div class="container why-grid">
+    <div class="why-copy reveal">
+      <span class="kicker">Why Choose RexWeb</span>
+      <h2>Your Success Is Our <span class="gradient">Priority</span></h2>
+      <p>We're more than just a service provider. With a passion for innovation and a commitment to excellence, we deliver solutions that make a real difference.</p>
+      <a class="btn btn-primary" href="#contact">Learn More →</a>
+    </div>
+    <div class="feature-grid">
+      <div class="feature reveal"><i>💡</i><div><h3>Creative &amp; Innovative</h3><p>Fresh ideas and modern solutions, always.</p></div></div>
+      <div class="feature reveal"><i>🎯</i><div><h3>Results Driven</h3><p>We focus on what matters: your success.</p></div></div>
+      <div class="feature reveal"><i>💬</i><div><h3>Transparent Communication</h3><p>No jargon. Just clear, honest updates.</p></div></div>
+      <div class="feature reveal"><i>🧩</i><div><h3>Tailored Solutions</h3><p>Every business is unique, so are our solutions.</p></div></div>
+      <div class="feature reveal"><i>📱</i><div><h3>Mobile-first</h3><p>Layouts that feel natural on every screen.</p></div></div>
+      <div class="feature reveal"><i>🤝</i><div><h3>Dedicated Support</h3><p>We stay in touch from first idea to launch.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="section" id="process">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">How It Works</span>
+      <h2>A Simple Process, <span class="gradient">Big Results</span></h2>
+      <p>We make the journey from idea to launch smooth, clear and stress-free.</p>
+    </div>
+    <div class="steps">
+      <article class="step reveal"><span class="num">01</span><h3>Discuss</h3><p>Share your ideas and requirements with us.</p></article>
+      <article class="step reveal"><span class="num">02</span><h3>Design</h3><p>We create a concept that fits your brand.</p></article>
+      <article class="step reveal"><span class="num">03</span><h3>Build</h3><p>We bring it to life with clean, modern code.</p></article>
+      <article class="step reveal"><span class="num">04</span><h3>Launch</h3><p>We test, refine and make it live.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Our Pricing</span>
+      <h2>Choose the Right <span class="gradient">Package</span></h2>
+      <p>Flexible and affordable packages designed to fit your goals. Final price is agreed with you before work starts.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price reveal"><h3>Basic</h3><div class="for">Perfect for small projects</div><div class="from">From</div><div class="amount">₦25,000</div>
+        <ul><li>1–3 page website</li><li>Mobile responsive</li><li>1 revision</li></ul>
+        <a class="btn btn-outline" href="#contact" data-service="Website Design & Development">Get Started →</a></div>
+      <div class="price pop reveal"><span class="tag">Most Popular</span><h3>Standard</h3><div class="for">Best for growing businesses</div><div class="from">From</div><div class="amount">₦60,000</div>
+        <ul><li>5–10 page website</li><li>Online store (optional)</li><li>App conversion support</li><li>3 revisions</li></ul>
+        <a class="btn btn-primary" href="#contact" data-service="Website Design & Development">Get Started →</a></div>
+      <div class="price reveal"><h3>Premium</h3><div class="for">For big ideas &amp; brands</div><div class="from">From</div><div class="amount">₦120,000+</div>
+        <ul><li>Custom web application</li><li>Full app conversion</li><li>Advanced features</li><li>Unlimited revisions</li></ul>
+        <a class="btn btn-outline" href="#contact" data-service="Custom Web Application">Get Started →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="section" id="contact">
+  <div class="container contact-grid">
+    <div class="contact-copy reveal">
+      <span class="kicker">Get In Touch</span>
+      <h2>Let's Build Something <span class="gradient">Amazing</span></h2>
+      <p>Tell us about your project and we'll get back as soon as possible. Fill in the form and continue to WhatsApp with your details ready to send.</p>
+      <div class="contact-note"><span>✉️</span><div><strong>Simple project enquiry</strong><br><small>No account or sign-up required</small></div></div>
+      <div class="contact-note"><span>⏱️</span><div><strong>Share your timeline</strong><br><small>Let us know when you hope to start</small></div></div>
+      <div class="contact-note"><span>💬</span><div><strong>Direct WhatsApp contact</strong><br><small>Your message opens in WhatsApp for you to send</small></div></div>
+    </div>
+    <form class="contact-form reveal" id="contactForm">
+      <div class="form-grid">
+        <div class="field"><label for="name">Full Name *</label><input id="name" name="name" autocomplete="name" placeholder="Your full name" required></div>
+        <div class="field"><label for="email">Email *</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="field full"><label for="service">Service Needed *</label>
+          <select id="service" name="service" required>
+            <option value="" disabled selected>Select a service</option>
+            <option>Website Design &amp; Development</option>
+            <option>Website-to-Android App Conversion</option>
+            <option>Custom Web Application</option>
+            <option>Logo and Brand Identity Design</option>
+            <option>Digital Flyer Design</option>
+            <option>Digital Solutions</option>
+            <option>I'm not sure yet — help me choose</option>
+          </select></div>
+        <div class="field full"><label for="details">Project Details *</label><textarea id="details" name="details" placeholder="Tell us about your project..." required></textarea></div>
+      </div>
+      <button class="btn btn-wa" type="submit">Send via WhatsApp ↗</button>
+      <p class="form-help">Your message is not sent automatically. WhatsApp opens so you can review and send it.</p>
+    </form>
+  </div>
+</section>
 </main>
-<footer class="footer"><div class="container footer-inner"><a class="brand" href="#home"><span class="brand-mark">R</span><span><span class="brand-name">Rex<span>Web</span></span><span class="brand-tag">Design · Technology · Growth</span></span></a><span>© <span id="year"></span> RexWeb. Built for your next idea.</span><div class="footer-links"><a href="#services">Services</a><a href="#process">Process</a><a href="#contact">Contact</a></div></div></footer>
-<a class="back-top" id="backTop" href="#home" aria-label="Back to top">↑</a>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <a class="brand" href="#home"><span class="brand-mark">RW</span><span><span class="brand-name">Rex<span>Web</span></span><span class="brand-tag">Build · Design · Grow</span></span></a>
+    <div class="footer-links"><a href="#services">Services</a><a href="#showcase">Showcase</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
+    <span>© <span id="year"></span> RexWeb. Your Vision. Our Mission.</span>
+  </div>
+</footer>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener noreferrer" aria-label="Chat with RexWeb on WhatsApp">💬 Chat on WhatsApp</a>
+
 <script>
 // Update this number if your official business WhatsApp contact changes.
 const WHATSAPP_NUMBER = '2349132204427';
+
+// Mobile menu (only visible on narrow screens)
 const menuToggle = document.getElementById('menuToggle');
-const serviceNav = document.getElementById('serviceNav');
-menuToggle.addEventListener('click', () => { const opened = serviceNav.classList.toggle('open'); menuToggle.setAttribute('aria-expanded', String(opened)); menuToggle.textContent = opened ? '✕' : '☰'; });
-serviceNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { serviceNav.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); menuToggle.textContent='☰'; }));
-document.querySelectorAll('[data-service]').forEach(link => link.addEventListener('click', () => { const select = document.getElementById('service'); const desired = link.dataset.service; [...select.options].forEach(option => { if (option.text === desired) select.value = option.text; }); }));
-document.getElementById('contactForm').addEventListener('submit', event => { event.preventDefault(); const data = new FormData(event.currentTarget); const message = [
-  'Hello RexWeb! I would like to discuss a project.',
-  '', 'Name: ' + data.get('name'),
-  'Business/Brand: ' + (data.get('business') || 'Not provided'),
-  'Service: ' + data.get('service'),
-  'Estimated budget: ' + data.get('budget'),
-  'Timeline: ' + data.get('timeline'),
-  '', 'Project details:', data.get('details')
-].join('\n');
-window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+const mainNav = document.getElementById('mainNav');
+menuToggle.addEventListener('click', () => {
+  const opened = mainNav.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', String(opened));
+  menuToggle.textContent = opened ? '✕' : '☰';
 });
+mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  mainNav.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  menuToggle.textContent = '☰';
+}));
+
+// Dark / light theme toggle (remembers the choice when the browser allows it)
+const themeToggle = document.getElementById('themeToggle');
+function setTheme(light){
+  document.body.classList.toggle('light', light);
+  themeToggle.textContent = light ? '☀️' : '🌙';
+  try { localStorage.setItem('rexweb-theme', light ? 'light' : 'dark'); } catch(e) {}
+}
+try { if (localStorage.getItem('rexweb-theme') === 'light') setTheme(true); } catch(e) {}
+themeToggle.addEventListener('click', () => setTheme(!document.body.classList.contains('light')));
+
+// Clicking a service or price button pre-selects it in the form
+document.querySelectorAll('[data-service]').forEach(link => link.addEventListener('click', () => {
+  const select = document.getElementById('service');
+  [...select.options].forEach(option => { if (option.text === link.dataset.service) select.value = option.text; });
+}));
+
+// Send the form to WhatsApp
+function waLink(text){ return 'https://wa.me/' + WHATSAPP_NUMBER + (text ? '?text=' + encodeURIComponent(text) : ''); }
+document.getElementById('waFloat').href = waLink('Hello RexWeb! I would like to ask about your services.');
+document.getElementById('contactForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  const message = [
+    'Hello RexWeb! I would like to discuss a project.', '',
+    'Name: ' + data.get('name'),
+    'Email: ' + data.get('email'),
+    'Service: ' + data.get('service'), '',
+    'Project details:', data.get('details')
+  ].join('\n');
+  window.open(waLink(message), '_blank', 'noopener,noreferrer');
+});
+
+// Footer year
 document.getElementById('year').textContent = new Date().getFullYear();
-const backTop = document.getElementById('backTop');
-window.addEventListener('scroll', () => backTop.classList.toggle('visible', window.scrollY > 500), {passive:true});
-const observer = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => entries.forEach(entry => { if(entry.isIntersecting){entry.target.classList.add('show');observer.unobserve(entry.target);} }), {threshold:.12}) : null;
+
+// Highlight the nav link of the section you are viewing
+const navLinks = [...mainNav.querySelectorAll('a')];
+const sections = navLinks.map(a => document.querySelector(a.getAttribute('href')));
+window.addEventListener('scroll', () => {
+  let current = 0;
+  sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top < 140) current = i; });
+  navLinks.forEach((a, i) => a.classList.toggle('active', i === current));
+}, {passive:true});
+
+// Fade-in on scroll
+const observer = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => entries.forEach(entry => {
+  if (entry.isIntersecting){ entry.target.classList.add('show'); observer.unobserve(entry.target); }
+}), {threshold:.12}) : null;
 document.querySelectorAll('.reveal').forEach(el => observer ? observer.observe(el) : el.classList.add('show'));
 </script>
 </body>
