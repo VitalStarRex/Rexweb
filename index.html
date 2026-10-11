@@ -1,0 +1,805 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b18">
+
+  <title>VITALSTAR | Creativity Meets Technology</title>
+  <meta name="description" content="VITALSTAR provides professional website design, web-to-app conversion, web app development, logo design and online flyer design.">
+
+  <style>
+    :root {
+      --bg: #080b18;
+      --surface: #11172a;
+      --purple: #9565ff;
+      --cyan: #20dcf5;
+      --white: #f5f7ff;
+      --muted: #a7aec5;
+      --border: rgba(255,255,255,.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      line-height: 1.7;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    button, input, textarea { font: inherit; }
+
+    .container {
+      width: min(1120px, 90%);
+      margin: auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,11,24,.94);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 1.65rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .logo span { color: var(--cyan); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      font-size: .9rem;
+      color: var(--muted);
+      transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--cyan); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 21px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: linear-gradient(110deg, var(--purple), #6747ed);
+      color: white;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .2s, opacity .2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: .92;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+    }
+
+    .hero {
+      padding: 95px 0 85px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 80% 25%, rgba(149,101,255,.17), transparent 40%),
+        radial-gradient(ellipse at 10% 70%, rgba(32,220,245,.09), transparent 35%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 13px;
+      border: 1px solid rgba(32,220,245,.3);
+      background: rgba(32,220,245,.06);
+      color: var(--cyan);
+      border-radius: 30px;
+      font-size: .8rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+      line-height: 1.12;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--cyan), #b49aff, var(--purple));
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero p, .section-intro {
+      color: var(--muted);
+      max-width: 590px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 30px;
+    }
+
+    .hero-art {
+      min-height: 340px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .orbit {
+      width: min(310px, 78vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(149,101,255,.45);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 80px rgba(149,101,255,.13),
+                  inset 0 0 70px rgba(32,220,245,.06);
+      position: relative;
+    }
+
+    .orbit::before, .orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(32,220,245,.22);
+    }
+
+    .orbit::before { inset: 22px; }
+    .orbit::after { inset: 48px; }
+
+    .orbit-logo {
+      font-size: 4rem;
+      font-weight: 950;
+      color: white;
+      text-shadow: 0 0 28px rgba(32,220,245,.5);
+      z-index: 1;
+    }
+
+    .floating-card {
+      position: absolute;
+      padding: 13px 16px;
+      background: #151b31;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      box-shadow: 0 15px 35px rgba(0,0,0,.3);
+      font-size: .86rem;
+      font-weight: 700;
+    }
+
+    .card-one { top: 12%; right: 0; }
+    .card-two { bottom: 13%; left: 0; }
+    .card-three { bottom: 4%; right: 5%; color: var(--cyan); }
+
+    section { padding: 82px 0; }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 42px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      line-height: 1.2;
+      margin-bottom: 13px;
+    }
+
+    .section-intro { margin: auto; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .service-card {
+      padding: 26px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(145deg, #131a30, #0c1020);
+      transition: transform .25s, border-color .25s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(149,101,255,.65);
+    }
+
+    .service-icon {
+      width: 53px;
+      height: 53px;
+      display: grid;
+      place-items: center;
+      background: rgba(149,101,255,.13);
+      border-radius: 14px;
+      font-size: 1.6rem;
+      margin-bottom: 19px;
+    }
+
+    .service-card h3 {
+      font-size: 1.12rem;
+      margin-bottom: 10px;
+    }
+
+    .service-card p {
+      font-size: .94rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .service-link {
+      color: var(--cyan);
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .about {
+      background: #0c1020;
+      border-block: 1px solid var(--border);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 45px;
+      align-items: center;
+    }
+
+    .about h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .about p { color: var(--muted); }
+
+    .features {
+      display: grid;
+      gap: 16px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface);
+    }
+
+    .check { color: var(--cyan); font-weight: 900; }
+
+    .feature p { font-size: .9rem; }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .project {
+      padding: 27px;
+      border-radius: 17px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      min-height: 190px;
+    }
+
+    .project-art {
+      min-height: 85px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      background: linear-gradient(130deg, rgba(149,101,255,.25), rgba(32,220,245,.12));
+    }
+
+    .project p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 5px;
+    }
+
+    .cta {
+      text-align: center;
+      padding: 65px 25px;
+      border-radius: 24px;
+      border: 1px solid rgba(149,101,255,.35);
+      background: radial-gradient(ellipse at top, #25204a, #11172a 70%);
+    }
+
+    .cta h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 15px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 25px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 35px;
+    }
+
+    .contact-info p {
+      color: var(--muted);
+      margin: 12px 0 25px;
+    }
+
+    .contact-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .contact-form input, .contact-form textarea {
+      width: 100%;
+      padding: 14px 16px;
+      color: white;
+      background: #11172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: var(--purple);
+    }
+
+    .contact-form textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .contact-form small { color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 27px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    footer strong { color: var(--white); }
+
+    @media (max-width: 850px) {
+      .nav-links { gap: 13px; }
+      .nav-links a { font-size: .82rem; }
+      .nav-cta { display: none; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 65px; }
+      .hero-art { min-height: 320px; }
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid, .contact-grid { grid-template-columns: 1fr; }
+      .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {
+      .container { width: 91%; }
+      .nav-inner { min-height: 66px; }
+      .logo { font-size: 1.35rem; }
+      .nav-links { gap: 12px; }
+      .nav-links a { font-size: .76rem; }
+      .nav-links a:nth-child(2),
+      .nav-links a:nth-child(3) { display: none; }
+      .hero { padding: 57px 0 45px; }
+      h1 { letter-spacing: -1.2px; }
+      section { padding: 60px 0; }
+      .services-grid, .portfolio-grid { grid-template-columns: 1fr; }
+      .service-card { padding: 22px; }
+      .hero-art { min-height: 290px; }
+      .orbit { width: 250px; }
+      .floating-card { font-size: .76rem; padding: 10px; }
+      .card-one { right: -2px; }
+      .card-two { left: -2px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#home" class="logo">VITAL<span>STAR</span></a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <a href="#contact" class="btn nav-cta">Start a Project ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">✦ CREATIVITY MEETS TECHNOLOGY</span>
+
+          <h1>
+            We Build Digital
+            <span class="gradient-text">Experiences</span>
+            That Stand Out.
+          </h1>
+
+          <p>
+            From modern business websites and Android apps to powerful
+            web applications, unique logos and eye-catching flyers,
+            VITALSTAR brings your ideas to life.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#services" class="btn">Explore Our Services →</a>
+            <a href="#contact" class="btn btn-outline">Let's Talk</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-label="VITALSTAR digital creativity illustration">
+          <div class="orbit">
+            <div class="orbit-logo">VS✦</div>
+          </div>
+          <div class="floating-card card-one">🌐 Web Design</div>
+          <div class="floating-card card-two">📱 Mobile Apps</div>
+          <div class="floating-card card-three">✦ Creative Design</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">WHAT WE DO</span>
+          <h2>Our Digital Services</h2>
+          <p class="section-intro">
+            Everything you need to build your online presence,
+            grow your brand and turn ideas into digital products.
+          </p>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card">
+            <div class="service-icon">🌐</div>
+            <h3>Website Design &amp; Development</h3>
+            <p>
+              Modern, responsive business websites, landing pages
+              and online stores designed for phones and computers.
+            </p>
+            <a href="#contact" class="service-link" data-service="Website Design & Development">Order this service →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon">📱</div>
+            <h3>Web-to-App Conversion</h3>
+            <p>
+              Turn your website into an Android app experience
+              with suitable mobile navigation and functionality.
+            </p>
+            <a href="#contact" class="service-link" data-service="Web-to-App Conversion">Order this service →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon">💻</div>
+            <h3>Web App Development</h3>
+            <p>
+              Interactive web applications with custom features,
+              practical workflows and modern interfaces.
+            </p>
+            <a href="#contact" class="service-link" data-service="Web App Development">Order this service →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon">🎨</div>
+            <h3>Logo Design</h3>
+            <p>
+              Distinctive logo concepts that help your business
+              establish a recognizable and memorable identity.
+            </p>
+            <a href="#contact" class="service-link" data-service="Logo Design">Order this service →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon">🖼️</div>
+            <h3>Online Flyer Design</h3>
+            <p>
+              Eye-catching promotional flyers for businesses,
+              products, events, social media and announcements.
+            </p>
+            <a href="#contact" class="service-link" data-service="Online Flyer Design">Order this service →</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon">🚀</div>
+            <h3>Digital Solutions</h3>
+            <p>
+              Creative technology support to help transform
+              your ideas into useful, attractive digital products.
+            </p>
+            <a href="#contact" class="service-link" data-service="Digital Solutions">Let's discuss →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container about-grid">
+        <div>
+          <span class="eyebrow">WHY VITALSTAR?</span>
+          <h2>Big Ideas Deserve <span class="gradient-text">Great Execution.</span></h2>
+          <p>
+            We combine creativity and technology to help businesses,
+            entrepreneurs and individuals present their ideas
+            professionally online.
+          </p>
+          <br>
+          <p>
+            Whether you're launching a new brand, creating an app
+            or promoting a product, VITALSTAR is ready to help you
+            take the next step.
+          </p>
+          <br>
+          <a href="#contact" class="btn">Work With Us →</a>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <span class="check">✓</span>
+            <div>
+              <strong>Mobile-Friendly Design</strong>
+              <p>Layouts that adapt to smartphones, tablets and computers.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="check">✓</span>
+            <div>
+              <strong>Creative Thinking</strong>
+              <p>Designs tailored to your brand, goals and audience.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="check">✓</span>
+            <div>
+              <strong>Performance in Mind</strong>
+              <p>Efficient layouts designed with mobile data and loading speed in mind.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="check">✓</span>
+            <div>
+              <strong>Personalized Service</strong>
+              <p>Discuss your requirements before work begins.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="portfolio">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">OUR CREATIVE WORLD</span>
+          <h2>Explore What We Create</h2>
+          <p class="section-intro">
+            A preview of the kinds of projects VITALSTAR can create
+            for clients. Replace these examples with your completed work.
+          </p>
+        </div>
+
+        <div class="portfolio-grid">
+          <article class="project">
+            <div class="project-art">🌍</div>
+            <h3>Business Websites</h3>
+            <p>Professional online presence for growing businesses.</p>
+          </article>
+
+          <article class="project">
+            <div class="project-art">📲</div>
+            <h3>Mobile Experiences</h3>
+            <p>Website-to-app projects and interactive interfaces.</p>
+          </article>
+
+          <article class="project">
+            <div class="project-art">✨</div>
+            <h3>Brand &amp; Flyer Design</h3>
+            <p>Creative visual identity and promotional graphics.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="cta">
+          <span class="eyebrow">YOUR IDEA. OUR CREATIVITY.</span>
+          <h2>Ready to Build Something <span class="gradient-text">Amazing?</span></h2>
+          <p>
+            Tell us what you have in mind. Let's discuss your project
+            and find a digital solution that fits your needs.
+          </p>
+          <a href="#contact" class="btn">Start Your Project →</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">GET IN TOUCH</span>
+          <h2>Let's Talk About Your Project</h2>
+          <p class="section-intro">
+            Have an idea, need a website or want a custom design?
+            Send us your project details.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-info">
+            <h3>Let's create something great.</h3>
+            <p>
+              Fill in the form and continue to WhatsApp to send
+              your project request directly.
+            </p>
+            <p>⚡ Website development</p>
+            <p>⚡ Android app solutions</p>
+            <p>⚡ Logos and promotional flyers</p>
+            <p>📍 Available for online projects</p>
+          </div>
+
+          <form class="contact-form" id="contactForm">
+            <input
+              type="text"
+              id="clientName"
+              placeholder="Your name"
+              autocomplete="name"
+              required
+            >
+
+            <input
+              type="email"
+              id="clientEmail"
+              placeholder="Your email address (optional)"
+              autocomplete="email"
+            >
+
+            <input
+              type="text"
+              id="clientService"
+              placeholder="Service you need"
+              required
+            >
+
+            <textarea
+              id="clientMessage"
+              placeholder="Tell us about your project..."
+              required
+            ></textarea>
+
+            <button type="submit" class="btn">
+              Send Request on WhatsApp ↗
+            </button>
+
+            <small>
+              Your request will open in WhatsApp for you to send.
+            </small>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p><strong>VITALSTAR</strong> — Creativity Meets Technology.</p>
+      <p>© <span id="year"></span> VITALSTAR. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // IMPORTANT:
+    // Replace this with your WhatsApp number in international format.
+    // Example for Nigeria: 2348012345678
+    // Do not include +, spaces, or hyphens.
+    const WHATSAPP_NUMBER = "2348000000000";
+
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    // Automatically select a service when its order link is clicked.
+    document.querySelectorAll("[data-service]").forEach(link => {
+      link.addEventListener("click", () => {
+        document.getElementById("clientService").value =
+          link.dataset.service;
+      });
+    });
+
+    // Build a WhatsApp message from the contact form.
+    document.getElementById("contactForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const name = document.getElementById("clientName").value.trim();
+      const email = document.getElementById("clientEmail").value.trim();
+      const service = document.getElementById("clientService").value.trim();
+      const message = document.getElementById("clientMessage").value.trim();
+
+      if (!name || !service || !message) {
+        alert("Please complete your name, service and project details.");
+        return;
+      }
+
+      if (WHATSAPP_NUMBER === "2348000000000") {
+        alert("Website setup needed: replace the sample WhatsApp number in the HTML with your real business number.");
+        return;
+      }
+
+      const text =
+        "Hello VITALSTAR! I would like to make an enquiry.\n\n" +
+        "Name: " + name + "\n" +
+        "Email: " + (email || "Not provided") + "\n" +
+        "Service: " + service + "\n" +
+        "Project details: " + message;
+
+      const url =
+        "https://wa.me/" + WHATSAPP_NUMBER +
+        "?text=" + encodeURIComponent(text);
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+  </script>
+
+</body>
+</html>
