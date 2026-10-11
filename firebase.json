@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "target": "rexweb",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".*",
+      "node_modules/**",
+      "README.md"
+    ]
+  }
+}

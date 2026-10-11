@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "vitalstar"
+  },
+  "targets": {
+    "vitalstar": {
+      "hosting": {
+        "rexweb": [
+          "rexweb"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
