@@ -5,7 +5,7 @@
 <!-- width=1280 makes phones show the desktop layout.
      For a normal phone layout instead, use: width=device-width, initial-scale=1.0 -->
 <meta name="viewport" content="width=1280">
-<meta name="theme-color" content="#040815">
+<meta name="theme-color" content="#f3f6ff">
 <meta name="description" content="RexWeb creates responsive websites, converts websites into Android apps, builds custom web apps, and designs logos and digital flyers for growing businesses.">
 <meta property="og:title" content="RexWeb — Build · Design · Grow">
 <meta property="og:description" content="Web design, website-to-app conversion, web apps, logo design and digital flyers.">
@@ -69,7 +69,7 @@ body.light .badge{color:#2a55c9}
 
 /* ---------- Hero ---------- */
 .hero{padding:64px 0 54px}
-.hero-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:30px;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:30px;align-items:center}
 .hero h1{font-size:clamp(2.6rem,4.6vw,4.2rem);margin:20px 0 20px;letter-spacing:-.05em}
 .hero p.lead{color:var(--muted);font-size:1.08rem;max-width:520px}
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin:28px 0 32px}
@@ -77,7 +77,7 @@ body.light .badge{color:#2a55c9}
 .trust-item{display:flex;align-items:center;gap:10px;font-size:.78rem;line-height:1.3}
 .trust-item i{font-style:normal;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:rgba(79,124,255,.12)}
 .trust-item small{display:block;color:var(--muted);font-size:.7rem}
-.stage{position:relative;min-height:440px}
+.stage{position:relative;min-height:440px;width:min(100%,900px);margin:0 auto}
 .stage:before{content:'';position:absolute;inset:8% 6%;border-radius:50%;background:radial-gradient(circle,rgba(90,100,255,.35),rgba(170,70,255,.15) 55%,transparent 70%);filter:blur(30px)}
 .laptop{position:absolute;left:0;top:34px;width:76%;transform:perspective(1200px) rotateY(-10deg) rotateX(3deg)}
 .lscreen{aspect-ratio:16/10;border:2px solid rgba(150,180,255,.45);border-radius:14px 14px 4px 4px;background:linear-gradient(145deg,#10224a,#060d1f);padding:14px 18px;overflow:hidden;color:#f4f7ff;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 40px rgba(80,110,255,.2)}
@@ -117,7 +117,8 @@ body.light .badge{color:#2a55c9}
 /* ---------- Showcase (sample concepts) ---------- */
 .shots{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
 .shot{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
-.shot-art{height:150px;display:grid;place-items:center;padding:14px;background:linear-gradient(145deg,#10224a,#070e22);color:#f4f7ff}
+.shot-art{height:170px;display:grid;place-items:center;padding:0;overflow:hidden;background:linear-gradient(145deg,#10224a,#070e22);color:#f4f7ff}
+.shot-art svg{width:100%;height:100%;display:block}
 .shot-cap{padding:12px 14px}
 .shot-cap strong{display:block;font-size:.88rem}
 .shot-cap span{font-size:.75rem;color:var(--muted)}
@@ -137,8 +138,8 @@ body.light .badge{color:#2a55c9}
 /* ---------- Why us + Process ---------- */
 .why-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:center}
 .why-copy p{color:var(--muted);margin:14px 0 22px}
-.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.feature{display:flex;gap:13px;padding:16px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feature{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
 .feature i{font-style:normal;width:40px;height:40px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;background:rgba(79,124,255,.15);font-size:1.15rem}
 .feature h3{font-size:.92rem;margin-bottom:3px}
 .feature p{font-size:.8rem;color:var(--muted);line-height:1.45}
@@ -148,20 +149,6 @@ body.light .badge{color:#2a55c9}
 .step h3{font-size:1.02rem;margin-bottom:6px}
 .step p{font-size:.85rem;color:var(--muted)}
 .step:not(:last-child):after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:12px;color:#7aa8ff;z-index:1}
-
-/* ---------- Pricing ---------- */
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
-.price{position:relative;display:flex;flex-direction:column;padding:28px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface)}
-.price.pop{border-color:rgba(110,150,255,.8);background:linear-gradient(160deg,color-mix(in srgb,var(--blue) 14%,var(--surface)),var(--surface));box-shadow:0 20px 60px rgba(60,100,255,.2)}
-.price .tag{position:absolute;top:-12px;right:22px;padding:4px 12px;border-radius:999px;background:linear-gradient(110deg,#a855f7,#4f7cff);color:#fff;font-size:.68rem;font-weight:700}
-.price h3{font-size:1.2rem}
-.price .for{font-size:.8rem;color:var(--muted);margin-bottom:16px}
-.price .from{font-size:.75rem;color:var(--muted)}
-.price .amount{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-.04em;margin-bottom:16px}
-.price ul{list-style:none;display:grid;gap:9px;margin-bottom:24px;flex:1}
-.price li{font-size:.88rem;color:var(--muted);display:flex;gap:9px}
-.price li:before{content:'✓';color:var(--green);font-weight:700}
-.price .btn{width:100%}
 
 /* ---------- Contact ---------- */
 .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start}
@@ -201,15 +188,28 @@ body.light .badge{color:#2a55c9}
   .hero-grid,.svc-wrap,.why-grid,.contact-grid{grid-template-columns:1fr}
   .trust-row{grid-template-columns:repeat(2,auto)}
   .stage{min-height:400px}
-  .svc-grid{grid-template-columns:repeat(2,1fr)}
-  .shots{grid-template-columns:repeat(2,1fr)}
-  .steps{grid-template-columns:repeat(2,1fr)}
-  .step:after{display:none}
-  .price-grid{grid-template-columns:1fr}
+  .shots{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto;padding-bottom:6px}
 }
 @media(max-width:560px){
   .container{width:calc(100% - 32px)}
-  .svc-grid,.shots,.steps,.feature-grid,.form-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  /* Keep 3 services per row, 3 features per row and all 4 steps in one row, just more compact */
+  .svc-grid,.feature-grid{gap:8px}
+  .card{padding:12px}
+  .card .ico{width:38px;height:38px;font-size:1.1rem;margin-bottom:10px}
+  .card h3{font-size:.82rem}
+  .card p{font-size:.7rem;min-height:0}
+  .card .more{padding:7px 8px;font-size:.7rem;margin-top:10px}
+  .feature{padding:12px;gap:8px}
+  .feature i{width:34px;height:34px}
+  .feature h3{font-size:.8rem}
+  .feature p{font-size:.7rem}
+  .steps{gap:8px}
+  .step{padding:12px}
+  .step .num{width:32px;height:32px;margin-bottom:10px;font-size:.8rem}
+  .step h3{font-size:.85rem}
+  .step p{font-size:.7rem}
+  .step:after{display:none}
   .vtags{position:static;width:100%;grid-template-columns:1fr 1fr;margin-top:430px}
   .vtag:nth-child(even){margin-left:0}
   .stage{min-height:0}
@@ -218,7 +218,7 @@ body.light .badge{color:#2a55c9}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
-<body>
+<body class="light">
 
 <!-- ================= HEADER ================= -->
 <header class="header">
@@ -233,64 +233,16 @@ body.light .badge{color:#2a55c9}
       <a href="#services">Services</a>
       <a href="#showcase">Showcase</a>
       <a href="#about">About</a>
-      <a href="#pricing">Pricing</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="header-actions">
       <a class="btn btn-primary btn-sm" href="#contact">Get Started →</a>
-      <button class="theme-toggle" id="themeToggle" aria-label="Switch between dark and light theme">🌙</button>
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch between dark and light theme">☀️</button>
     </div>
   </div>
 </header>
 
-<main>
-<!-- ================= HERO ================= -->
-<section class="hero" id="home">
-  <div class="container hero-grid">
-    <div class="reveal">
-      <span class="badge">Professional Digital Solutions</span>
-      <h1>Turn Your Ideas Into Powerful <span class="gradient">Digital Products</span></h1>
-      <p class="lead">RexWeb creates modern websites, web applications, Android app conversions, logos and promotional designs that help businesses, creators and brands grow online.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#contact">Get Started Now →</a>
-        <a class="btn btn-outline" href="#services">◎ Explore Our Services</a>
-      </div>
-      <div class="trust-row">
-        <div class="trust-item"><i>⚡</i><span><strong>Fast Delivery</strong><small>On time, every time</small></span></div>
-        <div class="trust-item"><i>🛡️</i><span><strong>Clear Pricing</strong><small>Agreed before we start</small></span></div>
-        <div class="trust-item"><i>🚀</i><span><strong>Expert Team</strong><small>Skilled &amp; passionate</small></span></div>
-        <div class="trust-item"><i>📱</i><span><strong>Mobile-first</strong><small>Works on every screen</small></span></div>
-      </div>
-    </div>
-
-    <div class="stage reveal" aria-label="Illustration of a laptop and phone showing a website">
-      <div class="laptop">
-        <div class="lscreen">
-          <div class="lbar"><i></i><i></i><i></i><b>rexweb.web.app</b></div>
-          <h4>Modern Websites. Powerful Apps. <span>Bigger Opportunities.</span></h4>
-          <span class="mini-btn">Get Started</span>
-          <svg viewBox="0 0 200 90" fill="none" aria-hidden="true"><polyline points="0,80 30,60 55,68 90,30 120,45 160,12 200,22" stroke="#7c9cff" stroke-width="3" stroke-linejoin="round"/><polyline points="0,86 40,74 80,78 120,56 160,48 200,40" stroke="#c084fc" stroke-width="2" opacity=".7"/></svg>
-        </div>
-        <div class="lbase"></div>
-      </div>
-      <div class="phone">
-        <small>REXWEB</small>
-        <h5>Your Vision.<br><span class="gradient">Our Mission.</span></h5>
-        <div class="line"></div><div class="line s"></div><div class="line"></div>
-        <span class="mini-btn">Get Started</span>
-      </div>
-      <div class="vtags">
-        <div class="vtag" style="--c:#4f8cff"><i>🖥️</i>Web Design</div>
-        <div class="vtag" style="--c:#20d6b0"><i>📲</i>Web-to-App</div>
-        <div class="vtag" style="--c:#a855f7"><i>&lt;/&gt;</i>Web Applications</div>
-        <div class="vtag" style="--c:#ff4fa3"><i>✏️</i>Logo Design</div>
-        <div class="vtag" style="--c:#ffab48"><i>🖼️</i>Flyer Design</div>
-        <div class="vtag" style="--c:#22d3ee"><i>⚙️</i>Digital Solutions</div>
-      </div>
-    </div>
-  </div>
-</section>
-
+<main id="home">
 <!-- ================= SERVICES ================= -->
 <section class="section" id="services">
   <div class="container svc-wrap">
@@ -298,7 +250,6 @@ body.light .badge{color:#2a55c9}
       <span class="kicker">Our Services</span>
       <h2>Everything You Need, All in <span class="gradient">One Place</span></h2>
       <p>From stunning websites to powerful apps and creative designs, we provide complete digital support to bring your vision to life.</p>
-      <a class="btn btn-outline btn-sm" href="#pricing">View Pricing →</a>
     </div>
     <div class="svc-grid">
       <article class="card reveal" style="--c:#4f8cff"><div class="ico">🌐</div><h3>Website Design &amp; Development</h3><p>Modern, responsive websites and online stores designed to turn visitors into customers.</p><a class="more" href="#contact" data-service="Website Design & Development">Learn More <span>→</span></a></article>
@@ -322,11 +273,36 @@ body.light .badge{color:#2a55c9}
       <p>Sample concepts that show the kind of work RexWeb creates for clients.</p>
     </div>
     <div class="shots">
-      <div class="shot reveal"><div class="shot-art"><div class="mock-site"><b></b><i></i><i></i><i style="width:60%"></i></div></div><div class="shot-cap"><strong>Business Website</strong><span>Corporate · Responsive</span></div></div>
-      <div class="shot reveal"><div class="shot-art"><div class="mock-app"><b></b><i></i><i></i><i style="width:60%"></i></div></div><div class="shot-cap"><strong>Mobile App</strong><span>Android · Modern UI</span></div></div>
-      <div class="shot reveal"><div class="shot-art"><div class="mock-logo">RW</div></div><div class="shot-cap"><strong>Brand Logo</strong><span>Unique · Professional</span></div></div>
-      <div class="shot reveal"><div class="shot-art"><div class="mock-flyer"><small>YOUR OFFER</small><b>BIG<br>SALE</b><small>COMING SOON</small></div></div><div class="shot-cap"><strong>Promotional Flyer</strong><span>Creative · Eye-catching</span></div></div>
-      <div class="shot reveal"><div class="shot-art"><div class="mock-dash"><i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i><i style="height:85%"></i><i style="height:70%"></i><i style="height:95%"></i></div></div><div class="shot-cap"><strong>Web App Dashboard</strong><span>Powerful · Interactive</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><svg viewBox="0 0 240 170" role="img" aria-label="Sample business website design"><defs><linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+<rect x="14" y="16" width="212" height="140" rx="10" fill="#0b1633" stroke="#3b5ba5"/><rect x="14" y="16" width="212" height="18" rx="10" fill="#122349"/>
+<circle cx="26" cy="25" r="2.5" fill="#ff6c88"/><circle cx="35" cy="25" r="2.5" fill="#ffca65"/><circle cx="44" cy="25" r="2.5" fill="#2cddb0"/><rect x="70" y="21" width="100" height="8" rx="4" fill="#0b1633"/>
+<rect x="24" y="42" width="30" height="5" rx="2.5" fill="#7aa8ff"/><rect x="150" y="42" width="14" height="4" rx="2" fill="#41537f"/><rect x="170" y="42" width="14" height="4" rx="2" fill="#41537f"/><rect x="190" y="40" width="26" height="9" rx="4.5" fill="url(#gw)"/>
+<rect x="24" y="60" width="96" height="9" rx="3" fill="#e6edff"/><rect x="24" y="74" width="72" height="9" rx="3" fill="#8fb4ff"/><rect x="24" y="90" width="84" height="4" rx="2" fill="#41537f"/><rect x="24" y="98" width="64" height="4" rx="2" fill="#41537f"/><rect x="24" y="110" width="40" height="12" rx="6" fill="url(#gw)"/>
+<rect x="132" y="58" width="84" height="64" rx="8" fill="url(#gw)" opacity=".85"/><circle cx="174" cy="90" r="16" fill="#fff" opacity=".25"/>
+<rect x="24" y="132" width="58" height="16" rx="4" fill="#122349"/><rect x="91" y="132" width="58" height="16" rx="4" fill="#122349"/><rect x="158" y="132" width="58" height="16" rx="4" fill="#122349"/></svg></div><div class="shot-cap"><strong>Business Website</strong><span>Corporate · Responsive</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><svg viewBox="0 0 240 170" role="img" aria-label="Sample mobile app screens"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21d4a4"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+<g transform="rotate(-6 80 90)"><rect x="42" y="12" width="78" height="148" rx="14" fill="#0a1530" stroke="#3b5ba5" stroke-width="2"/><rect x="50" y="24" width="62" height="34" rx="8" fill="url(#ga)"/><rect x="56" y="32" width="30" height="5" rx="2.5" fill="#06222b"/><rect x="56" y="42" width="20" height="9" rx="4.5" fill="#06222b" opacity=".5"/>
+<rect x="50" y="66" width="62" height="18" rx="5" fill="#122349"/><rect x="50" y="90" width="62" height="18" rx="5" fill="#122349"/><rect x="50" y="114" width="62" height="18" rx="5" fill="#122349"/><circle cx="58" cy="75" r="5" fill="#21d4a4"/><circle cx="58" cy="99" r="5" fill="#4f7cff"/><circle cx="58" cy="123" r="5" fill="#a855f7"/><rect x="68" y="73" width="30" height="4" rx="2" fill="#41537f"/><rect x="68" y="97" width="24" height="4" rx="2" fill="#41537f"/><rect x="68" y="121" width="34" height="4" rx="2" fill="#41537f"/></g>
+<g transform="rotate(5 165 95)"><rect x="126" y="22" width="78" height="148" rx="14" fill="#0a1530" stroke="#3b5ba5" stroke-width="2"/><circle cx="165" cy="62" r="20" fill="none" stroke="#122349" stroke-width="7"/><path d="M165 42a20 20 0 0 1 17 30" fill="none" stroke="url(#ga)" stroke-width="7" stroke-linecap="round"/><rect x="146" y="92" width="38" height="5" rx="2.5" fill="#e6edff"/><rect x="140" y="104" width="50" height="4" rx="2" fill="#41537f"/><rect x="138" y="124" width="54" height="16" rx="8" fill="url(#ga)"/></g></svg></div><div class="shot-cap"><strong>Mobile App</strong><span>Android · Modern UI</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><svg viewBox="0 0 240 170" role="img" aria-label="Sample logo and brand identity board"><defs><linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a4dff"/><stop offset="1" stop-color="#20c9f0"/></linearGradient></defs>
+<rect x="16" y="18" width="208" height="134" rx="12" fill="#0b1633" stroke="#27386b" stroke-dasharray="3 3"/>
+<rect x="34" y="38" width="62" height="62" rx="18" fill="url(#gl)"/><text x="65" y="80" text-anchor="middle" font-size="26" font-weight="700" fill="#fff" font-family="'Space Grotesk','DM Sans',sans-serif">RW</text>
+<text x="108" y="66" font-size="17" font-weight="700" fill="#f4f7ff" font-family="'Space Grotesk','DM Sans',sans-serif">Your Brand</text><text x="109" y="80" font-size="6.5" fill="#8aa0c8" letter-spacing="2.2">TAGLINE GOES HERE</text>
+<circle cx="44" cy="126" r="9" fill="#7a4dff"/><circle cx="68" cy="126" r="9" fill="#20c9f0"/><circle cx="92" cy="126" r="9" fill="#f4f7ff"/><circle cx="116" cy="126" r="9" fill="#0e1a35" stroke="#41537f"/>
+<rect x="146" y="112" width="62" height="28" rx="8" fill="#122349"/><rect x="154" y="120" width="14" height="12" rx="4" fill="url(#gl)"/><rect x="174" y="121" width="26" height="4" rx="2" fill="#8aa0c8"/><rect x="174" y="129" width="18" height="3" rx="1.5" fill="#41537f"/></svg></div><div class="shot-cap"><strong>Brand Logo</strong><span>Unique · Professional</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><svg viewBox="0 0 240 170" role="img" aria-label="Sample promotional flyer"><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffab48"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs>
+<g transform="rotate(-5 120 85)"><rect x="64" y="10" width="112" height="150" rx="7" fill="url(#gf)"/><circle cx="156" cy="40" r="30" fill="#fff" opacity=".18"/><circle cx="84" cy="146" r="22" fill="#fff" opacity=".12"/>
+<text x="76" y="34" font-size="7.5" font-weight="700" fill="#2a0b3a" letter-spacing="2.2">GRAND OPENING</text>
+<text x="76" y="78" font-size="34" font-weight="700" fill="#1a0b2e" font-family="'Space Grotesk','DM Sans',sans-serif">50%</text><text x="77" y="98" font-size="15" font-weight="700" fill="#1a0b2e" font-family="'Space Grotesk','DM Sans',sans-serif">OFF TODAY</text>
+<rect x="76" y="108" width="62" height="3.5" rx="1.75" fill="#1a0b2e" opacity=".5"/><rect x="76" y="116" width="48" height="3.5" rx="1.75" fill="#1a0b2e" opacity=".5"/>
+<rect x="76" y="130" width="52" height="14" rx="7" fill="#1a0b2e"/><text x="102" y="140" text-anchor="middle" font-size="6.5" font-weight="700" fill="#fff">YOUR OFFER</text></g></svg></div><div class="shot-cap"><strong>Promotional Flyer</strong><span>Creative · Eye-catching</span></div></div>
+      <div class="shot reveal"><div class="shot-art"><svg viewBox="0 0 240 170" role="img" aria-label="Sample web app dashboard"><defs><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a855f7"/><stop offset="1" stop-color="#4f7cff"/></linearGradient></defs>
+<rect x="12" y="14" width="216" height="146" rx="10" fill="#0b1633" stroke="#3b5ba5"/><rect x="12" y="14" width="40" height="146" rx="10" fill="#0e1b3a"/>
+<rect x="22" y="26" width="20" height="20" rx="6" fill="url(#gd)"/><rect x="22" y="56" width="20" height="4" rx="2" fill="#41537f"/><rect x="22" y="68" width="20" height="4" rx="2" fill="#41537f"/><rect x="22" y="80" width="20" height="4" rx="2" fill="#41537f"/>
+<rect x="60" y="24" width="48" height="30" rx="6" fill="#122349"/><rect x="114" y="24" width="48" height="30" rx="6" fill="#122349"/><rect x="168" y="24" width="52" height="30" rx="6" fill="#122349"/>
+<rect x="66" y="31" width="20" height="4" rx="2" fill="#8aa0c8"/><rect x="66" y="40" width="30" height="8" rx="3" fill="#e6edff"/><rect x="120" y="31" width="20" height="4" rx="2" fill="#8aa0c8"/><rect x="120" y="40" width="26" height="8" rx="3" fill="#21d4a4"/><rect x="174" y="31" width="20" height="4" rx="2" fill="#8aa0c8"/><rect x="174" y="40" width="34" height="8" rx="3" fill="#8fb4ff"/>
+<rect x="60" y="62" width="104" height="88" rx="6" fill="#122349"/><polyline points="68,134 86,118 104,126 124,98 142,108 158,80" fill="none" stroke="#7c9cff" stroke-width="2.5" stroke-linejoin="round"/><polyline points="68,142 90,132 112,136 136,120 158,112" fill="none" stroke="#c084fc" stroke-width="2" opacity=".8"/>
+<rect x="170" y="62" width="50" height="88" rx="6" fill="#122349"/><rect x="177" y="118" width="7" height="26" rx="2" fill="url(#gd)"/><rect x="188" y="100" width="7" height="44" rx="2" fill="url(#gd)"/><rect x="199" y="108" width="7" height="36" rx="2" fill="url(#gd)"/><rect x="210" y="82" width="7" height="62" rx="2" fill="url(#gd)"/></svg></div><div class="shot-cap"><strong>Web App Dashboard</strong><span>Powerful · Interactive</span></div></div>
     </div>
     <p class="note">Concept illustrations. Real project examples can be shared on request.</p>
   </div>
@@ -365,28 +341,6 @@ body.light .badge{color:#2a55c9}
       <article class="step reveal"><span class="num">02</span><h3>Design</h3><p>We create a concept that fits your brand.</p></article>
       <article class="step reveal"><span class="num">03</span><h3>Build</h3><p>We bring it to life with clean, modern code.</p></article>
       <article class="step reveal"><span class="num">04</span><h3>Launch</h3><p>We test, refine and make it live.</p></article>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PRICING ================= -->
-<section class="section" id="pricing">
-  <div class="container">
-    <div class="section-head reveal">
-      <span class="kicker">Our Pricing</span>
-      <h2>Choose the Right <span class="gradient">Package</span></h2>
-      <p>Flexible and affordable packages designed to fit your goals. Final price is agreed with you before work starts.</p>
-    </div>
-    <div class="price-grid">
-      <div class="price reveal"><h3>Basic</h3><div class="for">Perfect for small projects</div><div class="from">From</div><div class="amount">₦25,000</div>
-        <ul><li>1–3 page website</li><li>Mobile responsive</li><li>1 revision</li></ul>
-        <a class="btn btn-outline" href="#contact" data-service="Website Design & Development">Get Started →</a></div>
-      <div class="price pop reveal"><span class="tag">Most Popular</span><h3>Standard</h3><div class="for">Best for growing businesses</div><div class="from">From</div><div class="amount">₦60,000</div>
-        <ul><li>5–10 page website</li><li>Online store (optional)</li><li>App conversion support</li><li>3 revisions</li></ul>
-        <a class="btn btn-primary" href="#contact" data-service="Website Design & Development">Get Started →</a></div>
-      <div class="price reveal"><h3>Premium</h3><div class="for">For big ideas &amp; brands</div><div class="from">From</div><div class="amount">₦120,000+</div>
-        <ul><li>Custom web application</li><li>Full app conversion</li><li>Advanced features</li><li>Unlimited revisions</li></ul>
-        <a class="btn btn-outline" href="#contact" data-service="Custom Web Application">Get Started →</a></div>
     </div>
   </div>
 </section>
@@ -430,7 +384,7 @@ body.light .badge{color:#2a55c9}
 <footer class="footer">
   <div class="container footer-inner">
     <a class="brand" href="#home"><span class="brand-mark">RW</span><span><span class="brand-name">Rex<span>Web</span></span><span class="brand-tag">Build · Design · Grow</span></span></a>
-    <div class="footer-links"><a href="#services">Services</a><a href="#showcase">Showcase</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
+    <div class="footer-links"><a href="#services">Services</a><a href="#showcase">Showcase</a><a href="#contact">Contact</a></div>
     <span>© <span id="year"></span> RexWeb. Your Vision. Our Mission.</span>
   </div>
 </footer>
@@ -462,7 +416,7 @@ function setTheme(light){
   themeToggle.textContent = light ? '☀️' : '🌙';
   try { localStorage.setItem('rexweb-theme', light ? 'light' : 'dark'); } catch(e) {}
 }
-try { if (localStorage.getItem('rexweb-theme') === 'light') setTheme(true); } catch(e) {}
+try { if (localStorage.getItem('rexweb-theme') === 'dark') setTheme(false); } catch(e) {}
 themeToggle.addEventListener('click', () => setTheme(!document.body.classList.contains('light')));
 
 // Clicking a service or price button pre-selects it in the form
