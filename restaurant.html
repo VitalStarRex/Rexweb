@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11100e">
+<meta name="description" content="Taste Haven Restaurant & Lounge — beautiful food, warm hospitality, unforgettable moments.">
+<title>Taste Haven | Restaurant & Lounge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#11100e;--panel:#191714;--gold:#f4b323;--gold2:#ffd06a;--cream:#f7f2e9;--muted:#bcb6ab;--line:rgba(255,255,255,.12);--max:1180px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{background:var(--bg);color:#fff;font-family:"DM Sans",Arial,sans-serif;line-height:1.6}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button,a{ -webkit-tap-highlight-color:transparent}
+.container{width:min(var(--max),calc(100% - 40px));margin:auto}
+.topline{background:var(--gold);color:#1a1407;text-align:center;padding:8px 16px;font-size:.78rem;font-weight:700;letter-spacing:.08em}
+header{position:sticky;top:0;z-index:50;background:rgba(17,16,14,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.nav{height:78px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:11px;min-width:max-content}
+.brand-mark{width:46px;height:46px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:25px}
+.brand-name{font-family:"Playfair Display",serif;font-weight:700;font-size:1.45rem;line-height:1.1}
+.brand-sub{font-size:.62rem;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.navlinks{display:flex;align-items:center;gap:27px;color:#e9e3d8;font-size:.88rem}
+.navlinks a{transition:color .2s}.navlinks a:hover{color:var(--gold)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 20px;border:1px solid transparent;border-radius:999px;font-weight:700;font-size:.88rem;cursor:pointer;transition:transform .2s,background .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:#211705}.btn-gold:hover{background:var(--gold2)}
+.btn-outline{border-color:rgba(255,255,255,.42);color:#fff;background:rgba(255,255,255,.04)}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.menu-toggle{display:none;background:none;color:white;border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:1.25rem}
+.hero{position:relative;min-height:610px;display:flex;align-items:center;overflow:hidden;background:#17130e}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,11,9,.96) 0%,rgba(12,11,9,.85) 34%,rgba(12,11,9,.25) 72%,rgba(12,11,9,.12) 100%),url("https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=2000&q=90") center 54%/cover no-repeat;transform:scale(1.02)}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:100px;background:linear-gradient(transparent,var(--bg))}
+.hero-content{position:relative;z-index:1;max-width:650px;padding:85px 0 110px}
+.eyebrow{display:flex;align-items:center;gap:10px;color:var(--gold);font-size:.77rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;margin-bottom:18px}
+.eyebrow:before{content:"";width:32px;height:1px;background:var(--gold)}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;line-height:1.12}
+h1{font-size:clamp(3rem,7vw,5.7rem);letter-spacing:-.045em;max-width:700px}
+h1 em{display:block;color:var(--gold);font-weight:600}
+.hero p{color:#e2ddd4;max-width:490px;margin:24px 0 30px;font-size:1.02rem}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-note{display:flex;align-items:center;gap:10px;margin-top:38px;color:#e9e0d2;font-size:.82rem}
+.stars{color:var(--gold);letter-spacing:2px}
+.benefits{position:relative;z-index:2;background:var(--cream);color:#171512;margin-top:-1px}
+.benefit-grid{display:grid;grid-template-columns:repeat(4,1fr);padding:24px 0}
+.benefit{display:flex;align-items:center;gap:13px;padding:7px 20px;border-right:1px solid #d9d0c4}.benefit:first-child{padding-left:0}.benefit:last-child{border:0}
+.benefit-icon{font-size:1.7rem}.benefit strong{display:block;font-size:.83rem}.benefit small{display:block;color:#716a60;font-size:.74rem;margin-top:3px}
+.section{padding:94px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:34px}
+.kicker{font-size:.75rem;color:var(--gold);letter-spacing:.19em;font-weight:700;text-transform:uppercase;margin-bottom:12px}
+h2{font-size:clamp(2.2rem,4vw,3.4rem);letter-spacing:-.035em}
+.section-desc{color:var(--muted);max-width:440px;margin-top:14px}
+.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.dish{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:linear-gradient(145deg,#1c1a17,#12110f);transition:transform .25s,border-color .25s}
+.dish:hover{transform:translateY(-6px);border-color:rgba(244,179,35,.6)}
+.dish-img{height:190px;overflow:hidden;position:relative}
+.dish-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}.dish:hover img{transform:scale(1.06)}
+.dish-tag{position:absolute;top:12px;left:12px;background:rgba(15,14,12,.88);color:var(--gold);border:1px solid rgba(244,179,35,.4);padding:5px 9px;border-radius:50px;font-size:.65rem;font-weight:700;letter-spacing:.08em}
+.dish-body{padding:17px}.dish-body h3{font-size:1.17rem;margin-bottom:7px}.dish-body p{font-size:.82rem;color:var(--muted);min-height:42px}.dish-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:14px;color:var(--gold);font-weight:700}
+.add-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(244,179,35,.5);background:transparent;color:var(--gold);font-size:1.15rem;cursor:pointer}.add-btn:hover{background:var(--gold);color:#211705}
+.menu-tabs{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:24px}.tab{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:transparent;color:#ddd5c8;cursor:pointer;font-size:.82rem}.tab.active,.tab:hover{background:var(--gold);border-color:var(--gold);color:#1d1607}
+.story{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.story-visual{position:relative;min-height:480px}
+.story-main{position:absolute;inset:0 50px 45px 0;border-radius:18px;overflow:hidden}
+.story-main img{width:100%;height:100%;object-fit:cover}
+.story-small{position:absolute;width:46%;height:190px;right:0;bottom:0;border:8px solid var(--bg);border-radius:17px;overflow:hidden}
+.story-small img{width:100%;height:100%;object-fit:cover}
+.story-badge{position:absolute;top:24px;right:20px;background:var(--gold);color:#1b1508;border-radius:50%;width:112px;height:112px;display:grid;place-items:center;text-align:center;font-family:"Playfair Display",serif;font-weight:700;line-height:1.15;transform:rotate(8deg);box-shadow:0 12px 30px #0005}
+.story-copy p{color:var(--muted);margin:18px 0}.ticks{list-style:none;display:grid;gap:12px;margin:25px 0 30px}.ticks li:before{content:"✓";color:var(--gold);font-weight:800;margin-right:11px}
+.gallery{display:grid;grid-template-columns:1.2fr 1fr 1fr;grid-template-rows:220px 220px;gap:14px}
+.gallery img{width:100%;height:100%;object-fit:cover;border-radius:13px;filter:saturate(.9);transition:filter .25s,transform .25s}.gallery img:hover{filter:saturate(1.15);transform:scale(1.01)}
+.gallery .tall{grid-row:span 2}
+.testimonial{background:linear-gradient(130deg,#211b11,#15130f);border:1px solid rgba(244,179,35,.2);border-radius:20px;padding:40px;max-width:820px;margin:auto;text-align:center}
+.quote-mark{font-family:Georgia,serif;font-size:4rem;line-height:.8;color:var(--gold)}
+.testimonial blockquote{font-family:"Playfair Display",serif;font-size:clamp(1.3rem,3vw,2rem);margin:18px auto;max-width:680px}
+.testimonial .author{color:var(--muted);font-size:.85rem;margin-top:14px}
+.reservation{background:linear-gradient(110deg,rgba(14,12,9,.96),rgba(14,12,9,.74)),url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=85") center/cover;border-radius:22px;padding:55px;display:grid;grid-template-columns:1fr .9fr;gap:40px;align-items:center}
+.reservation p{color:#d5cec2;max-width:480px;margin-top:17px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{width:100%;border:1px solid rgba(255,255,255,.2);background:rgba(10,9,7,.68);color:white;border-radius:10px;padding:13px 14px;outline:none}
+.field:focus{border-color:var(--gold)}.field option{background:#171512}
+.form-grid .full{grid-column:1/-1}
+.form-message{font-size:.85rem;color:var(--gold2);margin-top:12px;min-height:22px}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:32px}
+.contact-card{padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.contact-card .symbol{font-size:1.4rem;color:var(--gold)}.contact-card h3{font-size:1.05rem;margin:9px 0}.contact-card p{font-size:.85rem;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.82rem}
+.footer-row{display:flex;justify-content:space-between;gap:20px;align-items:center}.footer-links{display:flex;gap:18px;flex-wrap:wrap}.footer-links a:hover{color:var(--gold)}
+.toast{position:fixed;z-index:100;bottom:22px;left:50%;transform:translate(-50%,20px);background:var(--cream);color:#171512;border-radius:12px;padding:12px 18px;font-weight:700;font-size:.86rem;box-shadow:0 12px 40px #0006;opacity:0;pointer-events:none;transition:.25s;max-width:calc(100% - 30px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .65s,transform .65s}.reveal.visible{opacity:1;transform:none}
+@media(max-width:1000px){.navlinks{gap:15px}.nav-cta{display:none}.benefit{padding:7px 12px}.menu-grid{grid-template-columns:repeat(2,1fr)}.story{gap:35px}.reservation{padding:38px;grid-template-columns:1fr}.reservation .form-area{max-width:600px}}
+@media(max-width:760px){.container{width:min(100% - 30px,var(--max))}.nav{height:68px}.brand-mark{width:40px;height:40px}.brand-name{font-size:1.25rem}.menu-toggle{display:block}.navlinks{display:none;position:absolute;top:68px;left:0;right:0;padding:18px 22px 24px;background:#14120f;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:0}.navlinks.open{display:flex}.navlinks a{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}.navlinks a:last-child{border:0}.navlinks .mobile-book{display:inline-flex;margin-top:14px;align-self:flex-start}.hero{min-height:570px}.hero::before{background:linear-gradient(90deg,rgba(12,11,9,.94),rgba(12,11,9,.65)),url("https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85") 58% center/cover}.hero-content{padding:75px 0 95px}.hero p{font-size:.94rem}.benefit-grid{grid-template-columns:1fr 1fr;padding:15px 0}.benefit{border-right:0;padding:12px 6px}.benefit:nth-child(odd){border-right:1px solid #d9d0c4}.benefit-icon{font-size:1.4rem}.benefit strong{font-size:.77rem}.benefit small{font-size:.69rem}.section{padding:70px 0}.section-head{align-items:flex-start;flex-direction:column}.menu-grid{gap:12px}.dish-img{height:155px}.dish-body{padding:13px}.dish-body h3{font-size:1rem}.dish-body p{font-size:.76rem;min-height:48px}.dish-bottom{font-size:.9rem}.story{grid-template-columns:1fr;gap:30px}.story-visual{min-height:390px}.story-main{right:35px;bottom:35px}.story-small{height:150px;width:48%;border-width:6px}.story-badge{width:90px;height:90px;font-size:.9rem;right:6px}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:180px 180px 180px}.gallery .tall{grid-row:span 2}.gallery img:last-child{grid-column:span 2}.reservation{padding:28px 20px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.contact-grid{grid-template-columns:1fr}.footer-row{flex-direction:column;align-items:flex-start}.testimonial{padding:30px 20px}}
+@media(max-width:380px){h1{font-size:2.65rem}.menu-grid{grid-template-columns:1fr}.dish-img{height:200px}.benefit{gap:8px}.brand-sub{letter-spacing:.15em}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="topline">GOOD FOOD • GREAT VIBES • MEMORABLE MOMENTS</div>
+<header>
+  <div class="container nav">
+    <a class="brand" href="#home" aria-label="Taste Haven home">
+      <span class="brand-mark">♨</span>
+      <span><span class="brand-name">Taste Haven</span><span class="brand-sub">Restaurant &amp; Lounge</span></span>
+    </a>
+    <nav class="navlinks" id="navlinks" aria-label="Main navigation">
+      <a href="#home">Home</a><a href="#about">Our Story</a><a href="#menu">Menu</a><a href="#gallery">Gallery</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+      <a class="btn btn-gold mobile-book" href="#reserve" style="display:none">Book a Table ↗</a>
+    </nav>
+    <a class="btn btn-gold nav-cta" href="#reserve">▦ &nbsp; Book a Table</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+  </div>
+</header>
+<main>
+<section class="hero" id="home">
+  <div class="container"><div class="hero-content">
+    <div class="eyebrow">A little flavour, a lot of love</div>
+    <h1>Delicious Food <em>Made with Love.</em></h1>
+    <p>Come hungry, leave happy. Discover freshly prepared favourites, warm hospitality and the kind of atmosphere that makes every meal feel special.</p>
+    <div class="actions"><a class="btn btn-gold" href="#menu">Explore Our Menu <span>→</span></a><a class="btn btn-outline" href="#reserve">Book a Table &nbsp; ▦</a></div>
+    <div class="hero-note"><span class="stars">★★★★★</span> <span>Made fresh. Served with heart.</span></div>
+  </div></div>
+</section>
+<section class="benefits"><div class="container benefit-grid">
+  <div class="benefit"><span class="benefit-icon">♧</span><div><strong>Fresh Ingredients</strong><small>Selected with care, every day</small></div></div>
+  <div class="benefit"><span class="benefit-icon">❋</span><div><strong>Something for Everyone</strong><small>Comfort food and new favourites</small></div></div>
+  <div class="benefit"><span class="benefit-icon">♨</span><div><strong>Freshly Prepared</strong><small>Made to order, full of flavour</small></div></div>
+  <div class="benefit"><span class="benefit-icon">♡</span><div><strong>Made for Moments</strong><small>Dates, family meals and friends</small></div></div>
+</div></section>
+<section class="section" id="menu"><div class="container">
+  <div class="section-head reveal"><div><div class="kicker">A few guest favourites</div><h2>A Taste for Every Craving</h2><p class="section-desc">Thoughtfully prepared dishes, bold flavours and little details that make every bite memorable.</p></div><a href="#reserve" class="btn btn-outline">Plan Your Visit ↗</a></div>
+  <div class="menu-tabs reveal" role="group" aria-label="Filter menu">
+    <button class="tab active" data-filter="all">All favourites</button><button class="tab" data-filter="mains">Main dishes</button><button class="tab" data-filter="pasta">Pasta</button><button class="tab" data-filter="burgers">Burgers</button><button class="tab" data-filter="desserts">Desserts</button>
+  </div>
+  <div class="menu-grid">
+    <article class="dish reveal" data-category="mains"><div class="dish-img"><img loading="lazy" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=85" alt="Grilled steak with roasted vegetables"><span class="dish-tag">CHEF'S PICK</span></div><div class="dish-body"><h3>Signature Grilled Steak</h3><p>Juicy, smoky and served with seasonal roasted vegetables.</p><div class="dish-bottom"><span>₦18,500</span><button class="add-btn" aria-label="Ask about Signature Grilled Steak" data-dish="Signature Grilled Steak">+</button></div></div></article>
+    <article class="dish reveal" data-category="pasta"><div class="dish-img"><img loading="lazy" src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=700&q=85" alt="Creamy pasta dish" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=700&q=85'"><span class="dish-tag">COMFORT FAVOURITE</span></div><div class="dish-body"><h3>Creamy Alfredo Pasta</h3><p>Silky, creamy pasta finished with herbs and parmesan.</p><div class="dish-bottom"><span>₦12,000</span><button class="add-btn" aria-label="Ask about Creamy Alfredo Pasta" data-dish="Creamy Alfredo Pasta">+</button></div></div></article>
+    <article class="dish reveal" data-category="burgers"><div class="dish-img"><img loading="lazy" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=85" alt="Gourmet beef burger with fries"><span class="dish-tag">CROWD FAVOURITE</span></div><div class="dish-body"><h3>Classic Beef Burger</h3><p>A juicy beef patty, crisp greens and our house sauce.</p><div class="dish-bottom"><span>₦9,500</span><button class="add-btn" aria-label="Ask about Classic Beef Burger" data-dish="Classic Beef Burger">+</button></div></div></article>
+    <article class="dish reveal" data-category="desserts"><div class="dish-img"><img loading="lazy" src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=700&q=85" alt="Chocolate dessert with berries"><span class="dish-tag">SWEET FINISH</span></div><div class="dish-body"><h3>Chocolate Lava Cake</h3><p>Rich chocolate indulgence for the perfect finishing touch.</p><div class="dish-bottom"><span>₦6,500</span><button class="add-btn" aria-label="Ask about Chocolate Lava Cake" data-dish="Chocolate Lava Cake">+</button></div></div></article>
+  </div>
+  <p style="color:var(--muted);font-size:.76rem;margin-top:16px">Demo menu and sample prices — replace with the restaurant's real menu before publishing.</p>
+</div></section>
+<section class="section" id="about" style="background:#0d0c0a"><div class="container story">
+  <div class="story-visual reveal"><div class="story-main"><img loading="lazy" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1000&q=85" alt="Warm restaurant dining atmosphere"></div><div class="story-small"><img loading="lazy" src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=600&q=85" alt="Beautifully arranged restaurant table"></div><div class="story-badge">Good food<br>good mood</div></div>
+  <div class="story-copy reveal"><div class="kicker">Welcome to Taste Haven</div><h2>More Than a Meal.<br><span style="color:var(--gold)">It's a Feeling.</span></h2><p>We believe the best memories often happen around a table. Taste Haven brings together comforting flavours, thoughtfully prepared plates and a relaxed setting made for good company.</p><p>Whether you're stopping by for a quick bite, celebrating something special or sharing a long dinner with friends, there's always a seat for you.</p><ul class="ticks"><li>Freshly prepared dishes</li><li>A welcoming space for every occasion</li><li>Friendly service with attention to detail</li></ul><a class="btn btn-gold" href="#reserve">Come Dine With Us ↗</a></div>
+</div></section>
+<section class="section" id="gallery"><div class="container"><div class="section-head reveal"><div><div class="kicker">A feast for the eyes</div><h2>Made to Be Savoured</h2><p class="section-desc">A glimpse of the flavours, details and atmosphere waiting for you.</p></div></div>
+  <div class="gallery reveal"><img class="tall" loading="lazy" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=85" alt="Elegant restaurant interior"><img loading="lazy" src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=85" alt="Fresh colourful food"><img loading="lazy" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=700&q=85" alt="Food sizzling on the grill"><img loading="lazy" src="https://images.unsplash.com/photo-1515003197210-e0cd7184f8b5?auto=format&fit=crop&w=700&q=85" alt="Beautifully plated meal"><img loading="lazy" src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=700&q=85" alt="Fresh ingredients and vegetables"></div>
+</div></section>
+<section class="section" id="reviews" style="padding-top:15px"><div class="container"><div class="kicker" style="text-align:center">The feeling we aim for</div><h2 style="text-align:center;margin-bottom:30px">Every Visit, A Little Celebration</h2><div class="testimonial reveal"><div class="quote-mark">“</div><blockquote>Great food brings people together. We want every guest to feel welcome, cared for and excited to come back.</blockquote><div class="stars">★★★★★</div><div class="author">The Taste Haven promise</div></div><p style="text-align:center;color:var(--muted);font-size:.78rem;margin-top:15px">Demo testimonial section — replace with genuine customer reviews when available.</p></div></section>
+<section class="section" id="reserve"><div class="container"><div class="reservation reveal"><div><div class="kicker">Your table is waiting</div><h2>Let's Make It<br><span style="color:var(--gold)">A Special One.</span></h2><p>Planning a date night, a family meal or a get-together with friends? Send a reservation request and we’ll help you plan your visit.</p><p style="font-size:.82rem">✦ Sample concept website — the form opens a draft message; connect it to the real restaurant contact before launch.</p></div>
+  <div class="form-area"><form id="bookingForm" class="form-grid">
+    <input class="field" name="name" placeholder="Your full name" required autocomplete="name">
+    <input class="field" name="phone" placeholder="Phone number" required autocomplete="tel">
+    <input class="field" name="date" type="date" required aria-label="Preferred date">
+    <select class="field" name="guests" required aria-label="Number of guests"><option value="">Number of guests</option><option>1 guest</option><option>2 guests</option><option>3–4 guests</option><option>5–6 guests</option><option>7+ guests</option></select>
+    <select class="field full" name="time" required aria-label="Preferred time"><option value="">Preferred time</option><option>12:00 PM – 2:00 PM</option><option>2:00 PM – 5:00 PM</option><option>5:00 PM – 7:00 PM</option><option>7:00 PM – 9:00 PM</option></select>
+    <textarea class="field full" name="notes" rows="3" placeholder="Anything we should know? (optional)"></textarea>
+    <button class="btn btn-gold full" type="submit">Prepare Reservation Request ↗</button>
+  </form><div class="form-message" id="formMessage" aria-live="polite"></div></div>
+</div></div></section>
+<section class="section" id="contact" style="padding-top:0"><div class="container"><div class="kicker">We'd love to hear from you</div><h2>Come Say Hello</h2><p class="section-desc">Use these sample contact details as placeholders. Update them with the real restaurant information before sharing this website as a live business site.</p>
+  <div class="contact-grid"><div class="contact-card"><div class="symbol">⌖</div><h3>Visit Us</h3><p>Add your restaurant address here</p></div><div class="contact-card"><div class="symbol">☎</div><h3>Call or Message</h3><p>Add your business phone or WhatsApp number</p></div><div class="contact-card"><div class="symbol">◷</div><h3>Opening Hours</h3><p>Monday – Sunday<br>Update with actual opening hours</p></div></div>
+</div></section>
+</main>
+<footer><div class="container footer-row"><a class="brand" href="#home"><span class="brand-mark">♨</span><span><span class="brand-name">Taste Haven</span><span class="brand-sub">Restaurant &amp; Lounge</span></span></a><span>© <span id="year"></span> Taste Haven. Crafted with flavour.</span><div class="footer-links"><a href="#menu">Menu</a><a href="#reserve">Reservations</a><a href="#contact">Contact</a></div></div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const menuToggle=document.getElementById('menuToggle');
+const navlinks=document.getElementById('navlinks');
+menuToggle.addEventListener('click',()=>{const open=navlinks.classList.toggle('open');menuToggle.setAttribute('aria-expanded',String(open));menuToggle.textContent=open?'✕':'☰';});
+navlinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{navlinks.classList.remove('open');menuToggle.setAttribute('aria-expanded','false');menuToggle.textContent='☰';}));
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const filter=tab.dataset.filter;document.querySelectorAll('.dish').forEach(card=>{card.style.display=filter==='all'||card.dataset.category===filter?'':'none';});}));
+const toast=document.getElementById('toast');let toastTimer;
+function showToast(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3000);}
+document.querySelectorAll('.add-btn').forEach(btn=>btn.addEventListener('click',()=>{const item=btn.dataset.dish;const notes=document.querySelector('[name="notes"]');notes.value=(notes.value?notes.value+'; ':'')+'Interested in: '+item;showToast(item+' added to your reservation note.');document.getElementById('reserve').scrollIntoView({behavior:'smooth'});}));
+const dateInput=document.querySelector('[name="date"]');const now=new Date();dateInput.min=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+document.getElementById('bookingForm').addEventListener('submit',e=>{e.preventDefault();const data=new FormData(e.currentTarget);const msg=`Hello Taste Haven! I'd like to request a table reservation.\nName: ${data.get('name')}\nPhone: ${data.get('phone')}\nDate: ${data.get('date')}\nGuests: ${data.get('guests')}\nTime: ${data.get('time')}\nNotes: ${data.get('notes')||'None'}\n\nPlease confirm availability.`;document.getElementById('formMessage').textContent='Your request draft is ready. This demo form does not send a booking until a real contact channel is connected.';showToast('Reservation request prepared — connect the real contact details to receive it.');const blob=new Blob([msg],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='taste-haven-reservation-request.txt';a.click();URL.revokeObjectURL(url);});
+document.getElementById('year').textContent=new Date().getFullYear();
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
