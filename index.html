@@ -1,2290 +1,874 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080b18" id="themeColor">
-<title>RexWeb Nexora</title>
-<meta name="description" content="RexWeb Nexora — Play. Create. Trade. Grow.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b18">
 
-<script>
-(function () {
-  try {
-    const saved = localStorage.getItem("nexoraTheme");
-    if (saved === "light" || saved === "dark") {
-      document.documentElement.dataset.theme = saved;
+  <title>Games Hub | RexWeb Nexora</title>
+
+  <meta
+    name="description"
+    content="Play arcade games at RexWeb Nexora. Play, create, trade, and grow."
+  >
+
+  <style>
+    :root {
+      --bg: #080b18;
+      --panel: #11172a;
+      --panel-light: #19223b;
+      --border: rgba(255,255,255,.1);
+      --text: #f5f7ff;
+      --muted: #a5aec7;
+      --blue: #526dff;
+      --cyan: #34e7ff;
+      --yellow: #ffd65a;
+      --green: #46e6a5;
+      --radius: 20px;
     }
-  } catch (_) {}
-})();
-</script>
-
-<style>
-:root {
-  color-scheme: dark;
-  --bg:#080b18;
-  --surface:#10162a;
-  --surface2:#171f38;
-  --primary:#6575ff;
-  --secondary:#a855f7;
-  --cyan:#39d9ff;
-  --text:#f5f7ff;
-  --muted:#a7b0cb;
-  --border:rgba(255,255,255,.1);
-  --header-bg:rgba(8,11,24,.96);
-  --card-bg:linear-gradient(145deg,#151d37,#0d1223);
-  --input-bg:#080c18;
-  --input-text:#f3f5ff;
-  --editor-bg:#080c18;
-  --editor-text:#d5e1ff;
-  --preview-bg:#ffffff;
-  --shadow:0 15px 35px rgba(0,0,0,.2);
-}
-
-:root[data-theme="light"] {
-  color-scheme:light;
-  --bg:#f2f5fc;
-  --surface:#ffffff;
-  --surface2:#e9eef9;
-  --primary:#4e5ee8;
-  --secondary:#9146d9;
-  --cyan:#007caa;
-  --text:#18213a;
-  --muted:#596680;
-  --border:rgba(31,48,82,.16);
-  --header-bg:rgba(255,255,255,.96);
-  --card-bg:linear-gradient(145deg,#ffffff,#f0f4fc);
-  --input-bg:#ffffff;
-  --input-text:#18213a;
-  --editor-bg:#f7f9ff;
-  --editor-text:#18213a;
-  --preview-bg:#ffffff;
-  --shadow:0 12px 30px rgba(31,48,82,.09);
-}
-
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html {
-  min-height:100%;
-  scroll-behavior:smooth;
-}
-
-body {
-  width:100%;
-  min-height:100vh;
-  overflow-x:hidden;
-  background:
-    radial-gradient(ellipse at top left,rgba(101,117,255,.13),transparent 38%),
-    var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-  line-height:1.6;
-  transition:background-color .2s,color .2s;
-}
-
-button,input,textarea,select {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline:3px solid var(--cyan);
-  outline-offset:3px;
-}
-
-a {
-  color:inherit;
-  text-decoration:none;
-}
-
-.container {
-  width:min(1600px,96%);
-  margin-inline:auto;
-}
-
-/* HEADER */
-
-.site-header {
-  position:sticky;
-  top:0;
-  z-index:1000;
-  background:var(--header-bg);
-  backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
-}
-
-.header-top {
-  min-height:70px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  padding:8px 0;
-}
-
-.brand {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  letter-spacing:.5px;
-  font-size:20px;
-  white-space:nowrap;
-}
-
-.brand-icon {
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border-radius:13px;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  font-size:23px;
-}
-
-.brand span span {
-  color:var(--cyan);
-}
-
-.header-actions {
-  display:flex;
-  gap:7px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-.header-btn {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  min-height:40px;
-  padding:8px 13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--surface);
-  color:var(--text);
-  font-size:13px;
-  font-weight:700;
-  white-space:nowrap;
-  flex-shrink:0;
-  transition:background .2s,border-color .2s,transform .2s;
-}
-
-.header-btn:hover,
-.header-btn.active {
-  border-color:var(--primary);
-  background:var(--surface2);
-}
-
-.header-btn.primary {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  border:0;
-}
-
-.header-btn:hover {
-  transform:translateY(-1px);
-}
-
-.theme-toggle {
-  min-width:115px;
-}
-
-/* NAVIGATION */
-
-.nav-wrap {
-  border-top:1px solid var(--border);
-}
-
-.nav-buttons {
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  padding:10px 0;
-}
-
-.more-wrapper {
-  position:relative;
-}
-
-.more-menu {
-  display:none;
-  position:absolute;
-  top:calc(100% + 8px);
-  right:0;
-  width:230px;
-  padding:8px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:var(--shadow);
-}
-
-.more-menu.open {
-  display:block;
-}
-
-.more-menu button {
-  display:block;
-  width:100%;
-  text-align:left;
-  padding:11px;
-  border:0;
-  border-radius:8px;
-  background:transparent;
-  color:var(--text);
-}
-
-.more-menu button:hover {
-  background:var(--surface2);
-}
-
-/* PAGE NAVIGATION */
-
-.app-page {
-  display:none;
-  min-height:calc(100vh - 150px);
-}
-
-.app-page.active {
-  display:block;
-  animation:appear .2s ease;
-}
-
-@keyframes appear {
-  from {opacity:0;transform:translateY(4px)}
-  to {opacity:1;transform:translateY(0)}
-}
-
-.section {
-  padding:40px 0 65px;
-}
-
-.section-label {
-  display:inline-block;
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:2px;
-  margin-bottom:10px;
-}
-
-h1 {
-  font-size:clamp(28px,4vw,52px);
-  line-height:1.2;
-}
-
-h2 {
-  font-size:clamp(23px,2.5vw,32px);
-  line-height:1.3;
-  margin-bottom:10px;
-}
-
-h3 {
-  line-height:1.35;
-}
-
-p {
-  color:var(--muted);
-}
-
-/* HOME HERO */
-
-.hero {
-  padding:clamp(55px,8vw,110px) 0;
-  text-align:center;
-}
-
-.hero h1 {
-  font-size:clamp(38px,6vw,82px);
-  margin:20px 0;
-}
-
-.gradient-text {
-  background:linear-gradient(100deg,#6d8cff,#bf81ff,#40dfff);
-  background-clip:text;
-  -webkit-background-clip:text;
-  color:transparent;
-}
-
-.hero p {
-  max-width:800px;
-  margin:12px auto 22px;
-  font-size:clamp(14px,1.4vw,19px);
-}
-
-.eyebrow {
-  display:inline-block;
-  border:1px solid rgba(101,117,255,.4);
-  background:rgba(101,117,255,.1);
-  padding:7px 14px;
-  border-radius:30px;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1px;
-}
-
-/* HOME CARDS */
-
-.feature-grid {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:17px;
-  margin-top:25px;
-}
-
-.feature-card {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  text-align:left;
-  padding:23px;
-  min-height:210px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:var(--card-bg);
-  color:var(--text);
-  transition:transform .2s,border-color .2s,box-shadow .2s;
-}
-
-.feature-card:hover {
-  border-color:var(--primary);
-  transform:translateY(-3px);
-  box-shadow:var(--shadow);
-}
-
-.feature-icon {
-  font-size:32px;
-  margin-bottom:13px;
-}
-
-.feature-card h3 {
-  font-size:18px;
-  margin-bottom:8px;
-}
-
-.feature-card p {
-  font-size:13px;
-  margin-bottom:16px;
-}
-
-.card-link {
-  margin-top:auto;
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:bold;
-}
-
-/* PANELS */
-
-.panel {
-  padding:clamp(18px,3vw,34px);
-  margin-top:22px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:var(--card-bg);
-  box-shadow:var(--shadow);
-}
-
-.action-row {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:17px;
-}
-
-.action-btn {
-  padding:10px 14px;
-  border-radius:9px;
-  background:var(--surface2);
-  border:1px solid var(--border);
-  color:var(--text);
-  font-weight:bold;
-  font-size:12px;
-}
-
-.action-btn.primary {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  border:0;
-}
-
-.action-btn:hover {
-  border-color:var(--primary);
-}
-
-footer {
-  border-top:1px solid var(--border);
-  padding:24px 0;
-  color:var(--muted);
-  font-size:12px;
-  background:var(--surface);
-}
-
-/* CODING STUDIO */
-
-.coding-heading {
-  margin-bottom:22px;
-}
-
-.coding-heading p {
-  margin-top:9px;
-}
-
-.tool-card {
-  border:1px solid var(--border);
-  border-radius:15px;
-  overflow:hidden;
-  background:var(--surface);
-  margin-bottom:20px;
-  box-shadow:var(--shadow);
-}
-
-.tool-bar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:12px 15px;
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
-}
-
-.tool-bar strong {
-  font-size:14px;
-}
-
-.tool-bar .action-row {
-  gap:6px;
-}
-
-.preview-screen {
-  height:400px;
-  background:var(--preview-bg);
-  position:relative;
-}
-
-.preview-screen iframe {
-  width:100%;
-  height:100%;
-  border:0;
-  display:block;
-  background:white;
-}
-
-.editor-tabs {
-  display:flex;
-  overflow-x:auto;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  scrollbar-width:thin;
-}
-
-.editor-tab {
-  padding:11px 19px;
-  border:0;
-  border-bottom:3px solid transparent;
-  color:var(--muted);
-  background:transparent;
-  font-weight:bold;
-  font-size:13px;
-  white-space:nowrap;
-}
-
-.editor-tab.active {
-  color:var(--text);
-  border-bottom-color:var(--primary);
-  background:var(--surface2);
-}
-
-.editor-panel {
-  display:none;
-}
-
-.editor-panel.active {
-  display:block;
-}
-
-.file-label {
-  padding:8px 13px;
-  background:var(--surface2);
-  color:var(--muted);
-  font-size:11px;
-  border-bottom:1px solid var(--border);
-}
-
-.code-input {
-  display:block;
-  width:100%;
-  min-height:300px;
-  padding:15px;
-  resize:vertical;
-  border:0;
-  outline:none;
-  background:var(--editor-bg);
-  color:var(--editor-text);
-  font-family:monospace;
-  font-size:13px;
-  line-height:1.7;
-  tab-size:2;
-  white-space:pre;
-  overflow:auto;
-  border-radius:0;
-}
-
-.editor-footer {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:12px;
-  flex-wrap:wrap;
-  background:var(--surface2);
-  border-top:1px solid var(--border);
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* FULLSCREEN PREVIEW */
-
-.preview-screen:fullscreen {
-  width:100%;
-  height:100%;
-  background:white;
-}
-
-.preview-screen:fullscreen iframe {
-  width:100%;
-  height:100%;
-}
-
-.preview-screen:-webkit-full-screen {
-  width:100%;
-  height:100%;
-  background:white;
-}
-
-.preview-screen:-webkit-full-screen iframe {
-  width:100%;
-  height:100%;
-}
-
-.preview-fullscreen-btn {
-  position:absolute;
-  right:10px;
-  bottom:10px;
-  z-index:5;
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border:1px solid rgba(255,255,255,.3);
-  border-radius:10px;
-  background:#11182be8;
-  color:white;
-  font-size:19px;
-  box-shadow:0 4px 15px #0003;
-}
-
-.preview-fullscreen-btn:hover {
-  background:#27345a;
-}
-
-/* SCIENTIFIC CALCULATOR */
-
-.calculator {
-  width:100%;
-  max-width:720px;
-  margin:25px auto;
-  padding:clamp(12px,2.5vw,22px);
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:var(--card-bg);
-  box-shadow:var(--shadow);
-}
-
-.calc-top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:10px;
-  flex-wrap:wrap;
-}
-
-.calc-top strong {
-  font-size:16px;
-}
-
-.calc-display {
-  display:block;
-  width:100%;
-  min-width:0;
-  min-height:60px;
-  padding:12px;
-  margin-bottom:10px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--input-bg);
-  color:var(--cyan);
-  text-align:right;
-  font-family:monospace;
-  font-size:clamp(22px,4vw,34px);
-  outline:none;
-}
-
-.calc-expression {
-  min-height:20px;
-  color:var(--muted);
-  text-align:right;
-  overflow-wrap:anywhere;
-  font-family:monospace;
-  font-size:12px;
-  margin-bottom:4px;
-}
-
-.calc-status {
-  min-height:20px;
-  color:#c77726;
-  font-size:11px;
-  margin-bottom:7px;
-  overflow-wrap:anywhere;
-}
-
-.calc-grid {
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;
-}
-
-.calc-key {
-  min-width:0;
-  min-height:48px;
-  padding:8px 3px;
-  border:1px solid var(--border);
-  border-radius:9px;
-  color:var(--text);
-  background:var(--surface2);
-  font-size:14px;
-  font-weight:bold;
-  touch-action:manipulation;
-}
-
-.calc-key:hover {
-  border-color:var(--primary);
-  filter:brightness(1.06);
-}
-
-.calc-key.function {
-  background:var(--surface);
-  color:var(--cyan);
-}
-
-.calc-key.operator {
-  background:rgba(168,85,247,.15);
-  color:var(--text);
-}
-
-.calc-key.danger {
-  background:rgba(220,60,100,.13);
-  color:#e34d70;
-}
-
-.calc-key.equal {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-}
-
-.calc-key.wide {
-  grid-column:span 2;
-}
-
-.calc-mode {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:11px;
-  color:var(--muted);
-}
-
-.calc-mode select {
-  padding:6px 8px;
-  border-radius:7px;
-  border:1px solid var(--border);
-  background:var(--surface);
-  color:var(--text);
-}
-
-/* TEXT COUNTER */
-
-.text-counter {
-  margin-top:20px;
-}
-
-.counter-input {
-  display:block;
-  width:100%;
-  min-height:190px;
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  outline:none;
-  resize:vertical;
-  background:var(--input-bg);
-  color:var(--input-text);
-  font-family:monospace;
-  font-size:14px;
-  line-height:1.7;
-}
-
-.counter-input:focus {
-  border-color:var(--primary);
-}
-
-.counter-stats {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  margin-top:15px;
-}
-
-.counter-stat {
-  padding:16px 12px;
-  border:1px solid var(--border);
-  border-radius:11px;
-  background:var(--surface);
-  min-width:0;
-}
-
-.counter-stat strong {
-  display:block;
-  font-size:clamp(20px,2vw,27px);
-  overflow-wrap:anywhere;
-  line-height:1.4;
-}
-
-.counter-stat span {
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* NOTICES */
-
-.notice {
-  position:fixed;
-  z-index:3000;
-  bottom:18px;
-  left:50%;
-  transform:translate(-50%,15px);
-  width:max-content;
-  max-width:90%;
-  padding:11px 15px;
-  border:1px solid var(--primary);
-  border-radius:10px;
-  background:var(--surface);
-  color:var(--text);
-  font-size:12px;
-  box-shadow:var(--shadow);
-  opacity:0;
-  pointer-events:none;
-  transition:.2s;
-}
-
-.notice.show {
-  opacity:1;
-  transform:translate(-50%,0);
-}
-
-/* LIGHT MODE */
-
-:root[data-theme="light"] .feature-card:hover,
-:root[data-theme="light"] .panel,
-:root[data-theme="light"] .calculator,
-:root[data-theme="light"] .tool-card {
-  box-shadow:0 12px 30px rgba(31,48,82,.08);
-}
-
-:root[data-theme="light"] .calc-key.danger {
-  color:#a51e43;
-}
-
-:root[data-theme="light"] .calc-status {
-  color:#9a4a00;
-}
-
-/* TABLETS */
-
-@media(max-width:1200px) {
-  .feature-grid {
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-
-  .nav-buttons {
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    scrollbar-width:thin;
-  }
-}
-
-@media(max-width:850px) {
-  .container {
-    width:94%;
-  }
-
-  .feature-grid {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .preview-screen {
-    height:320px;
-  }
-
-  .code-input {
-    min-height:260px;
-  }
-
-  .counter-stats {
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-/* MOBILE PHONES */
-
-@media(max-width:550px) {
-  .brand {
-    font-size:15px;
-    gap:7px;
-  }
-
-  .brand-icon {
-    width:34px;
-    height:34px;
-    border-radius:10px;
-    font-size:19px;
-  }
-
-  .header-top {
-    padding:9px 0;
-    align-items:center;
-    gap:8px;
-  }
-
-  .header-actions {
-    gap:5px;
-  }
-
-  .header-actions .header-btn {
-    min-height:34px;
-    padding:6px 8px;
-    font-size:10px;
-    border-radius:8px;
-  }
-
-  .theme-toggle {
-    min-width:0;
-  }
-
-  .container {
-    width:92%;
-  }
-
-  .nav-buttons {
-    gap:6px;
-    padding:8px 0;
-  }
-
-  .nav-buttons .header-btn {
-    min-height:34px;
-    padding:7px 10px;
-    font-size:11px;
-  }
-
-  .feature-grid {
-    grid-template-columns:1fr;
-    gap:11px;
-  }
-
-  .feature-card {
-    min-height:145px;
-    padding:18px;
-  }
-
-  .feature-icon {
-    font-size:27px;
-    margin-bottom:8px;
-  }
-
-  .feature-card h3 {
-    font-size:16px;
-  }
-
-  .section {
-    padding:25px 0 40px;
-  }
-
-  .hero {
-    padding:48px 0;
-  }
-
-  .hero h1 {
-    margin:15px 0;
-  }
-
-  .hero p {
-    font-size:13px;
-  }
-
-  .calculator {
-    padding:9px;
-    margin:18px auto;
-    border-radius:13px;
-  }
-
-  .calc-top {
-    margin-bottom:7px;
-  }
-
-  .calc-top strong {
-    font-size:13px;
-  }
-
-  .calc-display {
-    min-height:49px;
-    padding:9px;
-    margin-bottom:7px;
-    font-size:23px;
-    border-radius:8px;
-  }
-
-  .calc-expression {
-    font-size:10px;
-    min-height:16px;
-  }
-
-  .calc-status {
-    min-height:16px;
-    font-size:10px;
-    margin-bottom:5px;
-  }
-
-  .calc-grid {
-    gap:4px;
-  }
-
-  .calc-key {
-    min-height:39px;
-    padding:5px 1px;
-    font-size:12px;
-    border-radius:7px;
-  }
-
-  .calc-mode {
-    font-size:10px;
-  }
-
-  .calc-mode select {
-    padding:5px;
-  }
-
-  .counter-input {
-    min-height:145px;
-    padding:11px;
-    font-size:13px;
-  }
-
-  .counter-stats {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:7px;
-    margin-top:10px;
-  }
-
-  .counter-stat {
-    padding:12px 9px;
-  }
-
-  .counter-stat strong {
-    font-size:21px;
-  }
-
-  .counter-stat span {
-    font-size:10px;
-  }
-
-  .preview-screen {
-    height:230px;
-  }
-
-  .preview-fullscreen-btn {
-    right:7px;
-    bottom:7px;
-    width:36px;
-    height:36px;
-    font-size:16px;
-  }
-
-  .code-input {
-    min-height:200px;
-    padding:11px;
-    font-size:12px;
-    line-height:1.6;
-  }
-
-  .editor-tab {
-    padding:10px 13px;
-    font-size:11px;
-  }
-
-  .tool-bar {
-    padding:9px;
-  }
-
-  .tool-bar strong {
-    font-size:12px;
-  }
-
-  .tool-bar .action-btn,
-  .editor-footer .action-btn {
-    padding:8px 10px;
-    font-size:11px;
-  }
-
-  .editor-footer {
-    padding:9px;
-  }
-
-  .panel {
-    padding:15px;
-  }
-
-  .app-page {
-    min-height:65vh;
-  }
-
-  footer {
-    padding:19px 0;
-  }
-}
-
-@media(max-width:360px) {
-  .brand {
-    font-size:13px;
-  }
-
-  .header-actions .header-btn {
-    padding:5px 6px;
-    font-size:9px;
-  }
-
-  .calc-key {
-    min-height:35px;
-    font-size:11px;
-  }
-
-  .calc-grid {
-    gap:3px;
-  }
-
-  .calc-display {
-    font-size:20px;
-  }
-
-  .counter-stat strong {
-    font-size:18px;
-  }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    animation:none!important;
-    transition:none!important;
-    scroll-behavior:auto!important;
-  }
-}
-</style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at top left, rgba(67,91,255,.18), transparent 45%),
+        radial-gradient(ellipse at top right, rgba(52,231,255,.08), transparent 35%),
+        var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,11,24,.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      width: min(1180px, 100%);
+      margin: auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: #080b18;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 22px rgba(82,109,255,.25);
+    }
+
+    .brand-name span {
+      color: var(--cyan);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-button {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 750;
+    }
+
+    .nav-button:hover {
+      border-color: var(--cyan);
+    }
+
+    .container {
+      width: min(1180px, 100%);
+      margin: auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      padding-top: 56px;
+      padding-bottom: 30px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(52,231,255,.25);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(52,231,255,.07);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(35px, 7vw, 66px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: var(--cyan);
+    }
+
+    .hero-description {
+      max-width: 650px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 46px;
+      padding: 12px 18px;
+      border-radius: 13px;
+      font-weight: 850;
+    }
+
+    .primary-button {
+      color: #07101b;
+      border: 0;
+      background: linear-gradient(135deg, var(--cyan), #8bffda);
+    }
+
+    .secondary-button {
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+      max-width: 650px;
+    }
+
+    .stat {
+      padding: 16px;
+      background: rgba(17,23,42,.82);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 23px;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      padding-top: 25px;
+      padding-bottom: 35px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(23px, 4vw, 32px);
+      letter-spacing: -.7px;
+    }
+
+    .section-heading p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .search-box {
+      width: min(100%, 330px);
+      min-height: 46px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+
+    .search-box input {
+      width: 100%;
+      min-width: 0;
+      outline: none;
+      border: 0;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .search-box input::placeholder {
+      color: #828ba5;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 22px;
+    }
+
+    .filter-button {
+      min-height: 40px;
+      padding: 9px 15px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+      font-weight: 750;
+    }
+
+    .filter-button.active {
+      color: #07101b;
+      background: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .games-panel {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(17,23,42,.8);
+      box-shadow: 0 15px 45px rgba(0,0,0,.15);
+    }
+
+    #nexora-games {
+      min-width: 0;
+      width: 100%;
+    }
+
+    #nexora-games canvas,
+    #nexora-games img,
+    #nexora-games video {
+      max-width: 100%;
+    }
+
+    .loading-state {
+      padding: 35px 15px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .loading-icon {
+      font-size: 48px;
+      animation: pulse 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(.95); opacity: .7; }
+      to { transform: scale(1.08); opacity: 1; }
+    }
+
+    .error-box {
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255,100,130,.35);
+      border-radius: 16px;
+      background: rgba(255,70,110,.07);
+    }
+
+    .error-box h3 {
+      margin-top: 0;
+    }
+
+    .error-box p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .error-box button {
+      margin-top: 8px;
+    }
+
+    .notice {
+      margin-top: 15px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-card {
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .feature-card .icon {
+      font-size: 29px;
+    }
+
+    .feature-card h3 {
+      margin: 12px 0 8px;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      margin-top: 20px;
+      padding: 28px 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .footer strong {
+      color: var(--text);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 200;
+      width: max-content;
+      max-width: calc(100% - 32px);
+      padding: 13px 18px;
+      color: var(--text);
+      background: #202943;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        padding: 12px 15px;
+      }
+
+      .brand {
+        font-size: 16px;
+      }
+
+      .brand-icon {
+        width: 38px;
+        height: 38px;
+      }
+
+      .nav-button {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .container {
+        padding: 0 15px;
+      }
+
+      .hero {
+        padding-top: 38px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1.3px;
+      }
+
+      .stats {
+        gap: 8px;
+      }
+
+      .stat {
+        padding: 12px 9px;
+      }
+
+      .stat strong {
+        font-size: 19px;
+      }
+
+      .stat span {
+        font-size: 11px;
+      }
+
+      .section-heading {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .games-panel {
+        padding: 12px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="site-header">
-  <div class="container">
-
-    <div class="header-top">
-      <a class="brand" href="#home" data-page="home">
-        <span class="brand-icon">⚡</span>
-        <span>REXWEB <span>NEXORA</span></span>
+  <!-- HEADER -->
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html" aria-label="RexWeb Nexora home">
+        <span class="brand-icon">🎮</span>
+        <span class="brand-name">RexWeb <span>Nexora</span></span>
       </a>
 
-      <div class="header-actions">
-        <button class="header-btn theme-toggle" id="themeToggle" type="button">
-          ☀️ Light Mode
-        </button>
-
-        <button class="header-btn" data-notice="Login requires account authentication to be connected.">
-          👤 Login
-        </button>
-
-        <button class="header-btn primary" data-notice="Registration requires account authentication to be connected.">
-          Sign Up
-        </button>
-
-        <div class="more-wrapper">
-          <button class="header-btn" id="moreButton" aria-expanded="false" aria-controls="moreMenu">
-            ☰ More
-          </button>
-
-          <div class="more-menu" id="moreMenu">
-            <button data-page="rewards">💰 Rewards Centre</button>
-            <button data-page="help">🛟 Help Centre</button>
-            <button data-page="about">ℹ️ About RexWeb</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav-wrap" aria-label="Main navigation">
-      <div class="nav-buttons" id="mainNav">
-        <button class="header-btn active" data-page="home">🏠 Home</button>
-        <button class="header-btn" data-page="games">🎮 Games</button>
-        <button class="header-btn" data-page="creator-hub">🎨 Creator Hub</button>
-        <button class="header-btn" data-page="marketplace">🛍️ Marketplace</button>
-        <button class="header-btn" data-page="learning">📚 Learning</button>
-        <button class="header-btn" data-page="web-dev">💻 Web Dev</button>
-        <button class="header-btn" data-page="coding-studio">🧑‍💻 Coding Studio</button>
-        <button class="header-btn" data-page="calculator">🧮 Calculator</button>
-        <button class="header-btn" data-page="text-counter">🔢 Text Counter</button>
-        <button class="header-btn" data-page="competitions">🏆 Competitions</button>
-        <button class="header-btn" data-page="rewards">💰 Rewards</button>
+      <div class="nav-actions">
+        <a class="nav-button" href="index.html">← Website</a>
+        <a class="nav-button" href="#games">Play Now</a>
       </div>
     </nav>
+  </header>
 
-  </div>
-</header>
+  <main>
 
-<main>
+    <!-- HERO -->
+    <section class="container hero">
+      <span class="eyebrow">⚡ THE NEXORA ARCADE</span>
 
-<!-- HOME -->
+      <h1>
+        Your next<br>
+        <span>gaming adventure.</span>
+      </h1>
 
-<section class="app-page active" id="page-home">
-  <div class="hero container">
-    <div class="eyebrow">YOUR DIGITAL DESTINATION</div>
-
-    <h1>
-      Welcome to<br>
-      <span class="gradient-text">RexWeb Nexora</span>
-    </h1>
-
-    <p>Play. Create. Trade. Grow.</p>
-
-    <p>
-      Discover gaming, creative resources, coding tools, digital products,
-      and learning resources in one place.
-    </p>
-
-    <button class="header-btn primary" data-page="coding-studio">
-      🧑‍💻 Open Coding Studio
-    </button>
-  </div>
-
-  <div class="container section">
-    <h2>Explore RexWeb</h2>
-    <p>Choose a destination to get started.</p>
-
-    <div class="feature-grid">
-      <button class="feature-card" data-page="games">
-        <span class="feature-icon">🎮</span>
-        <h3>Games</h3>
-        <p>Discover games and challenges.</p>
-        <span class="card-link">Explore Games →</span>
-      </button>
-
-      <button class="feature-card" data-page="creator-hub">
-        <span class="feature-icon">🎨</span>
-        <h3>Creator Hub</h3>
-        <p>Explore creative resources and projects.</p>
-        <span class="card-link">Open Creator Hub →</span>
-      </button>
-
-      <button class="feature-card" data-page="marketplace">
-        <span class="feature-icon">🛍️</span>
-        <h3>Marketplace</h3>
-        <p>Discover digital products.</p>
-        <span class="card-link">Browse Products →</span>
-      </button>
-
-      <button class="feature-card" data-page="learning">
-        <span class="feature-icon">📚</span>
-        <h3>Learning Centre</h3>
-        <p>Explore lessons and tutorials.</p>
-        <span class="card-link">Start Learning →</span>
-      </button>
-
-      <button class="feature-card" data-page="web-dev">
-        <span class="feature-icon">💻</span>
-        <h3>Web Development</h3>
-        <p>Explore code and website resources.</p>
-        <span class="card-link">Explore Web Dev →</span>
-      </button>
-
-      <button class="feature-card" data-page="coding-studio">
-        <span class="feature-icon">🧑‍💻</span>
-        <h3>Coding Studio</h3>
-        <p>Write HTML, CSS and JavaScript with a live preview.</p>
-        <span class="card-link">Start Coding →</span>
-      </button>
-
-      <button class="feature-card" data-page="calculator">
-        <span class="feature-icon">🧮</span>
-        <h3>Scientific Calculator</h3>
-        <p>Calculate expressions with scientific functions.</p>
-        <span class="card-link">Open Calculator →</span>
-      </button>
-
-      <button class="feature-card" data-page="text-counter">
-        <span class="feature-icon">🔢</span>
-        <h3>Text Counter</h3>
-        <p>Count words, characters, lines, digits, and letters.</p>
-        <span class="card-link">Count Text →</span>
-      </button>
-
-      <button class="feature-card" data-page="competitions">
-        <span class="feature-icon">🏆</span>
-        <h3>Competitions</h3>
-        <p>Explore tournaments and challenges.</p>
-        <span class="card-link">View Competitions →</span>
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- GAMES -->
-
-<section class="app-page" id="page-games">
-  <div class="container section">
-    <span class="section-label">PLAY</span>
-    <h1>🎮 Games Hub</h1>
-    <div class="panel">
-      <p>Discover games, gaming challenges, and leaderboards.</p>
-      <div class="action-row">
-        <button class="action-btn" data-notice="Add your game catalogue to this section.">Browse Games</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CREATOR HUB -->
-
-<section class="app-page" id="page-creator-hub">
-  <div class="container section">
-    <span class="section-label">CREATE</span>
-    <h1>🎨 Creator Hub</h1>
-    <div class="panel">
-      <p>Explore creative resources, design assets, and project ideas.</p>
-    </div>
-  </div>
-</section>
-
-<!-- MARKETPLACE -->
-
-<section class="app-page" id="page-marketplace">
-  <div class="container section">
-    <span class="section-label">TRADE</span>
-    <h1>🛍️ Marketplace</h1>
-    <div class="panel">
-      <p>
-        Discover digital products and downloadable resources.
-        Product listings and payments require backend integration.
+      <p class="hero-description">
+        Welcome to RexWeb Nexora Games. Explore arcade challenges,
+        sharpen your skills, and beat your personal bests.
+        Pick a game and start playing.
       </p>
-    </div>
-  </div>
-</section>
 
-<!-- LEARNING -->
+      <div class="hero-buttons">
+        <button class="primary-button" id="heroPlayButton" type="button">
+          🎮 Explore Games
+        </button>
 
-<section class="app-page" id="page-learning">
-  <div class="container section">
-    <span class="section-label">LEARN</span>
-    <h1>📚 Learning Centre</h1>
-    <div class="panel">
-      <p>Explore tutorials, lessons, and educational resources.</p>
-    </div>
-  </div>
-</section>
-
-<!-- WEB DEVELOPMENT -->
-
-<section class="app-page" id="page-web-dev">
-  <div class="container section">
-    <span class="section-label">BUILD</span>
-    <h1>💻 Web Development</h1>
-    <div class="panel">
-      <p>Explore HTML, CSS, JavaScript, templates, and web development guides.</p>
-      <div class="action-row">
-        <button class="action-btn primary" data-page="coding-studio">Open Coding Studio</button>
+        <button class="secondary-button" id="howToPlayButton" type="button">
+          ℹ️ How to Play
+        </button>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- COMPETITIONS -->
+      <div class="stats">
+        <div class="stat">
+          <strong id="gameCount">10</strong>
+          <span>Arcade Games</span>
+        </div>
 
-<section class="app-page" id="page-competitions">
-  <div class="container section">
-    <span class="section-label">COMPETE</span>
-    <h1>🏆 Competitions</h1>
-    <div class="panel">
-      <p>Explore tournaments and challenges. Event registration is not connected yet.</p>
-    </div>
-  </div>
-</section>
+        <div class="stat">
+          <strong>📱</strong>
+          <span>Mobile Friendly</span>
+        </div>
 
-<!-- REWARDS -->
-
-<section class="app-page" id="page-rewards">
-  <div class="container section">
-    <span class="section-label">REWARDS</span>
-    <h1>💰 Rewards Centre</h1>
-    <div class="panel">
-      <p>Explore reward programme information. No earning or withdrawal system is connected yet.</p>
-    </div>
-  </div>
-</section>
-
-<!-- HELP -->
-
-<section class="app-page" id="page-help">
-  <div class="container section">
-    <h1>🛟 Help Centre</h1>
-    <div class="panel">
-      <p>Help resources can be added here.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-
-<section class="app-page" id="page-about">
-  <div class="container section">
-    <h1>⚡ About RexWeb Nexora</h1>
-    <div class="panel">
-      <p>Play. Create. Trade. Grow. A digital destination for gaming, creativity, coding, and learning.</p>
-    </div>
-  </div>
-</section>
-
-<!-- CODING STUDIO -->
-
-<section class="app-page" id="page-coding-studio">
-  <div class="container section">
-
-    <div class="coding-heading">
-      <span class="section-label">REXWEB DEVELOPER TOOLS</span>
-      <h1>🧑‍💻 Coding Studio</h1>
-      <p>Write HTML, CSS and JavaScript. Run your code and expand the preview to fullscreen.</p>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-bar">
-        <strong>👁️ Live Preview</strong>
-        <div class="action-row" style="margin:0">
-          <button class="action-btn primary" id="refreshPreview">▶ Run</button>
-          <button class="action-btn" id="resetEditor">↺ Reset</button>
+        <div class="stat">
+          <strong>🏆</strong>
+          <span>Personal Bests</span>
         </div>
       </div>
+    </section>
 
-      <div class="preview-screen" id="previewScreen">
-        <iframe id="codePreview" title="Code preview" sandbox="allow-scripts"></iframe>
-        <button class="preview-fullscreen-btn" id="fullscreenPreview" type="button" aria-label="Open fullscreen preview" title="Fullscreen preview">⛶</button>
-      </div>
-    </div>
+    <!-- GAMES -->
+    <section class="container section" id="games">
+      <div class="section-heading">
+        <div>
+          <h2>🎯 Choose Your Game</h2>
+          <p>Find a game and see how high you can score.</p>
+        </div>
 
-    <div class="tool-card">
-      <div class="tool-bar">
-        <strong>Code Editor</strong>
-        <span>REXWEB IDE</span>
-      </div>
-
-      <div class="editor-tabs">
-        <button class="editor-tab active" data-editor="html">HTML</button>
-        <button class="editor-tab" data-editor="css">CSS</button>
-        <button class="editor-tab" data-editor="javascript">JavaScript</button>
-      </div>
-
-      <div class="editor-panel active" id="panel-html">
-        <div class="file-label">index.html</div>
-        <textarea class="code-input" id="htmlCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="HTML editor"></textarea>
-      </div>
-
-      <div class="editor-panel" id="panel-css">
-        <div class="file-label">style.css</div>
-        <textarea class="code-input" id="cssCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="CSS editor"></textarea>
-      </div>
-
-      <div class="editor-panel" id="panel-javascript">
-        <div class="file-label">script.js</div>
-        <textarea class="code-input" id="jsCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="JavaScript editor"></textarea>
-      </div>
-
-      <div class="editor-footer">
-        <span id="editorStatus" aria-live="polite">Ready to code</span>
-        <button class="action-btn primary" id="runCode">▶ Run Code</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SCIENTIFIC CALCULATOR -->
-
-<section class="app-page" id="page-calculator">
-  <div class="container section">
-    <span class="section-label">REXWEB TOOLS</span>
-    <h1>🧮 Scientific Calculator</h1>
-    <p>Use the buttons or type a mathematical expression.</p>
-
-    <div class="calculator">
-      <div class="calc-top">
-        <strong>Scientific Calculator</strong>
-        <label class="calc-mode">
-          Angle
-          <select id="angleMode">
-            <option value="DEG">DEG</option>
-            <option value="RAD">RAD</option>
-          </select>
+        <label class="search-box">
+          <span aria-hidden="true">🔍</span>
+          <input
+            id="gameSearch"
+            type="search"
+            placeholder="Search games..."
+            aria-label="Search games"
+          >
         </label>
       </div>
 
-      <div class="calc-expression" id="calcExpression" aria-live="polite"></div>
+      <div class="filters" aria-label="Game categories">
+        <button class="filter-button active" data-filter="all" type="button">
+          All Games
+        </button>
 
-      <input class="calc-display" id="calcDisplay" value="0" aria-label="Calculator display" inputmode="decimal">
+        <button class="filter-button" data-filter="arcade" type="button">
+          🕹️ Arcade
+        </button>
 
-      <div class="calc-status" id="calcStatus" aria-live="polite"></div>
+        <button class="filter-button" data-filter="puzzle" type="button">
+          🧩 Puzzle
+        </button>
 
-      <div class="calc-grid" id="calcKeys">
-        <button class="calc-key danger" data-action="clear">AC</button>
-        <button class="calc-key danger" data-action="delete">DEL</button>
-        <button class="calc-key function" data-value="(">(</button>
-        <button class="calc-key function" data-value=")">)</button>
-        <button class="calc-key operator" data-value="/">÷</button>
+        <button class="filter-button" data-filter="action" type="button">
+          🚀 Action
+        </button>
 
-        <button class="calc-key function" data-value="sin(">sin</button>
-        <button class="calc-key function" data-value="cos(">cos</button>
-        <button class="calc-key function" data-value="tan(">tan</button>
-        <button class="calc-key function" data-value="sqrt(">√</button>
-        <button class="calc-key operator" data-value="^">xʸ</button>
-
-        <button class="calc-key function" data-value="asin(">sin⁻¹</button>
-        <button class="calc-key function" data-value="acos(">cos⁻¹</button>
-        <button class="calc-key function" data-value="atan(">tan⁻¹</button>
-        <button class="calc-key function" data-value="log(">log</button>
-        <button class="calc-key function" data-value="ln(">ln</button>
-
-        <button class="calc-key function" data-value="π">π</button>
-        <button class="calc-key function" data-value="e">e</button>
-        <button class="calc-key function" data-value="!">x!</button>
-        <button class="calc-key function" data-value="%">%</button>
-        <button class="calc-key operator" data-value="*">×</button>
-
-        <button class="calc-key" data-value="7">7</button>
-        <button class="calc-key" data-value="8">8</button>
-        <button class="calc-key" data-value="9">9</button>
-        <button class="calc-key function" data-value="abs(">abs</button>
-        <button class="calc-key operator" data-value="-">−</button>
-
-        <button class="calc-key" data-value="4">4</button>
-        <button class="calc-key" data-value="5">5</button>
-        <button class="calc-key" data-value="6">6</button>
-        <button class="calc-key function" data-value="floor(">floor</button>
-        <button class="calc-key operator" data-value="+">+</button>
-
-        <button class="calc-key" data-value="1">1</button>
-        <button class="calc-key" data-value="2">2</button>
-        <button class="calc-key" data-value="3">3</button>
-        <button class="calc-key function" data-value="ceil(">ceil</button>
-        <button class="calc-key function" data-value="round(">round</button>
-
-        <button class="calc-key" data-value="0">0</button>
-        <button class="calc-key" data-value=".">.</button>
-        <button class="calc-key function" data-value="Ans">Ans</button>
-        <button class="calc-key equal wide" data-action="equals">=</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TEXT COUNTER -->
-
-<section class="app-page" id="page-text-counter">
-  <div class="container section">
-    <span class="section-label">REXWEB WRITING TOOLS</span>
-    <h1>🔢 Text Counter</h1>
-    <p>Type or paste your text. The statistics update automatically.</p>
-
-    <div class="text-counter">
-      <textarea id="counterInput" class="counter-input" placeholder="Type or paste your text here..." aria-label="Text to count"></textarea>
-
-      <div class="action-row">
-        <button class="action-btn primary" id="copyText">Copy Text</button>
-        <button class="action-btn" id="clearText">Clear Text</button>
+        <button class="filter-button" data-filter="classic" type="button">
+          🎲 Classic
+        </button>
       </div>
 
-      <div class="counter-stats" aria-live="polite">
-        <div class="counter-stat"><strong id="countChars">0</strong><span>Characters</span></div>
-        <div class="counter-stat"><strong id="countNoSpaces">0</strong><span>Characters without spaces</span></div>
-        <div class="counter-stat"><strong id="countWords">0</strong><span>Words</span></div>
-        <div class="counter-stat"><strong id="countLines">0</strong><span>Lines</span></div>
-        <div class="counter-stat"><strong id="countDigits">0</strong><span>Digits (0–9)</span></div>
-        <div class="counter-stat"><strong id="countLetters">0</strong><span>Letters</span></div>
+      <div class="games-panel">
+        <p id="nexora-games-status" role="status" aria-live="polite">
+          Loading game engine...
+        </p>
+
+        <!-- IMPORTANT: game.js renders its game hub here -->
+        <div id="nexora-games">
+          <div class="loading-state">
+            <div class="loading-icon">🎮</div>
+            <h3>Preparing the arcade...</h3>
+            <p>Your games will appear here shortly.</p>
+          </div>
+        </div>
+
+        <div class="action-row" style="margin-top:18px">
+          <button
+            class="secondary-button"
+            id="reloadNexoraGames"
+            type="button"
+          >
+            🔄 Reload Games
+          </button>
+        </div>
+
+        <p class="notice">
+          Game progress and personal-best scores may be stored locally
+          on your device. Clearing browser data can remove locally stored
+          progress.
+        </p>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-</main>
+    <!-- FEATURES -->
+    <section class="container section">
+      <div class="section-heading">
+        <div>
+          <h2>✨ Made for Players</h2>
+          <p>A simple arcade experience designed for quick gaming sessions.</p>
+        </div>
+      </div>
 
-<footer>
-  <div class="container">
-    <strong>⚡ REXWEB NEXORA</strong><br>
-    Play. Create. Trade. Grow. · © <span id="year"></span> RexWeb Nexora
-  </div>
-</footer>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="icon">📱</div>
+          <h3>Play on Mobile</h3>
+          <p>
+            Enjoy games on your phone. Touch controls depend on the
+            controls implemented in each game.
+          </p>
+        </article>
 
-<div class="notice" id="notice" role="status" aria-live="polite"></div>
+        <article class="feature-card">
+          <div class="icon">🏆</div>
+          <h3>Beat Your Best</h3>
+          <p>
+            Challenge yourself to improve your scores and reach new
+            personal records.
+          </p>
+        </article>
 
-<script>
-/* =========================================
-   THEME SWITCH
-========================================= */
+        <article class="feature-card">
+          <div class="icon">⚡</div>
+          <h3>Jump Straight In</h3>
+          <p>
+            Choose a game from the hub and start playing without
+            navigating through multiple pages.
+          </p>
+        </article>
+      </div>
+    </section>
 
-(function initTheme() {
-  const toggle = document.getElementById("themeToggle");
-  const root = document.documentElement;
-  const themeColor = document.getElementById("themeColor");
+  </main>
 
-  function applyTheme(theme, save = true) {
-    if (theme !== "light" && theme !== "dark") theme = "dark";
+  <!-- FOOTER -->
+  <footer class="footer">
+    <strong>RexWeb Nexora</strong><br>
+    PLAY. CREATE. TRADE. GROW.<br>
+    <span>© <span id="currentYear"></span> RexWeb Nexora.</span>
+  </footer>
 
-    root.dataset.theme = theme;
-    const isDark = theme === "dark";
+  <div class="toast" id="nexoraToast" role="status" aria-live="polite"></div>
 
-    toggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-    toggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-    toggle.setAttribute("aria-pressed", String(!isDark));
+  <!-- GAME ENGINE LOADER -->
+  <script>
+    (function () {
+      "use strict";
 
-    themeColor.setAttribute("content", isDark ? "#080b18" : "#f2f5fc");
+      const container = document.getElementById("nexora-games");
+      const status = document.getElementById("nexora-games-status");
+      const reloadButton = document.getElementById("reloadNexoraGames");
+      const searchInput = document.getElementById("gameSearch");
+      const filterButtons = document.querySelectorAll("[data-filter]");
+      const toast = document.getElementById("nexoraToast");
 
-    if (save) {
-      try {
-        localStorage.setItem("nexoraTheme", theme);
-      } catch (_) {}
-    }
-  }
+      let loading = false;
+      let toastTimer = null;
+      let activeFilter = "all";
 
-  let initialTheme = "dark";
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
 
-  try {
-    const saved = localStorage.getItem("nexoraTheme");
-    if (saved === "light" || saved === "dark") initialTheme = saved;
-  } catch (_) {}
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
 
-  applyTheme(initialTheme, false);
+        clearTimeout(toastTimer);
 
-  toggle.addEventListener("click", () => {
-    applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
-  });
-})();
+        toastTimer = setTimeout(function () {
+          toast.classList.remove("show");
+        }, 2600);
+      }
 
+      document.getElementById("heroPlayButton").addEventListener("click", function () {
+        document.getElementById("games").scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      });
 
-/* =========================================
-   GLOBAL UTILITIES
-========================================= */
+      document.getElementById("howToPlayButton").addEventListener("click", function () {
+        showToast("Choose a game and follow its on-screen instructions.");
+        document.getElementById("games").scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      });
 
-document.getElementById("year").textContent = new Date().getFullYear();
-
-const noticeElement = document.getElementById("notice");
-let noticeTimer;
-
-function showNotice(message) {
-  noticeElement.textContent = message;
-  noticeElement.classList.add("show");
-  clearTimeout(noticeTimer);
-
-  noticeTimer = setTimeout(() => {
-    noticeElement.classList.remove("show");
-  }, 2800);
-}
-
-document.querySelectorAll("[data-notice]").forEach(button => {
-  button.addEventListener("click", () => showNotice(button.dataset.notice));
-});
-
-
-/* =========================================
-   PAGE NAVIGATION
-========================================= */
-
-const pageNames = [
-  "home", "games", "creator-hub", "marketplace", "learning",
-  "web-dev", "coding-studio", "calculator", "text-counter",
-  "competitions", "rewards", "help", "about"
-];
-
-const navButtons = document.querySelectorAll("#mainNav [data-page]");
-
-const titles = {
-  home:"Home",
-  games:"Games",
-  "creator-hub":"Creator Hub",
-  marketplace:"Marketplace",
-  learning:"Learning Centre",
-  "web-dev":"Web Development",
-  "coding-studio":"Coding Studio",
-  calculator:"Scientific Calculator",
-  "text-counter":"Text Counter",
-  competitions:"Competitions",
-  rewards:"Rewards Centre",
-  help:"Help Centre",
-  about:"About"
-};
-
-function loadPage(name, updateHistory = true) {
-  if (!pageNames.includes(name)) name = "home";
-
-  const page = document.getElementById("page-" + name);
-  if (!page) return;
-
-  document.querySelectorAll(".app-page").forEach(section => {
-    section.classList.remove("active");
-  });
-
-  page.classList.add("active");
-
-  navButtons.forEach(button => {
-    button.classList.toggle("active", button.dataset.page === name);
-  });
-
-  document.getElementById("moreMenu").classList.remove("open");
-  document.getElementById("moreButton").setAttribute("aria-expanded", "false");
-
-  document.title = (titles[name] || "Home") + " | RexWeb Nexora";
-
-  window.scrollTo({top:0, behavior:"auto"});
-
-  if (updateHistory && location.hash !== "#" + name) {
-    history.pushState({page:name}, "", "#" + name);
-  }
-}
-
-document.querySelectorAll("[data-page]").forEach(button => {
-  button.addEventListener("click", () => loadPage(button.dataset.page));
-});
-
-window.addEventListener("popstate", () => {
-  loadPage(location.hash.slice(1) || "home", false);
-});
-
-const moreButton = document.getElementById("moreButton");
-const moreMenu = document.getElementById("moreMenu");
-
-moreButton.addEventListener("click", () => {
-  const open = moreMenu.classList.toggle("open");
-  moreButton.setAttribute("aria-expanded", String(open));
-});
-
-document.addEventListener("click", event => {
-  if (!moreMenu.contains(event.target) && !moreButton.contains(event.target)) {
-    moreMenu.classList.remove("open");
-    moreButton.setAttribute("aria-expanded", "false");
-  }
-});
-
-loadPage(pageNames.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home", false);
-
-
-/* =========================================
-   CODING STUDIO
-========================================= */
-
-(function initCodingStudio() {
-  const htmlEditor = document.getElementById("htmlCode");
-  const cssEditor = document.getElementById("cssCode");
-  const jsEditor = document.getElementById("jsCode");
-  const preview = document.getElementById("codePreview");
-  const previewScreen = document.getElementById("previewScreen");
-  const fullscreenButton = document.getElementById("fullscreenPreview");
-  const status = document.getElementById("editorStatus");
-
-  const starterHTML = `<main class="welcome">
-  <div class="logo">⚡</div>
-  <h1>My First Website</h1>
-  <p>I built this with RexWeb Nexora.</p>
-  <button id="helloButton">Click Me!</button>
-  <p id="message"></p>
-</main>`;
-
-  const starterCSS = `* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: #0b1020;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
-.welcome {
-  width: min(90%, 500px);
-  padding: 35px 20px;
-  text-align: center;
-  background: #151e38;
-  border: 1px solid #3e4b78;
-  border-radius: 20px;
-}
-
-h1 { color: #8e9cff; }
-
-button {
-  padding: 12px 20px;
-  border: 0;
-  border-radius: 9px;
-  background: #6575ff;
-  color: white;
-  cursor: pointer;
-}`;
-
-  const starterJS = `document.getElementById("helloButton")
-  .addEventListener("click", function () {
-    document.getElementById("message").textContent =
-      "Great! Your JavaScript works!";
-  });`;
-
-  function updatePreview() {
-    const safeCSS = cssEditor.value.replace(/<\/style/gi, "<\\/style");
-    const safeJS = jsEditor.value.replace(/<\/script/gi, "<\\/script");
-
-    const src = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${safeCSS}</style>
-</head>
-<body>
-${htmlEditor.value}
-<script>
-try {
-${safeJS}
-} catch (error) {
-  const box = document.createElement("pre");
-  box.style.cssText = "color:#b91c1c;white-space:pre-wrap;padding:12px";
-  box.textContent = "JavaScript error: " + error.message;
-  document.body.appendChild(box);
-}
-<\/script>
-</body>
-</html>`;
-
-    preview.srcdoc = src;
-    status.textContent = "Preview updated";
-  }
-
-  htmlEditor.value = starterHTML;
-  cssEditor.value = starterCSS;
-  jsEditor.value = starterJS;
-
-  document.querySelectorAll(".editor-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".editor-tab").forEach(item => item.classList.remove("active"));
-      document.querySelectorAll(".editor-panel").forEach(item => item.classList.remove("active"));
-
-      tab.classList.add("active");
-      document.getElementById("panel-" + tab.dataset.editor).classList.add("active");
-    });
-  });
-
-  document.getElementById("runCode").addEventListener("click", updatePreview);
-  document.getElementById("refreshPreview").addEventListener("click", updatePreview);
-
-  document.getElementById("resetEditor").addEventListener("click", () => {
-    if (!confirm("Reset all code to the starter example?")) return;
-
-    htmlEditor.value = starterHTML;
-    cssEditor.value = starterCSS;
-    jsEditor.value = starterJS;
-
-    updatePreview();
-    status.textContent = "Starter code restored";
-  });
-
-  [htmlEditor, cssEditor, jsEditor].forEach(editor => {
-    editor.addEventListener("keydown", event => {
-      if (event.key === "Tab") {
-        event.preventDefault();
-
-        editor.setRangeText(
-          "  ",
-          editor.selectionStart,
-          editor.selectionEnd,
-          "end"
+      function getGameCards() {
+        return Array.from(
+          container.querySelectorAll(
+            "[data-game-name], [data-game], .game-card, .nexora-game-card"
+          )
         );
       }
-    });
-  });
 
-  async function toggleFullscreen() {
-    try {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-        return;
+      function applyFilters() {
+        const query = (searchInput.value || "").trim().toLowerCase();
+        const cards = getGameCards();
+
+        cards.forEach(function (card) {
+          const text = (
+            (card.innerText || "") + " " +
+            (card.dataset.gameName || "") + " " +
+            (card.dataset.game || "") + " " +
+            (card.dataset.category || "")
+          ).toLowerCase();
+
+          const category = (card.dataset.category || "").toLowerCase();
+
+          const matchesSearch = !query || text.includes(query);
+          const matchesCategory =
+            activeFilter === "all" ||
+            category === activeFilter ||
+            text.includes(activeFilter);
+
+          card.hidden = !(matchesSearch && matchesCategory);
+        });
       }
 
-      if (previewScreen.requestFullscreen) {
-        await previewScreen.requestFullscreen();
-      } else if (previewScreen.webkitRequestFullscreen) {
-        previewScreen.webkitRequestFullscreen();
-      } else {
-        showNotice("Fullscreen is not supported by this browser.");
-      }
-    } catch (_) {
-      showNotice("Unable to open fullscreen preview.");
-    }
-  }
+      searchInput.addEventListener("input", applyFilters);
 
-  fullscreenButton.addEventListener("click", toggleFullscreen);
+      filterButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          activeFilter = button.dataset.filter;
 
-  function updateFullscreenButton() {
-    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+          filterButtons.forEach(function (item) {
+            const selected = item === button;
+            item.classList.toggle("active", selected);
+            item.setAttribute("aria-pressed", String(selected));
+          });
 
-    fullscreenButton.textContent = isFullscreen ? "⤢" : "⛶";
-    fullscreenButton.title = isFullscreen ? "Exit fullscreen" : "Fullscreen preview";
-    fullscreenButton.setAttribute(
-      "aria-label",
-      isFullscreen ? "Exit fullscreen preview" : "Open fullscreen preview"
-    );
-  }
+          applyFilters();
+        });
 
-  document.addEventListener("fullscreenchange", updateFullscreenButton);
-  document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+        button.setAttribute(
+          "aria-pressed",
+          String(button.classList.contains("active"))
+        );
+      });
 
-  updatePreview();
-})();
+      function loadGames() {
+        if (loading) return;
+        loading = true;
 
+        status.textContent = "Loading game.js...";
 
-/* =========================================
-   SCIENTIFIC CALCULATOR
-   Uses a parser instead of eval().
-========================================= */
+        container.innerHTML = `
+          <div class="loading-state">
+            <div class="loading-icon">🎮</div>
+            <h3>Loading your games...</h3>
+            <p>Please wait a moment.</p>
+          </div>
+        `;
 
-(function initCalculator() {
-  const display = document.getElementById("calcDisplay");
-  const expressionLabel = document.getElementById("calcExpression");
-  const status = document.getElementById("calcStatus");
-  const angleMode = document.getElementById("angleMode");
-  const keys = document.getElementById("calcKeys");
+        const previousScript = document.getElementById("nexora-game-engine");
 
-  let expression = "";
-  let answer = 0;
-  let justCalculated = false;
-
-  function showExpression() {
-    display.value = expression || "0";
-  }
-
-  function insert(value) {
-    status.textContent = "";
-
-    if (justCalculated && /^[0-9.]$/.test(value)) {
-      expression = "";
-      expressionLabel.textContent = "";
-    }
-
-    justCalculated = false;
-
-    if (expression.length > 300) {
-      status.textContent = "Expression is too long.";
-      return;
-    }
-
-    expression += value;
-    showExpression();
-  }
-
-  function clearAll() {
-    expression = "";
-    expressionLabel.textContent = "";
-    status.textContent = "";
-    justCalculated = false;
-    showExpression();
-  }
-
-  function deleteLast() {
-    expression = expression.slice(0, -1);
-    justCalculated = false;
-    status.textContent = "";
-    showExpression();
-  }
-
-  function factorial(n) {
-    if (!Number.isInteger(n) || n < 0 || n > 170) {
-      throw new Error("Factorial requires a whole number from 0 to 170.");
-    }
-
-    let result = 1;
-
-    for (let i = 2; i <= n; i++) result *= i;
-
-    return result;
-  }
-
-  function calculate(input) {
-    let s = input
-      .replace(/π/g, "pi")
-      .replace(/×/g, "*")
-      .replace(/÷/g, "/")
-      .replace(/−/g, "-")
-      .replace(/\s+/g, "");
-
-    if (!s) throw new Error("Enter a calculation first.");
-    if (s.length > 300) throw new Error("Expression is too long.");
-
-    if (!/^[0-9a-zA-Z.+\-*/^()%!,]*$/.test(s)) {
-      throw new Error("Expression contains an unsupported character.");
-    }
-
-    const tokens = s.match(
-      /(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|[a-zA-Z]+|[()+\-*/^%!]/gi
-    ) || [];
-
-    if (tokens.join("").toLowerCase() !== s.toLowerCase()) {
-      throw new Error("Check the expression syntax.");
-    }
-
-    let pos = 0;
-
-    function peek() {
-      return tokens[pos];
-    }
-
-    function take() {
-      return tokens[pos++];
-    }
-
-    function parseExpression() {
-      let value = parseTerm();
-
-      while (peek() === "+" || peek() === "-") {
-        const op = take();
-        const right = parseTerm();
-        value = op === "+" ? value + right : value - right;
-      }
-
-      return value;
-    }
-
-    function parseTerm() {
-      let value = parseUnary();
-
-      while (peek() === "*" || peek() === "/") {
-        const op = take();
-        const right = parseUnary();
-
-        if (op === "/" && right === 0) {
-          throw new Error("Cannot divide by zero.");
+        if (previousScript) {
+          previousScript.remove();
         }
 
-        value = op === "*" ? value * right : value / right;
-      }
+        const script = document.createElement("script");
 
-      return value;
-    }
+        script.id = "nexora-game-engine";
+        script.src = "./game.js";
+        script.async = true;
 
-    function parseUnary() {
-      if (peek() === "+") {
-        take();
-        return parseUnary();
-      }
+        script.onload = function () {
+          loading = false;
 
-      if (peek() === "-") {
-        take();
-        return -parseUnary();
-      }
+          if (container.children.length > 0) {
+            status.textContent =
+              "Game engine loaded. Choose a game to start playing.";
 
-      return parsePower();
-    }
+            applyFilters();
+          } else {
+            status.textContent =
+              "The game engine loaded, but the game hub is empty.";
 
-    function parsePower() {
-      let value = parsePostfix();
-
-      if (peek() === "^") {
-        take();
-        value = Math.pow(value, parseUnary());
-      }
-
-      return value;
-    }
-
-    function parsePostfix() {
-      let value = parsePrimary();
-
-      while (peek() === "!" || peek() === "%") {
-        const op = take();
-        value = op === "!" ? factorial(value) : value / 100;
-      }
-
-      return value;
-    }
-
-    function parsePrimary() {
-      const token = take();
-
-      if (token === undefined) throw new Error("Incomplete expression.");
-
-      if (token === "(") {
-        const value = parseExpression();
-
-        if (take() !== ")") {
-          throw new Error("Missing closing parenthesis.");
-        }
-
-        return value;
-      }
-
-      if (/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(token)) {
-        return Number(token);
-      }
-
-      const name = token.toLowerCase();
-
-      if (name === "pi") return Math.PI;
-      if (name === "e") return Math.E;
-      if (name === "ans") return answer;
-
-      const functions = {
-        sin: x => Math.sin(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
-        cos: x => Math.cos(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
-
-        tan: x => {
-          const a = angleMode.value === "DEG" ? x * Math.PI / 180 : x;
-
-          if (Math.abs(Math.cos(a)) < 1e-12) {
-            throw new Error("Tangent is undefined at this angle.");
+            container.innerHTML = `
+              <div class="error-box">
+                <h3>⚠️ No games displayed</h3>
+                <p>
+                  Check whether game.js renders the games inside
+                  the element with id="nexora-games".
+                </p>
+              </div>
+            `;
           }
+        };
 
-          return Math.tan(a);
-        },
+        script.onerror = function () {
+          loading = false;
 
-        asin: x => {
-          if (x < -1 || x > 1) throw new Error("asin accepts values from -1 to 1.");
-          const a = Math.asin(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
+          status.textContent = "Could not load game.js.";
 
-        acos: x => {
-          if (x < -1 || x > 1) throw new Error("acos accepts values from -1 to 1.");
-          const a = Math.acos(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
+          container.innerHTML = `
+            <div class="error-box">
+              <h3>⚠️ Unable to load the games</h3>
+              <p>
+                Make sure game.js is in the same folder as games.html
+                and the filename is spelled correctly.
+              </p>
+              <p>
+                If the website is hosted online, make sure game.js
+                has been uploaded to the published branch.
+              </p>
+              <button class="primary-button" id="retryGameLoad" type="button">
+                Try Again
+              </button>
+            </div>
+          `;
 
-        atan: x => {
-          const a = Math.atan(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
+          document.getElementById("retryGameLoad").addEventListener(
+            "click",
+            loadGames
+          );
 
-        sqrt: x => {
-          if (x < 0) throw new Error("Cannot take the real square root of a negative number.");
-          return Math.sqrt(x);
-        },
+          console.error("RexWeb Nexora: Could not load ./game.js");
+        };
 
-        log: x => {
-          if (x <= 0) throw new Error("Logarithm requires a positive number.");
-          return Math.log10(x);
-        },
-
-        ln: x => {
-          if (x <= 0) throw new Error("Natural logarithm requires a positive number.");
-          return Math.log(x);
-        },
-
-        abs: x => Math.abs(x),
-        floor: x => Math.floor(x),
-        ceil: x => Math.ceil(x),
-        round: x => Math.round(x)
-      };
-
-      if (functions[name]) {
-        if (take() !== "(") {
-          throw new Error("Function " + name + " needs parentheses.");
-        }
-
-        const argument = parseExpression();
-
-        if (take() !== ")") {
-          throw new Error("Missing closing parenthesis.");
-        }
-
-        return functions[name](argument);
+        document.body.appendChild(script);
       }
 
-      throw new Error("Unknown value: " + token);
-    }
+      reloadButton.addEventListener("click", loadGames);
 
-    const result = parseExpression();
-
-    if (pos < tokens.length) {
-      throw new Error("Check the expression near " + tokens[pos] + ".");
-    }
-
-    if (!Number.isFinite(result)) {
-      throw new Error("Result is outside the supported range.");
-    }
-
-    return result;
-  }
-
-  function equals() {
-    try {
-      const original = expression;
-      const result = calculate(expression);
-
-      answer = result;
-      expressionLabel.textContent = original + " =";
-      expression = Number(result.toPrecision(12)).toString();
-      display.value = expression;
-      justCalculated = true;
-      status.textContent = "";
-    } catch (error) {
-      status.textContent = error.message || "Invalid calculation.";
-    }
-  }
-
-  keys.addEventListener("click", event => {
-    const button = event.target.closest("button");
-    if (!button) return;
-
-    const action = button.dataset.action;
-    const value = button.dataset.value;
-
-    if (action === "clear") clearAll();
-    else if (action === "delete") deleteLast();
-    else if (action === "equals") equals();
-    else if (value !== undefined) insert(value);
-  });
-
-  display.addEventListener("input", () => {
-    expression = display.value;
-    justCalculated = false;
-    status.textContent = "";
-  });
-
-  display.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === "=") {
-      event.preventDefault();
-      equals();
-    } else if (event.key === "Escape") {
-      clearAll();
-    }
-  });
-
-  angleMode.addEventListener("change", () => {
-    status.textContent = "Angle mode: " + angleMode.value;
-  });
-
-  showExpression();
-})();
-
-
-/* =========================================
-   TEXT COUNTER
-========================================= */
-
-(function initTextCounter() {
-  const input = document.getElementById("counterInput");
-
-  const output = {
-    chars: document.getElementById("countChars"),
-    noSpaces: document.getElementById("countNoSpaces"),
-    words: document.getElementById("countWords"),
-    lines: document.getElementById("countLines"),
-    digits: document.getElementById("countDigits"),
-    letters: document.getElementById("countLetters")
-  };
-
-  function countText() {
-    const text = input.value;
-
-    output.chars.textContent = Array.from(text).length.toLocaleString();
-
-    output.noSpaces.textContent =
-      Array.from(text.replace(/\s/g, "")).length.toLocaleString();
-
-    const trimmed = text.trim();
-
-    output.words.textContent = trimmed
-      ? trimmed.split(/\s+/u).length.toLocaleString()
-      : "0";
-
-    output.lines.textContent = text.length
-      ? text.split(/\r\n|\r|\n/).length.toLocaleString()
-      : "0";
-
-    output.digits.textContent =
-      (text.match(/[0-9]/g) || []).length.toLocaleString();
-
-    output.letters.textContent =
-      (text.match(/\p{L}/gu) || []).length.toLocaleString();
-  }
-
-  input.addEventListener("input", countText);
-
-  document.getElementById("clearText").addEventListener("click", () => {
-    input.value = "";
-    countText();
-    input.focus();
-  });
-
-  document.getElementById("copyText").addEventListener("click", async () => {
-    if (!input.value) {
-      showNotice("There is no text to copy.");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(input.value);
-      showNotice("Text copied.");
-    } catch (_) {
-      input.focus();
-      input.select();
-
-      const copied = document.execCommand("copy");
-
-      showNotice(copied ? "Text copied." : "Select the text and copy it manually.");
-    }
-  });
-
-  countText();
-})();
-
-</script>
-<div id="nexora-games"></div>
-<script src="game.js"></script>
+      loadGames();
+    })();
+  </script>
 
 </body>
 </html>
