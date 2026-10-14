@@ -2,22 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080b18">
-
-  <title>Games Hub | RexWeb Nexora</title>
-
-  <meta
-    name="description"
-    content="Play arcade games at RexWeb Nexora. Play, create, trade, and grow."
-  >
+  <meta name="description" content="RexWeb Nexora — Play, Create, Trade, Grow.">
+  <title>RexWeb Nexora</title>
 
   <style>
     :root {
       --bg: #080b18;
       --panel: #11172a;
-      --panel-light: #19223b;
-      --border: rgba(255,255,255,.1);
+      --panel2: #19223b;
+      --border: rgba(255,255,255,.11);
       --text: #f5f7ff;
       --muted: #a5aec7;
       --blue: #526dff;
@@ -27,13 +22,9 @@
       --radius: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -41,30 +32,25 @@
       color: var(--text);
       background:
         radial-gradient(ellipse at top left, rgba(67,91,255,.18), transparent 45%),
-        radial-gradient(ellipse at top right, rgba(52,231,255,.08), transparent 35%),
+        radial-gradient(ellipse at top right, rgba(52,231,255,.07), transparent 35%),
         var(--bg);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    button,
-    input {
-      font: inherit;
-    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
 
-    button {
-      cursor: pointer;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
     }
 
     .site-header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(8,11,24,.92);
+      background: rgba(8,11,24,.94);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
     }
@@ -72,71 +58,67 @@
     .nav {
       width: min(1180px, 100%);
       margin: auto;
-      padding: 14px 20px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 900;
-      letter-spacing: -.5px;
+      white-space: nowrap;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       display: grid;
       place-items: center;
-      border-radius: 14px;
-      color: #080b18;
+      border-radius: 13px;
+      color: #07101b;
       background: linear-gradient(135deg, var(--cyan), var(--blue));
-      box-shadow: 0 0 22px rgba(82,109,255,.25);
     }
 
-    .brand-name span {
-      color: var(--cyan);
-    }
+    .brand-name span { color: var(--cyan); }
 
     .nav-actions {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .nav-button {
-      padding: 10px 14px;
+      padding: 9px 12px;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--panel);
+      border-radius: 11px;
       color: var(--text);
+      background: var(--panel);
+      font-size: 13px;
       font-weight: 750;
     }
 
-    .nav-button:hover {
+    .nav-button.active {
+      color: #06111a;
+      background: var(--cyan);
       border-color: var(--cyan);
     }
 
     .container {
       width: min(1180px, 100%);
       margin: auto;
-      padding: 0 20px;
+      padding: 0 18px;
     }
 
-    .hero {
-      padding-top: 56px;
-      padding-bottom: 30px;
-    }
+    .hero { padding-top: 48px; padding-bottom: 28px; }
 
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      display: inline-block;
       padding: 8px 12px;
       border: 1px solid rgba(52,231,255,.25);
       border-radius: 999px;
@@ -147,36 +129,32 @@
       letter-spacing: 1px;
     }
 
-    .hero h1 {
+    h1 {
       margin: 18px 0 12px;
-      font-size: clamp(35px, 7vw, 66px);
+      font-size: clamp(36px, 7vw, 65px);
       line-height: 1.05;
       letter-spacing: -2px;
     }
 
-    .hero h1 span {
-      color: var(--cyan);
-    }
+    h1 span { color: var(--cyan); }
 
     .hero-description {
-      max-width: 650px;
+      max-width: 660px;
       color: var(--muted);
       line-height: 1.8;
-      font-size: 16px;
     }
 
-    .hero-buttons {
+    .hero-buttons, .action-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 24px;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    .primary-button,
-    .secondary-button {
-      min-height: 46px;
-      padding: 12px 18px;
-      border-radius: 13px;
+    .primary-button, .secondary-button {
+      min-height: 44px;
+      padding: 11px 16px;
+      border-radius: 12px;
       font-weight: 850;
     }
 
@@ -192,45 +170,9 @@
       background: var(--panel);
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 30px;
-      max-width: 650px;
-    }
+    .section { padding-top: 26px; padding-bottom: 34px; }
 
-    .stat {
-      padding: 16px;
-      background: rgba(17,23,42,.82);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 23px;
-    }
-
-    .stat span {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .section {
-      padding-top: 25px;
-      padding-bottom: 35px;
-    }
-
-    .section-heading {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
+    .section-heading { margin-bottom: 20px; }
 
     .section-heading h2 {
       margin: 0;
@@ -239,46 +181,128 @@
     }
 
     .section-heading p {
-      margin: 8px 0 0;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.65;
+      margin: 8px 0 0;
     }
 
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(17,23,42,.85);
+      box-shadow: 0 15px 45px rgba(0,0,0,.15);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 28px;
+      max-width: 650px;
+    }
+
+    .stat {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: rgba(17,23,42,.82);
+    }
+
+    .stat strong { display: block; font-size: 22px; }
+    .stat span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+    /* Main application navigation */
+
+    .app-page { display: none; }
+    .app-page.active { display: block; }
+
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,11,24,.55);
+    }
+
+    .page-nav button {
+      min-height: 42px;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 750;
+    }
+
+    .page-nav button.active {
+      color: #07101b;
+      background: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    /* Games */
+
+    #nexora-games { width: 100%; min-width: 0; }
+    #nexora-games canvas, #nexora-games img, #nexora-games video {
+      max-width: 100%;
+    }
+
+    .loading-state {
+      padding: 30px 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .loading-icon {
+      font-size: 43px;
+      animation: pulse 1.1s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(.96); opacity: .7; }
+      to { transform: scale(1.05); opacity: 1; }
+    }
+
+    .error-box {
+      padding: 18px;
+      text-align: center;
+      border: 1px solid rgba(255,100,130,.35);
+      border-radius: 15px;
+      background: rgba(255,70,110,.07);
+    }
+
+    .error-box p { color: var(--muted); line-height: 1.7; }
+
+    /* Search and category controls */
+
     .search-box {
-      width: min(100%, 330px);
-      min-height: 46px;
-      padding: 0 14px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
+      max-width: 350px;
+      min-height: 44px;
+      padding: 0 13px;
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       background: var(--panel);
     }
 
     .search-box input {
       width: 100%;
       min-width: 0;
-      outline: none;
       border: 0;
+      outline: 0;
       color: var(--text);
       background: transparent;
     }
 
-    .search-box input::placeholder {
-      color: #828ba5;
-    }
-
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin-bottom: 22px;
-    }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
 
     .filter-button {
-      min-height: 40px;
-      padding: 9px 15px;
+      min-height: 39px;
+      padding: 8px 13px;
       color: var(--muted);
       border: 1px solid var(--border);
       border-radius: 999px;
@@ -292,110 +316,206 @@
       border-color: var(--cyan);
     }
 
-    .games-panel {
-      padding: 18px;
+    /* Feature cards */
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 13px;
+    }
+
+    .feature-card {
+      padding: 19px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(17,23,42,.8);
-      box-shadow: 0 15px 45px rgba(0,0,0,.15);
+      border-radius: 17px;
+      background: var(--panel);
     }
 
-    #nexora-games {
-      min-width: 0;
+    .feature-card .icon { font-size: 28px; }
+    .feature-card h3 { margin: 11px 0 7px; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* Scientific calculator */
+
+    .calculator-wrap {
+      width: min(100%, 460px);
+      margin: 10px auto;
+    }
+
+    .calculator {
+      padding: 16px;
+      border: 1px solid #35405b;
+      border-radius: 25px;
+      background: linear-gradient(145deg, #20283a, #0d1220 70%);
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.4),
+        inset 0 1px 1px rgba(255,255,255,.12);
+    }
+
+    .calculator-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 3px 14px;
+      color: #b5c0d8;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 1.5px;
+    }
+
+    .calculator-brand { color: #e1e9f8; }
+    .calculator-brand span { color: var(--cyan); }
+
+    .calculator-display {
+      min-height: 112px;
+      margin-bottom: 16px;
+      padding: 15px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+      border: 1px solid rgba(87,237,255,.38);
+      border-radius: 13px;
+      background: #07111a;
+      box-shadow:
+        inset 0 0 18px rgba(0,0,0,.85),
+        0 0 8px rgba(52,231,255,.12),
+        0 0 18px rgba(52,231,255,.07);
+    }
+
+    .calculator-expression {
+      min-height: 22px;
+      color: #91bfc9;
+      text-align: right;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .calculator-result {
       width: 100%;
+      margin-top: 7px;
+      color: #baffd8;
+      text-align: right;
+      font-family: "Courier New", monospace;
+      font-size: clamp(27px, 6vw, 37px);
+      font-weight: 700;
+      line-height: 1.25;
+      text-shadow: 0 0 8px rgba(70,230,165,.32);
+      overflow-wrap: anywhere;
     }
 
-    #nexora-games canvas,
-    #nexora-games img,
-    #nexora-games video {
-      max-width: 100%;
+    .calculator-mode {
+      margin: 0 0 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
 
-    .loading-state {
-      padding: 35px 15px;
-      text-align: center;
+    .mode-indicator {
       color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
     }
 
-    .loading-icon {
-      font-size: 48px;
-      animation: pulse 1s ease-in-out infinite alternate;
+    .mode-button {
+      padding: 7px 12px;
+      color: var(--cyan);
+      background: #142432;
+      border: 1px solid #2b5866;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 850;
     }
 
-    @keyframes pulse {
-      from { transform: scale(.95); opacity: .7; }
-      to { transform: scale(1.08); opacity: 1; }
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap: 8px;
     }
 
-    .error-box {
-      padding: 20px;
+    .calc-key {
+      min-width: 0;
+      min-height: 49px;
+      padding: 7px 3px;
+      color: #f3f6ff;
+      background: linear-gradient(145deg, #343e53, #20283a);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 11px;
+      box-shadow: 0 3px 0 #111725, inset 0 1px rgba(255,255,255,.07);
+      font-size: 15px;
+      font-weight: 750;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: filter .1s, transform .1s;
+    }
+
+    .calc-key:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #111725;
+      filter: brightness(1.25);
+    }
+
+    .calc-key.function {
+      color: #9befff;
+      background: linear-gradient(145deg, #1c3b50, #152a3b);
+    }
+
+    .calc-key.operator {
+      color: #ffdd8a;
+      background: linear-gradient(145deg, #4b402b, #30291f);
+    }
+
+    .calc-key.danger {
+      color: #ffabb9;
+      background: linear-gradient(145deg, #502b3a, #321c28);
+    }
+
+    .calc-key.equals {
+      color: #06131b;
+      background: linear-gradient(135deg, #49eaff, #65f0ba);
+      border-color: transparent;
+      font-size: 19px;
+    }
+
+    .calc-key.zero { grid-column: span 2; }
+
+    .calculator-note {
+      margin: 13px 3px 0;
+      color: #8995af;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    /* Placeholder pages */
+
+    .coming-soon {
+      padding: 28px 15px;
       text-align: center;
-      border: 1px solid rgba(255,100,130,.35);
-      border-radius: 16px;
-      background: rgba(255,70,110,.07);
     }
 
-    .error-box h3 {
-      margin-top: 0;
-    }
-
-    .error-box p {
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .error-box button {
-      margin-top: 8px;
-    }
+    .coming-soon .big-icon { font-size: 44px; }
+    .coming-soon p { color: var(--muted); line-height: 1.8; }
+    .coming-soon code { color: var(--cyan); }
 
     .notice {
-      margin-top: 15px;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.7;
     }
 
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .feature-card {
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--panel);
-    }
-
-    .feature-card .icon {
-      font-size: 29px;
-    }
-
-    .feature-card h3 {
-      margin: 12px 0 8px;
-    }
-
-    .feature-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
     .footer {
       margin-top: 20px;
-      padding: 28px 20px;
+      padding: 26px 18px;
       border-top: 1px solid var(--border);
-      text-align: center;
       color: var(--muted);
+      text-align: center;
       font-size: 13px;
       line-height: 1.8;
     }
 
-    .footer strong {
-      color: var(--text);
-    }
+    .footer strong { color: var(--text); }
 
     .toast {
       position: fixed;
@@ -404,92 +524,43 @@
       z-index: 200;
       width: max-content;
       max-width: calc(100% - 32px);
-      padding: 13px 18px;
+      padding: 12px 16px;
       color: var(--text);
       background: #202943;
       border: 1px solid var(--border);
-      border-radius: 13px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.3);
-      transform: translate(-50%, 20px);
+      border-radius: 12px;
+      transform: translate(-50%, 15px);
       opacity: 0;
       pointer-events: none;
       transition: opacity .2s, transform .2s;
     }
 
-    .toast.show {
-      transform: translate(-50%, 0);
-      opacity: 1;
-    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
     @media (max-width: 700px) {
-      .nav {
-        padding: 12px 15px;
-      }
+      .nav { align-items: flex-start; flex-direction: column; }
+      .nav-actions { justify-content: flex-start; }
+      .container { padding: 0 14px; }
+      .hero { padding-top: 34px; }
+      h1 { letter-spacing: -1.2px; }
+      .stats { gap: 7px; }
+      .stat { padding: 11px 8px; }
+      .stat strong { font-size: 19px; }
+      .stat span { font-size: 11px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .panel { padding: 12px; }
+      .calculator { padding: 12px; border-radius: 20px; }
+      .calculator-grid { gap: 6px; }
+      .calc-key { min-height: 47px; font-size: 14px; }
+    }
 
-      .brand {
-        font-size: 16px;
-      }
-
-      .brand-icon {
-        width: 38px;
-        height: 38px;
-      }
-
-      .nav-button {
-        padding: 9px 10px;
-        font-size: 12px;
-      }
-
-      .container {
-        padding: 0 15px;
-      }
-
-      .hero {
-        padding-top: 38px;
-      }
-
-      .hero h1 {
-        letter-spacing: -1.3px;
-      }
-
-      .stats {
-        gap: 8px;
-      }
-
-      .stat {
-        padding: 12px 9px;
-      }
-
-      .stat strong {
-        font-size: 19px;
-      }
-
-      .stat span {
-        font-size: 11px;
-      }
-
-      .section-heading {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .search-box {
-        width: 100%;
-      }
-
-      .games-panel {
-        padding: 12px;
-      }
-
-      .feature-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 360px) {
+      .calc-key { min-height: 43px; font-size: 12px; }
+      .calculator-grid { gap: 5px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
+      *, *::before, *::after {
         scroll-behavior: auto !important;
         animation-duration: .01ms !important;
         transition-duration: .01ms !important;
@@ -500,375 +571,706 @@
 
 <body>
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <nav class="nav">
-      <a class="brand" href="index.html" aria-label="RexWeb Nexora home">
-        <span class="brand-icon">🎮</span>
-        <span class="brand-name">RexWeb <span>Nexora</span></span>
-      </a>
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="#home" data-page="home" aria-label="RexWeb Nexora home">
+      <span class="brand-icon">✦</span>
+      <span class="brand-name">RexWeb <span>Nexora</span></span>
+    </a>
 
-      <div class="nav-actions">
-        <a class="nav-button" href="index.html">← Website</a>
-        <a class="nav-button" href="#games">Play Now</a>
-      </div>
-    </nav>
-  </header>
+    <div class="nav-actions" aria-label="Main navigation">
+      <button class="nav-button active" data-page="home">🏠 Home</button>
+      <button class="nav-button" data-page="games">🎮 Games</button>
+      <button class="nav-button" data-page="community">👥 Community</button>
+      <button class="nav-button" data-page="calculator">🧮 Calculator</button>
+      <button class="nav-button" data-page="settings">⚙️ Settings</button>
+    </div>
+  </nav>
+</header>
 
-  <main>
+<main>
 
-    <!-- HERO -->
-    <section class="container hero">
-      <span class="eyebrow">⚡ THE NEXORA ARCADE</span>
+  <!-- HOME -->
+  <section class="app-page active" id="page-home">
+    <div class="container hero">
+      <span class="eyebrow">⚡ WELCOME TO NEXORA</span>
 
-      <h1>
-        Your next<br>
-        <span>gaming adventure.</span>
-      </h1>
+      <h1>PLAY. CREATE.<br><span>TRADE. GROW.</span></h1>
 
       <p class="hero-description">
-        Welcome to RexWeb Nexora Games. Explore arcade challenges,
-        sharpen your skills, and beat your personal bests.
-        Pick a game and start playing.
+        Welcome to RexWeb Nexora — your digital space for games,
+        community features, useful tools, and future experiences.
       </p>
 
       <div class="hero-buttons">
-        <button class="primary-button" id="heroPlayButton" type="button">
-          🎮 Explore Games
-        </button>
-
-        <button class="secondary-button" id="howToPlayButton" type="button">
-          ℹ️ How to Play
-        </button>
+        <button class="primary-button" data-page="games">🎮 Explore Games</button>
+        <button class="secondary-button" data-page="calculator">🧮 Open Calculator</button>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <strong id="gameCount">10</strong>
+          <strong>10</strong>
           <span>Arcade Games</span>
         </div>
-
         <div class="stat">
           <strong>📱</strong>
-          <span>Mobile Friendly</span>
+          <span>Mobile Ready</span>
         </div>
-
         <div class="stat">
-          <strong>🏆</strong>
-          <span>Personal Bests</span>
+          <strong>✨</strong>
+          <span>Growing Platform</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- GAMES -->
-    <section class="container section" id="games">
+    <div class="container section">
       <div class="section-heading">
-        <div>
-          <h2>🎯 Choose Your Game</h2>
-          <p>Find a game and see how high you can score.</p>
-        </div>
-
-        <label class="search-box">
-          <span aria-hidden="true">🔍</span>
-          <input
-            id="gameSearch"
-            type="search"
-            placeholder="Search games..."
-            aria-label="Search games"
-          >
-        </label>
-      </div>
-
-      <div class="filters" aria-label="Game categories">
-        <button class="filter-button active" data-filter="all" type="button">
-          All Games
-        </button>
-
-        <button class="filter-button" data-filter="arcade" type="button">
-          🕹️ Arcade
-        </button>
-
-        <button class="filter-button" data-filter="puzzle" type="button">
-          🧩 Puzzle
-        </button>
-
-        <button class="filter-button" data-filter="action" type="button">
-          🚀 Action
-        </button>
-
-        <button class="filter-button" data-filter="classic" type="button">
-          🎲 Classic
-        </button>
-      </div>
-
-      <div class="games-panel">
-        <p id="nexora-games-status" role="status" aria-live="polite">
-          Loading game engine...
-        </p>
-
-        <!-- IMPORTANT: game.js renders its game hub here -->
-        <div id="nexora-games">
-          <div class="loading-state">
-            <div class="loading-icon">🎮</div>
-            <h3>Preparing the arcade...</h3>
-            <p>Your games will appear here shortly.</p>
-          </div>
-        </div>
-
-        <div class="action-row" style="margin-top:18px">
-          <button
-            class="secondary-button"
-            id="reloadNexoraGames"
-            type="button"
-          >
-            🔄 Reload Games
-          </button>
-        </div>
-
-        <p class="notice">
-          Game progress and personal-best scores may be stored locally
-          on your device. Clearing browser data can remove locally stored
-          progress.
-        </p>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section class="container section">
-      <div class="section-heading">
-        <div>
-          <h2>✨ Made for Players</h2>
-          <p>A simple arcade experience designed for quick gaming sessions.</p>
-        </div>
+        <h2>Explore Nexora</h2>
+        <p>Choose a feature to get started.</p>
       </div>
 
       <div class="feature-grid">
         <article class="feature-card">
-          <div class="icon">📱</div>
-          <h3>Play on Mobile</h3>
-          <p>
-            Enjoy games on your phone. Touch controls depend on the
-            controls implemented in each game.
-          </p>
+          <div class="icon">🎮</div>
+          <h3>Games Hub</h3>
+          <p>Play arcade games, practise your skills, and beat your personal bests.</p>
+          <div class="action-row">
+            <button class="primary-button" data-page="games">Open Games</button>
+          </div>
         </article>
 
         <article class="feature-card">
-          <div class="icon">🏆</div>
-          <h3>Beat Your Best</h3>
-          <p>
-            Challenge yourself to improve your scores and reach new
-            personal records.
-          </p>
+          <div class="icon">🧮</div>
+          <h3>Scientific Calculator</h3>
+          <p>Calculate expressions, powers, roots, trigonometric values, and more.</p>
+          <div class="action-row">
+            <button class="primary-button" data-page="calculator">Open Calculator</button>
+          </div>
         </article>
 
         <article class="feature-card">
-          <div class="icon">⚡</div>
-          <h3>Jump Straight In</h3>
-          <p>
-            Choose a game from the hub and start playing without
-            navigating through multiple pages.
-          </p>
+          <div class="icon">👥</div>
+          <h3>Community</h3>
+          <p>A prepared space for future community features.</p>
+          <div class="action-row">
+            <button class="secondary-button" data-page="community">Explore</button>
+          </div>
         </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-  </main>
+  <!-- GAMES -->
+  <section class="app-page" id="page-games">
+    <div class="container section">
+      <div class="section-heading">
+        <h2>🎮 RexWeb Nexora Games</h2>
+        <p>Choose a game and start playing.</p>
+      </div>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <strong>RexWeb Nexora</strong><br>
-    PLAY. CREATE. TRADE. GROW.<br>
-    <span>© <span id="currentYear"></span> RexWeb Nexora.</span>
-  </footer>
+      <div class="panel">
+        <p id="nexora-games-status" role="status" aria-live="polite">
+          Preparing the game engine...
+        </p>
 
-  <div class="toast" id="nexoraToast" role="status" aria-live="polite"></div>
-
-  <!-- GAME ENGINE LOADER -->
-  <script>
-    (function () {
-      "use strict";
-
-      const container = document.getElementById("nexora-games");
-      const status = document.getElementById("nexora-games-status");
-      const reloadButton = document.getElementById("reloadNexoraGames");
-      const searchInput = document.getElementById("gameSearch");
-      const filterButtons = document.querySelectorAll("[data-filter]");
-      const toast = document.getElementById("nexoraToast");
-
-      let loading = false;
-      let toastTimer = null;
-      let activeFilter = "all";
-
-      document.getElementById("currentYear").textContent =
-        new Date().getFullYear();
-
-      function showToast(message) {
-        toast.textContent = message;
-        toast.classList.add("show");
-
-        clearTimeout(toastTimer);
-
-        toastTimer = setTimeout(function () {
-          toast.classList.remove("show");
-        }, 2600);
-      }
-
-      document.getElementById("heroPlayButton").addEventListener("click", function () {
-        document.getElementById("games").scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      });
-
-      document.getElementById("howToPlayButton").addEventListener("click", function () {
-        showToast("Choose a game and follow its on-screen instructions.");
-        document.getElementById("games").scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      });
-
-      function getGameCards() {
-        return Array.from(
-          container.querySelectorAll(
-            "[data-game-name], [data-game], .game-card, .nexora-game-card"
-          )
-        );
-      }
-
-      function applyFilters() {
-        const query = (searchInput.value || "").trim().toLowerCase();
-        const cards = getGameCards();
-
-        cards.forEach(function (card) {
-          const text = (
-            (card.innerText || "") + " " +
-            (card.dataset.gameName || "") + " " +
-            (card.dataset.game || "") + " " +
-            (card.dataset.category || "")
-          ).toLowerCase();
-
-          const category = (card.dataset.category || "").toLowerCase();
-
-          const matchesSearch = !query || text.includes(query);
-          const matchesCategory =
-            activeFilter === "all" ||
-            category === activeFilter ||
-            text.includes(activeFilter);
-
-          card.hidden = !(matchesSearch && matchesCategory);
-        });
-      }
-
-      searchInput.addEventListener("input", applyFilters);
-
-      filterButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          activeFilter = button.dataset.filter;
-
-          filterButtons.forEach(function (item) {
-            const selected = item === button;
-            item.classList.toggle("active", selected);
-            item.setAttribute("aria-pressed", String(selected));
-          });
-
-          applyFilters();
-        });
-
-        button.setAttribute(
-          "aria-pressed",
-          String(button.classList.contains("active"))
-        );
-      });
-
-      function loadGames() {
-        if (loading) return;
-        loading = true;
-
-        status.textContent = "Loading game.js...";
-
-        container.innerHTML = `
+        <div id="nexora-games">
           <div class="loading-state">
             <div class="loading-icon">🎮</div>
             <h3>Loading your games...</h3>
-            <p>Please wait a moment.</p>
+            <p>Your arcade is being prepared.</p>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="secondary-button" id="reloadNexoraGames" type="button">
+            🔄 Reload Games
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY: ready for a future community.js -->
+  <section class="app-page" id="page-community">
+    <div class="container section">
+      <div class="section-heading">
+        <h2>👥 Nexora Community</h2>
+        <p>Your community area is prepared for future development.</p>
+      </div>
+
+      <div class="panel" id="nexora-community">
+        <div class="coming-soon">
+          <div class="big-icon">🌐</div>
+          <h3>Community Features</h3>
+          <p>
+            This section is ready to connect to
+            <code>community.js</code> when you create that file.
+          </p>
+          <p>No community script is loaded yet, so existing features are not fabricated.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCIENTIFIC CALCULATOR -->
+  <section class="app-page" id="page-calculator">
+    <div class="container section">
+      <div class="section-heading">
+        <h2>🧮 Scientific Calculator</h2>
+        <p>A calculator-style keypad with a softly glowing digital display.</p>
+      </div>
+
+      <div class="calculator-wrap">
+        <div class="calculator">
+          <div class="calculator-top">
+            <span class="calculator-brand">NEXORA <span>SCIENTIFIC</span></span>
+            <span>ADVANCED</span>
+          </div>
+
+          <div class="calculator-display" aria-label="Calculator display">
+            <div class="calculator-expression" id="calcExpression">DEG · Ready</div>
+            <output class="calculator-result" id="calcResult" aria-live="polite">0</output>
+          </div>
+
+          <div class="calculator-mode">
+            <span class="mode-indicator" id="calcModeLabel">ANGLE: DEG</span>
+            <button class="mode-button" id="calcAngleMode" type="button">DEG / RAD</button>
+          </div>
+
+          <div class="calculator-grid" id="calculatorKeys">
+            <button class="calc-key function" data-action="second">2nd</button>
+            <button class="calc-key function" data-action="parenthesis">( )</button>
+            <button class="calc-key function" data-action="percent">%</button>
+            <button class="calc-key danger" data-action="clear">AC</button>
+            <button class="calc-key danger" data-action="delete">DEL</button>
+
+            <button class="calc-key function" data-value="sin(">sin</button>
+            <button class="calc-key function" data-value="cos(">cos</button>
+            <button class="calc-key function" data-value="tan(">tan</button>
+            <button class="calc-key function" data-value="log(">log</button>
+            <button class="calc-key function" data-value="ln(">ln</button>
+
+            <button class="calc-key function" data-value="π">π</button>
+            <button class="calc-key function" data-value="e">e</button>
+            <button class="calc-key function" data-value="√(">√</button>
+            <button class="calc-key function" data-value="^2">x²</button>
+            <button class="calc-key function" data-value="^">xʸ</button>
+
+            <button class="calc-key" data-value="7">7</button>
+            <button class="calc-key" data-value="8">8</button>
+            <button class="calc-key" data-value="9">9</button>
+            <button class="calc-key operator" data-value="÷">÷</button>
+            <button class="calc-key function" data-value="(">(</button>
+
+            <button class="calc-key" data-value="4">4</button>
+            <button class="calc-key" data-value="5">5</button>
+            <button class="calc-key" data-value="6">6</button>
+            <button class="calc-key operator" data-value="×">×</button>
+            <button class="calc-key function" data-value=")">)</button>
+
+            <button class="calc-key" data-value="1">1</button>
+            <button class="calc-key" data-value="2">2</button>
+            <button class="calc-key" data-value="3">3</button>
+            <button class="calc-key operator" data-value="−">−</button>
+            <button class="calc-key function" data-value="!">x!</button>
+
+            <button class="calc-key" data-value="0">0</button>
+            <button class="calc-key" data-value=".">.</button>
+            <button class="calc-key function" data-value="Ans">Ans</button>
+            <button class="calc-key operator" data-value="+">+</button>
+            <button class="calc-key equals" data-action="equals">=</button>
+          </div>
+
+          <p class="calculator-note">
+            Supports basic arithmetic, brackets, powers, roots, factorial,
+            logarithms, π, e, and trigonometry. Use DEG/RAD to change angle mode.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS: ready for future settings.js -->
+  <section class="app-page" id="page-settings">
+    <div class="container section">
+      <div class="section-heading">
+        <h2>⚙️ Settings</h2>
+        <p>Basic display preferences are available now. More settings can be added later.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Appearance</h3>
+        <p class="notice">RexWeb Nexora currently uses its dark neon theme.</p>
+
+        <div class="action-row">
+          <button class="secondary-button" id="settingsReloadGames" type="button">
+            🔄 Reload Game Engine
+          </button>
+          <button class="secondary-button" id="settingsResetCalculator" type="button">
+            🧮 Reset Calculator
+          </button>
+        </div>
+
+        <p class="notice">
+          This section is ready for <code>settings.js</code> when you add it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <strong>RexWeb Nexora</strong><br>
+  PLAY. CREATE. TRADE. GROW.<br>
+  © <span id="currentYear"></span> RexWeb Nexora.
+</footer>
+
+<div class="toast" id="nexoraToast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const toast = $("nexoraToast");
+  let toastTimer;
+  let currentPage = "home";
+
+  $("currentYear").textContent = new Date().getFullYear();
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+  }
+
+  /* Main navigation: all buttons switch to their matching page. */
+  function showPage(name) {
+    const target = $("page-" + name);
+    if (!target) return;
+
+    currentPage = name;
+
+    document.querySelectorAll(".app-page").forEach(page => {
+      page.classList.toggle("active", page === target);
+    });
+
+    document.querySelectorAll("[data-page]").forEach(button => {
+      if (button.tagName === "BUTTON") {
+        button.classList.toggle("active", button.dataset.page === name);
+      }
+    });
+
+    if (name === "games") {
+      loadGames();
+    }
+
+    if (name === "calculator") {
+      $("calcResult").focus?.();
+    }
+
+    if (location.hash !== "#" + name) {
+      history.replaceState(null, "", "#" + name);
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll("[data-page]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      showPage(button.dataset.page);
+    });
+  });
+
+  const initialPage = location.hash.replace("#", "");
+  if ($("page-" + initialPage)) {
+    showPage(initialPage);
+  }
+
+  /* Game engine loader.
+     Only game.js exists currently, so other feature scripts are not requested. */
+  let gameScriptLoaded = false;
+  let gameLoading = false;
+
+  function loadGames(forceReload = false) {
+    if (gameLoading) return;
+    if (gameScriptLoaded && !forceReload) return;
+
+    const container = $("nexora-games");
+    const status = $("nexora-games-status");
+
+    if (!container || !status) return;
+
+    gameLoading = true;
+    status.textContent = "Loading game.js...";
+
+    if (forceReload) {
+      const oldScript = $("nexora-game-engine");
+      if (oldScript) oldScript.remove();
+      gameScriptLoaded = false;
+    }
+
+    container.innerHTML = `
+      <div class="loading-state">
+        <div class="loading-icon">🎮</div>
+        <h3>Loading your games...</h3>
+      </div>
+    `;
+
+    const script = document.createElement("script");
+    script.id = "nexora-game-engine";
+    script.src = "./game.js";
+    script.async = true;
+
+    script.onload = () => {
+      gameLoading = false;
+      gameScriptLoaded = true;
+      status.textContent = "Game engine loaded.";
+
+      if (!container.children.length) {
+        status.textContent =
+          "game.js loaded, but no games appeared. Check its render target.";
+        container.innerHTML = `
+          <div class="error-box">
+            <h3>Games not displayed</h3>
+            <p>
+              Check that game.js renders its hub inside #nexora-games.
+            </p>
           </div>
         `;
+      }
+    };
 
-        const previousScript = document.getElementById("nexora-game-engine");
+    script.onerror = () => {
+      gameLoading = false;
+      status.textContent = "Unable to load game.js.";
 
-        if (previousScript) {
-          previousScript.remove();
-        }
+      container.innerHTML = `
+        <div class="error-box">
+          <h3>⚠️ Games could not load</h3>
+          <p>
+            Make sure game.js is in the same folder as index.html
+            and that its filename uses the correct capitalization.
+          </p>
+          <button class="primary-button" id="retryGameLoad" type="button">
+            Try Again
+          </button>
+        </div>
+      `;
 
-        const script = document.createElement("script");
+      $("retryGameLoad").addEventListener("click", () => loadGames(true));
+    };
 
-        script.id = "nexora-game-engine";
-        script.src = "./game.js";
-        script.async = true;
+    document.body.appendChild(script);
+  }
 
-        script.onload = function () {
-          loading = false;
+  $("reloadNexoraGames").addEventListener("click", () => loadGames(true));
+  $("settingsReloadGames").addEventListener("click", () => {
+    showPage("games");
+    loadGames(true);
+  });
 
-          if (container.children.length > 0) {
-            status.textContent =
-              "Game engine loaded. Choose a game to start playing.";
+  /* Scientific calculator */
+  let expression = "";
+  let answer = 0;
+  let angleMode = "DEG";
+  let secondMode = false;
+  let justCalculated = false;
 
-            applyFilters();
-          } else {
-            status.textContent =
-              "The game engine loaded, but the game hub is empty.";
+  const resultDisplay = $("calcResult");
+  const expressionDisplay = $("calcExpression");
 
-            container.innerHTML = `
-              <div class="error-box">
-                <h3>⚠️ No games displayed</h3>
-                <p>
-                  Check whether game.js renders the games inside
-                  the element with id="nexora-games".
-                </p>
-              </div>
-            `;
-          }
-        };
+  function updateDisplay(message) {
+    resultDisplay.textContent = message ?? (expression || "0");
+    expressionDisplay.textContent = angleMode + " · " + (expression || "Ready");
+  }
 
-        script.onerror = function () {
-          loading = false;
+  function insertValue(value) {
+    if (justCalculated && /^[0-9.]$/.test(value)) expression = "";
+    justCalculated = false;
 
-          status.textContent = "Could not load game.js.";
+    if (value === "sin(" && secondMode) value = "asin(";
+    if (value === "cos(" && secondMode) value = "acos(";
+    if (value === "tan(" && secondMode) value = "atan(";
+    if (value === "log(" && secondMode) value = "10^(";
+    if (value === "ln(" && secondMode) value = "e^(";
 
-          container.innerHTML = `
-            <div class="error-box">
-              <h3>⚠️ Unable to load the games</h3>
-              <p>
-                Make sure game.js is in the same folder as games.html
-                and the filename is spelled correctly.
-              </p>
-              <p>
-                If the website is hosted online, make sure game.js
-                has been uploaded to the published branch.
-              </p>
-              <button class="primary-button" id="retryGameLoad" type="button">
-                Try Again
-              </button>
-            </div>
-          `;
+    expression += value;
+    secondMode = false;
+    updateDisplay();
+  }
 
-          document.getElementById("retryGameLoad").addEventListener(
-            "click",
-            loadGames
-          );
+  function factorial(n) {
+    if (!Number.isInteger(n) || n < 0 || n > 170) {
+      throw new Error("Factorial requires an integer from 0 to 170.");
+    }
 
-          console.error("RexWeb Nexora: Could not load ./game.js");
-        };
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
 
-        document.body.appendChild(script);
+  /* Convert the supported calculator syntax into a safe arithmetic expression.
+     No arbitrary JavaScript is evaluated. */
+  function evaluateExpression(source) {
+    let s = source
+      .replace(/×/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/−/g, "-")
+      .replace(/π/g, "PI")
+      .replace(/\bAns\b/g, "ANS")
+      .replace(/\be\b/g, "E");
+
+    if (!s.trim()) return 0;
+
+    /* Add implicit multiplication: 2π, 2(3), )(, 3sin(1), etc. */
+    s = s.replace(/(\d|\)|PI|E)(?=(PI|E|\(|sin|cos|tan|asin|acos|atan|log|ln|sqrt))/g, "$1*");
+    s = s.replace(/(PI|E|\))(?=\d)/g, "$1*");
+
+    const tokens = s.match(
+      /(?:\d+(?:\.\d*)?|\.\d+|PI|ANS|E|asin|acos|atan|sin|cos|tan|log|ln|sqrt|10\^|e\^|[+\-*/^()%!])/g
+    );
+
+    if (!tokens || tokens.join("") !== s.replace(/\s+/g, "")) {
+      throw new Error("Invalid expression");
+    }
+
+    let index = 0;
+
+    function peek() { return tokens[index]; }
+    function take() { return tokens[index++]; }
+
+    function parsePrimary() {
+      const token = take();
+
+      if (token === undefined) throw new Error("Incomplete expression");
+
+      if (token === "+") return parseUnary();
+      if (token === "-") return -parseUnary();
+
+      if (token === "(") {
+        const value = parseAddSub();
+        if (take() !== ")") throw new Error("Missing closing bracket");
+        return value;
       }
 
-      reloadButton.addEventListener("click", loadGames);
+      if (token === "PI") return Math.PI;
+      if (token === "E") return Math.E;
+      if (token === "ANS") return answer;
 
-      loadGames();
-    })();
-  </script>
+      if (/^(sin|cos|tan|asin|acos|atan|log|ln|sqrt|10\^|e\^)$/.test(token)) {
+        if (take() !== "(") throw new Error("Function requires parentheses");
+        const value = parseAddSub();
+        if (take() !== ")") throw new Error("Missing function bracket");
+
+        const toRad = x => angleMode === "DEG" ? x * Math.PI / 180 : x;
+        const fromRad = x => angleMode === "DEG" ? x * 180 / Math.PI : x;
+
+        switch (token) {
+          case "sin": return Math.sin(toRad(value));
+          case "cos": return Math.cos(toRad(value));
+          case "tan": return Math.tan(toRad(value));
+          case "asin": return fromRad(Math.asin(value));
+          case "acos": return fromRad(Math.acos(value));
+          case "atan": return fromRad(Math.atan(value));
+          case "log": return Math.log10(value);
+          case "ln": return Math.log(value);
+          case "sqrt": return Math.sqrt(value);
+          case "10^": return Math.pow(10, value);
+          case "e^": return Math.exp(value);
+        }
+      }
+
+      if (/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token)) return Number(token);
+
+      throw new Error("Unexpected input");
+    }
+
+    function parsePostfix() {
+      let value = parsePrimary();
+
+      while (peek() === "!" || peek() === "%") {
+        const op = take();
+        value = op === "!" ? factorial(value) : value / 100;
+      }
+
+      return value;
+    }
+
+    function parsePower() {
+      let left = parsePostfix();
+      if (peek() === "^") {
+        take();
+        left = Math.pow(left, parseUnary());
+      }
+      return left;
+    }
+
+    function parseUnary() {
+      if (peek() === "+") {
+        take();
+        return parseUnary();
+      }
+      if (peek() === "-") {
+        take();
+        return -parseUnary();
+      }
+      return parsePower();
+    }
+
+    function parseMultiplyDivide() {
+      let value = parseUnary();
+
+      while (peek() === "*" || peek() === "/") {
+        const op = take();
+        const next = parseUnary();
+
+        if (op === "/" && next === 0) throw new Error("Cannot divide by zero");
+        value = op === "*" ? value * next : value / next;
+      }
+
+      return value;
+    }
+
+    function parseAddSub() {
+      let value = parseMultiplyDivide();
+
+      while (peek() === "+" || peek() === "-") {
+        const op = take();
+        const next = parseMultiplyDivide();
+        value = op === "+" ? value + next : value - next;
+      }
+
+      return value;
+    }
+
+    const result = parseAddSub();
+
+    if (index !== tokens.length) throw new Error("Check your expression");
+    if (!Number.isFinite(result)) throw new Error("Result is undefined");
+
+    return result;
+  }
+
+  function calculate() {
+    try {
+      const value = evaluateExpression(expression);
+      answer = value;
+
+      const formatted = Number(value.toPrecision(12)).toString();
+      expressionDisplay.textContent = expression + " =";
+      resultDisplay.textContent = formatted;
+
+      expression = formatted;
+      justCalculated = true;
+    } catch (error) {
+      resultDisplay.textContent = "Error";
+      expressionDisplay.textContent = error.message || "Invalid expression";
+      justCalculated = false;
+    }
+  }
+
+  function clearCalculator() {
+    expression = "";
+    justCalculated = false;
+    updateDisplay("0");
+  }
+
+  $("calculatorKeys").addEventListener("click", event => {
+    const button = event.target.closest("button");
+    if (!button) return;
+
+    const value = button.dataset.value;
+    const action = button.dataset.action;
+
+    if (value !== undefined) {
+      insertValue(value);
+      return;
+    }
+
+    switch (action) {
+      case "clear":
+        clearCalculator();
+        break;
+
+      case "delete":
+        expression = expression.slice(0, -1);
+        justCalculated = false;
+        updateDisplay();
+        break;
+
+      case "equals":
+        calculate();
+        break;
+
+      case "second":
+        secondMode = !secondMode;
+        button.style.borderColor = secondMode ? "var(--cyan)" : "";
+        showToast(secondMode ? "Second functions enabled" : "Second functions disabled");
+        break;
+
+      case "parenthesis": {
+        const opens = (expression.match(/\(/g) || []).length;
+        const closes = (expression.match(/\)/g) || []).length;
+        insertValue(opens > closes ? ")" : "(");
+        break;
+      }
+
+      case "percent":
+        insertValue("%");
+        break;
+    }
+  });
+
+  $("calcAngleMode").addEventListener("click", () => {
+    angleMode = angleMode === "DEG" ? "RAD" : "DEG";
+    $("calcModeLabel").textContent = "ANGLE: " + angleMode;
+    updateDisplay();
+  });
+
+  $("settingsResetCalculator").addEventListener("click", () => {
+    clearCalculator();
+    showPage("calculator");
+    showToast("Calculator reset");
+  });
+
+  /* Physical keyboard support when the calculator page is open. */
+  document.addEventListener("keydown", event => {
+    if (currentPage !== "calculator") return;
+
+    if (/^[0-9.]$/.test(event.key)) {
+      insertValue(event.key);
+    } else if (event.key === "+") {
+      insertValue("+");
+    } else if (event.key === "-") {
+      insertValue("−");
+    } else if (event.key === "*") {
+      insertValue("×");
+    } else if (event.key === "/") {
+      event.preventDefault();
+      insertValue("÷");
+    } else if (event.key === "^") {
+      insertValue("^");
+    } else if (event.key === "(" || event.key === ")") {
+      insertValue(event.key);
+    } else if (event.key === "Enter" || event.key === "=") {
+      event.preventDefault();
+      calculate();
+    } else if (event.key === "Backspace") {
+      expression = expression.slice(0, -1);
+      updateDisplay();
+    } else if (event.key === "Escape") {
+      clearCalculator();
+    }
+  });
+
+  updateDisplay("0");
+})();
+</script>
 
 </body>
 </html>
