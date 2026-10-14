@@ -1,10 +1,1429 @@
-<nav class="nav-buttons" id="mainNav">
-  <button class="header-btn active" data-page="home">🏠 Home</button>
-  <button class="header-btn" data-page="games">🎮 Games</button>
-  <button class="header-btn" data-page="creator-hub">🎨 Creator Hub</button>
-  <button class="header-btn" data-page="marketplace">🛍️ Marketplace</button>
-  <button class="header-btn" data-page="learning">📚 Learning</button>
-  <button class="header-btn" data-page="web-dev">💻 Web Dev</button>
-  <button class="header-btn" data-page="competitions">🏆 Competitions</button>
-  <button class="header-btn" data-page="rewards">💰 Rewards</button>
-</nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b18">
+<title>RexWeb Nexora</title>
+<meta name="description" content="RexWeb Nexora — Play. Create. Trade. Grow.">
+
+<style>
+:root {
+  --bg:#080b18;
+  --surface:#10162a;
+  --surface2:#171f38;
+  --primary:#6575ff;
+  --secondary:#a855f7;
+  --cyan:#39d9ff;
+  --text:#f5f7ff;
+  --muted:#a7b0cb;
+  --border:rgba(255,255,255,.1);
+}
+
+* {box-sizing:border-box;margin:0;padding:0}
+
+body {
+  background:radial-gradient(ellipse at top left,#171e49,transparent 38%),var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+button,input,textarea {font:inherit}
+button {cursor:pointer}
+a {color:inherit;text-decoration:none}
+.container {width:min(1180px,94%);margin:auto}
+
+/* HEADER */
+
+.site-header {
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(8,11,24,.96);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+
+.header-top {
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  font-size:18px;
+}
+
+.brand-icon {
+  width:40px;height:40px;
+  display:grid;place-items:center;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  font-size:22px;
+}
+
+.brand span {color:var(--cyan)}
+
+.header-actions {display:flex;gap:7px;align-items:center}
+
+.header-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:42px;
+  padding:9px 13px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--surface);
+  color:var(--text);
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+.header-btn:hover,.header-btn.active {
+  border-color:var(--primary);
+  background:#222c51;
+}
+
+.header-btn.primary {
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  border:0;
+}
+
+.nav-wrap {border-top:1px solid rgba(255,255,255,.04)}
+
+.nav-buttons {
+  display:flex;
+  gap:8px;
+  padding:10px 0;
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+
+.more-wrapper {position:relative}
+
+.more-menu {
+  display:none;
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  width:210px;
+  padding:8px;
+  background:#11172b;
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:0 15px 35px #0008;
+}
+
+.more-menu.open {display:block}
+
+.more-menu button {
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:10px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--text);
+}
+
+.more-menu button:hover {background:var(--surface2)}
+
+/* PAGE NAVIGATION */
+
+.app-page {display:none;min-height:65vh}
+.app-page.active {display:block;animation:appear .2s ease}
+
+@keyframes appear {
+  from {opacity:0;transform:translateY(4px)}
+  to {opacity:1;transform:translateY(0)}
+}
+
+.section {padding:38px 0 60px}
+
+.section-label {
+  display:inline-block;
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  margin-bottom:8px;
+}
+
+h1 {font-size:clamp(28px,5vw,43px);line-height:1.2}
+h2 {font-size:25px;line-height:1.3;margin-bottom:8px}
+p {color:var(--muted)}
+
+.hero {padding:65px 0;text-align:center}
+.hero h1 {font-size:clamp(38px,7vw,70px);margin:15px 0}
+.gradient-text {
+  background:linear-gradient(100deg,#6d8cff,#bf81ff,#40dfff);
+  background-clip:text;
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero p {max-width:650px;margin:10px auto 20px}
+.eyebrow {
+  display:inline-block;
+  border:1px solid #6575ff66;
+  background:#6575ff18;
+  padding:7px 13px;
+  border-radius:30px;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+.feature-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:15px;
+  margin-top:24px;
+}
+
+.feature-card {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  text-align:left;
+  padding:22px;
+  min-height:200px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:linear-gradient(145deg,#151d37,#0d1223);
+  color:var(--text);
+  transition:.2s;
+}
+
+.feature-card:hover {border-color:var(--primary);transform:translateY(-3px)}
+.feature-icon {font-size:28px;margin-bottom:12px}
+.feature-card h3 {margin-bottom:8px}
+.feature-card p {font-size:13px;margin-bottom:15px}
+.card-link {margin-top:auto;color:#c6ccff;font-size:13px;font-weight:bold}
+
+.panel {
+  padding:23px;
+  margin-top:20px;
+  border:1px solid var(--border);
+  border-radius:17px;
+  background:linear-gradient(145deg,#151d37,#0d1223);
+}
+
+.action-row {display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+
+.action-btn {
+  padding:11px 15px;
+  border-radius:10px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-weight:bold;
+  font-size:13px;
+}
+
+.action-btn.primary {
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  border:0;
+}
+
+.action-btn:hover {border-color:var(--primary)}
+
+footer {
+  border-top:1px solid var(--border);
+  padding:25px 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* CODING STUDIO */
+
+.coding-heading {margin-bottom:22px}
+.coding-heading p {margin-top:8px}
+
+.tool-card {
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  background:#0e1425;
+  margin-bottom:20px;
+}
+
+.tool-bar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:13px;
+  background:#141c32;
+  border-bottom:1px solid var(--border);
+}
+
+.tool-bar strong {font-size:14px}
+
+.preview-screen {height:310px;background:white}
+.preview-screen iframe {width:100%;height:100%;border:0;display:block;background:white}
+
+.editor-tabs {
+  display:flex;
+  overflow-x:auto;
+  background:#11182a;
+  border-bottom:1px solid var(--border);
+}
+
+.editor-tab {
+  padding:12px 16px;
+  border:0;
+  border-bottom:2px solid transparent;
+  color:var(--muted);
+  background:transparent;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.editor-tab.active {
+  color:white;
+  border-bottom-color:var(--primary);
+  background:#202945;
+}
+
+.editor-panel {display:none}
+.editor-panel.active {display:block}
+
+.file-label {
+  padding:8px 13px;
+  background:#0b1020;
+  color:#c3cced;
+  font-size:12px;
+}
+
+.code-input {
+  display:block;
+  width:100%;
+  min-height:280px;
+  padding:15px;
+  resize:vertical;
+  border:0;
+  outline:none;
+  background:#080c18;
+  color:#d5e1ff;
+  font-family:monospace;
+  font-size:13px;
+  line-height:1.7;
+  tab-size:2;
+  white-space:pre;
+}
+
+.editor-footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  flex-wrap:wrap;
+  background:#11182a;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* SCIENTIFIC CALCULATOR */
+
+.calculator {
+  max-width:650px;
+  margin:25px auto;
+  padding:18px;
+  border:1px solid #303b59;
+  border-radius:20px;
+  background:linear-gradient(145deg,#121a30,#090d19);
+  box-shadow:0 15px 45px #0003;
+}
+
+.calc-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.calc-display {
+  width:100%;
+  min-width:0;
+  padding:20px 15px;
+  margin-bottom:14px;
+  border:1px solid #343f60;
+  border-radius:13px;
+  background:#050914;
+  color:#a8f2ff;
+  text-align:right;
+  font-family:monospace;
+  font-size:clamp(24px,6vw,36px);
+  outline:none;
+}
+
+.calc-expression {
+  min-height:24px;
+  color:var(--muted);
+  text-align:right;
+  overflow-wrap:anywhere;
+  font-family:monospace;
+  font-size:13px;
+  margin-bottom:5px;
+}
+
+.calc-status {
+  min-height:20px;
+  color:#ffbd82;
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.calc-grid {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+}
+
+.calc-key {
+  min-width:0;
+  min-height:49px;
+  padding:8px 3px;
+  border:1px solid #293452;
+  border-radius:10px;
+  color:#f3f5ff;
+  background:#1a2440;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.calc-key:hover {border-color:#8190ff;background:#27365d}
+.calc-key.function {background:#202b46;color:#b8c5ff}
+.calc-key.operator {background:#32264e;color:#e3c4ff}
+.calc-key.danger {background:#462435;color:#ffb8c7}
+.calc-key.equal {background:linear-gradient(135deg,#6575ff,#a855f7)}
+.calc-key.wide {grid-column:span 2}
+
+.calc-mode {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.calc-mode select {
+  padding:7px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#11182a;
+  color:white;
+}
+
+/* TEXT COUNTER */
+
+.text-counter {margin-top:20px}
+
+.counter-input {
+  width:100%;
+  min-height:260px;
+  padding:17px;
+  border:1px solid #303b59;
+  border-radius:13px;
+  outline:none;
+  resize:vertical;
+  background:#080c18;
+  color:#f3f5ff;
+  font-family:monospace;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.counter-input:focus {border-color:var(--primary)}
+
+.counter-stats {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:16px;
+}
+
+.counter-stat {
+  padding:17px 10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#11182a;
+  min-width:0;
+}
+
+.counter-stat strong {
+  display:block;
+  font-size:25px;
+  overflow-wrap:anywhere;
+}
+
+.counter-stat span {font-size:12px;color:var(--muted)}
+
+.notice {
+  position:fixed;
+  z-index:2000;
+  bottom:16px;
+  left:50%;
+  transform:translate(-50%,15px);
+  width:max-content;
+  max-width:90%;
+  padding:12px 17px;
+  border:1px solid #6575ff88;
+  border-radius:11px;
+  background:#151d37;
+  color:white;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+
+.notice.show {opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:850px) {
+  .feature-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:550px) {
+  .brand {font-size:15px}
+  .header-top {padding:10px 0}
+  .header-actions .header-btn {padding:8px;font-size:11px}
+  .feature-grid {grid-template-columns:1fr}
+  .section {padding:27px 0 45px}
+  .calculator {padding:10px}
+  .calc-grid {gap:5px}
+  .calc-key {min-height:46px;font-size:12px}
+  .counter-stats {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .preview-screen {height:260px}
+  .code-input {min-height:240px}
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {animation:none!important;transition:none!important}
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="container">
+
+    <div class="header-top">
+      <a class="brand" href="#home" data-page="home">
+        <span class="brand-icon">⚡</span>
+        <span>REXWEB <span>NEXORA</span></span>
+      </a>
+
+      <div class="header-actions">
+        <button class="header-btn" data-notice="Login requires account authentication to be connected.">👤 Login</button>
+        <button class="header-btn primary" data-notice="Registration requires account authentication to be connected.">Sign Up</button>
+
+        <div class="more-wrapper">
+          <button class="header-btn" id="moreButton" aria-expanded="false">☰ More</button>
+          <div class="more-menu" id="moreMenu">
+            <button data-page="rewards">💰 Rewards Centre</button>
+            <button data-page="help">🛟 Help Centre</button>
+            <button data-page="about">ℹ️ About RexWeb</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav-wrap">
+      <div class="nav-buttons" id="mainNav">
+        <button class="header-btn active" data-page="home">🏠 Home</button>
+        <button class="header-btn" data-page="games">🎮 Games</button>
+        <button class="header-btn" data-page="creator-hub">🎨 Creator Hub</button>
+        <button class="header-btn" data-page="marketplace">🛍️ Marketplace</button>
+        <button class="header-btn" data-page="learning">📚 Learning</button>
+        <button class="header-btn" data-page="web-dev">💻 Web Dev</button>
+        <button class="header-btn" data-page="coding-studio">🧑‍💻 Coding Studio</button>
+        <button class="header-btn" data-page="calculator">🧮 Calculator</button>
+        <button class="header-btn" data-page="text-counter">🔢 Text Counter</button>
+        <button class="header-btn" data-page="competitions">🏆 Competitions</button>
+        <button class="header-btn" data-page="rewards">💰 Rewards</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section class="app-page active" id="page-home">
+  <div class="hero container">
+    <div class="eyebrow">YOUR DIGITAL DESTINATION</div>
+    <h1>Welcome to<br><span class="gradient-text">RexWeb Nexora</span></h1>
+    <p>Play. Create. Trade. Grow.</p>
+    <p>Discover gaming, creative resources, coding tools, digital products, and learning resources in one place.</p>
+    <button class="header-btn primary" data-page="coding-studio">🧑‍💻 Open Coding Studio</button>
+  </div>
+
+  <div class="container section">
+    <h2>Explore RexWeb</h2>
+    <p>Choose a destination to get started.</p>
+
+    <div class="feature-grid">
+      <button class="feature-card" data-page="games">
+        <span class="feature-icon">🎮</span><h3>Games</h3>
+        <p>Discover games and challenges.</p><span class="card-link">Explore Games →</span>
+      </button>
+
+      <button class="feature-card" data-page="creator-hub">
+        <span class="feature-icon">🎨</span><h3>Creator Hub</h3>
+        <p>Explore creative resources and projects.</p><span class="card-link">Open Creator Hub →</span>
+      </button>
+
+      <button class="feature-card" data-page="marketplace">
+        <span class="feature-icon">🛍️</span><h3>Marketplace</h3>
+        <p>Discover digital products.</p><span class="card-link">Browse Products →</span>
+      </button>
+
+      <button class="feature-card" data-page="learning">
+        <span class="feature-icon">📚</span><h3>Learning Centre</h3>
+        <p>Explore lessons and tutorials.</p><span class="card-link">Start Learning →</span>
+      </button>
+
+      <button class="feature-card" data-page="web-dev">
+        <span class="feature-icon">💻</span><h3>Web Development</h3>
+        <p>Explore code and website resources.</p><span class="card-link">Explore Web Dev →</span>
+      </button>
+
+      <button class="feature-card" data-page="coding-studio">
+        <span class="feature-icon">🧑‍💻</span><h3>Coding Studio</h3>
+        <p>Write HTML, CSS and JavaScript with a live preview.</p><span class="card-link">Start Coding →</span>
+      </button>
+
+      <button class="feature-card" data-page="calculator">
+        <span class="feature-icon">🧮</span><h3>Scientific Calculator</h3>
+        <p>Calculate expressions with scientific functions.</p><span class="card-link">Open Calculator →</span>
+      </button>
+
+      <button class="feature-card" data-page="text-counter">
+        <span class="feature-icon">🔢</span><h3>Text Counter</h3>
+        <p>Count words, characters, lines, digits, and letters.</p><span class="card-link">Count Text →</span>
+      </button>
+
+      <button class="feature-card" data-page="competitions">
+        <span class="feature-icon">🏆</span><h3>Competitions</h3>
+        <p>Explore tournaments and challenges.</p><span class="card-link">View Competitions →</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- SIMPLE DESTINATION PAGES -->
+<section class="app-page" id="page-games">
+  <div class="container section">
+    <span class="section-label">PLAY</span><h1>🎮 Games Hub</h1>
+    <div class="panel"><p>Discover games, gaming challenges, and leaderboards.</p><div class="action-row"><button class="action-btn" data-notice="Add your game catalogue to this section.">Browse Games</button></div></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-creator-hub">
+  <div class="container section">
+    <span class="section-label">CREATE</span><h1>🎨 Creator Hub</h1>
+    <div class="panel"><p>Explore creative resources, design assets, and project ideas.</p></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-marketplace">
+  <div class="container section">
+    <span class="section-label">TRADE</span><h1>🛍️ Marketplace</h1>
+    <div class="panel"><p>Discover digital products and downloadable resources. Product listings and payments require backend integration.</p></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-learning">
+  <div class="container section">
+    <span class="section-label">LEARN</span><h1>📚 Learning Centre</h1>
+    <div class="panel"><p>Explore tutorials, lessons, and educational resources.</p></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-web-dev">
+  <div class="container section">
+    <span class="section-label">BUILD</span><h1>💻 Web Development</h1>
+    <div class="panel"><p>Explore HTML, CSS, JavaScript, templates, and web development guides.</p><div class="action-row"><button class="action-btn primary" data-page="coding-studio">Open Coding Studio</button></div></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-competitions">
+  <div class="container section">
+    <span class="section-label">COMPETE</span><h1>🏆 Competitions</h1>
+    <div class="panel"><p>Explore tournaments and challenges. Event registration is not connected yet.</p></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-rewards">
+  <div class="container section">
+    <span class="section-label">REWARDS</span><h1>💰 Rewards Centre</h1>
+    <div class="panel"><p>Explore reward programme information. No earning or withdrawal system is connected yet.</p></div>
+  </div>
+</section>
+
+<section class="app-page" id="page-help">
+  <div class="container section"><h1>🛟 Help Centre</h1><div class="panel"><p>Help resources can be added here.</p></div></div>
+</section>
+
+<section class="app-page" id="page-about">
+  <div class="container section"><h1>⚡ About RexWeb Nexora</h1><div class="panel"><p>Play. Create. Trade. Grow. A digital destination for gaming, creativity, coding, and learning.</p></div></div>
+</section>
+
+<!-- CODING STUDIO -->
+<section class="app-page" id="page-coding-studio">
+  <div class="container section">
+    <div class="coding-heading">
+      <span class="section-label">REXWEB DEVELOPER TOOLS</span>
+      <h1>🧑‍💻 Coding Studio</h1>
+      <p>Write HTML, CSS and JavaScript. Your preview appears above your code.</p>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-bar">
+        <strong>👁️ Live Preview</strong>
+        <div class="action-row" style="margin:0">
+          <button class="action-btn primary" id="refreshPreview">▶ Run</button>
+          <button class="action-btn" id="resetEditor">↺ Reset</button>
+        </div>
+      </div>
+      <div class="preview-screen">
+        <iframe id="codePreview" title="Code preview" sandbox="allow-scripts"></iframe>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-bar"><strong>Code Editor</strong><span>REXWEB IDE</span></div>
+      <div class="editor-tabs">
+        <button class="editor-tab active" data-editor="html">HTML</button>
+        <button class="editor-tab" data-editor="css">CSS</button>
+        <button class="editor-tab" data-editor="javascript">JavaScript</button>
+      </div>
+
+      <div class="editor-panel active" id="panel-html">
+        <div class="file-label">index.html</div>
+        <textarea class="code-input" id="htmlCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="HTML editor"></textarea>
+      </div>
+
+      <div class="editor-panel" id="panel-css">
+        <div class="file-label">style.css</div>
+        <textarea class="code-input" id="cssCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="CSS editor"></textarea>
+      </div>
+
+      <div class="editor-panel" id="panel-javascript">
+        <div class="file-label">script.js</div>
+        <textarea class="code-input" id="jsCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="JavaScript editor"></textarea>
+      </div>
+
+      <div class="editor-footer">
+        <span id="editorStatus" aria-live="polite">Ready to code</span>
+        <button class="action-btn primary" id="runCode">▶ Run Code</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCIENTIFIC CALCULATOR -->
+<section class="app-page" id="page-calculator">
+  <div class="container section">
+    <span class="section-label">REXWEB TOOLS</span>
+    <h1>🧮 Scientific Calculator</h1>
+    <p>Use the buttons or type a mathematical expression.</p>
+
+    <div class="calculator">
+      <div class="calc-top">
+        <strong>Scientific Calculator</strong>
+        <label class="calc-mode">
+          Angle
+          <select id="angleMode">
+            <option value="DEG">DEG</option>
+            <option value="RAD">RAD</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="calc-expression" id="calcExpression" aria-live="polite"></div>
+      <input class="calc-display" id="calcDisplay" value="0" aria-label="Calculator display" inputmode="decimal">
+      <div class="calc-status" id="calcStatus" aria-live="polite"></div>
+
+      <div class="calc-grid" id="calcKeys">
+        <button class="calc-key danger" data-action="clear">AC</button>
+        <button class="calc-key danger" data-action="delete">DEL</button>
+        <button class="calc-key function" data-value="(">(</button>
+        <button class="calc-key function" data-value=")">)</button>
+        <button class="calc-key operator" data-value="/">÷</button>
+
+        <button class="calc-key function" data-value="sin(">sin</button>
+        <button class="calc-key function" data-value="cos(">cos</button>
+        <button class="calc-key function" data-value="tan(">tan</button>
+        <button class="calc-key function" data-value="sqrt(">√</button>
+        <button class="calc-key operator" data-value="^">xʸ</button>
+
+        <button class="calc-key function" data-value="asin(">sin⁻¹</button>
+        <button class="calc-key function" data-value="acos(">cos⁻¹</button>
+        <button class="calc-key function" data-value="atan(">tan⁻¹</button>
+        <button class="calc-key function" data-value="log(">log</button>
+        <button class="calc-key function" data-value="ln(">ln</button>
+
+        <button class="calc-key function" data-value="π">π</button>
+        <button class="calc-key function" data-value="e">e</button>
+        <button class="calc-key function" data-value="!">x!</button>
+        <button class="calc-key function" data-value="%">%</button>
+        <button class="calc-key operator" data-value="*">×</button>
+
+        <button class="calc-key" data-value="7">7</button>
+        <button class="calc-key" data-value="8">8</button>
+        <button class="calc-key" data-value="9">9</button>
+        <button class="calc-key function" data-value="abs(">abs</button>
+        <button class="calc-key operator" data-value="-">−</button>
+
+        <button class="calc-key" data-value="4">4</button>
+        <button class="calc-key" data-value="5">5</button>
+        <button class="calc-key" data-value="6">6</button>
+        <button class="calc-key function" data-value="floor(">floor</button>
+        <button class="calc-key operator" data-value="+">+</button>
+
+        <button class="calc-key" data-value="1">1</button>
+        <button class="calc-key" data-value="2">2</button>
+        <button class="calc-key" data-value="3">3</button>
+        <button class="calc-key function" data-value="ceil(">ceil</button>
+        <button class="calc-key function" data-value="round(">round</button>
+
+        <button class="calc-key" data-value="0">0</button>
+        <button class="calc-key" data-value=".">.</button>
+        <button class="calc-key function" data-value="Ans">Ans</button>
+        <button class="calc-key equal wide" data-action="equals">=</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEXT COUNTER -->
+<section class="app-page" id="page-text-counter">
+  <div class="container section">
+    <span class="section-label">REXWEB WRITING TOOLS</span>
+    <h1>🔢 Text Counter</h1>
+    <p>Type or paste your text. The statistics update automatically.</p>
+
+    <div class="text-counter">
+      <textarea id="counterInput" class="counter-input" placeholder="Type or paste your text here..." aria-label="Text to count"></textarea>
+
+      <div class="action-row">
+        <button class="action-btn primary" id="copyText">Copy Text</button>
+        <button class="action-btn" id="clearText">Clear Text</button>
+      </div>
+
+      <div class="counter-stats" aria-live="polite">
+        <div class="counter-stat"><strong id="countChars">0</strong><span>Characters</span></div>
+        <div class="counter-stat"><strong id="countNoSpaces">0</strong><span>Characters without spaces</span></div>
+        <div class="counter-stat"><strong id="countWords">0</strong><span>Words</span></div>
+        <div class="counter-stat"><strong id="countLines">0</strong><span>Lines</span></div>
+        <div class="counter-stat"><strong id="countDigits">0</strong><span>Digits (0–9)</span></div>
+        <div class="counter-stat"><strong id="countLetters">0</strong><span>Letters</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <strong>⚡ REXWEB NEXORA</strong><br>
+    Play. Create. Trade. Grow. · © <span id="year"></span> RexWeb Nexora
+  </div>
+</footer>
+
+<div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================
+   GLOBAL UTILITIES AND PAGE NAVIGATION
+========================================= */
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const noticeElement = document.getElementById("notice");
+let noticeTimer;
+
+function showNotice(message) {
+  noticeElement.textContent = message;
+  noticeElement.classList.add("show");
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => noticeElement.classList.remove("show"), 2800);
+}
+
+document.querySelectorAll("[data-notice]").forEach(button => {
+  button.addEventListener("click", () => showNotice(button.dataset.notice));
+});
+
+const pageNames = [
+  "home", "games", "creator-hub", "marketplace", "learning",
+  "web-dev", "coding-studio", "calculator", "text-counter",
+  "competitions", "rewards", "help", "about"
+];
+
+const navButtons = document.querySelectorAll("#mainNav [data-page]");
+
+function loadPage(name, updateHistory = true) {
+  if (!pageNames.includes(name)) name = "home";
+
+  const page = document.getElementById("page-" + name);
+  if (!page) return;
+
+  document.querySelectorAll(".app-page").forEach(section => {
+    section.classList.remove("active");
+  });
+
+  page.classList.add("active");
+
+  navButtons.forEach(button => {
+    button.classList.toggle("active", button.dataset.page === name);
+  });
+
+  document.getElementById("moreMenu").classList.remove("open");
+  document.getElementById("moreButton").setAttribute("aria-expanded", "false");
+
+  window.scrollTo({top: 0, behavior: "auto"});
+
+  if (updateHistory) {
+    history.replaceState(null, "", "#" + name);
+  }
+
+  const titles = {
+    home:"Home",
+    games:"Games",
+    "creator-hub":"Creator Hub",
+    marketplace:"Marketplace",
+    learning:"Learning Centre",
+    "web-dev":"Web Development",
+    "coding-studio":"Coding Studio",
+    calculator:"Scientific Calculator",
+    "text-counter":"Text Counter",
+    competitions:"Competitions",
+    rewards:"Rewards Centre",
+    help:"Help Centre",
+    about:"About"
+  };
+
+  document.title = (titles[name] || "Home") + " | RexWeb Nexora";
+}
+
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", () => loadPage(button.dataset.page));
+});
+
+const moreButton = document.getElementById("moreButton");
+const moreMenu = document.getElementById("moreMenu");
+
+moreButton.addEventListener("click", () => {
+  const open = moreMenu.classList.toggle("open");
+  moreButton.setAttribute("aria-expanded", String(open));
+});
+
+document.addEventListener("click", event => {
+  if (!moreMenu.contains(event.target) && !moreButton.contains(event.target)) {
+    moreMenu.classList.remove("open");
+    moreButton.setAttribute("aria-expanded", "false");
+  }
+});
+
+loadPage(pageNames.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home", false);
+
+
+/* =========================================
+   CODING STUDIO
+========================================= */
+
+(function initCodingStudio() {
+  const htmlEditor = document.getElementById("htmlCode");
+  const cssEditor = document.getElementById("cssCode");
+  const jsEditor = document.getElementById("jsCode");
+  const preview = document.getElementById("codePreview");
+  const status = document.getElementById("editorStatus");
+
+  const starterHTML = `<main class="welcome">
+  <div class="logo">⚡</div>
+  <h1>My First Website</h1>
+  <p>I built this with RexWeb Nexora.</p>
+  <button id="helloButton">Click Me!</button>
+  <p id="message"></p>
+</main>`;
+
+  const starterCSS = `* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #0b1020;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.welcome {
+  width: min(90%, 500px);
+  padding: 35px 20px;
+  text-align: center;
+  background: #151e38;
+  border: 1px solid #3e4b78;
+  border-radius: 20px;
+}
+
+h1 { color: #8e9cff; }
+
+button {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 9px;
+  background: #6575ff;
+  color: white;
+  cursor: pointer;
+}`;
+
+  const starterJS = `document.getElementById("helloButton")
+  .addEventListener("click", function () {
+    document.getElementById("message").textContent =
+      "Great! Your JavaScript works!";
+  });`;
+
+  function updatePreview() {
+    const safeCSS = cssEditor.value.replace(/<\/style/gi, "<\\/style");
+    const safeJS = jsEditor.value.replace(/<\/script/gi, "<\\/script");
+
+    const src = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>${safeCSS}</style>
+</head>
+<body>
+${htmlEditor.value}
+<script>
+try {
+${safeJS}
+} catch (error) {
+  const box = document.createElement("pre");
+  box.style.cssText = "color:#b91c1c;white-space:pre-wrap;padding:12px";
+  box.textContent = "JavaScript error: " + error.message;
+  document.body.appendChild(box);
+}
+<\/script>
+</body>
+</html>`;
+
+    preview.srcdoc = src;
+    status.textContent = "Preview updated";
+  }
+
+  htmlEditor.value = starterHTML;
+  cssEditor.value = starterCSS;
+  jsEditor.value = starterJS;
+
+  document.querySelectorAll(".editor-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".editor-tab").forEach(item => item.classList.remove("active"));
+      document.querySelectorAll(".editor-panel").forEach(item => item.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById("panel-" + tab.dataset.editor).classList.add("active");
+    });
+  });
+
+  document.getElementById("runCode").addEventListener("click", updatePreview);
+  document.getElementById("refreshPreview").addEventListener("click", updatePreview);
+
+  document.getElementById("resetEditor").addEventListener("click", () => {
+    if (!confirm("Reset all code to the starter example?")) return;
+    htmlEditor.value = starterHTML;
+    cssEditor.value = starterCSS;
+    jsEditor.value = starterJS;
+    updatePreview();
+    status.textContent = "Starter code restored";
+  });
+
+  [htmlEditor, cssEditor, jsEditor].forEach(editor => {
+    editor.addEventListener("keydown", event => {
+      if (event.key === "Tab") {
+        event.preventDefault();
+        editor.setRangeText("  ", editor.selectionStart, editor.selectionEnd, "end");
+      }
+    });
+  });
+
+  updatePreview();
+})();
+
+
+/* =========================================
+   SCIENTIFIC CALCULATOR
+   Recursive-descent parser; no eval().
+========================================= */
+
+(function initCalculator() {
+  const display = document.getElementById("calcDisplay");
+  const expressionLabel = document.getElementById("calcExpression");
+  const status = document.getElementById("calcStatus");
+  const angleMode = document.getElementById("angleMode");
+  const keys = document.getElementById("calcKeys");
+
+  let expression = "";
+  let answer = 0;
+  let justCalculated = false;
+
+  function showExpression() {
+    display.value = expression || "0";
+  }
+
+  function insert(value) {
+    status.textContent = "";
+
+    if (justCalculated && /^[0-9.]$/.test(value)) {
+      expression = "";
+    }
+
+    justCalculated = false;
+
+    if (expression.length > 300) {
+      status.textContent = "Expression is too long.";
+      return;
+    }
+
+    expression += value;
+    showExpression();
+  }
+
+  function clearAll() {
+    expression = "";
+    expressionLabel.textContent = "";
+    status.textContent = "";
+    justCalculated = false;
+    showExpression();
+  }
+
+  function deleteLast() {
+    expression = expression.slice(0, -1);
+    justCalculated = false;
+    status.textContent = "";
+    showExpression();
+  }
+
+  function factorial(n) {
+    if (!Number.isInteger(n) || n < 0 || n > 170) {
+      throw new Error("Factorial requires a whole number from 0 to 170.");
+    }
+
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
+
+  function calculate(input) {
+    let s = input
+      .replace(/π/g, "pi")
+      .replace(/×/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/−/g, "-")
+      .replace(/\s+/g, "");
+
+    if (!s) throw new Error("Enter a calculation first.");
+    if (s.length > 300) throw new Error("Expression is too long.");
+    if (!/^[0-9a-zA-Z.+\-*/^()%!,]*$/.test(s)) {
+      throw new Error("Expression contains an unsupported character.");
+    }
+
+    const tokens = s.match(/(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|[a-zA-Z]+|[()+\-*/^%!]/gi) || [];
+    if (tokens.join("").toLowerCase() !== s.toLowerCase()) {
+      throw new Error("Check the expression syntax.");
+    }
+
+    let pos = 0;
+
+    function peek() { return tokens[pos]; }
+    function take() { return tokens[pos++]; }
+
+    function parseExpression() {
+      let value = parseTerm();
+
+      while (peek() === "+" || peek() === "-") {
+        const op = take();
+        const right = parseTerm();
+        value = op === "+" ? value + right : value - right;
+      }
+
+      return value;
+    }
+
+    function parseTerm() {
+      let value = parseUnary();
+
+      while (["*", "/"].includes(peek())) {
+        const op = take();
+        const right = parseUnary();
+
+        if (op === "/" && right === 0) throw new Error("Cannot divide by zero.");
+        value = op === "*" ? value * right : value / right;
+      }
+
+      return value;
+    }
+
+    function parseUnary() {
+      if (peek() === "+") {
+        take();
+        return parseUnary();
+      }
+
+      if (peek() === "-") {
+        take();
+        return -parseUnary();
+      }
+
+      return parsePower();
+    }
+
+    function parsePower() {
+      let value = parsePostfix();
+
+      if (peek() === "^") {
+        take();
+        value = Math.pow(value, parseUnary());
+      }
+
+      return value;
+    }
+
+    function parsePostfix() {
+      let value = parsePrimary();
+
+      while (peek() === "!" || peek() === "%") {
+        const op = take();
+
+        if (op === "!") {
+          value = factorial(value);
+        } else {
+          value /= 100;
+        }
+      }
+
+      return value;
+    }
+
+    function parsePrimary() {
+      const token = take();
+
+      if (token === undefined) throw new Error("Incomplete expression.");
+
+      if (token === "(") {
+        const value = parseExpression();
+        if (take() !== ")") throw new Error("Missing closing parenthesis.");
+        return value;
+      }
+
+      if (/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(token)) {
+        return Number(token);
+      }
+
+      const name = token.toLowerCase();
+
+      if (name === "pi") return Math.PI;
+      if (name === "e") return Math.E;
+      if (name === "ans") return answer;
+
+      const functions = {
+        sin: x => Math.sin(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
+        cos: x => Math.cos(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
+        tan: x => {
+          const a = angleMode.value === "DEG" ? x * Math.PI / 180 : x;
+          if (Math.abs(Math.cos(a)) < 1e-12) throw new Error("Tangent is undefined at this angle.");
+          return Math.tan(a);
+        },
+        asin: x => {
+          if (x < -1 || x > 1) throw new Error("asin accepts values from -1 to 1.");
+          const a = Math.asin(x);
+          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
+        },
+        acos: x => {
+          if (x < -1 || x > 1) throw new Error("acos accepts values from -1 to 1.");
+          const a = Math.acos(x);
+          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
+        },
+        atan: x => {
+          const a = Math.atan(x);
+          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
+        },
+        sqrt: x => {
+          if (x < 0) throw new Error("Cannot take the real square root of a negative number.");
+          return Math.sqrt(x);
+        },
+        log: x => {
+          if (x <= 0) throw new Error("Logarithm requires a positive number.");
+          return Math.log10(x);
+        },
+        ln: x => {
+          if (x <= 0) throw new Error("Natural logarithm requires a positive number.");
+          return Math.log(x);
+        },
+        abs: x => Math.abs(x),
+        floor: x => Math.floor(x),
+        ceil: x => Math.ceil(x),
+        round: x => Math.round(x)
+      };
+
+      if (functions[name]) {
+        if (take() !== "(") throw new Error("Function " + name + " needs parentheses.");
+        const argument = parseExpression();
+        if (take() !== ")") throw new Error("Missing closing parenthesis.");
+        return functions[name](argument);
+      }
+
+      throw new Error("Unknown value: " + token);
+    }
+
+    const result = parseExpression();
+
+    if (pos < tokens.length) throw new Error("Check the expression near " + tokens[pos] + ".");
+    if (!Number.isFinite(result)) throw new Error("Result is outside the supported range.");
+
+    return result;
+  }
+
+  function equals() {
+    try {
+      const original = expression;
+      const result = calculate(expression);
+      answer = result;
+      expressionLabel.textContent = original + " =";
+      expression = Number(result.toPrecision(12)).toString();
+      display.value = expression;
+      justCalculated = true;
+      status.textContent = "";
+    } catch (error) {
+      status.textContent = error.message || "Invalid calculation.";
+    }
+  }
+
+  keys.addEventListener("click", event => {
+    const button = event.target.closest("button");
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const value = button.dataset.value;
+
+    if (action === "clear") clearAll();
+    else if (action === "delete") deleteLast();
+    else if (action === "equals") equals();
+    else if (value !== undefined) insert(value);
+  });
+
+  display.addEventListener("input", () => {
+    expression = display.value;
+    justCalculated = false;
+    status.textContent = "";
+  });
+
+  display.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === "=") {
+      event.preventDefault();
+      equals();
+    } else if (event.key === "Escape") {
+      clearAll();
+    }
+  });
+
+  angleMode.addEventListener("change", () => {
+    status.textContent = "Angle mode: " + angleMode.value;
+  });
+
+  showExpression();
+})();
+
+
+/* =========================================
+   TEXT COUNTER
+========================================= */
+
+(function initTextCounter() {
+  const input = document.getElementById("counterInput");
+
+  const output = {
+    chars: document.getElementById("countChars"),
+    noSpaces: document.getElementById("countNoSpaces"),
+    words: document.getElementById("countWords"),
+    lines: document.getElementById("countLines"),
+    digits: document.getElementById("countDigits"),
+    letters: document.getElementById("countLetters")
+  };
+
+  function countText() {
+    const text = input.value;
+
+    output.chars.textContent = text.length.toLocaleString();
+    output.noSpaces.textContent = text.replace(/\s/g, "").length.toLocaleString();
+
+    const trimmed = text.trim();
+    output.words.textContent = trimmed
+      ? trimmed.split(/\s+/u).length.toLocaleString()
+      : "0";
+
+    output.lines.textContent = text.length
+      ? text.split(/\r\n|\r|\n/).length.toLocaleString()
+      : "0";
+
+    output.digits.textContent = (text.match(/[0-9]/g) || []).length.toLocaleString();
+    output.letters.textContent = (text.match(/\p{L}/gu) || []).length.toLocaleString();
+  }
+
+  input.addEventListener("input", countText);
+
+  document.getElementById("clearText").addEventListener("click", () => {
+    input.value = "";
+    countText();
+    input.focus();
+  });
+
+  document.getElementById("copyText").addEventListener("click", async () => {
+    if (!input.value) {
+      showNotice("There is no text to copy.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(input.value);
+      showNotice("Text copied.");
+    } catch {
+      input.focus();
+      input.select();
+      const copied = document.execCommand("copy");
+      showNotice(copied ? "Text copied." : "Select the text and copy it manually.");
+    }
+  });
+
+  countText();
+})();
+</script>
+
+</body>
+</html>
