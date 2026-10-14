@@ -1,7 +1,6 @@
 /* =========================================================
    REXWEB NEXORA — 10-GAME ARCADE
-   PART 1 OF 3
-   Includes: Game Hub, Snake, Memory Match, Tic-Tac-Toe
+   COMPLETE SELF-CONTAINED GAME.JS
    ========================================================= */
 
 (() => {
@@ -659,9 +658,7 @@
 
     function changeDirection(x, y) {
       if (!running || ended) return;
-
       if (x === -direction.x && y === -direction.y) return;
-
       nextDirection = { x, y };
     }
 
@@ -676,7 +673,6 @@
       };
 
       const eating = head.x === food.x && head.y === food.y;
-
       const collisionBody = eating ? snake : snake.slice(0, -1);
 
       if (
@@ -754,18 +750,10 @@
 
     function keyHandler(event) {
       const keys = {
-        ArrowUp: [0, -1],
-        w: [0, -1],
-        W: [0, -1],
-        ArrowDown: [0, 1],
-        s: [0, 1],
-        S: [0, 1],
-        ArrowLeft: [-1, 0],
-        a: [-1, 0],
-        A: [-1, 0],
-        ArrowRight: [1, 0],
-        d: [1, 0],
-        D: [1, 0]
+        ArrowUp: [0, -1], w: [0, -1], W: [0, -1],
+        ArrowDown: [0, 1], s: [0, 1], S: [0, 1],
+        ArrowLeft: [-1, 0], a: [-1, 0], A: [-1, 0],
+        ArrowRight: [1, 0], d: [1, 0], D: [1, 0]
       };
 
       if (keys[event.key]) {
@@ -802,9 +790,7 @@
         secondary: true,
         onClick: () => {
           if (ended) return;
-
           running = !running;
-
           if (running) {
             timer = setInterval(step, 125);
             status(`Resumed • Score: ${score}`);
@@ -974,7 +960,6 @@
     }
 
     actions([{ label: "Restart", onClick: reset }]);
-
     reset();
 
     return () => {
@@ -1026,7 +1011,6 @@
           return cells[a];
         }
       }
-
       return cells.every(Boolean) ? "draw" : null;
     }
 
@@ -1074,7 +1058,6 @@
         status("It's a draw! Restart for another round.");
       } else {
         status(result === "X" ? "X wins!" : "O wins!");
-
         if (result === "X") {
           recordScore("tictactoe", getBest("tictactoe") + 1);
         }
@@ -1087,7 +1070,6 @@
       if (ended || boardState[index] || !isActive(token)) return;
 
       boardState[index] = turn;
-
       if (finishIfNeeded()) return;
 
       if (mode === "two") {
@@ -1129,24 +1111,20 @@
     }
 
     function chooseComputerMove(cells) {
-      // Try to win.
       for (let i = 0; i < 9; i++) {
         if (!cells[i]) {
           cells[i] = "O";
           const result = winner(cells);
           cells[i] = "";
-
           if (result === "O") return i;
         }
       }
 
-      // Block the player from winning.
       for (let i = 0; i < 9; i++) {
         if (!cells[i]) {
           cells[i] = "X";
           const result = winner(cells);
           cells[i] = "";
-
           if (result === "X") return i;
         }
       }
@@ -1192,7 +1170,6 @@
     ]);
 
     const pendingTimers = new Set();
-
     reset();
 
     return () => {
@@ -1201,2000 +1178,1588 @@
     };
   }
 
-  /* The remaining seven games are added in Parts 2 and 3. */
+  /* ======================== GAME 4: PONG ======================== */
 
-/* =========================================================
-   REXWEB NEXORA — PART 2 OF 3
-   Games 4–7:
-   Pong, Brick Breaker, Endless Runner, Space Shooter
-   ========================================================= */
+  register(
+    "pong",
+    "Pong",
+    "Beat the computer by bouncing the ball past its paddle.",
+    "🏓",
+    "Arcade",
+    startPong
+  );
 
+  function startPong(token) {
+    shell("Pong", "Move your paddle with the mouse, touch, or arrow keys.");
 
-/* ======================== GAME 4: PONG ======================== */
+    const playArea = area();
+    const wrap = document.createElement("div");
+    wrap.className = "nx-canvas-wrap";
 
-register(
-  "pong",
-  "Pong",
-  "Beat the computer by bouncing the ball past its paddle.",
-  "🏓",
-  "Arcade",
-  startPong
-);
+    const canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 420;
+    canvas.setAttribute("aria-label", "Pong game");
+    wrap.appendChild(canvas);
+    playArea.appendChild(wrap);
 
-function startPong(token) {
-  shell("Pong", "Move your paddle with the mouse, touch, or arrow keys.");
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+    const paddleH = 82;
+    const paddleW = 12;
 
-  const playArea = area();
-  const wrap = document.createElement("div");
-  wrap.className = "nx-canvas-wrap";
+    let playerY, cpuY, ballX, ballY, ballVX, ballVY, playerScore, cpuScore;
+    let running = false;
+    let ended = false;
+    let animation = 0;
+    let lastTime = 0;
+    let up = false;
+    let down = false;
+    let targetY = null;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 700;
-  canvas.height = 420;
-  canvas.setAttribute("aria-label", "Pong game");
-  wrap.appendChild(canvas);
-  playArea.appendChild(wrap);
-
-  const ctx = canvas.getContext("2d");
-
-  const W = canvas.width;
-  const H = canvas.height;
-  const paddleH = 82;
-  const paddleW = 12;
-
-  let playerY;
-  let cpuY;
-  let ballX;
-  let ballY;
-  let ballVX;
-  let ballVY;
-  let playerScore;
-  let cpuScore;
-  let running = false;
-  let ended = false;
-  let animation = 0;
-  let lastTime = 0;
-  let up = false;
-  let down = false;
-  let targetY = null;
-
-  function resetBall(direction) {
-    ballX = W / 2;
-    ballY = H / 2;
-
-    const speed = 270;
-    ballVX = speed * direction;
-    ballVY = randomInt(-150, 150);
-  }
-
-  function reset() {
-    cancelAnimationFrame(animation);
-
-    playerY = H / 2 - paddleH / 2;
-    cpuY = H / 2 - paddleH / 2;
-    playerScore = 0;
-    cpuScore = 0;
-    running = true;
-    ended = false;
-    lastTime = 0;
-
-    resetBall(Math.random() < 0.5 ? -1 : 1);
-
-    status("First to 5 points wins. Good luck!");
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function draw() {
-    ctx.fillStyle = "#060b16";
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.strokeStyle = "#273955";
-    ctx.setLineDash([8, 10]);
-    ctx.beginPath();
-    ctx.moveTo(W / 2, 0);
-    ctx.lineTo(W / 2, H);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = "#67caff";
-    ctx.fillRect(22, playerY, paddleW, paddleH);
-
-    ctx.fillStyle = "#c4a5ff";
-    ctx.fillRect(W - 22 - paddleW, cpuY, paddleW, paddleH);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, 9, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.font = "bold 36px system-ui";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#67caff";
-    ctx.fillText(playerScore, W * 0.35, 52);
-
-    ctx.fillStyle = "#c4a5ff";
-    ctx.fillText(cpuScore, W * 0.65, 52);
-
-    if (!running && !ended) {
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "18px system-ui";
-      ctx.fillText("Paused", W / 2, H / 2);
-    }
-  }
-
-  function frame(time) {
-    if (!isActive(token) || ended) return;
-
-    if (!lastTime) lastTime = time;
-
-    const dt = Math.min((time - lastTime) / 1000, 0.03);
-    lastTime = time;
-
-    if (running) update(dt);
-
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function update(dt) {
-    if (up) playerY -= 360 * dt;
-    if (down) playerY += 360 * dt;
-
-    if (targetY !== null) {
-      const center = playerY + paddleH / 2;
-      playerY += Math.max(-360 * dt, Math.min(360 * dt, targetY - center));
+    function resetBall(direction) {
+      ballX = W / 2;
+      ballY = H / 2;
+      const speed = 270;
+      ballVX = speed * direction;
+      ballVY = randomInt(-150, 150);
     }
 
-    playerY = Math.max(0, Math.min(H - paddleH, playerY));
-
-    const cpuCenter = cpuY + paddleH / 2;
-    const cpuTarget = ballY;
-
-    // The computer follows the ball but cannot move instantly.
-    const cpuSpeed = 265;
-    const difference = cpuTarget - cpuCenter;
-
-    cpuY += Math.max(-cpuSpeed * dt, Math.min(cpuSpeed * dt, difference));
-    cpuY = Math.max(0, Math.min(H - paddleH, cpuY));
-
-    ballX += ballVX * dt;
-    ballY += ballVY * dt;
-
-    if (ballY < 9 || ballY > H - 9) {
-      ballVY *= -1;
-      ballY = Math.max(9, Math.min(H - 9, ballY));
-    }
-
-    // Player paddle collision.
-    if (
-      ballVX < 0 &&
-      ballX - 9 <= 34 &&
-      ballX > 22 &&
-      ballY >= playerY &&
-      ballY <= playerY + paddleH
-    ) {
-      ballX = 35;
-      ballVX = Math.abs(ballVX) * 1.045;
-
-      const offset = (ballY - (playerY + paddleH / 2)) / (paddleH / 2);
-      ballVY = offset * 320;
-    }
-
-    // Computer paddle collision.
-    if (
-      ballVX > 0 &&
-      ballX + 9 >= W - 34 &&
-      ballX < W - 22 &&
-      ballY >= cpuY &&
-      ballY <= cpuY + paddleH
-    ) {
-      ballX = W - 35;
-      ballVX = -Math.abs(ballVX) * 1.045;
-
-      const offset = (ballY - (cpuY + paddleH / 2)) / (paddleH / 2);
-      ballVY = offset * 300;
-    }
-
-    if (ballX < -15) {
-      cpuScore++;
-      pointScored(-1);
-    } else if (ballX > W + 15) {
-      playerScore++;
-      pointScored(1);
-    }
-  }
-
-  function pointScored(direction) {
-    if (playerScore >= 5 || cpuScore >= 5) {
-      ended = true;
-      running = false;
-
-      const won = playerScore >= 5;
-      if (won) recordScore("pong", playerScore);
-
-      status(
-        won
-          ? `You win ${playerScore}–${cpuScore}!`
-          : `Computer wins ${cpuScore}–${playerScore}. Try again!`
-      );
-
-      return;
-    }
-
-    status(`You ${playerScore} — ${cpuScore} Computer`);
-    resetBall(direction);
-  }
-
-  function moveFromPointer(event) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleY = H / rect.height;
-    const y = (event.clientY - rect.top) * scaleY;
-
-    targetY = y - H / 2;
-    targetY = Math.max(-paddleH / 2, Math.min(H - paddleH / 2, targetY));
-  }
-
-  function keyHandler(event) {
-    if (["ArrowUp", "ArrowDown", "w", "W", "s", "S", " "].includes(event.key)) {
-      event.preventDefault();
-    }
-
-    if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = true;
-    if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = true;
-
-    if (event.key === " " && !ended) {
-      running = !running;
+    function reset() {
+      cancelAnimationFrame(animation);
+      playerY = H / 2 - paddleH / 2;
+      cpuY = H / 2 - paddleH / 2;
+      playerScore = 0;
+      cpuScore = 0;
+      running = true;
+      ended = false;
       lastTime = 0;
-      status(running ? "Game resumed." : "Game paused.");
+      resetBall(Math.random() < 0.5 ? -1 : 1);
+      status("First to 5 points wins. Good luck!");
+      draw();
+      animation = requestAnimationFrame(frame);
     }
-  }
 
-  function keyUp(event) {
-    if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = false;
-    if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = false;
-  }
+    function draw() {
+      ctx.fillStyle = "#060b16";
+      ctx.fillRect(0, 0, W, H);
 
-  canvas.addEventListener("pointermove", moveFromPointer);
-  document.addEventListener("keydown", keyHandler);
-  document.addEventListener("keyup", keyUp);
+      ctx.strokeStyle = "#273955";
+      ctx.setLineDash([8, 10]);
+      ctx.beginPath();
+      ctx.moveTo(W / 2, 0);
+      ctx.lineTo(W / 2, H);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
-  actions([
-    { label: "Restart", onClick: reset },
-    {
-      label: "Pause / Resume",
-      secondary: true,
-      onClick: () => {
-        if (ended) return;
+      ctx.fillStyle = "#67caff";
+      ctx.fillRect(22, playerY, paddleW, paddleH);
+
+      ctx.fillStyle = "#c4a5ff";
+      ctx.fillRect(W - 22 - paddleW, cpuY, paddleW, paddleH);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = "bold 36px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#67caff";
+      ctx.fillText(playerScore, W * 0.35, 52);
+
+      ctx.fillStyle = "#c4a5ff";
+      ctx.fillText(cpuScore, W * 0.65, 52);
+
+      if (!running && !ended) {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "18px system-ui";
+        ctx.fillText("Paused", W / 2, H / 2);
+      }
+    }
+
+    function frame(time) {
+      if (!isActive(token) || ended) return;
+      if (!lastTime) lastTime = time;
+      const dt = Math.min((time - lastTime) / 1000, 0.03);
+      lastTime = time;
+
+      if (running) update(dt);
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
+
+    function update(dt) {
+      if (up) playerY -= 360 * dt;
+      if (down) playerY += 360 * dt;
+
+      if (targetY !== null) {
+        const center = playerY + paddleH / 2;
+        playerY += Math.max(-360 * dt, Math.min(360 * dt, targetY - center));
+      }
+
+      playerY = Math.max(0, Math.min(H - paddleH, playerY));
+
+      const cpuCenter = cpuY + paddleH / 2;
+      const cpuSpeed = 265;
+      const difference = ballY - cpuCenter;
+
+      cpuY += Math.max(-cpuSpeed * dt, Math.min(cpuSpeed * dt, difference));
+      cpuY = Math.max(0, Math.min(H - paddleH, cpuY));
+
+      ballX += ballVX * dt;
+      ballY += ballVY * dt;
+
+      if (ballY < 9 || ballY > H - 9) {
+        ballVY *= -1;
+        ballY = Math.max(9, Math.min(H - 9, ballY));
+      }
+
+      if (
+        ballVX < 0 &&
+        ballX - 9 <= 34 &&
+        ballX > 22 &&
+        ballY >= playerY &&
+        ballY <= playerY + paddleH
+      ) {
+        ballX = 35;
+        ballVX = Math.abs(ballVX) * 1.045;
+        const offset = (ballY - (playerY + paddleH / 2)) / (paddleH / 2);
+        ballVY = offset * 320;
+      }
+
+      if (
+        ballVX > 0 &&
+        ballX + 9 >= W - 34 &&
+        ballX < W - 22 &&
+        ballY >= cpuY &&
+        ballY <= cpuY + paddleH
+      ) {
+        ballX = W - 35;
+        ballVX = -Math.abs(ballVX) * 1.045;
+        const offset = (ballY - (cpuY + paddleH / 2)) / (paddleH / 2);
+        ballVY = offset * 300;
+      }
+
+      if (ballX < -15) {
+        cpuScore++;
+        pointScored(-1);
+      } else if (ballX > W + 15) {
+        playerScore++;
+        pointScored(1);
+      }
+    }
+
+    function pointScored(direction) {
+      if (playerScore >= 5 || cpuScore >= 5) {
+        ended = true;
+        running = false;
+        const won = playerScore >= 5;
+        if (won) recordScore("pong", playerScore);
+        status(won ? `You win ${playerScore}–${cpuScore}!` : `Computer wins ${cpuScore}–${playerScore}. Try again!`);
+        return;
+      }
+      status(`You ${playerScore} — ${cpuScore} Computer`);
+      resetBall(direction);
+    }
+
+    function moveFromPointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleY = H / rect.height;
+      const y = (event.clientY - rect.top) * scaleY;
+      targetY = y - H / 2;
+      targetY = Math.max(-paddleH / 2, Math.min(H - paddleH / 2, targetY));
+    }
+
+    function keyHandler(event) {
+      if (["ArrowUp", "ArrowDown", "w", "W", "s", "S", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = true;
+      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = true;
+
+      if (event.key === " " && !ended) {
         running = !running;
         lastTime = 0;
         status(running ? "Game resumed." : "Game paused.");
       }
     }
-  ]);
 
-  reset();
-
-  return () => {
-    cancelAnimationFrame(animation);
-    canvas.removeEventListener("pointermove", moveFromPointer);
-    document.removeEventListener("keydown", keyHandler);
-    document.removeEventListener("keyup", keyUp);
-  };
-}
-
-
-/* ==================== GAME 5: BRICK BREAKER ==================== */
-
-register(
-  "brickbreaker",
-  "Brick Breaker",
-  "Bounce the ball off your paddle and destroy every brick.",
-  "🧱",
-  "Arcade",
-  startBrickBreaker
-);
-
-function startBrickBreaker(token) {
-  shell("Brick Breaker", "Move the paddle with touch, mouse, or arrow keys.");
-  const playArea = area();
-
-  const wrap = document.createElement("div");
-  wrap.className = "nx-canvas-wrap";
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 700;
-  canvas.height = 480;
-  canvas.setAttribute("aria-label", "Brick Breaker game");
-  wrap.appendChild(canvas);
-  playArea.appendChild(wrap);
-
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width;
-  const H = canvas.height;
-
-  const paddle = { x: W / 2 - 52, y: H - 35, w: 104, h: 12 };
-  const ball = { x: W / 2, y: H - 65, r: 8, vx: 210, vy: -250 };
-
-  let bricks = [];
-  let score = 0;
-  let lives = 3;
-  let running = false;
-  let ended = false;
-  let animation = 0;
-  let lastTime = 0;
-  let left = false;
-  let right = false;
-
-  function makeBricks() {
-    bricks = [];
-
-    const rows = 6;
-    const cols = 10;
-    const gap = 7;
-    const margin = 20;
-    const brickW = (W - margin * 2 - gap * (cols - 1)) / cols;
-    const brickH = 20;
-
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        bricks.push({
-          x: margin + col * (brickW + gap),
-          y: 48 + row * (brickH + gap),
-          w: brickW,
-          h: brickH,
-          alive: true,
-          color: row
-        });
-      }
-    }
-  }
-
-  function resetBall() {
-    ball.x = W / 2;
-    ball.y = H - 65;
-    ball.vx = (Math.random() < 0.5 ? -1 : 1) * 210;
-    ball.vy = -250;
-    paddle.x = W / 2 - paddle.w / 2;
-  }
-
-  function reset() {
-    cancelAnimationFrame(animation);
-
-    score = 0;
-    lives = 3;
-    running = true;
-    ended = false;
-    lastTime = 0;
-
-    makeBricks();
-    resetBall();
-
-    status("Destroy all the bricks. You have 3 lives.");
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function draw() {
-    ctx.fillStyle = "#060b16";
-    ctx.fillRect(0, 0, W, H);
-
-    const colors = ["#ff628d", "#ff9f59", "#ffd166", "#58dfb5", "#5dc6ff", "#a78bfa"];
-
-    bricks.forEach(brick => {
-      if (!brick.alive) return;
-
-      ctx.fillStyle = colors[brick.color];
-      ctx.beginPath();
-      ctx.roundRect(brick.x, brick.y, brick.w, brick.h, 4);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = "#67caff";
-    ctx.beginPath();
-    ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
-    ctx.fill();
-
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.font = "bold 18px system-ui";
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(`Score: ${score}`, 20, 27);
-
-    ctx.textAlign = "right";
-    ctx.fillText(`Lives: ${lives}`, W - 20, 27);
-  }
-
-  function frame(time) {
-    if (!isActive(token) || ended) return;
-
-    if (!lastTime) lastTime = time;
-
-    const dt = Math.min((time - lastTime) / 1000, 0.025);
-    lastTime = time;
-
-    if (running) update(dt);
-
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function update(dt) {
-    if (left) paddle.x -= 430 * dt;
-    if (right) paddle.x += 430 * dt;
-
-    paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
-
-    ball.x += ball.vx * dt;
-    ball.y += ball.vy * dt;
-
-    if (ball.x - ball.r <= 0 || ball.x + ball.r >= W) {
-      ball.vx *= -1;
-      ball.x = Math.max(ball.r, Math.min(W - ball.r, ball.x));
+    function keyUp(event) {
+      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = false;
+      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = false;
     }
 
-    if (ball.y - ball.r <= 0) {
-      ball.vy = Math.abs(ball.vy);
-      ball.y = ball.r;
-    }
+    canvas.addEventListener("pointermove", moveFromPointer);
+    document.addEventListener("keydown", keyHandler);
+    document.addEventListener("keyup", keyUp);
 
-    // Paddle collision.
-    if (
-      ball.vy > 0 &&
-      ball.y + ball.r >= paddle.y &&
-      ball.y - ball.r <= paddle.y + paddle.h &&
-      ball.x >= paddle.x &&
-      ball.x <= paddle.x + paddle.w
-    ) {
-      ball.y = paddle.y - ball.r;
-
-      const offset = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
-
-      ball.vx = offset * 340;
-      ball.vy = -Math.max(200, Math.sqrt(210 * 210 + 250 * 250));
-
-      // Gradually increase ball speed without making it unmanageable.
-      const speed = Math.hypot(ball.vx, ball.vy);
-      const targetSpeed = Math.min(440, speed + 4);
-      ball.vx = ball.vx / speed * targetSpeed;
-      ball.vy = ball.vy / speed * targetSpeed;
-    }
-
-    // Brick collisions.
-    for (const brick of bricks) {
-      if (!brick.alive) continue;
-
-      const insideX = ball.x + ball.r >= brick.x &&
-        ball.x - ball.r <= brick.x + brick.w;
-
-      const insideY = ball.y + ball.r >= brick.y &&
-        ball.y - ball.r <= brick.y + brick.h;
-
-      if (insideX && insideY) {
-        brick.alive = false;
-        score += 10;
-
-        const previousX = ball.x - ball.vx * dt;
-        const previousY = ball.y - ball.vy * dt;
-
-        if (previousX + ball.r <= brick.x || previousX - ball.r >= brick.x + brick.w) {
-          ball.vx *= -1;
-        } else {
-          ball.vy *= -1;
+    actions([
+      { label: "Restart", onClick: reset },
+      {
+        label: "Pause / Resume",
+        secondary: true,
+        onClick: () => {
+          if (ended) return;
+          running = !running;
+          lastTime = 0;
+          status(running ? "Game resumed." : "Game paused.");
         }
+      }
+    ]);
 
-        break;
+    reset();
+
+    return () => {
+      cancelAnimationFrame(animation);
+      canvas.removeEventListener("pointermove", moveFromPointer);
+      document.removeEventListener("keydown", keyHandler);
+      document.removeEventListener("keyup", keyUp);
+    };
+  }
+
+  /* ==================== GAME 5: BRICK BREAKER ==================== */
+
+  register(
+    "brickbreaker",
+    "Brick Breaker",
+    "Bounce the ball off your paddle and destroy every brick.",
+    "🧱",
+    "Arcade",
+    startBrickBreaker
+  );
+
+  function startBrickBreaker(token) {
+    shell("Brick Breaker", "Move the paddle with touch, mouse, or arrow keys.");
+    const playArea = area();
+
+    const wrap = document.createElement("div");
+    wrap.className = "nx-canvas-wrap";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 480;
+    canvas.setAttribute("aria-label", "Brick Breaker game");
+    wrap.appendChild(canvas);
+    playArea.appendChild(wrap);
+
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const paddle = { x: W / 2 - 52, y: H - 35, w: 104, h: 12 };
+    const ball = { x: W / 2, y: H - 65, r: 8, vx: 210, vy: -250 };
+
+    let bricks = [];
+    let score = 0;
+    let lives = 3;
+    let running = false;
+    let ended = false;
+    let animation = 0;
+    let lastTime = 0;
+    let left = false;
+    let right = false;
+
+    function makeBricks() {
+      bricks = [];
+      const rows = 6;
+      const cols = 10;
+      const gap = 7;
+      const margin = 20;
+      const brickW = (W - margin * 2 - gap * (cols - 1)) / cols;
+      const brickH = 20;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          bricks.push({
+            x: margin + col * (brickW + gap),
+            y: 48 + row * (brickH + gap),
+            w: brickW,
+            h: brickH,
+            alive: true,
+            color: row
+          });
+        }
       }
     }
 
-    if (bricks.every(brick => !brick.alive)) {
-      ended = true;
-      running = false;
-      recordScore("brickbreaker", score);
-      status(`Victory! You destroyed every brick. Score: ${score}.`);
-      return;
+    function resetBall() {
+      ball.x = W / 2;
+      ball.y = H - 65;
+      ball.vx = (Math.random() < 0.5 ? -1 : 1) * 210;
+      ball.vy = -250;
+      paddle.x = W / 2 - paddle.w / 2;
     }
 
-    if (ball.y - ball.r > H) {
-      lives--;
+    function reset() {
+      cancelAnimationFrame(animation);
+      score = 0;
+      lives = 3;
+      running = true;
+      ended = false;
+      lastTime = 0;
+      makeBricks();
+      resetBall();
+      status("Destroy all the bricks. You have 3 lives.");
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
 
-      if (lives <= 0) {
+    function draw() {
+      ctx.fillStyle = "#060b16";
+      ctx.fillRect(0, 0, W, H);
+
+      const colors = ["#ff628d", "#ff9f59", "#ffd166", "#58dfb5", "#5dc6ff", "#a78bfa"];
+
+      bricks.forEach(brick => {
+        if (!brick.alive) return;
+        ctx.fillStyle = colors[brick.color];
+        ctx.beginPath();
+        ctx.roundRect(brick.x, brick.y, brick.w, brick.h, 4);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "#67caff";
+      ctx.beginPath();
+      ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = "bold 18px system-ui";
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(`Score: ${score}`, 20, 27);
+
+      ctx.textAlign = "right";
+      ctx.fillText(`Lives: ${lives}`, W - 20, 27);
+    }
+
+    function frame(time) {
+      if (!isActive(token) || ended) return;
+      if (!lastTime) lastTime = time;
+      const dt = Math.min((time - lastTime) / 1000, 0.025);
+      lastTime = time;
+
+      if (running) update(dt);
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
+
+    function update(dt) {
+      if (left) paddle.x -= 430 * dt;
+      if (right) paddle.x += 430 * dt;
+
+      paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
+
+      ball.x += ball.vx * dt;
+      ball.y += ball.vy * dt;
+
+      if (ball.x - ball.r <= 0 || ball.x + ball.r >= W) {
+        ball.vx *= -1;
+        ball.x = Math.max(ball.r, Math.min(W - ball.r, ball.x));
+      }
+
+      if (ball.y - ball.r <= 0) {
+        ball.vy = Math.abs(ball.vy);
+        ball.y = ball.r;
+      }
+
+      if (
+        ball.vy > 0 &&
+        ball.y + ball.r >= paddle.y &&
+        ball.y - ball.r <= paddle.y + paddle.h &&
+        ball.x >= paddle.x &&
+        ball.x <= paddle.x + paddle.w
+      ) {
+        ball.y = paddle.y - ball.r;
+        const offset = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
+        ball.vx = offset * 340;
+        ball.vy = -Math.max(200, Math.sqrt(210 * 210 + 250 * 250));
+
+        const speed = Math.hypot(ball.vx, ball.vy);
+        const targetSpeed = Math.min(440, speed + 4);
+        ball.vx = (ball.vx / speed) * targetSpeed;
+        ball.vy = (ball.vy / speed) * targetSpeed;
+      }
+
+      for (const brick of bricks) {
+        if (!brick.alive) continue;
+        const insideX = ball.x + ball.r >= brick.x && ball.x - ball.r <= brick.x + brick.w;
+        const insideY = ball.y + ball.r >= brick.y && ball.y - ball.r <= brick.y + brick.h;
+
+        if (insideX && insideY) {
+          brick.alive = false;
+          score += 10;
+
+          const previousX = ball.x - ball.vx * dt;
+          if (previousX + ball.r <= brick.x || previousX - ball.r >= brick.x + brick.w) {
+            ball.vx *= -1;
+          } else {
+            ball.vy *= -1;
+          }
+          break;
+        }
+      }
+
+      if (bricks.every(brick => !brick.alive)) {
         ended = true;
         running = false;
         recordScore("brickbreaker", score);
-        status(`Game over! Score: ${score}. Best: ${getBest("brickbreaker")}.`);
-      } else {
-        resetBall();
-        status(`Ball lost. ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
-      }
-    }
-  }
-
-  function movePointer(event) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = W / rect.width;
-    const x = (event.clientX - rect.left) * scaleX;
-
-    paddle.x = Math.max(0, Math.min(W - paddle.w, x - paddle.w / 2));
-  }
-
-  function keyHandler(event) {
-    if (["ArrowLeft", "ArrowRight", "a", "A", "d", "D", " "].includes(event.key)) {
-      event.preventDefault();
-    }
-
-    if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = true;
-    if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = true;
-
-    if (event.key === " " && !ended) {
-      running = !running;
-      lastTime = 0;
-      status(running ? "Game resumed." : "Game paused.");
-    }
-  }
-
-  function keyUp(event) {
-    if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = false;
-    if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = false;
-  }
-
-  canvas.addEventListener("pointermove", movePointer);
-  document.addEventListener("keydown", keyHandler);
-  document.addEventListener("keyup", keyUp);
-
-  actions([
-    { label: "Restart", onClick: reset },
-    {
-      label: "Pause / Resume",
-      secondary: true,
-      onClick: () => {
-        if (ended) return;
-        running = !running;
-        lastTime = 0;
-        status(running ? "Game resumed." : "Game paused.");
-      }
-    }
-  ]);
-
-  reset();
-
-  return () => {
-    cancelAnimationFrame(animation);
-    canvas.removeEventListener("pointermove", movePointer);
-    document.removeEventListener("keydown", keyHandler);
-    document.removeEventListener("keyup", keyUp);
-  };
-}
-
-
-/* ==================== GAME 6: ENDLESS RUNNER ==================== */
-
-register(
-  "runner",
-  "Endless Runner",
-  "Jump over obstacles, survive longer, and beat your best distance.",
-  "🏃",
-  "Arcade",
-  startRunner
-);
-
-function startRunner(token) {
-  shell("Endless Runner", "Tap the game, press Space, or use the Jump button.");
-  const playArea = area();
-
-  const wrap = document.createElement("div");
-  wrap.className = "nx-canvas-wrap";
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 700;
-  canvas.height = 340;
-  canvas.setAttribute("aria-label", "Endless Runner game");
-  wrap.appendChild(canvas);
-  playArea.appendChild(wrap);
-
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width;
-  const H = canvas.height;
-  const ground = H - 48;
-
-  let player;
-  let obstacles;
-  let score;
-  let speed;
-  let spawnIn;
-  let running;
-  let ended;
-  let animation = 0;
-  let lastTime = 0;
-  let jumpQueued = false;
-
-  function reset() {
-    cancelAnimationFrame(animation);
-
-    player = {
-      x: 80,
-      y: ground - 38,
-      w: 30,
-      h: 38,
-      vy: 0,
-      onGround: true
-    };
-
-    obstacles = [];
-    score = 0;
-    speed = 280;
-    spawnIn = 1;
-    running = true;
-    ended = false;
-    lastTime = 0;
-    jumpQueued = false;
-
-    status("Jump over obstacles. Your distance is your score.");
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function jump() {
-    if (ended) return;
-
-    if (!running) {
-      running = true;
-      lastTime = 0;
-      return;
-    }
-
-    if (player.onGround) {
-      player.vy = -570;
-      player.onGround = false;
-    }
-  }
-
-  function draw() {
-    ctx.fillStyle = "#060b16";
-    ctx.fillRect(0, 0, W, H);
-
-    // Stars.
-    ctx.fillStyle = "#1c3557";
-    for (let i = 0; i < 25; i++) {
-      const x = (i * 97 + Math.floor(score * 0.3)) % W;
-      const y = 25 + (i * 43) % 170;
-      ctx.fillRect(x, y, 2, 2);
-    }
-
-    ctx.strokeStyle = "#35577d";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, ground);
-    ctx.lineTo(W, ground);
-    ctx.stroke();
-
-    // Player.
-    ctx.fillStyle = "#67caff";
-    ctx.beginPath();
-    ctx.roundRect(player.x, player.y, player.w, player.h, 7);
-    ctx.fill();
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(player.x + 18, player.y + 8, 5, 5);
-
-    // Obstacles.
-    obstacles.forEach(obstacle => {
-      ctx.fillStyle = "#ff658b";
-      ctx.beginPath();
-      ctx.roundRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h, 5);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 18px system-ui";
-    ctx.textAlign = "left";
-    ctx.fillText(`Distance: ${Math.floor(score)}`, 18, 28);
-    ctx.fillText(`Speed: ${Math.floor(speed)}`, 18, 53);
-  }
-
-  function frame(time) {
-    if (!isActive(token) || ended) return;
-
-    if (!lastTime) lastTime = time;
-
-    const dt = Math.min((time - lastTime) / 1000, 0.025);
-    lastTime = time;
-
-    if (running) update(dt);
-
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function update(dt) {
-    score += dt * 10;
-    speed = Math.min(560, 280 + score * 0.8);
-
-    if (jumpQueued) {
-      jumpQueued = false;
-      jump();
-    }
-
-    player.vy += 1450 * dt;
-    player.y += player.vy * dt;
-
-    if (player.y + player.h >= ground) {
-      player.y = ground - player.h;
-      player.vy = 0;
-      player.onGround = true;
-    }
-
-    spawnIn -= dt;
-
-    if (spawnIn <= 0) {
-      const height = randomInt(25, 48);
-      const width = randomInt(18, 30);
-
-      obstacles.push({
-        x: W + 10,
-        y: ground - height,
-        w: width,
-        h: height
-      });
-
-      spawnIn = Math.max(0.65, randomInt(90, 155) / 100 - score / 1200);
-    }
-
-    obstacles.forEach(obstacle => {
-      obstacle.x -= speed * dt;
-    });
-
-    obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -10);
-
-    for (const obstacle of obstacles) {
-      const collided =
-        player.x + player.w > obstacle.x &&
-        player.x < obstacle.x + obstacle.w &&
-        player.y + player.h > obstacle.y &&
-        player.y < obstacle.y + obstacle.h;
-
-      if (collided) {
-        ended = true;
-        running = false;
-
-        const finalScore = Math.floor(score);
-        recordScore("runner", finalScore);
-
-        status(`Game over! Distance: ${finalScore}. Best: ${getBest("runner")}. Press Restart to try again.`);
+        status(`Victory! You destroyed every brick. Score: ${score}.`);
         return;
       }
+
+      if (ball.y - ball.r > H) {
+        lives--;
+        if (lives <= 0) {
+          ended = true;
+          running = false;
+          recordScore("brickbreaker", score);
+          status(`Game over! Score: ${score}. Best: ${getBest("brickbreaker")}.`);
+        } else {
+          resetBall();
+          status(`Ball lost. ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
+        }
+      }
     }
 
-    if (Math.floor(score) % 100 === 0) {
-      status(`Distance: ${Math.floor(score)} • Keep going!`);
+    function movePointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const x = (event.clientX - rect.left) * scaleX;
+      paddle.x = Math.max(0, Math.min(W - paddle.w, x - paddle.w / 2));
     }
-  }
 
-  function keyHandler(event) {
-    if (["Space", "ArrowUp", "w", "W"].includes(event.key)) {
-      event.preventDefault();
+    function keyHandler(event) {
+      if (["ArrowLeft", "ArrowRight", "a", "A", "d", "D", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = true;
+      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = true;
 
-      if (event.repeat) return;
-
-      jumpQueued = true;
-    }
-  }
-
-  function pointerJump(event) {
-    if (event.target.closest("button")) return;
-
-    jumpQueued = true;
-  }
-
-  document.addEventListener("keydown", keyHandler);
-  canvas.addEventListener("pointerdown", pointerJump);
-
-  const jumpButton = button("⬆ Jump", () => {
-    jumpQueued = true;
-  });
-
-  playArea.appendChild(jumpButton);
-
-  actions([
-    { label: "Restart", onClick: reset },
-    {
-      label: "Pause / Resume",
-      secondary: true,
-      onClick: () => {
-        if (ended) return;
+      if (event.key === " " && !ended) {
         running = !running;
         lastTime = 0;
         status(running ? "Game resumed." : "Game paused.");
       }
     }
-  ]);
 
-  reset();
-
-  return () => {
-    cancelAnimationFrame(animation);
-    document.removeEventListener("keydown", keyHandler);
-    canvas.removeEventListener("pointerdown", pointerJump);
-  };
-}
-
-
-/* ==================== GAME 7: SPACE SHOOTER ==================== */
-
-register(
-  "space",
-  "Space Shooter",
-  "Pilot your ship, shoot enemies, dodge collisions, and survive waves.",
-  "🚀",
-  "Arcade",
-  startSpaceShooter
-);
-
-function startSpaceShooter(token) {
-  shell("Space Shooter", "Move with arrows or WASD. Hold Space to shoot.");
-  const playArea = area();
-
-  const wrap = document.createElement("div");
-  wrap.className = "nx-canvas-wrap";
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 700;
-  canvas.height = 460;
-  canvas.setAttribute("aria-label", "Space Shooter game");
-  wrap.appendChild(canvas);
-  playArea.appendChild(wrap);
-
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width;
-  const H = canvas.height;
-
-  let player;
-  let bullets;
-  let enemies;
-  let enemyBullets;
-  let particles;
-  let score;
-  let lives;
-  let wave;
-  let spawnTimer;
-  let shootTimer;
-  let running;
-  let ended;
-  let animation = 0;
-  let lastTime = 0;
-
-  const keys = new Set();
-
-  function reset() {
-    cancelAnimationFrame(animation);
-
-    player = {
-      x: W / 2,
-      y: H - 65,
-      r: 15,
-      speed: 310,
-      invincible: 0
-    };
-
-    bullets = [];
-    enemies = [];
-    enemyBullets = [];
-    particles = [];
-    score = 0;
-    lives = 3;
-    wave = 1;
-    spawnTimer = 0.5;
-    shootTimer = 0;
-    running = true;
-    ended = false;
-    lastTime = 0;
-
-    status("Destroy enemies and dodge incoming fire.");
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function spawnEnemy() {
-    const type = Math.random();
-
-    enemies.push({
-      x: randomInt(28, W - 28),
-      y: -25,
-      r: type < 0.25 ? 18 : 13,
-      hp: type < 0.25 ? 2 : 1,
-      speed: randomInt(65, 105) + wave * 7,
-      fire: randomInt(10, 30) / 10,
-      drift: randomInt(-40, 40),
-      points: type < 0.25 ? 30 : 10
-    });
-  }
-
-  function shoot() {
-    bullets.push({
-      x: player.x,
-      y: player.y - 16,
-      r: 4,
-      speed: 440
-    });
-  }
-
-  function addExplosion(x, y) {
-    for (let i = 0; i < 8; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = randomInt(40, 160);
-
-      particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 0.45
-      });
-    }
-  }
-
-  function draw() {
-    ctx.fillStyle = "#060b16";
-    ctx.fillRect(0, 0, W, H);
-
-    // Starfield.
-    ctx.fillStyle = "#9ccfff";
-
-    for (let i = 0; i < 75; i++) {
-      const x = (i * 89 + Math.floor(score * 0.5)) % W;
-      const y = (i * 47 + Math.floor(score * 1.8)) % H;
-      ctx.fillRect(x, y, 2, 2);
+    function keyUp(event) {
+      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = false;
+      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = false;
     }
 
-    // Player ship.
-    ctx.save();
-    ctx.translate(player.x, player.y);
+    canvas.addEventListener("pointermove", movePointer);
+    document.addEventListener("keydown", keyHandler);
+    document.addEventListener("keyup", keyUp);
 
-    ctx.fillStyle = player.invincible > 0 ? "#ffffff" : "#67caff";
-    ctx.beginPath();
-    ctx.moveTo(0, -19);
-    ctx.lineTo(15, 15);
-    ctx.lineTo(0, 8);
-    ctx.lineTo(-15, 15);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.restore();
-
-    // Player bullets.
-    ctx.fillStyle = "#83f7d4";
-
-    bullets.forEach(bullet => {
-      ctx.beginPath();
-      ctx.roundRect(bullet.x - 2, bullet.y - 8, 4, 13, 2);
-      ctx.fill();
-    });
-
-    // Enemies.
-    enemies.forEach(enemy => {
-      ctx.fillStyle = enemy.hp > 1 ? "#ffb45d" : "#ff658b";
-
-      ctx.beginPath();
-      ctx.moveTo(enemy.x, enemy.y + enemy.r);
-      ctx.lineTo(enemy.x + enemy.r, enemy.y - enemy.r * 0.6);
-      ctx.lineTo(enemy.x, enemy.y - enemy.r * 0.2);
-      ctx.lineTo(enemy.x - enemy.r, enemy.y - enemy.r * 0.6);
-      ctx.closePath();
-      ctx.fill();
-    });
-
-    // Enemy bullets.
-    ctx.fillStyle = "#d6a5ff";
-
-    enemyBullets.forEach(bullet => {
-      ctx.beginPath();
-      ctx.arc(bullet.x, bullet.y, bullet.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // Explosion particles.
-    particles.forEach(particle => {
-      ctx.globalAlpha = Math.max(0, particle.life / 0.45);
-      ctx.fillStyle = "#ffd166";
-      ctx.fillRect(particle.x, particle.y, 4, 4);
-    });
-
-    ctx.globalAlpha = 1;
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 17px system-ui";
-    ctx.textAlign = "left";
-    ctx.fillText(`Score: ${score}`, 16, 26);
-    ctx.fillText(`Lives: ${lives}`, 16, 50);
-
-    ctx.textAlign = "right";
-    ctx.fillText(`Wave: ${wave}`, W - 16, 26);
-  }
-
-  function frame(time) {
-    if (!isActive(token) || ended) return;
-
-    if (!lastTime) lastTime = time;
-
-    const dt = Math.min((time - lastTime) / 1000, 0.025);
-    lastTime = time;
-
-    if (running) update(dt);
-
-    draw();
-    animation = requestAnimationFrame(frame);
-  }
-
-  function update(dt) {
-    if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) {
-      player.x -= player.speed * dt;
-    }
-
-    if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) {
-      player.x += player.speed * dt;
-    }
-
-    if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) {
-      player.y -= player.speed * dt;
-    }
-
-    if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) {
-      player.y += player.speed * dt;
-    }
-
-    player.x = Math.max(player.r, Math.min(W - player.r, player.x));
-    player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
-
-    player.invincible = Math.max(0, player.invincible - dt);
-
-    shootTimer -= dt;
-
-    if (keys.has(" ") && shootTimer <= 0) {
-      shoot();
-      shootTimer = 0.19;
-    }
-
-    spawnTimer -= dt;
-
-    if (spawnTimer <= 0) {
-      spawnEnemy();
-
-      spawnTimer = Math.max(0.3, 1.05 - wave * 0.07);
-    }
-
-    bullets.forEach(bullet => {
-      bullet.y -= bullet.speed * dt;
-    });
-
-    bullets = bullets.filter(bullet => bullet.y > -15);
-
-    enemies.forEach(enemy => {
-      enemy.y += enemy.speed * dt;
-      enemy.x += enemy.drift * dt;
-
-      if (enemy.x < enemy.r || enemy.x > W - enemy.r) {
-        enemy.drift *= -1;
-      }
-
-      enemy.fire -= dt;
-
-      if (enemy.fire <= 0 && enemy.y > 0 && enemy.y < H - 100) {
-        const dx = player.x - enemy.x;
-        const dy = player.y - enemy.y;
-        const length = Math.hypot(dx, dy) || 1;
-
-        enemyBullets.push({
-          x: enemy.x,
-          y: enemy.y + enemy.r,
-          vx: dx / length * 150,
-          vy: dy / length * 150,
-          r: 5
-        });
-
-        enemy.fire = randomInt(20, 40) / 10;
-      }
-    });
-
-    enemyBullets.forEach(bullet => {
-      bullet.x += bullet.vx * dt;
-      bullet.y += bullet.vy * dt;
-    });
-
-    enemyBullets = enemyBullets.filter(bullet =>
-      bullet.y < H + 10 &&
-      bullet.x > -10 &&
-      bullet.x < W + 10
-    );
-
-    particles.forEach(particle => {
-      particle.x += particle.vx * dt;
-      particle.y += particle.vy * dt;
-      particle.life -= dt;
-    });
-
-    particles = particles.filter(particle => particle.life > 0);
-
-    // Player bullets hitting enemies.
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i];
-
-      for (let j = bullets.length - 1; j >= 0; j--) {
-        const bullet = bullets[j];
-
-        if (Math.hypot(enemy.x - bullet.x, enemy.y - bullet.y) < enemy.r + bullet.r) {
-          bullets.splice(j, 1);
-          enemy.hp--;
-
-          if (enemy.hp <= 0) {
-            score += enemy.points;
-            addExplosion(enemy.x, enemy.y);
-            enemies.splice(i, 1);
-          }
-
-          break;
+    actions([
+      { label: "Restart", onClick: reset },
+      {
+        label: "Pause / Resume",
+        secondary: true,
+        onClick: () => {
+          if (ended) return;
+          running = !running;
+          lastTime = 0;
+          status(running ? "Game resumed." : "Game paused.");
         }
       }
-    }
-
-    // Enemies reaching the player or bottom.
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i];
-
-      if (enemy.y > H + 25) {
-        enemies.splice(i, 1);
-        continue;
-      }
-
-      if (
-        player.invincible <= 0 &&
-        Math.hypot(player.x - enemy.x, player.y - enemy.y) < player.r + enemy.r
-      ) {
-        enemies.splice(i, 1);
-        damagePlayer();
-      }
-    }
-
-    // Enemy shots hitting the player.
-    if (player.invincible <= 0) {
-      for (let i = enemyBullets.length - 1; i >= 0; i--) {
-        const bullet = enemyBullets[i];
-
-        if (Math.hypot(player.x - bullet.x, player.y - bullet.y) < player.r + bullet.r) {
-          enemyBullets.splice(i, 1);
-          damagePlayer();
-          break;
-        }
-      }
-    }
-
-    const newWave = 1 + Math.floor(score / 150);
-
-    if (newWave > wave) {
-      wave = newWave;
-      status(`Wave ${wave}! Enemies are getting faster.`);
-    } else if (score > 0 && score % 100 === 0) {
-      status(`Score: ${score} • Wave ${wave}`);
-    }
-  }
-
-  function damagePlayer() {
-    if (player.invincible > 0 || ended) return;
-
-    lives--;
-    player.invincible = 1.3;
-
-    status(`Hit! ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
-
-    if (lives <= 0) {
-      ended = true;
-      running = false;
-
-      recordScore("space", score);
-
-      status(`Game over! Score: ${score}. Best: ${getBest("space")}. Press Restart to play again.`);
-    }
-  }
-
-  function keyDown(event) {
-    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-
-    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(key)) {
-      event.preventDefault();
-    }
-
-    keys.add(key);
-  }
-
-  function keyUp(event) {
-    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-    keys.delete(key);
-  }
-
-  function pointerMove(event) {
-    if (event.pointerType === "mouse") return;
-
-    const rect = canvas.getBoundingClientRect();
-    player.x = (event.clientX - rect.left) * W / rect.width;
-    player.y = (event.clientY - rect.top) * H / rect.height;
-
-    player.x = Math.max(player.r, Math.min(W - player.r, player.x));
-    player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
-  }
-
-  document.addEventListener("keydown", keyDown);
-  document.addEventListener("keyup", keyUp);
-  canvas.addEventListener("pointermove", pointerMove);
-
-  actions([
-    { label: "Restart", onClick: reset },
-    {
-      label: "Pause / Resume",
-      secondary: true,
-      onClick: () => {
-        if (ended) return;
-        running = !running;
-        lastTime = 0;
-        status(running ? "Game resumed." : "Game paused.");
-      }
-    }
-  ]);
-
-  reset();
-
-  return () => {
-    cancelAnimationFrame(animation);
-    document.removeEventListener("keydown", keyDown);
-    document.removeEventListener("keyup", keyUp);
-    canvas.removeEventListener("pointermove", pointerMove);
-    keys.clear();
-  };
-}
-
-
-/* END OF PART 2.
-   Do not close the main JavaScript wrapper yet.
-   Part 3 adds Minesweeper, Math Challenge, Rock Paper Scissors,
-   initialization, and the final closing code. */
-
-
-
-/* =========================================================
-   REXWEB NEXORA — PART 3 OF 3
-   Games 8–10 + initialization
-   ========================================================= */
-
-
-/* ===================== GAME 8: MINESWEEPER ===================== */
-
-register(
-  "minesweeper",
-  "Minesweeper",
-  "Reveal safe squares, follow the number clues, and avoid mines.",
-  "💣",
-  "Puzzle",
-  startMinesweeper
-);
-
-function startMinesweeper(token) {
-  shell(
-    "Minesweeper",
-    "Reveal every safe square. Use Flag Mode or right-click to mark suspected mines."
-  );
-
-  const playArea = area();
-
-  const SIZE = 10;
-  const MINE_COUNT = 15;
-
-  let cells;
-  let revealed;
-  let flagged;
-  let started;
-  let ended;
-  let flagMode;
-  let seconds;
-  let timer;
-  let revealedSafe;
-
-  const info = document.createElement("div");
-  info.className = "nx-status";
-  playArea.appendChild(info);
-
-  const board = document.createElement("div");
-  board.className = "nx-board";
-  board.style.gridTemplateColumns = `repeat(${SIZE}, minmax(0, 1fr))`;
-  board.style.maxWidth = "500px";
-  board.style.gap = "3px";
-  playArea.appendChild(board);
-
-  function indexOf(x, y) {
-    return y * SIZE + x;
-  }
-
-  function neighbors(index) {
-    const x = index % SIZE;
-    const y = Math.floor(index / SIZE);
-    const result = [];
-
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        if (dx === 0 && dy === 0) continue;
-
-        const nx = x + dx;
-        const ny = y + dy;
-
-        if (nx >= 0 && nx < SIZE && ny >= 0 && ny < SIZE) {
-          result.push(indexOf(nx, ny));
-        }
-      }
-    }
-
-    return result;
-  }
-
-  function placeMines(firstIndex) {
-    const forbidden = new Set([
-      firstIndex,
-      ...neighbors(firstIndex)
     ]);
 
-    // Prefer a safe opening area around the first click.
-    // This makes the first move more forgiving.
-    const candidates = [];
+    reset();
 
-    for (let i = 0; i < SIZE * SIZE; i++) {
-      if (!forbidden.has(i)) candidates.push(i);
+    return () => {
+      cancelAnimationFrame(animation);
+      canvas.removeEventListener("pointermove", movePointer);
+      document.removeEventListener("keydown", keyHandler);
+      document.removeEventListener("keyup", keyUp);
+    };
+  }
+
+  /* ==================== GAME 6: ENDLESS RUNNER ==================== */
+
+  register(
+    "runner",
+    "Endless Runner",
+    "Jump over obstacles, survive longer, and beat your best distance.",
+    "🏃",
+    "Arcade",
+    startRunner
+  );
+
+  function startRunner(token) {
+    shell("Endless Runner", "Tap the game, press Space, or use the Jump button.");
+    const playArea = area();
+
+    const wrap = document.createElement("div");
+    wrap.className = "nx-canvas-wrap";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 340;
+    canvas.setAttribute("aria-label", "Endless Runner game");
+    wrap.appendChild(canvas);
+    playArea.appendChild(wrap);
+
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+    const ground = H - 48;
+
+    let player, obstacles, score, speed, spawnIn, running, ended;
+    let animation = 0;
+    let lastTime = 0;
+    let jumpQueued = false;
+
+    function reset() {
+      cancelAnimationFrame(animation);
+      player = { x: 80, y: ground - 38, w: 30, h: 38, vy: 0, onGround: true };
+      obstacles = [];
+      score = 0;
+      speed = 280;
+      spawnIn = 1;
+      running = true;
+      ended = false;
+      lastTime = 0;
+      jumpQueued = false;
+
+      status("Jump over obstacles. Your distance is your score.");
+      draw();
+      animation = requestAnimationFrame(frame);
     }
 
-    // The board has 100 cells, so there are enough candidates
-    // to place 15 mines outside the first click's neighborhood.
-    const mineLocations = shuffle(candidates).slice(0, MINE_COUNT);
-
-    mineLocations.forEach(index => {
-      cells[index].mine = true;
-    });
-
-    cells.forEach((cell, index) => {
-      if (cell.mine) return;
-
-      cell.count = neighbors(index).filter(
-        neighbor => cells[neighbor].mine
-      ).length;
-    });
-
-    started = true;
-    seconds = 0;
-
-    timer = setInterval(() => {
-      if (!isActive(token) || ended) return;
-
-      seconds++;
-      updateInfo();
-    }, 1000);
-  }
-
-  function reset() {
-    clearInterval(timer);
-
-    cells = Array.from({ length: SIZE * SIZE }, () => ({
-      mine: false,
-      count: 0
-    }));
-
-    revealed = new Set();
-    flagged = new Set();
-    started = false;
-    ended = false;
-    flagMode = false;
-    seconds = 0;
-    revealedSafe = 0;
-
-    board.innerHTML = "";
-
-    for (let i = 0; i < SIZE * SIZE; i++) {
-      const cellButton = document.createElement("button");
-
-      cellButton.className = "nx-cell";
-      cellButton.textContent = "";
-      cellButton.style.fontSize = "clamp(12px, 3.5vw, 19px)";
-      cellButton.style.borderRadius = "5px";
-      cellButton.style.aspectRatio = "1";
-      cellButton.style.minHeight = "0";
-      cellButton.style.minWidth = "0";
-      cellButton.setAttribute("aria-label", `Hidden square ${i + 1}`);
-
-      cellButton.addEventListener("click", () => {
-        if (flagMode) {
-          toggleFlag(i);
-        } else {
-          reveal(i);
-        }
-      });
-
-      cellButton.addEventListener("contextmenu", event => {
-        event.preventDefault();
-        toggleFlag(i);
-      });
-
-      board.appendChild(cellButton);
-    }
-
-    updateInfo();
-    status("Choose any square to begin. Your first area will be safe.");
-  }
-
-  function updateInfo() {
-    info.textContent =
-      `Mines: ${MINE_COUNT} • Flags: ${flagged.size} • Safe squares: ${revealedSafe}/${SIZE * SIZE - MINE_COUNT} • Time: ${seconds}s`;
-  }
-
-  function toggleFlag(index) {
-    if (ended || revealed.has(index)) return;
-
-    if (flagged.has(index)) {
-      flagged.delete(index);
-    } else {
-      if (flagged.size >= MINE_COUNT) {
-        status("You have used all 15 flags. Remove a flag before adding another.");
+    function jump() {
+      if (ended) return;
+      if (!running) {
+        running = true;
+        lastTime = 0;
         return;
       }
-
-      flagged.add(index);
+      if (player.onGround) {
+        player.vy = -570;
+        player.onGround = false;
+      }
     }
 
-    renderBoard();
-    updateInfo();
-  }
+    function draw() {
+      ctx.fillStyle = "#060b16";
+      ctx.fillRect(0, 0, W, H);
 
-  function reveal(index) {
-    if (ended || revealed.has(index) || flagged.has(index)) return;
-
-    if (!started) {
-      placeMines(index);
-    }
-
-    if (cells[index].mine) {
-      ended = true;
-      clearInterval(timer);
-
-      cells.forEach((cell, i) => {
-        if (cell.mine) revealed.add(i);
-      });
-
-      renderBoard();
-      status(`Boom! You found a mine after ${seconds} seconds. Press Restart to try again.`);
-      return;
-    }
-
-    floodReveal(index);
-    renderBoard();
-    updateInfo();
-
-    if (revealedSafe === SIZE * SIZE - MINE_COUNT) {
-      ended = true;
-      clearInterval(timer);
-
-      const score = Math.max(100, 1500 - seconds * 5);
-      recordScore("minesweeper", score);
-
-      status(
-        `You win! All safe squares revealed in ${seconds} seconds. Score: ${score}.`
-      );
-    } else {
-      status("Safe! Continue revealing squares and using the number clues.");
-    }
-  }
-
-  function floodReveal(startIndex) {
-    const stack = [startIndex];
-
-    while (stack.length) {
-      const index = stack.pop();
-
-      if (
-        revealed.has(index) ||
-        flagged.has(index) ||
-        cells[index].mine
-      ) {
-        continue;
+      ctx.fillStyle = "#1c3557";
+      for (let i = 0; i < 25; i++) {
+        const x = (i * 97 + Math.floor(score * 0.3)) % W;
+        const y = 25 + (i * 43) % 170;
+        ctx.fillRect(x, y, 2, 2);
       }
 
-      revealed.add(index);
-      revealedSafe++;
+      ctx.strokeStyle = "#35577d";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, ground);
+      ctx.lineTo(W, ground);
+      ctx.stroke();
 
-      if (cells[index].count === 0) {
-        neighbors(index).forEach(neighbor => {
-          if (
-            !revealed.has(neighbor) &&
-            !flagged.has(neighbor) &&
-            !cells[neighbor].mine
-          ) {
-            stack.push(neighbor);
-          }
+      ctx.fillStyle = "#67caff";
+      ctx.beginPath();
+      ctx.roundRect(player.x, player.y, player.w, player.h, 7);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(player.x + 18, player.y + 8, 5, 5);
+
+      obstacles.forEach(obstacle => {
+        ctx.fillStyle = "#ff658b";
+        ctx.beginPath();
+        ctx.roundRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h, 5);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 18px system-ui";
+      ctx.textAlign = "left";
+      ctx.fillText(`Distance: ${Math.floor(score)}`, 18, 28);
+      ctx.fillText(`Speed: ${Math.floor(speed)}`, 18, 53);
+    }
+
+    function frame(time) {
+      if (!isActive(token) || ended) return;
+      if (!lastTime) lastTime = time;
+      const dt = Math.min((time - lastTime) / 1000, 0.025);
+      lastTime = time;
+
+      if (running) update(dt);
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
+
+    function update(dt) {
+      score += dt * 10;
+      speed = Math.min(560, 280 + score * 0.8);
+
+      if (jumpQueued) {
+        jumpQueued = false;
+        jump();
+      }
+
+      player.vy += 1450 * dt;
+      player.y += player.vy * dt;
+
+      if (player.y + player.h >= ground) {
+        player.y = ground - player.h;
+        player.vy = 0;
+        player.onGround = true;
+      }
+
+      spawnIn -= dt;
+      if (spawnIn <= 0) {
+        const height = randomInt(25, 48);
+        const width = randomInt(18, 30);
+        obstacles.push({
+          x: W + 10,
+          y: ground - height,
+          w: width,
+          h: height
+        });
+        spawnIn = Math.max(0.65, randomInt(90, 155) / 100 - score / 1200);
+      }
+
+      obstacles.forEach(obstacle => {
+        obstacle.x -= speed * dt;
+      });
+
+      obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -10);
+
+      for (const obstacle of obstacles) {
+        const collided =
+          player.x + player.w > obstacle.x &&
+          player.x < obstacle.x + obstacle.w &&
+          player.y + player.h > obstacle.y &&
+          player.y < obstacle.y + obstacle.h;
+
+        if (collided) {
+          ended = true;
+          running = false;
+          const finalScore = Math.floor(score);
+          recordScore("runner", finalScore);
+          status(`Game over! Distance: ${finalScore}. Best: ${getBest("runner")}. Press Restart to try again.`);
+          return;
+        }
+      }
+    }
+
+    function keyHandler(event) {
+      if (["Space", "ArrowUp", "w", "W"].includes(event.key)) {
+        event.preventDefault();
+        if (event.repeat) return;
+        jumpQueued = true;
+      }
+    }
+
+    function pointerJump(event) {
+      if (event.target.closest("button")) return;
+      jumpQueued = true;
+    }
+
+    document.addEventListener("keydown", keyHandler);
+    canvas.addEventListener("pointerdown", pointerJump);
+
+    const jumpButton = button("⬆ Jump", () => {
+      jumpQueued = true;
+    });
+    playArea.appendChild(jumpButton);
+
+    actions([
+      { label: "Restart", onClick: reset },
+      {
+        label: "Pause / Resume",
+        secondary: true,
+        onClick: () => {
+          if (ended) return;
+          running = !running;
+          lastTime = 0;
+          status(running ? "Game resumed." : "Game paused.");
+        }
+      }
+    ]);
+
+    reset();
+
+    return () => {
+      cancelAnimationFrame(animation);
+      document.removeEventListener("keydown", keyHandler);
+      canvas.removeEventListener("pointerdown", pointerJump);
+    };
+  }
+
+  /* ==================== GAME 7: SPACE SHOOTER ==================== */
+
+  register(
+    "space",
+    "Space Shooter",
+    "Pilot your ship, shoot enemies, dodge collisions, and survive waves.",
+    "🚀",
+    "Arcade",
+    startSpaceShooter
+  );
+
+  function startSpaceShooter(token) {
+    shell("Space Shooter", "Move with arrows or WASD. Hold Space to shoot.");
+    const playArea = area();
+
+    const wrap = document.createElement("div");
+    wrap.className = "nx-canvas-wrap";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 700;
+    canvas.height = 460;
+    canvas.setAttribute("aria-label", "Space Shooter game");
+    wrap.appendChild(canvas);
+    playArea.appendChild(wrap);
+
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+
+    let player, bullets, enemies, enemyBullets, particles, score, lives, wave;
+    let spawnTimer, shootTimer, running, ended;
+    let animation = 0;
+    let lastTime = 0;
+    const keys = new Set();
+
+    function reset() {
+      cancelAnimationFrame(animation);
+      player = { x: W / 2, y: H - 65, r: 15, speed: 310, invincible: 0 };
+      bullets = [];
+      enemies = [];
+      enemyBullets = [];
+      particles = [];
+      score = 0;
+      lives = 3;
+      wave = 1;
+      spawnTimer = 0.5;
+      shootTimer = 0;
+      running = true;
+      ended = false;
+      lastTime = 0;
+
+      status("Destroy enemies and dodge incoming fire.");
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
+
+    function spawnEnemy() {
+      const type = Math.random();
+      enemies.push({
+        x: randomInt(28, W - 28),
+        y: -25,
+        r: type < 0.25 ? 18 : 13,
+        hp: type < 0.25 ? 2 : 1,
+        speed: randomInt(65, 105) + wave * 7,
+        fire: randomInt(10, 30) / 10,
+        drift: randomInt(-40, 40),
+        points: type < 0.25 ? 30 : 10
+      });
+    }
+
+    function shoot() {
+      bullets.push({ x: player.x, y: player.y - 16, r: 4, speed: 440 });
+    }
+
+    function addExplosion(x, y) {
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = randomInt(40, 160);
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 0.45
         });
       }
     }
-  }
 
-  function renderBoard() {
-    const buttons = board.children;
+    function draw() {
+      ctx.fillStyle = "#060b16";
+      ctx.fillRect(0, 0, W, H);
 
-    for (let i = 0; i < cells.length; i++) {
-      const button = buttons[i];
-      const cell = cells[i];
+      ctx.fillStyle = "#9ccfff";
+      for (let i = 0; i < 75; i++) {
+        const x = (i * 89 + Math.floor(score * 0.5)) % W;
+        const y = (i * 47 + Math.floor(score * 1.8)) % H;
+        ctx.fillRect(x, y, 2, 2);
+      }
 
-      button.className = "nx-cell";
-      button.style.background = "";
-      button.style.color = "";
-      button.style.borderColor = "";
-      button.disabled = revealed.has(i) || ended;
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.fillStyle = player.invincible > 0 ? "#ffffff" : "#67caff";
+      ctx.beginPath();
+      ctx.moveTo(0, -19);
+      ctx.lineTo(15, 15);
+      ctx.lineTo(0, 8);
+      ctx.lineTo(-15, 15);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
 
-      if (revealed.has(i)) {
-        if (cell.mine) {
-          button.textContent = "💣";
-          button.style.background = "#662b40";
-        } else {
-          button.textContent = cell.count || "";
-          button.style.background = "#101c31";
-          button.disabled = true;
+      ctx.fillStyle = "#83f7d4";
+      bullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.roundRect(bullet.x - 2, bullet.y - 8, 4, 13, 2);
+        ctx.fill();
+      });
 
-          const colors = {
-            1: "#67caff",
-            2: "#70e0a0",
-            3: "#ff8e8e",
-            4: "#bba5ff",
-            5: "#ffbd66",
-            6: "#73e8dc",
-            7: "#ffffff",
-            8: "#9eabc5"
-          };
+      enemies.forEach(enemy => {
+        ctx.fillStyle = enemy.hp > 1 ? "#ffb45d" : "#ff658b";
+        ctx.beginPath();
+        ctx.moveTo(enemy.x, enemy.y + enemy.r);
+        ctx.lineTo(enemy.x + enemy.r, enemy.y - enemy.r * 0.6);
+        ctx.lineTo(enemy.x, enemy.y - enemy.r * 0.2);
+        ctx.lineTo(enemy.x - enemy.r, enemy.y - enemy.r * 0.6);
+        ctx.closePath();
+        ctx.fill();
+      });
 
-          if (cell.count) {
-            button.style.color = colors[cell.count] || "#ffffff";
+      ctx.fillStyle = "#d6a5ff";
+      enemyBullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, bullet.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      particles.forEach(particle => {
+        ctx.globalAlpha = Math.max(0, particle.life / 0.45);
+        ctx.fillStyle = "#ffd166";
+        ctx.fillRect(particle.x, particle.y, 4, 4);
+      });
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 17px system-ui";
+      ctx.textAlign = "left";
+      ctx.fillText(`Score: ${score}`, 16, 26);
+      ctx.fillText(`Lives: ${lives}`, 16, 50);
+
+      ctx.textAlign = "right";
+      ctx.fillText(`Wave: ${wave}`, W - 16, 26);
+    }
+
+    function frame(time) {
+      if (!isActive(token) || ended) return;
+      if (!lastTime) lastTime = time;
+      const dt = Math.min((time - lastTime) / 1000, 0.025);
+      lastTime = time;
+
+      if (running) update(dt);
+      draw();
+      animation = requestAnimationFrame(frame);
+    }
+
+    function update(dt) {
+      if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) player.x -= player.speed * dt;
+      if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) player.x += player.speed * dt;
+      if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) player.y -= player.speed * dt;
+      if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) player.y += player.speed * dt;
+
+      player.x = Math.max(player.r, Math.min(W - player.r, player.x));
+      player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
+      player.invincible = Math.max(0, player.invincible - dt);
+
+      shootTimer -= dt;
+      if (keys.has(" ") && shootTimer <= 0) {
+        shoot();
+        shootTimer = 0.19;
+      }
+
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnEnemy();
+        spawnTimer = Math.max(0.3, 1.05 - wave * 0.07);
+      }
+
+      bullets.forEach(bullet => { bullet.y -= bullet.speed * dt; });
+      bullets = bullets.filter(bullet => bullet.y > -15);
+
+      enemies.forEach(enemy => {
+        enemy.y += enemy.speed * dt;
+        enemy.x += enemy.drift * dt;
+        if (enemy.x < enemy.r || enemy.x > W - enemy.r) enemy.drift *= -1;
+
+        enemy.fire -= dt;
+        if (enemy.fire <= 0 && enemy.y > 0 && enemy.y < H - 100) {
+          const dx = player.x - enemy.x;
+          const dy = player.y - enemy.y;
+          const length = Math.hypot(dx, dy) || 1;
+          enemyBullets.push({
+            x: enemy.x,
+            y: enemy.y + enemy.r,
+            vx: (dx / length) * 150,
+            vy: (dy / length) * 150,
+            r: 5
+          });
+          enemy.fire = randomInt(20, 40) / 10;
+        }
+      });
+
+      enemyBullets.forEach(bullet => {
+        bullet.x += bullet.vx * dt;
+        bullet.y += bullet.vy * dt;
+      });
+      enemyBullets = enemyBullets.filter(bullet => bullet.y < H + 10 && bullet.x > -10 && bullet.x < W + 10);
+
+      particles.forEach(particle => {
+        particle.x += particle.vx * dt;
+        particle.y += particle.vy * dt;
+        particle.life -= dt;
+      });
+      particles = particles.filter(particle => particle.life > 0);
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const bullet = bullets[j];
+          if (Math.hypot(enemy.x - bullet.x, enemy.y - bullet.y) < enemy.r + bullet.r) {
+            bullets.splice(j, 1);
+            enemy.hp--;
+            if (enemy.hp <= 0) {
+              score += enemy.points;
+              addExplosion(enemy.x, enemy.y);
+              enemies.splice(i, 1);
+            }
+            break;
           }
         }
+      }
 
-        button.setAttribute("aria-label", `Revealed square ${i + 1}`);
-      } else if (flagged.has(i)) {
-        button.textContent = "🚩";
-        button.style.background = "#563a19";
-        button.setAttribute("aria-label", `Flagged square ${i + 1}`);
-      } else {
-        button.textContent = "";
-        button.setAttribute("aria-label", `Hidden square ${i + 1}`);
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        if (enemy.y > H + 25) {
+          enemies.splice(i, 1);
+          continue;
+        }
+        if (player.invincible <= 0 && Math.hypot(player.x - enemy.x, player.y - enemy.y) < player.r + enemy.r) {
+          enemies.splice(i, 1);
+          damagePlayer();
+        }
+      }
+
+      if (player.invincible <= 0) {
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+          const bullet = enemyBullets[i];
+          if (Math.hypot(player.x - bullet.x, player.y - bullet.y) < player.r + bullet.r) {
+            enemyBullets.splice(i, 1);
+            damagePlayer();
+            break;
+          }
+        }
+      }
+
+      const newWave = 1 + Math.floor(score / 150);
+      if (newWave > wave) {
+        wave = newWave;
+        status(`Wave ${wave}! Enemies are getting faster.`);
       }
     }
+
+    function damagePlayer() {
+      if (player.invincible > 0 || ended) return;
+      lives--;
+      player.invincible = 1.3;
+      status(`Hit! ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
+      if (lives <= 0) {
+        ended = true;
+        running = false;
+        recordScore("space", score);
+        status(`Game over! Score: ${score}. Best: ${getBest("space")}. Press Restart to play again.`);
+      }
+    }
+
+    function keyDown(event) {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(key)) {
+        event.preventDefault();
+      }
+      keys.add(key);
+    }
+
+    function keyUp(event) {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      keys.delete(key);
+    }
+
+    function pointerMove(event) {
+      if (event.pointerType === "mouse") return;
+      const rect = canvas.getBoundingClientRect();
+      player.x = (event.clientX - rect.left) * W / rect.width;
+      player.y = (event.clientY - rect.top) * H / rect.height;
+      player.x = Math.max(player.r, Math.min(W - player.r, player.x));
+      player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
+    }
+
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
+    canvas.addEventListener("pointermove", pointerMove);
+
+    actions([
+      { label: "Restart", onClick: reset },
+      {
+        label: "Pause / Resume",
+        secondary: true,
+        onClick: () => {
+          if (ended) return;
+          running = !running;
+          lastTime = 0;
+          status(running ? "Game resumed." : "Game paused.");
+        }
+      }
+    ]);
+
+    reset();
+
+    return () => {
+      cancelAnimationFrame(animation);
+      document.removeEventListener("keydown", keyDown);
+      document.removeEventListener("keyup", keyUp);
+      canvas.removeEventListener("pointermove", pointerMove);
+      keys.clear();
+    };
   }
 
-  actions([
-    { label: "Restart", onClick: reset },
-    {
-      label: "🚩 Flag Mode: OFF",
-      secondary: true,
-      onClick: event => {
-        flagMode = !flagMode;
-        event.currentTarget.textContent =
-          `🚩 Flag Mode: ${flagMode ? "ON" : "OFF"}`;
+  /* ===================== GAME 8: MINESWEEPER ===================== */
 
-        status(
-          flagMode
-            ? "Flag Mode is ON. Tap a hidden square to place or remove a flag."
-            : "Flag Mode is OFF. Tap a hidden square to reveal it."
-        );
-      }
-    }
-  ]);
-
-  reset();
-
-  return () => {
-    clearInterval(timer);
-  };
-}
-
-
-/* ==================== GAME 9: MATH CHALLENGE ==================== */
-
-register(
-  "math",
-  "Math Challenge",
-  "Solve arithmetic questions before the 30-second timer reaches zero.",
-  "🔢",
-  "Puzzle",
-  startMath
-);
-
-function startMath(token) {
-  shell(
-    "Math Challenge",
-    "Answer as many arithmetic questions as you can in 30 seconds."
+  register(
+    "minesweeper",
+    "Minesweeper",
+    "Reveal safe squares, follow the number clues, and avoid mines.",
+    "💣",
+    "Puzzle",
+    startMinesweeper
   );
 
-  const playArea = area();
+  function startMinesweeper(token) {
+    shell("Minesweeper", "Reveal every safe square. Use Flag Mode or right-click to mark suspected mines.");
+    const playArea = area();
 
-  const question = document.createElement("div");
-  question.className = "nx-panel";
-  question.style.textAlign = "center";
-  question.style.marginTop = "15px";
-  question.style.fontSize = "clamp(25px, 7vw, 42px)";
-  question.style.fontWeight = "900";
-  playArea.appendChild(question);
+    const SIZE = 10;
+    const MINE_COUNT = 15;
 
-  const form = document.createElement("form");
-  form.style.display = "flex";
-  form.style.gap = "9px";
-  form.style.flexWrap = "wrap";
-  form.style.margin = "15px 0";
-  playArea.appendChild(form);
+    let cells, revealed, flagged, started, ended, flagMode, seconds, timer, revealedSafe;
 
-  const input = document.createElement("input");
-  input.type = "number";
-  input.inputMode = "numeric";
-  input.placeholder = "Your answer";
-  input.setAttribute("aria-label", "Your answer");
-  input.required = true;
-  input.style.flex = "1 1 130px";
-  input.style.minWidth = "0";
-  input.style.padding = "13px";
-  input.style.background = "#080f20";
-  input.style.color = "white";
-  input.style.border = "1px solid #344765";
-  input.style.borderRadius = "10px";
+    const info = document.createElement("div");
+    info.className = "nx-status";
+    playArea.appendChild(info);
 
-  const submit = document.createElement("button");
-  submit.className = "nx-btn";
-  submit.type = "submit";
-  submit.textContent = "Submit Answer";
+    const board = document.createElement("div");
+    board.className = "nx-board";
+    board.style.gridTemplateColumns = `repeat(${SIZE}, minmax(0, 1fr))`;
+    board.style.maxWidth = "500px";
+    board.style.gap = "3px";
+    playArea.appendChild(board);
 
-  form.append(input, submit);
+    function indexOf(x, y) { return y * SIZE + x; }
 
-  const nextButton = button("Next Question", nextQuestion, true);
-  nextButton.style.display = "none";
-  playArea.appendChild(nextButton);
-
-  let answer = 0;
-  let score = 0;
-  let correct = 0;
-  let attempted = 0;
-  let remaining = 30;
-  let running = false;
-  let ended = false;
-  let timer = null;
-  let questionLocked = false;
-
-  function makeQuestion() {
-    const difficulty = Math.min(4, Math.floor(score / 5));
-    const operation = randomInt(0, Math.min(3, difficulty + 1));
-
-    let a;
-    let b;
-    let symbol;
-
-    if (operation === 0) {
-      a = randomInt(1, 10 + difficulty * 10);
-      b = randomInt(1, 10 + difficulty * 10);
-      answer = a + b;
-      symbol = "+";
-    } else if (operation === 1) {
-      a = randomInt(1, 10 + difficulty * 10);
-      b = randomInt(1, a);
-      answer = a - b;
-      symbol = "−";
-    } else if (operation === 2) {
-      a = randomInt(2, 10 + difficulty * 2);
-      b = randomInt(2, 10);
-      answer = a * b;
-      symbol = "×";
-    } else {
-      b = randomInt(2, 12);
-      answer = randomInt(2, 12);
-      a = b * answer;
-      symbol = "÷";
+    function neighbors(index) {
+      const x = index % SIZE;
+      const y = Math.floor(index / SIZE);
+      const result = [];
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx >= 0 && nx < SIZE && ny >= 0 && ny < SIZE) {
+            result.push(indexOf(nx, ny));
+          }
+        }
+      }
+      return result;
     }
 
-    question.textContent = `${a} ${symbol} ${b} = ?`;
+    function placeMines(firstIndex) {
+      const forbidden = new Set([firstIndex, ...neighbors(firstIndex)]);
+      const candidates = [];
+      for (let i = 0; i < SIZE * SIZE; i++) {
+        if (!forbidden.has(i)) candidates.push(i);
+      }
+      const mineLocations = shuffle(candidates).slice(0, MINE_COUNT);
+      mineLocations.forEach(index => { cells[index].mine = true; });
+
+      cells.forEach((cell, index) => {
+        if (cell.mine) return;
+        cell.count = neighbors(index).filter(neighbor => cells[neighbor].mine).length;
+      });
+
+      started = true;
+      seconds = 0;
+      timer = setInterval(() => {
+        if (!isActive(token) || ended) return;
+        seconds++;
+        updateInfo();
+      }, 1000);
+    }
+
+    function reset() {
+      clearInterval(timer);
+      cells = Array.from({ length: SIZE * SIZE }, () => ({ mine: false, count: 0 }));
+      revealed = new Set();
+      flagged = new Set();
+      started = false;
+      ended = false;
+      flagMode = false;
+      seconds = 0;
+      revealedSafe = 0;
+
+      board.innerHTML = "";
+      for (let i = 0; i < SIZE * SIZE; i++) {
+        const cellButton = document.createElement("button");
+        cellButton.className = "nx-cell";
+        cellButton.style.aspectRatio = "1";
+        cellButton.setAttribute("aria-label", `Hidden square ${i + 1}`);
+
+        cellButton.addEventListener("click", () => {
+          if (flagMode) toggleFlag(i);
+          else reveal(i);
+        });
+
+        cellButton.addEventListener("contextmenu", event => {
+          event.preventDefault();
+          toggleFlag(i);
+        });
+
+        board.appendChild(cellButton);
+      }
+      updateInfo();
+      status("Choose any square to begin. Your first area will be safe.");
+    }
+
+    function updateInfo() {
+      info.textContent = `Mines: ${MINE_COUNT} • Flags: ${flagged.size} • Safe squares: ${revealedSafe}/${SIZE * SIZE - MINE_COUNT} • Time: ${seconds}s`;
+    }
+
+    function toggleFlag(index) {
+      if (ended || revealed.has(index)) return;
+      if (flagged.has(index)) {
+        flagged.delete(index);
+      } else {
+        if (flagged.size >= MINE_COUNT) {
+          status("You have used all 15 flags.");
+          return;
+        }
+        flagged.add(index);
+      }
+      renderBoard();
+      updateInfo();
+    }
+
+    function reveal(index) {
+      if (ended || revealed.has(index) || flagged.has(index)) return;
+      if (!started) placeMines(index);
+
+      if (cells[index].mine) {
+        ended = true;
+        clearInterval(timer);
+        cells.forEach((cell, i) => { if (cell.mine) revealed.add(i); });
+        renderBoard();
+        status(`Boom! You found a mine after ${seconds} seconds.`);
+        return;
+      }
+
+      floodReveal(index);
+      renderBoard();
+      updateInfo();
+
+      if (revealedSafe === SIZE * SIZE - MINE_COUNT) {
+        ended = true;
+        clearInterval(timer);
+        const score = Math.max(100, 1500 - seconds * 5);
+        recordScore("minesweeper", score);
+        status(`You win! Revealed in ${seconds} seconds. Score: ${score}.`);
+      }
+    }
+
+    function floodReveal(startIndex) {
+      const stack = [startIndex];
+      while (stack.length) {
+        const index = stack.pop();
+        if (revealed.has(index) || flagged.has(index) || cells[index].mine) continue;
+        revealed.add(index);
+        revealedSafe++;
+
+        if (cells[index].count === 0) {
+          neighbors(index).forEach(neighbor => {
+            if (!revealed.has(neighbor) && !flagged.has(neighbor) && !cells[neighbor].mine) {
+              stack.push(neighbor);
+            }
+          });
+        }
+      }
+    }
+
+    function renderBoard() {
+      const buttons = board.children;
+      for (let i = 0; i < cells.length; i++) {
+        const button = buttons[i];
+        const cell = cells[i];
+        button.className = "nx-cell";
+        button.style.background = "";
+        button.style.color = "";
+        button.disabled = revealed.has(i) || ended;
+
+        if (revealed.has(i)) {
+          if (cell.mine) {
+            button.textContent = "💣";
+            button.style.background = "#662b40";
+          } else {
+            button.textContent = cell.count || "";
+            button.style.background = "#101c31";
+            const colors = { 1: "#67caff", 2: "#70e0a0", 3: "#ff8e8e", 4: "#bba5ff", 5: "#ffbd66" };
+            if (cell.count) button.style.color = colors[cell.count] || "#ffffff";
+          }
+        } else if (flagged.has(i)) {
+          button.textContent = "🚩";
+          button.style.background = "#563a19";
+        } else {
+          button.textContent = "";
+        }
+      }
+    }
+
+    actions([
+      { label: "Restart", onClick: reset },
+      {
+        label: "🚩 Flag Mode: OFF",
+        secondary: true,
+        onClick: event => {
+          flagMode = !flagMode;
+          event.currentTarget.textContent = `🚩 Flag Mode: ${flagMode ? "ON" : "OFF"}`;
+          status(flagMode ? "Flag Mode is ON." : "Flag Mode is OFF.");
+        }
+      }
+    ]);
+
+    reset();
+    return () => clearInterval(timer);
   }
 
-  function updateStatus() {
-    status(
-      `Time: ${remaining}s • Score: ${score} • Correct: ${correct}/${attempted}`
-    );
-  }
+  /* ==================== GAME 9: MATH CHALLENGE ==================== */
 
-  function nextQuestion() {
-    if (ended) return;
+  register(
+    "math",
+    "Math Challenge",
+    "Solve arithmetic questions before the 30-second timer reaches zero.",
+    "🔢",
+    "Puzzle",
+    startMath
+  );
 
-    questionLocked = false;
-    input.value = "";
-    input.disabled = false;
-    submit.disabled = false;
+  function startMath(token) {
+    shell("Math Challenge", "Answer as many arithmetic questions as you can in 30 seconds.");
+    const playArea = area();
+
+    const question = document.createElement("div");
+    question.className = "nx-panel";
+    question.style.textAlign = "center";
+    question.style.marginTop = "15px";
+    question.style.fontSize = "clamp(25px, 7vw, 42px)";
+    question.style.fontWeight = "900";
+    playArea.appendChild(question);
+
+    const form = document.createElement("form");
+    form.style.display = "flex";
+    form.style.gap = "9px";
+    form.style.flexWrap = "wrap";
+    form.style.margin = "15px 0";
+    playArea.appendChild(form);
+
+    const input = document.createElement("input");
+    input.type = "number";
+    input.inputMode = "numeric";
+    input.placeholder = "Your answer";
+    input.required = true;
+    input.style.flex = "1 1 130px";
+    input.style.padding = "13px";
+    input.style.background = "#080f20";
+    input.style.color = "white";
+    input.style.border = "1px solid #344765";
+    input.style.borderRadius = "10px";
+
+    const submit = document.createElement("button");
+    submit.className = "nx-btn";
+    submit.type = "submit";
+    submit.textContent = "Submit Answer";
+    form.append(input, submit);
+
+    const nextButton = button("Next Question", nextQuestion, true);
     nextButton.style.display = "none";
+    playArea.appendChild(nextButton);
 
-    makeQuestion();
-    input.focus();
-  }
+    let answer = 0, score = 0, correct = 0, attempted = 0, remaining = 30;
+    let running = false, ended = false, timer = null, questionLocked = false;
 
-  function finish() {
-    ended = true;
-    running = false;
-    clearInterval(timer);
+    function makeQuestion() {
+      const difficulty = Math.min(4, Math.floor(score / 5));
+      const operation = randomInt(0, Math.min(3, difficulty + 1));
+      let a, b, symbol;
 
-    input.disabled = true;
-    submit.disabled = true;
-    nextButton.style.display = "none";
+      if (operation === 0) {
+        a = randomInt(1, 10 + difficulty * 10);
+        b = randomInt(1, 10 + difficulty * 10);
+        answer = a + b;
+        symbol = "+";
+      } else if (operation === 1) {
+        a = randomInt(1, 10 + difficulty * 10);
+        b = randomInt(1, a);
+        answer = a - b;
+        symbol = "−";
+      } else if (operation === 2) {
+        a = randomInt(2, 10 + difficulty * 2);
+        b = randomInt(2, 10);
+        answer = a * b;
+        symbol = "×";
+      } else {
+        b = randomInt(2, 12);
+        answer = randomInt(2, 12);
+        a = b * answer;
+        symbol = "÷";
+      }
+      question.textContent = `${a} ${symbol} ${b} = ?`;
+    }
 
-    recordScore("math", score);
+    function updateStatus() {
+      status(`Time: ${remaining}s • Score: ${score} • Correct: ${correct}/${attempted}`);
+    }
 
-    question.textContent = "Time's up!";
-    status(
-      `Final score: ${score}. Correct answers: ${correct}/${attempted}. Personal best: ${getBest("math")}. Press Restart to play again.`
-    );
-  }
+    function nextQuestion() {
+      if (ended) return;
+      questionLocked = false;
+      input.value = "";
+      input.disabled = false;
+      submit.disabled = false;
+      nextButton.style.display = "none";
+      makeQuestion();
+      input.focus();
+    }
 
-  function reset() {
-    clearInterval(timer);
+    function finish() {
+      ended = true;
+      running = false;
+      clearInterval(timer);
+      input.disabled = true;
+      submit.disabled = true;
+      nextButton.style.display = "none";
+      recordScore("math", score);
+      question.textContent = "Time's up!";
+      status(`Final score: ${score}. Correct: ${correct}/${attempted}. Best: ${getBest("math")}.`);
+    }
 
-    score = 0;
-    correct = 0;
-    attempted = 0;
-    remaining = 30;
-    running = true;
-    ended = false;
-    questionLocked = false;
-
-    input.disabled = false;
-    submit.disabled = false;
-    nextButton.style.display = "none";
-
-    makeQuestion();
-    updateStatus();
-
-    timer = setInterval(() => {
-      if (!isActive(token) || ended) return;
-
-      remaining--;
+    function reset() {
+      clearInterval(timer);
+      score = 0;
+      correct = 0;
+      attempted = 0;
+      remaining = 30;
+      running = true;
+      ended = false;
+      questionLocked = false;
+      input.disabled = false;
+      submit.disabled = false;
+      nextButton.style.display = "none";
+      makeQuestion();
       updateStatus();
 
-      if (remaining <= 0) {
-        finish();
+      timer = setInterval(() => {
+        if (!isActive(token) || ended) return;
+        remaining--;
+        updateStatus();
+        if (remaining <= 0) finish();
+      }, 1000);
+      input.focus();
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (ended || questionLocked) return;
+      if (input.value.trim() === "") return;
+
+      const submitted = Number(input.value);
+      attempted++;
+      questionLocked = true;
+      input.disabled = true;
+      submit.disabled = true;
+
+      if (submitted === answer) {
+        correct++;
+        score += 10;
+        status(`Correct! +10 points.`);
+      } else {
+        status(`Not quite. The correct answer was ${answer}.`);
       }
-    }, 1000);
 
-    input.focus();
-  }
+      recordScore("math", score);
+      updateStatus();
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-
-    if (ended || questionLocked) return;
-
-    if (input.value.trim() === "") {
-      status("Enter an answer first.");
-      return;
-    }
-
-    const submitted = Number(input.value);
-
-    if (!Number.isFinite(submitted)) {
-      status("Please enter a valid number.");
-      return;
-    }
-
-    attempted++;
-    questionLocked = true;
-    input.disabled = true;
-    submit.disabled = true;
-
-    if (submitted === answer) {
-      correct++;
-      score += 10;
-      status(`Correct! +10 points. Score: ${score}.`);
-    } else {
-      status(`Not quite. The correct answer was ${answer}.`);
-    }
-
-    recordScore("math", score);
-    updateStatus();
-
-    if (remaining > 0) {
-      nextButton.style.display = "inline-block";
-      nextButton.textContent = "Next Question";
-    }
-  });
-
-  actions([
-    { label: "Restart", onClick: reset }
-  ]);
-
-  reset();
-
-  return () => {
-    clearInterval(timer);
-  };
-}
-
-
-/* ================= GAME 10: ROCK PAPER SCISSORS ================= */
-
-register(
-  "rps",
-  "Rock Paper Scissors",
-  "Choose rock, paper, or scissors and challenge the computer.",
-  "✊",
-  "Casual",
-  startRPS
-);
-
-function startRPS(token) {
-  shell(
-    "Rock Paper Scissors",
-    "Rock beats scissors. Scissors beat paper. Paper beats rock."
-  );
-
-  const playArea = area();
-
-  let playerScore = 0;
-  let computerScore = 0;
-  let draws = 0;
-  let round = 0;
-  let ended = false;
-
-  const choices = [
-    { name: "Rock", icon: "✊" },
-    { name: "Paper", icon: "✋" },
-    { name: "Scissors", icon: "✌️" }
-  ];
-
-  const resultBox = document.createElement("div");
-  resultBox.className = "nx-panel";
-  resultBox.style.textAlign = "center";
-  resultBox.style.marginTop = "15px";
-  playArea.appendChild(resultBox);
-
-  const scoreBox = document.createElement("div");
-  scoreBox.className = "nx-status";
-  playArea.appendChild(scoreBox);
-
-  const choiceGrid = document.createElement("div");
-  choiceGrid.className = "nx-grid";
-  choiceGrid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
-  playArea.appendChild(choiceGrid);
-
-  function updateScore() {
-    scoreBox.textContent =
-      `You: ${playerScore} • Computer: ${computerScore} • Draws: ${draws} • Rounds: ${round}`;
-  }
-
-  function reset() {
-    playerScore = 0;
-    computerScore = 0;
-    draws = 0;
-    round = 0;
-    ended = false;
-
-    resultBox.innerHTML = `
-      <div style="font-size:46px">✊ ✋ ✌️</div>
-      <h3>Ready for a match?</h3>
-      <p class="nx-muted">Choose your move below.</p>
-    `;
-
-    choiceGrid.querySelectorAll("button").forEach(button => {
-      button.disabled = false;
+      if (remaining > 0) {
+        nextButton.style.display = "inline-block";
+      }
     });
 
-    updateScore();
-    status("Make your first move!");
+    actions([{ label: "Restart", onClick: reset }]);
+    reset();
+
+    return () => clearInterval(timer);
   }
 
-  function play(playerChoice) {
-    if (ended || !isActive(token)) return;
+  /* ================= GAME 10: ROCK PAPER SCISSORS ================= */
 
-    const computerChoice = randomInt(0, 2);
-    const player = choices[playerChoice];
-    const computer = choices[computerChoice];
+  register(
+    "rps",
+    "Rock Paper Scissors",
+    "Choose rock, paper, or scissors and challenge the computer.",
+    "✊",
+    "Casual",
+    startRPS
+  );
 
-    round++;
+  function startRPS(token) {
+    shell("Rock Paper Scissors", "Rock beats scissors. Scissors beat paper. Paper beats rock.");
+    const playArea = area();
 
-    let outcome;
+    let playerScore = 0, computerScore = 0, draws = 0, round = 0, ended = false;
 
-    if (playerChoice === computerChoice) {
-      draws++;
-      outcome = "It's a draw!";
-    } else if (
-      (playerChoice === 0 && computerChoice === 2) ||
-      (playerChoice === 1 && computerChoice === 0) ||
-      (playerChoice === 2 && computerChoice === 1)
-    ) {
-      playerScore++;
-      outcome = "You win this round!";
-    } else {
-      computerScore++;
-      outcome = "Computer wins this round!";
+    const choices = [
+      { name: "Rock", icon: "✊" },
+      { name: "Paper", icon: "✋" },
+      { name: "Scissors", icon: "✌️" }
+    ];
+
+    const resultBox = document.createElement("div");
+    resultBox.className = "nx-panel";
+    resultBox.style.textAlign = "center";
+    resultBox.style.marginTop = "15px";
+    playArea.appendChild(resultBox);
+
+    const scoreBox = document.createElement("div");
+    scoreBox.className = "nx-status";
+    playArea.appendChild(scoreBox);
+
+    const choiceGrid = document.createElement("div");
+    choiceGrid.className = "nx-grid";
+    choiceGrid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
+    playArea.appendChild(choiceGrid);
+
+    function updateScore() {
+      scoreBox.textContent = `You: ${playerScore} • Computer: ${computerScore} • Draws: ${draws} • Rounds: ${round}`;
     }
 
-    resultBox.innerHTML = `
-      <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap">
-        <div>
-          <div style="font-size:48px">${player.icon}</div>
-          <strong>You</strong>
-          <div class="nx-small">${player.name}</div>
-        </div>
-        <div style="font-size:22px;font-weight:900;color:#67caff">VS</div>
-        <div>
-          <div style="font-size:48px">${computer.icon}</div>
-          <strong>Computer</strong>
-          <div class="nx-small">${computer.name}</div>
-        </div>
-      </div>
-      <h3 style="margin-bottom:5px">${outcome}</h3>
-    `;
+    function reset() {
+      playerScore = 0;
+      computerScore = 0;
+      draws = 0;
+      round = 0;
+      ended = false;
 
-    recordScore("rps", playerScore);
+      resultBox.innerHTML = `
+        <div style="font-size:46px">✊ ✋ ✌️</div>
+        <h3>Ready for a match?</h3>
+        <p class="nx-muted">Choose your move below.</p>
+      `;
+      updateScore();
+      status("Make your first move!");
+    }
 
-    updateScore();
-    status(`Round ${round}: ${outcome} Your best win count: ${getBest("rps")}.`);
+    function play(playerChoice) {
+      if (ended || !isActive(token)) return;
+
+      const computerChoice = randomInt(0, 2);
+      const player = choices[playerChoice];
+      const computer = choices[computerChoice];
+      round++;
+
+      let outcome;
+      if (playerChoice === computerChoice) {
+        draws++;
+        outcome = "It's a draw!";
+      } else if (
+        (playerChoice === 0 && computerChoice === 2) ||
+        (playerChoice === 1 && computerChoice === 0) ||
+        (playerChoice === 2 && computerChoice === 1)
+      ) {
+        playerScore++;
+        outcome = "You win this round!";
+      } else {
+        computerScore++;
+        outcome = "Computer wins this round!";
+      }
+
+      resultBox.innerHTML = `
+        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:48px">${player.icon}</div>
+            <strong>You</strong>
+            <div class="nx-small">${player.name}</div>
+          </div>
+          <div style="font-size:22px;font-weight:900;color:#67caff">VS</div>
+          <div>
+            <div style="font-size:48px">${computer.icon}</div>
+            <strong>Computer</strong>
+            <div class="nx-small">${computer.name}</div>
+          </div>
+        </div>
+        <h3 style="margin-bottom:5px">${outcome}</h3>
+      `;
+
+      recordScore("rps", playerScore);
+      updateScore();
+      status(`Round ${round}: ${outcome} Best win count: ${getBest("rps")}.`);
+    }
+
+    choices.forEach((choice, index) => {
+      const card = document.createElement("div");
+      card.className = "nx-card";
+      card.style.textAlign = "center";
+
+      const icon = document.createElement("div");
+      icon.className = "nx-icon";
+      icon.style.fontSize = "42px";
+      icon.textContent = choice.icon;
+
+      const title = document.createElement("h3");
+      title.textContent = choice.name;
+
+      const playButton = button("Choose " + choice.name, () => play(index));
+      playButton.style.width = "100%";
+
+      card.append(icon, title, playButton);
+      choiceGrid.appendChild(card);
+    });
+
+    actions([{ label: "Restart Match", onClick: reset }]);
+    reset();
+
+    return () => {};
   }
 
-  choices.forEach((choice, index) => {
-    const card = document.createElement("div");
-    card.className = "nx-card";
-    card.style.textAlign = "center";
+  /* ====================== INITIALIZATION ====================== */
 
-    const icon = document.createElement("div");
-    icon.className = "nx-icon";
-    icon.style.fontSize = "42px";
-    icon.textContent = choice.icon;
-
-    const title = document.createElement("h3");
-    title.textContent = choice.name;
-
-    const playButton = button("Choose " + choice.name, () => play(index));
-    playButton.style.width = "100%";
-
-    card.append(icon, title, playButton);
-    choiceGrid.appendChild(card);
-  });
-
-  actions([
-    { label: "Restart Match", onClick: reset }
-  ]);
-
-  reset();
-
-  return () => {};
-}
-
-
-/* ====================== INITIALIZATION ====================== */
-
-function initializeNexoraGames() {
-  root = document.getElementById(ROOT_ID);
-
-  if (!root) {
-    root = document.createElement("div");
-    root.id = ROOT_ID;
-    document.body.appendChild(root);
+  function initializeNexoraGames() {
+    root = document.getElementById(ROOT_ID);
+    if (!root) {
+      root = document.createElement("div");
+      root.id = ROOT_ID;
+      document.body.appendChild(root);
+    }
+    showHub();
   }
 
-  showHub();
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener(
-    "DOMContentLoaded",
-    initializeNexoraGames,
-    { once: true }
-  );
-} else {
-  initializeNexoraGames();
-}
-
-
-/* ====================== END OF GAME.JS ====================== */
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeNexoraGames, { once: true });
+  } else {
+    initializeNexoraGames();
+  }
 
 })();
-
