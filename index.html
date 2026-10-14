@@ -1270,24 +1270,60 @@ footer {
   </div>
 </section>
 
-<!-- GAMES -->
 
+
+
+<!-- GAMES HUB -->
 <section class="app-page" id="page-games">
   <div class="container section">
-    <span class="section-label">PLAY</span>
+    <span class="section-label">PLAY • EXPLORE • COMPETE</span>
     <h1>🎮 Games Hub</h1>
-    <div class="panel">
-      <p>Discover games, gaming challenges, and leaderboards.</p>
-      <div class="action-row">
 
-<button class="action-btn"
-onclick="window.location.href='games.html'">
-Browse Games 🎮
-</button>
+    <p>Welcome to the RexWeb Nexora gaming zone.</p>
+
+    <div class="feature-grid">
+      <button class="feature-card" type="button"
+        onclick="window.location.href='games.html'">
+        <span class="feature-icon">🕹️</span>
+        <h3>All Games</h3>
+        <p>Explore available games and start playing.</p>
+        <span class="card-link">Browse Games →</span>
+      </button>
+
+      <button class="feature-card" type="button"
+        onclick="showNotice('Game challenges can be connected when available.')">
+        <span class="feature-icon">⚡</span>
+        <h3>Challenges</h3>
+        <p>Discover gaming challenges.</p>
+        <span class="card-link">Explore Challenges →</span>
+      </button>
+
+      <button class="feature-card" type="button"
+        onclick="showNotice('Leaderboards are not connected yet.')">
+        <span class="feature-icon">🏆</span>
+        <h3>Leaderboards</h3>
+        <p>Leaderboard functionality can be added later.</p>
+        <span class="card-link">View Leaderboards →</span>
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>Ready to play?</h2>
+      <p>Open the Games Hub to access your games.</p>
+      <div class="action-row">
+        <button class="action-btn primary" type="button"
+          onclick="window.location.href='games.html'">
+          🎮 Open Games Hub
+        </button>
       </div>
     </div>
   </div>
 </section>
+
+
+
+
+
 
 <!-- CREATOR HUB -->
 
