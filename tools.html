@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050b19" id="themeColor">
+<title>Digital Tools | RexWeb Nexora</title>
+<meta name="description" content="Explore digital tools, a scientific calculator, text utilities, a code board, and more at RexWeb Nexora.">
+
+<style>
+:root{
+--bg:#030918;--surface:#071327;--card:#09172b;
+--text:#f4f7ff;--muted:#aabbd5;--border:#203d61;
+--blue:#00c8ff;--purple:#8650ff;--green:#39ff14;
+}
+html[data-theme="light"]{
+--bg:#f2f6ff;--surface:#fff;--card:#fff;
+--text:#101b32;--muted:#52627c;--border:#d4e0f4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.container{width:min(1100px,93%);margin:auto}
+header{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border)}
+.topbar{min-height:65px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:23px;font-weight:900}
+.brand span{color:var(--blue)}
+.actions{display:flex;gap:8px}
+.icon-btn{padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text)}
+.category-nav{overflow-x:auto;border-top:1px solid var(--border)}
+.category-row{display:flex;gap:9px;padding:10px 0;width:max-content}
+.category-row a{padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card);font-size:12px;font-weight:bold}
+.hero{padding:40px 0;background:radial-gradient(ellipse at top right,#7545ff35,transparent 55%)}
+.badge{color:var(--blue);font-size:11px;font-weight:bold;letter-spacing:2px}
+h1{font-size:clamp(32px,6vw,48px);margin:15px 0}
+.gradient{background:linear-gradient(90deg,var(--blue),#a56aff,#ff43c6);color:transparent;background-clip:text}
+.hero p,.muted{color:var(--muted);line-height:1.7;font-size:14px}
+.section{padding:25px 0}
+.search{width:100%;padding:14px;border:1px solid var(--border);border-radius:11px;background:var(--card);color:var(--text);margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;overflow:hidden}
+.tool-card:hover{border-color:var(--blue)}
+.tool-heading{display:flex;align-items:center;gap:10px}
+.tool-icon{font-size:24px}
+.tool-heading h3{font-size:16px}
+.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px}
+.tool-content{padding-top:13px}
+.tool-card.collapsed .tool-content{display:none}
+.tool-card.collapsed .tool-toggle{transform:rotate(-90deg)}
+.tool-card .desc{color:var(--muted);font-size:12px;line-height:1.6;margin:9px 0 13px}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+input:not([type=checkbox]):not([type=range]):not([type=color]),textarea,select{
+width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);outline:none
+}
+textarea{min-height:95px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+.row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:10px 12px;border:0;border-radius:8px;background:linear-gradient(110deg,#008dff,#7545ff);color:white;font-size:12px;font-weight:bold}
+.btn.alt{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.result{margin-top:11px;padding:11px;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:13px;line-height:1.7;overflow-wrap:anywhere;white-space:pre-wrap}
+.calc{border-color:#39ff1470;box-shadow:0 0 18px #39ff1410}
+.calc input{border-color:#39ff1470!important}
+.calc .tool-icon,.calc h3{color:var(--green)}
+.calc .btn{background:#143b17;border:1px solid var(--green);color:var(--green);box-shadow:0 0 8px #39ff1420}
+.calc-display{font-size:22px!important;text-align:right;border-color:var(--green)!important;box-shadow:inset 0 0 12px #39ff1418}
+.calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
+.calc-buttons button{padding:13px 3px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px}
+.calc-buttons button:hover{border-color:var(--green);color:var(--green)}
+.calc-buttons .equals{background:#143b17;color:var(--green);border-color:var(--green)}
+input[type=range]{width:100%;accent-color:var(--blue)}
+input[type=color]{width:100%;height:45px;border:0;background:transparent}
+footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surface);padding:25px 0;color:var(--muted);font-size:12px}
+.menu{display:none;position:fixed;z-index:50;right:10px;top:65px;width:min(300px,90vw);padding:15px;background:var(--surface);border:1px solid var(--border);border-radius:12px;max-height:80vh;overflow:auto}
+.menu.open{display:block}
+.menu a{display:block;padding:12px;border:1px solid var(--border);border-radius:8px;margin:6px 0;font-size:13px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.hero{padding:30px 0}.brand{font-size:20px}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="container topbar">
+<a class="brand" href="index.html">Rex<span>Web</span></a>
+<div class="actions">
+<button class="icon-btn" id="themeToggle" aria-label="Switch theme">☀️</button>
+<button class="icon-btn" id="menuToggle" aria-label="Open menu">☰</button>
+</div>
+</div>
+<nav class="category-nav">
+<div class="container category-row">
+<a href="index.html">🏠 Home</a>
+<a href="tools.html">🛠️ Tools</a>
+<a href="templates.html">💻 Web Templates</a>
+<a href="themes.html">🎨 Themes</a>
+<a href="ebooks.html">📚 Ebooks</a>
+<a href="games.html">🎮 Games</a>
+<a href="marketplace.html">🛍️ Marketplace</a>
+</div>
+</nav>
+</header>
+
+<nav class="menu" id="sideMenu">
+<a href="index.html">🏠 Home</a>
+<a href="tools.html">🛠️ Digital Tools</a>
+<a href="templates.html">💻 Web Templates</a>
+<a href="themes.html">🎨 Themes</a>
+<a href="ebooks.html">📚 Ebooks</a>
+<a href="games.html">🎮 Games</a>
+<a href="marketplace.html">🛍️ Marketplace</a>
+<a href="https://vitalstar.web.app/">⭐ Enter VitalStar</a>
+<a href="explore.html">🌍 Explore</a>
+<a href="login.html">🔐 Login</a>
+<a href="register.html">👤 Register</a>
+<a href="about.html">ℹ️ About</a>
+<a href="contact.html">✉️ Contact</a>
+<a href="privacy.html">🔒 Privacy Policy</a>
+<a href="terms.html">📄 Terms & Conditions</a>
+</nav>
+
+<section class="hero">
+<div class="container">
+<span class="badge">REXWEB DIGITAL TOOLKIT</span>
+<h1>Powerful Tools.<br><span class="gradient">Simpler Digital Life.</span></h1>
+<p>Calculate, create, convert, and code with useful browser-based tools. Expand only the tools you need to keep your workspace clean.</p>
+</div>
+</section>
+
+<main class="container section">
+<h2>Explore Online Tools</h2>
+<p class="muted">Tap any arrow to expand or collapse a tool.</p>
+<input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools...">
+
+<div class="grid" id="toolsGrid">
+
+<!-- SCIENTIFIC CALCULATOR -->
+<article class="tool-card calc" data-name="scientific calculator math trigonometry">
+<div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Scientific Calculator">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Scientific functions, powers, roots, trigonometry and arithmetic. Trigonometric functions use degrees.</p>
+<input id="calcDisplay" class="calc-display" placeholder="0" aria-label="Calculator display">
+<div class="calc-buttons">
+<button data-calc="sin(">sin</button><button data-calc="cos(">cos</button><button data-calc="tan(">tan</button><button data-calc="sqrt(">√</button>
+<button data-calc="log(">log</button><button data-calc="ln(">ln</button><button data-calc="^">xʸ</button><button data-calc="!">x!</button>
+<button data-calc="(">(</button><button data-calc=")">)</button><button data-calc="pi">π</button><button data-calc="e">e</button>
+<button data-calc="7">7</button><button data-calc="8">8</button><button data-calc="9">9</button><button data-calc="/">÷</button>
+<button data-calc="4">4</button><button data-calc="5">5</button><button data-calc="6">6</button><button data-calc="*">×</button>
+<button data-calc="1">1</button><button data-calc="2">2</button><button data-calc="3">3</button><button data-calc="-">−</button>
+<button data-calc="0">0</button><button data-calc=".">.</button><button id="calcBack">⌫</button><button data-calc="+">+</button>
+<button id="calcClear">AC</button><button data-calc="%">%</button><button data-calc="Ans">Ans</button><button class="equals" id="calcEquals">=</button>
+</div>
+<div class="result" id="calcResult">Your answer will appear here.</div>
+</div>
+</article>
+
+<!-- ADVANCED TEXT COUNTER -->
+<article class="tool-card" data-name="text word character sentence paragraph counter reading time">
+<div class="tool-heading"><span class="tool-icon">📝</span><h3>Advanced Text Counter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Advanced Text Counter">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Track words, characters, paragraphs, sentences, spaces, and estimated reading time.</p>
+<textarea id="wordInput" placeholder="Type or paste your text here..."></textarea>
+<div class="result" id="wordResult">Words: 0</div>
+<div class="row"><button class="btn alt" id="clearText">Clear Text</button><button class="btn" id="copyText">Copy Text</button></div>
+</div>
+</article>
+
+<!-- CASE CONVERTER -->
+<article class="tool-card" data-name="case converter uppercase lowercase title text">
+<div class="tool-heading"><span class="tool-icon">🔠</span><h3>Case Converter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Case Converter">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Convert text into uppercase, lowercase, title case, or sentence case.</p>
+<textarea id="caseInput" placeholder="Enter your text..."></textarea>
+<div class="row">
+<button class="btn" data-case="upper">UPPERCASE</button>
+<button class="btn" data-case="lower">lowercase</button>
+<button class="btn" data-case="title">Title Case</button>
+<button class="btn alt" data-case="sentence">Sentence case</button>
+</div>
+<div class="row"><button class="btn alt" id="copyCase">Copy Result</button></div>
+</div>
+</article>
+
+<!-- PASSWORD GENERATOR -->
+<article class="tool-card" data-name="password generator secure random">
+<div class="tool-heading"><span class="tool-icon">🔐</span><h3>Password Generator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Password Generator">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Create a random password locally in your browser.</p>
+<label>Password length: <span id="passLengthLabel">16</span></label>
+<input type="range" id="passLength" min="8" max="48" value="16">
+<label><input type="checkbox" id="passNumbers" checked> Include numbers</label>
+<label><input type="checkbox" id="passSymbols" checked> Include symbols</label>
+<div class="row"><button class="btn" id="generatePass">Generate</button><button class="btn alt" id="copyPass">Copy</button></div>
+<div class="result" id="passResult">Your password appears here.</div>
+</div>
+</article>
+
+<!-- CODE BOARD -->
+<article class="tool-card" data-name="code board editor html css javascript coding preview">
+<div class="tool-heading"><span class="tool-icon">💻</span><h3>Code Board</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Code Board">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Write HTML, CSS, and JavaScript and preview your work in a sandboxed frame.</p>
+<label for="codeInput">HTML / CSS / JavaScript</label>
+<textarea id="codeInput" style="min-height:180px;font-family:monospace" spellcheck="false" placeholder="<!DOCTYPE html>
+<html>
+<body>
+<h1>Hello RexWeb!</h1>
+</body>
+</html>"></textarea>
+<div class="row"><button class="btn" id="runCode">▶ Run Preview</button><button class="btn alt" id="copyCode">Copy Code</button><button class="btn alt" id="clearCode">Clear</button></div>
+<iframe id="codePreview" title="Code preview" sandbox="allow-scripts" style="width:100%;height:220px;background:white;border:1px solid var(--border);border-radius:9px;margin-top:12px"></iframe>
+</div>
+</article>
+
+<!-- URL CONVERTER -->
+<article class="tool-card" data-name="url encoder decoder links">
+<div class="tool-heading"><span class="tool-icon">🔗</span><h3>URL Encoder / Decoder</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse URL Encoder / Decoder">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Encode or decode URL text.</p>
+<textarea id="urlInput" placeholder="Enter text..."></textarea>
+<div class="row"><button class="btn" id="urlEncode">Encode</button><button class="btn" id="urlDecode">Decode</button><button class="btn alt" id="urlCopy">Copy</button></div>
+<div class="result" id="urlResult">Your result appears here.</div>
+</div>
+</article>
+
+<!-- COLOR PICKER -->
+<article class="tool-card" data-name="color picker hex rgb colour design">
+<div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Picker</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Color Picker">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Select a color and obtain HEX and RGB values.</p>
+<input type="color" id="colorInput" value="#00c8ff">
+<div class="result" id="colorResult">HEX: #00C8FF · RGB: 0, 200, 255</div>
+<div class="row"><button class="btn" id="copyColor">Copy HEX</button></div>
+</div>
+</article>
+
+<!-- AGE CALCULATOR -->
+<article class="tool-card" data-name="age calculator date birthday">
+<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Age Calculator">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Calculate age from a date of birth.</p>
+<label>Date of birth</label><input type="date" id="birthDate">
+<div class="row"><button class="btn" id="ageBtn">Calculate Age</button></div>
+<div class="result" id="ageResult">Your age will appear here.</div>
+</div>
+</article>
+
+<!-- NUMBER BASE CONVERTER -->
+<article class="tool-card" data-name="number base binary decimal hexadecimal converter">
+<div class="tool-heading"><span class="tool-icon">🔢</span><h3>Number Base Converter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Number Base Converter">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Convert whole numbers between binary, octal, decimal, and hexadecimal.</p>
+<label>Number</label><input id="baseInput" placeholder="Example: 1010">
+<label>Input base</label>
+<select id="baseFrom"><option value="2">Binary</option><option value="8">Octal</option><option value="10" selected>Decimal</option><option value="16">Hexadecimal</option></select>
+<div class="row"><button class="btn" id="convertBase">Convert</button></div>
+<div class="result" id="baseResult">Converted values appear here.</div>
+</div>
+</article>
+
+<!-- TEXT REVERSER -->
+<article class="tool-card" data-name="text reverse letters">
+<div class="tool-heading"><span class="tool-icon">🔄</span><h3>Text Reverser</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Text Reverser">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Reverse the order of characters in text.</p>
+<textarea id="reverseInput" placeholder="Enter text..."></textarea>
+<div class="row"><button class="btn" id="reverseBtn">Reverse</button><button class="btn alt" id="copyReverse">Copy</button></div>
+<div class="result" id="reverseResult">Your reversed text appears here.</div>
+</div>
+</article>
+
+<!-- HTML FORMATTER -->
+<article class="tool-card" data-name="html formatter code developer">
+<div class="tool-heading"><span class="tool-icon">🧩</span><h3>HTML Formatter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse HTML Formatter">⌄</button></div>
+<div class="tool-content">
+<p class="desc">Format basic HTML with indentation for easier reading.</p>
+<textarea id="htmlInput" style="font-family:monospace" placeholder="<div><h1>Hello</h1></div>"></textarea>
+<div class="row"><button class="btn" id="formatHtml">Format HTML</button><button class="btn alt" id="copyHtml">Copy</button></div>
+<div class="result" id="htmlResult">Formatted code appears here.</div>
+</div>
+</article>
+
+</div>
+</main>
+
+<footer><div class="container">
+<strong>RexWeb Nexora</strong>
+<p style="margin-top:8px">Explore · Create · Grow</p>
+<p style="margin-top:8px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
+</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const show=(id,text)=>$(id).textContent=text;
+
+/* THEME */
+function setTheme(theme){
+document.documentElement.dataset.theme=theme;
+$("themeToggle").textContent=theme==="dark"?"☀️":"🌙";
+$("themeColor").content=theme==="dark"?"#050b19":"#f2f6ff";
+try{localStorage.setItem("rexweb-theme",theme)}catch(e){}
+}
+let savedTheme="dark";
+try{savedTheme=localStorage.getItem("rexweb-theme")||"dark"}catch(e){}
+setTheme(savedTheme);
+$("themeToggle").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+
+/* MENU */
+$("menuToggle").onclick=()=>$("sideMenu").classList.toggle("open");
+document.addEventListener("click",e=>{
+if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle"))$("sideMenu").classList.remove("open");
+});
+
+/* EXPAND / COLLAPSE */
+document.querySelectorAll(".tool-card").forEach(card=>{
+const btn=card.querySelector(".tool-toggle");
+btn.onclick=()=>{
+const collapsed=card.classList.toggle("collapsed");
+btn.textContent=collapsed?"+":"⌄";
+btn.setAttribute("aria-expanded",String(!collapsed));
+btn.setAttribute("aria-label",(collapsed?"Expand ":"Collapse ")+card.querySelector("h3").textContent);
+};
+});
+
+/* SEARCH */
+$("toolSearch").addEventListener("input",function(){
+const q=this.value.toLowerCase().trim();
+document.querySelectorAll(".tool-card").forEach(card=>{
+card.hidden=!(card.dataset.name+" "+card.textContent).toLowerCase().includes(q);
+});
+});
+
+/* COPY HELPER */
+async function copyValue(value,id){
+if(!value){show(id,"Nothing to copy yet.");return}
+try{
+await navigator.clipboard.writeText(value);
+show(id,"Copied successfully!");
+}catch(e){
+const t=document.createElement("textarea");t.value=value;
+document.body.appendChild(t);t.select();
+const ok=document.execCommand("copy");t.remove();
+show(id,ok?"Copied successfully!":"Copy manually, please.");
+}
+}
+
+/* SCIENTIFIC CALCULATOR */
+let lastAnswer=0;
+$("calcDisplay").addEventListener("keydown",e=>{if(e.key==="Enter")$("calcEquals").click()});
+document.querySelectorAll("[data-calc]").forEach(b=>{
+b.onclick=()=>{$("calcDisplay").value+=b.dataset.calc;$("calcDisplay").focus()};
+});
+$("calcClear").onclick=()=>{$("calcDisplay").value="";show("calcResult","Cleared.")};
+$("calcBack").onclick=()=>$("calcDisplay").value=$("calcDisplay").value.slice(0,-1);
+
+function factorial(n){
+if(!Number.isInteger(n)||n<0||n>170)throw Error("Factorial needs a whole number from 0 to 170.");
+let r=1;for(let i=2;i<=n;i++)r*=i;return r;
+}
+function sciCalc(source){
+let s=source.replace(/\s/g,"").replace(/π/g,"pi");
+if(!s||s.length>180)throw Error("Enter a valid expression.");
+if(!/^[0-9+\-*/().%^!,a-zA-Z]+$/.test(s))throw Error("Unsupported character.");
+const tokens=s.match(/sin|cos|tan|sqrt|log|ln|pi|Ans|e|[0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?|[()+\-*/%^!]/gi)||[];
+if(tokens.join("")!==s)throw Error("Check the expression.");
+let i=0;
+function expr(){let x=term();while(tokens[i]==="+"||tokens[i]==="-"){let op=tokens[i++],y=term();x=op==="+"?x+y:x-y}return x}
+function term(){let x=unary();while(["*","/","%"].includes(tokens[i])){let op=tokens[i++],y=unary();if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");x=op==="*"?x*y:op==="/"?x/y:x%y}return x}
+function unary(){if(tokens[i]==="+"){i++;return unary()}if(tokens[i]==="-"){i++;return-unary()}return power()}
+function power(){let x=atom();if(tokens[i]==="^"){i++;x=Math.pow(x,unary())}while(tokens[i]==="!"){i++;x=factorial(x)}return x}
+function atom(){
+let t=tokens[i++];
+if(t==="("){let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");return x}
+if(/^\d/.test(t||""))return Number(t);
+if(t==="pi")return Math.PI;
+if(t==="e")return Math.E;
+if(t==="Ans")return lastAnswer;
+if(["sin","cos","tan","sqrt","log","ln"].includes(t)){
+if(tokens[i++]!=="(")throw Error("Use function(argument).");
+let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");
+if(t==="sin")return Math.sin(x*Math.PI/180);
+if(t==="cos")return Math.cos(x*Math.PI/180);
+if(t==="tan")return Math.tan(x*Math.PI/180);
+if(t==="sqrt"){if(x<0)throw Error("Square root requires a non-negative number.");return Math.sqrt(x)}
+if(t==="log"){if(x<=0)throw Error("Log requires a positive number.");return Math.log10(x)}
+if(x<=0)throw Error("Natural log requires a positive number.");return Math.log(x);
+}
+throw Error("Check the expression.");
+}
+const result=expr();
+if(i<tokens.length||!Number.isFinite(result))throw Error("Invalid expression.");
+return result;
+}
+$("calcEquals").onclick=()=>{
+try{lastAnswer=sciCalc($("calcDisplay").value);$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));show("calcResult","Answer: "+$("calcDisplay").value)}
+catch(e){show("calcResult",e.message||"Invalid expression.")}
+};
+
+/* ADVANCED TEXT COUNTER */
+$("wordInput").addEventListener("input",()=>{
+const t=$("wordInput").value;
+const words=t.trim()?t.trim().split(/\s+/u).length:0;
+const chars=Array.from(t).length;
+const noSpaces=Array.from(t.replace(/\s/g,"")).length;
+const sentences=(t.match(/[.!?]+(?=\s|$)/g)||[]).length;
+const paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
+const lines=t?t.split(/\n/).length:0;
+const reading=Math.ceil(words/200);
+const speaking=Math.ceil(words/130);
+show("wordResult",
+"Words: "+words+
+"\nCharacters (with spaces): "+chars+
+"\nCharacters (without spaces): "+noSpaces+
+"\nSentences: "+sentences+
+"\nParagraphs: "+paragraphs+
+"\nLines: "+lines+
+"\nEstimated reading time: "+reading+" min"+
+"\nEstimated speaking time: "+speaking+" min");
+});
+$("clearText").onclick=()=>{$("wordInput").value="";$("wordInput").dispatchEvent(new Event("input"))};
+$("copyText").onclick=()=>copyValue($("wordInput").value,"wordResult");
+
+/* CASE CONVERTER */
+document.querySelectorAll("[data-case]").forEach(b=>b.onclick=()=>{
+let t=$("caseInput").value;
+if(b.dataset.case==="upper")t=t.toUpperCase();
+if(b.dataset.case==="lower")t=t.toLowerCase();
+if(b.dataset.case==="title")t=t.toLowerCase().replace(/\b\p{L}/gu,m=>m.toUpperCase());
+if(b.dataset.case==="sentence")t=t.toLowerCase().replace(/(^\s*\p{L}|[.!?]\s+\p{L})/gu,m=>m.toUpperCase());
+$("caseInput").value=t;
+});
+$("copyCase").onclick=()=>copyValue($("caseInput").value,"caseInput");
+
+/* PASSWORD GENERATOR */
+$("passLength").oninput=()=>$("passLengthLabel").textContent=$("passLength").value;
+$("generatePass").onclick=()=>{
+let chars="abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+if($("passNumbers").checked)chars+="23456789";
+if($("passSymbols").checked)chars+="!@#$%^&*()-_=+?";
+if(!chars){show("passResult","Choose at least one character type.");return}
+const arr=new Uint32Array(48);crypto.getRandomValues(arr);
+let p="";for(let i=0;i<+$("passLength").value;i++)p+=chars[arr[i]%chars.length];
+show("passResult",p);
+};
+$("copyPass").onclick=()=>copyValue($("passResult").textContent,"passResult");
+
+/* CODE BOARD */
+$("runCode").onclick=()=>{
+const preview=$("codePreview");
+preview.srcdoc=$("codeInput").value;
+};
+$("copyCode").onclick=()=>copyValue($("codeInput").value,"codeInput");
+$("clearCode").onclick=()=>{$("codeInput").value="";$("codePreview").srcdoc=""};
+
+/* URL ENCODER */
+$("urlEncode").onclick=()=>show("urlResult",encodeURIComponent($("urlInput").value));
+$("urlDecode").onclick=()=>{
+try{show("urlResult",decodeURIComponent($("urlInput").value))}
+catch(e){show("urlResult","Invalid encoded text.")}
+};
+$("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
+
+/* COLOR PICKER */
+function updateColor(){
+const hex=$("colorInput").value.toUpperCase();
+const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+show("colorResult",`HEX: ${hex}\nRGB: ${r}, ${g}, ${b}`);
+}
+$("colorInput").oninput=updateColor;
+$("copyColor").onclick=()=>copyValue($("colorInput").value.toUpperCase(),"colorResult");
+
+/* AGE CALCULATOR */
+$("birthDate").max=new Date().toISOString().slice(0,10);
+$("ageBtn").onclick=()=>{
+const value=$("birthDate").value;
+if(!value){show("ageResult","Select your date of birth.");return}
+const birth=new Date(value+"T00:00:00"),now=new Date();
+if(Number.isNaN(birth.getTime())||birth>now){show("ageResult","Choose a valid past date.");return}
+let y=now.getFullYear()-birth.getFullYear();
+let m=now.getMonth()-birth.getMonth();
+let d=now.getDate()-birth.getDate();
+if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate()}
+if(m<0){y--;m+=12}
+show("ageResult",`Age: ${y} years, ${m} months, ${d} days.`);
+};
+
+/* NUMBER BASE CONVERTER */
+$("convertBase").onclick=()=>{
+const raw=$("baseInput").value.trim(),base=+$("baseFrom").value;
+if(!raw||! /^[+-]?[0-9a-f]+$/i.test(raw)){show("baseResult","Enter a valid whole number.");return}
+const n=parseInt(raw,base);
+if(!Number.isSafeInteger(n)){show("baseResult","Invalid number or value too large.");return}
+show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);
+};
+
+/* TEXT REVERSER */
+$("reverseBtn").onclick=()=>show("reverseResult",Array.from($("reverseInput").value).reverse().join("")||"Enter text first.");
+$("copyReverse").onclick=()=>copyValue($("reverseResult").textContent,"reverseResult");
+
+/* HTML FORMATTER */
+$("formatHtml").onclick=()=>{
+const src=$("htmlInput").value;
+if(!src.trim()){show("htmlResult","Paste some HTML first.");return}
+const tokens=src.replace(/>\s*</g,">\n<").split("\n").map(x=>x.trim()).filter(Boolean);
+let depth=0,out=[];
+for(const t of tokens){
+if(/^<\//.test(t))depth=Math.max(0,depth-1);
+out.push("  ".repeat(depth)+t);
+if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&!/^<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i.test(t)&&!/^<\//.test(t)&&! /\/>$/.test(t))depth++;
+}
+show("htmlResult",out.join("\n"));
+};
+$("copyHtml").onclick=()=>copyValue($("htmlResult").textContent,"htmlResult");
+
+/* FOOTER */
+$("year").textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
