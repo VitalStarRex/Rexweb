@@ -1,5 +1,5 @@
 /* =========================================================
-   REXWEB NEXORA — 10-GAME ARCADE
+   REXWEB NEXORA — 20-GAME ARCADE
    COMPLETE SELF-CONTAINED GAME.JS
    ========================================================= */
 
@@ -20,6 +20,22 @@
     recent: [],
     sound: false
   };
+
+  /* roundRect fallback for older browsers */
+  if (
+    typeof CanvasRenderingContext2D !== "undefined" &&
+    !CanvasRenderingContext2D.prototype.roundRect
+  ) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+      r = Math.max(0, Math.min(typeof r === "number" ? r : 0, w / 2, h / 2));
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+    };
+  }
 
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
@@ -265,11 +281,34 @@
       border: 1px solid #a33d55;
     }
 
+    #${ROOT_ID} .nx-hold {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      min-width: 90px;
+      min-height: 52px;
+    }
+
     #${ROOT_ID} .nx-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 9px;
       margin: 12px 0;
+    }
+
+    #${ROOT_ID} .nx-pad-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px auto;
+    }
+
+    #${ROOT_ID} .nx-pad-row button {
+      min-width: 62px;
+      min-height: 50px;
+      font-size: 19px;
     }
 
     #${ROOT_ID} .nx-game-title {
@@ -327,6 +366,7 @@
       min-width: 0;
       padding: 0;
       user-select: none;
+      -webkit-user-select: none;
     }
 
     #${ROOT_ID} .nx-cell:disabled {
@@ -464,11 +504,11 @@
     element.innerHTML = "";
 
     items.forEach(item => {
-      const button = document.createElement("button");
-      button.className = "nx-btn " + (item.secondary ? "nx-btn-secondary" : "");
-      button.textContent = item.label;
-      button.addEventListener("click", item.onClick);
-      element.appendChild(button);
+      const btn = document.createElement("button");
+      btn.className = "nx-btn " + (item.secondary ? "nx-btn-secondary" : "");
+      btn.textContent = item.label;
+      btn.addEventListener("click", item.onClick);
+      element.appendChild(btn);
     });
   }
 
@@ -484,11 +524,124 @@
     return element;
   }
 
+  /* A button that stays "pressed" while a finger or mouse is held on it */
+  function holdButton(label, onDown, onUp) {
+    const element = document.createElement("button");
+    element.className = "nx-btn nx-btn-secondary nx-hold";
+    element.textContent = label;
+    element.addEventListener("pointerdown", event => {
+      event.preventDefault();
+      onDown();
+    });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(type => {
+      element.addEventListener(type, () => onUp());
+    });
+    element.addEventListener("contextmenu", event => event.preventDefault());
+    return element;
+  }
+
+  function padRow(playArea, buttons) {
+    const row = document.createElement("div");
+    row.className = "nx-pad-row";
+    buttons.forEach(item => row.appendChild(item));
+    playArea.appendChild(row);
+    return row;
+  }
+
+  function smallButton(label, onClick, aria) {
+    const element = button(label, onClick, true);
+    if (aria) element.setAttribute("aria-label", aria);
+    return element;
+  }
+
+  function dpad(playArea, onMove) {
+    const controls = document.createElement("div");
+    controls.className = "nx-controls";
+
+    [
+      ["↑", "nx-up", 0, -1],
+      ["←", "nx-left", -1, 0],
+      ["↓", "nx-down", 0, 1],
+      ["→", "nx-right", 1, 0]
+    ].forEach(([label, className, x, y]) => {
+      const control = document.createElement("button");
+      control.className = className;
+      control.textContent = label;
+      control.setAttribute("aria-label", "Move " + label);
+      control.addEventListener("click", () => onMove(x, y));
+      controls.appendChild(control);
+    });
+
+    playArea.appendChild(controls);
+    return controls;
+  }
+
+  function makeCanvas(playArea, w, h, label, maxWidth) {
+    const wrap = document.createElement("div");
+    wrap.className = "nx-canvas-wrap";
+    if (maxWidth) wrap.style.maxWidth = maxWidth + "px";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    canvas.setAttribute("aria-label", label);
+    wrap.appendChild(canvas);
+    playArea.appendChild(wrap);
+
+    return { canvas, ctx: canvas.getContext("2d"), wrap };
+  }
+
+  /* Shared animation loop for the newer canvas games */
+  function makeLoop(token, update, draw, maxDt) {
+    let id = 0;
+    let last = 0;
+    let running = true;
+    let stopped = false;
+    const limit = maxDt || 0.03;
+
+    function frame(time) {
+      if (stopped || !isActive(token)) return;
+      if (!last) last = time;
+      const dt = Math.min((time - last) / 1000, limit);
+      last = time;
+      if (running) update(dt);
+      draw();
+      id = requestAnimationFrame(frame);
+    }
+
+    return {
+      start() {
+        cancelAnimationFrame(id);
+        last = 0;
+        stopped = false;
+        id = requestAnimationFrame(frame);
+      },
+      stop() {
+        stopped = true;
+        cancelAnimationFrame(id);
+      },
+      setRunning(value) {
+        running = !!value;
+        last = 0;
+      },
+      toggle() {
+        running = !running;
+        last = 0;
+        return running;
+      },
+      get running() {
+        return running;
+      }
+    };
+  }
+
   function showHub() {
     gameToken++;
     cleanupCurrent();
     cleanupCurrent = () => {};
     currentGame = null;
+
+    const total = Object.keys(games).length;
 
     root.innerHTML = `
       <div class="nx-wrap">
@@ -497,12 +650,12 @@
             <h1 class="nx-brand">REXWEB NEXORA</h1>
             <p class="nx-tagline">PLAY. CREATE. TRADE. GROW.</p>
           </div>
-          <div class="nx-small">10 GAMES • FREE TO PLAY</div>
+          <div class="nx-small">${total} GAMES • FREE TO PLAY</div>
         </header>
 
         <section class="nx-panel nx-hero">
           <h2>Your next high score starts here.</h2>
-          <p>Ten arcade games. One destination. Choose a game and beat your personal best.</p>
+          <p>${total} arcade games. One destination. Choose a game and beat your personal best.</p>
         </section>
 
         <input
@@ -524,6 +677,8 @@
     const search = root.querySelector("#nxSearch");
     search.addEventListener("input", renderCards);
     renderCards();
+
+    try { window.scrollTo(0, 0); } catch (_) {}
   }
 
   function renderCards() {
@@ -575,6 +730,8 @@
     state.recent = [id, ...state.recent.filter(item => item !== id)].slice(0, 10);
     save();
 
+    try { window.scrollTo(0, 0); } catch (_) {}
+
     try {
       cleanupCurrent = game.start(token) || (() => {});
     } catch (error) {
@@ -588,7 +745,7 @@
     return token === gameToken && currentGame !== null;
   }
 
-  /* ====================== GAME 1: SNAKE ====================== */
+  /* ====================== GAME: SNAKE ====================== */
 
   register(
     "snake",
@@ -764,24 +921,7 @@
 
     document.addEventListener("keydown", keyHandler);
 
-    const controls = document.createElement("div");
-    controls.className = "nx-controls";
-
-    [
-      ["↑", "nx-up", 0, -1],
-      ["←", "nx-left", -1, 0],
-      ["↓", "nx-down", 0, 1],
-      ["→", "nx-right", 1, 0]
-    ].forEach(([label, className, x, y]) => {
-      const control = document.createElement("button");
-      control.className = className;
-      control.textContent = label;
-      control.setAttribute("aria-label", "Move " + label);
-      control.addEventListener("click", () => changeDirection(x, y));
-      controls.appendChild(control);
-    });
-
-    playArea.appendChild(controls);
+    dpad(playArea, changeDirection);
 
     actions([
       { label: "Restart", onClick: reset },
@@ -810,165 +950,7 @@
     };
   }
 
-  /* ================== GAME 2: MEMORY MATCH ================== */
-
-  register(
-    "memory",
-    "Memory Match",
-    "Flip cards and find every matching pair in as few moves as possible.",
-    "🧠",
-    "Puzzle",
-    startMemory
-  );
-
-  function startMemory(token) {
-    shell("Memory Match", "Tap two cards to find matching pairs.");
-    const playArea = area();
-
-    const symbols = [
-      "🚀", "🐱", "🌟", "🍉", "🎮", "🦊",
-      "⚽", "🍀", "🎵", "🐼", "🍕", "🌈"
-    ];
-
-    let deck = [];
-    let flipped = [];
-    let matched = new Set();
-    let moves = 0;
-    let locked = false;
-    let finished = false;
-    let hideTimer = null;
-    let startedAt = Date.now();
-    let elapsedTimer = null;
-
-    const info = document.createElement("div");
-    info.className = "nx-status";
-    playArea.appendChild(info);
-
-    const board = document.createElement("div");
-    board.className = "nx-board";
-    board.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
-    playArea.appendChild(board);
-
-    function updateInfo() {
-      const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      info.textContent =
-        `Moves: ${moves} • Matched: ${matched.size / 2}/${symbols.length} pairs • Time: ${seconds}s`;
-    }
-
-    function reset() {
-      clearTimeout(hideTimer);
-      clearInterval(elapsedTimer);
-
-      deck = shuffle([...symbols, ...symbols]);
-      flipped = [];
-      matched = new Set();
-      moves = 0;
-      locked = false;
-      finished = false;
-      startedAt = Date.now();
-
-      board.innerHTML = "";
-
-      deck.forEach((symbol, index) => {
-        const card = document.createElement("button");
-        card.className = "nx-cell";
-        card.textContent = "?";
-        card.setAttribute("aria-label", "Hidden card");
-        card.dataset.index = index;
-
-        card.addEventListener("click", () => flipCard(index, card));
-        board.appendChild(card);
-      });
-
-      updateInfo();
-      status("Find all 12 matching pairs.");
-
-      elapsedTimer = setInterval(() => {
-        if (!finished && isActive(token)) updateInfo();
-      }, 1000);
-    }
-
-    function flipCard(index, card) {
-      if (
-        locked || finished ||
-        matched.has(index) ||
-        flipped.some(item => item.index === index)
-      ) {
-        return;
-      }
-
-      card.textContent = deck[index];
-      card.classList.add("nx-selected");
-      card.setAttribute("aria-label", deck[index]);
-      flipped.push({ index, card });
-
-      if (flipped.length < 2) return;
-
-      moves++;
-      locked = true;
-      updateInfo();
-
-      const [first, second] = flipped;
-
-      if (deck[first.index] === deck[second.index]) {
-        matched.add(first.index);
-        matched.add(second.index);
-
-        first.card.classList.remove("nx-selected");
-        second.card.classList.remove("nx-selected");
-        first.card.classList.add("nx-matched");
-        second.card.classList.add("nx-matched");
-
-        first.card.disabled = true;
-        second.card.disabled = true;
-
-        flipped = [];
-        locked = false;
-
-        if (matched.size === deck.length) {
-          finished = true;
-          clearInterval(elapsedTimer);
-
-          const seconds = Math.floor((Date.now() - startedAt) / 1000);
-          const score = Math.max(10, 1000 - moves * 10 - seconds * 2);
-
-          recordScore("memory", score);
-          updateInfo();
-          status(`You matched every pair in ${moves} moves and ${seconds} seconds! Score: ${score}.`);
-        } else {
-          status("Match found! Keep going.");
-        }
-
-        updateInfo();
-        return;
-      }
-
-      status("Not a match. Try to remember the cards.");
-
-      hideTimer = setTimeout(() => {
-        if (!isActive(token)) return;
-
-        flipped.forEach(item => {
-          item.card.textContent = "?";
-          item.card.classList.remove("nx-selected");
-          item.card.setAttribute("aria-label", "Hidden card");
-        });
-
-        flipped = [];
-        locked = false;
-      }, 850);
-    }
-
-    actions([{ label: "Restart", onClick: reset }]);
-    reset();
-
-    return () => {
-      clearTimeout(hideTimer);
-      clearInterval(elapsedTimer);
-    };
-  }
-
-  /* ================== GAME 3: TIC-TAC-TOE ================== */
+  /* ================== GAME: TIC-TAC-TOE ================== */
 
   register(
     "tictactoe",
@@ -987,6 +969,7 @@
     let turn;
     let ended;
     let mode = "computer";
+    const pendingTimers = new Set();
 
     const modeLabel = document.createElement("div");
     modeLabel.className = "nx-status";
@@ -1035,7 +1018,13 @@
       });
     }
 
+    function clearTimers() {
+      pendingTimers.forEach(clearTimeout);
+      pendingTimers.clear();
+    }
+
     function reset() {
+      clearTimers();
       boardState = Array(9).fill("");
       turn = "X";
       ended = false;
@@ -1058,7 +1047,7 @@
         status("It's a draw! Restart for another round.");
       } else {
         status(result === "X" ? "X wins!" : "O wins!");
-        if (result === "X") {
+        if (result === "X" && mode === "computer") {
           recordScore("tictactoe", getBest("tictactoe") + 1);
         }
       }
@@ -1068,6 +1057,7 @@
 
     function playMove(index) {
       if (ended || boardState[index] || !isActive(token)) return;
+      if (mode === "computer" && turn === "O") return;
 
       boardState[index] = turn;
       if (finishIfNeeded()) return;
@@ -1083,20 +1073,12 @@
       status("Computer is thinking...");
       paint();
 
-      const available = boardState
-        .map((value, i) => value ? -1 : i)
-        .filter(i => i >= 0);
-
-      const move = chooseComputerMove(boardState);
-
       const timer = setTimeout(() => {
+        pendingTimers.delete(timer);
         if (!isActive(token) || ended) return;
 
-        const selected = move >= 0 && boardState[move] === ""
-          ? move
-          : available[Math.floor(Math.random() * available.length)];
-
-        if (selected === undefined) return;
+        const selected = chooseComputerMove(boardState);
+        if (selected < 0) return;
 
         boardState[selected] = "O";
 
@@ -1140,45 +1122,31 @@
       return cells.findIndex(value => !value);
     }
 
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Switch to Two Players",
-        secondary: true,
-        onClick: () => {
-          mode = mode === "computer" ? "two" : "computer";
-          modeLabel.textContent = mode === "computer"
-            ? "Mode: Play against the computer"
-            : "Mode: Two players on one device";
-          actions([
-            { label: "Restart", onClick: reset },
-            {
-              label: mode === "computer" ? "Switch to Two Players" : "Play Against Computer",
-              secondary: true,
-              onClick: () => {
-                mode = mode === "computer" ? "two" : "computer";
-                modeLabel.textContent = mode === "computer"
-                  ? "Mode: Play against the computer"
-                  : "Mode: Two players on one device";
-                reset();
-              }
-            }
-          ]);
-          reset();
+    function renderActions() {
+      actions([
+        { label: "Restart", onClick: reset },
+        {
+          label: mode === "computer" ? "Switch to Two Players" : "Play Against Computer",
+          secondary: true,
+          onClick: () => {
+            mode = mode === "computer" ? "two" : "computer";
+            modeLabel.textContent = mode === "computer"
+              ? "Mode: Play against the computer"
+              : "Mode: Two players on one device";
+            renderActions();
+            reset();
+          }
         }
-      }
-    ]);
+      ]);
+    }
 
-    const pendingTimers = new Set();
+    renderActions();
     reset();
 
-    return () => {
-      pendingTimers.forEach(clearTimeout);
-      pendingTimers.clear();
-    };
+    return () => clearTimers();
   }
 
-  /* ======================== GAME 4: PONG ======================== */
+  /* ======================== GAME: PONG ======================== */
 
   register(
     "pong",
@@ -1235,6 +1203,7 @@
       running = true;
       ended = false;
       lastTime = 0;
+      targetY = null;
       resetBall(Math.random() < 0.5 ? -1 : 1);
       status("First to 5 points wins. Good luck!");
       draw();
@@ -1367,19 +1336,21 @@
     function moveFromPointer(event) {
       const rect = canvas.getBoundingClientRect();
       const scaleY = H / rect.height;
-      const y = (event.clientY - rect.top) * scaleY;
-      targetY = y - H / 2;
-      targetY = Math.max(-paddleH / 2, Math.min(H - paddleH / 2, targetY));
+      targetY = (event.clientY - rect.top) * scaleY;
+      targetY = Math.max(0, Math.min(H, targetY));
     }
 
+    function isUpKey(key) { return key === "ArrowUp" || key === "w" || key === "W"; }
+    function isDownKey(key) { return key === "ArrowDown" || key === "s" || key === "S"; }
+
     function keyHandler(event) {
-      if (["ArrowUp", "ArrowDown", "w", "W", "s", "S", " "].includes(event.key)) {
+      if (isUpKey(event.key) || isDownKey(event.key) || event.key === " ") {
         event.preventDefault();
       }
-      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = true;
-      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = true;
+      if (isUpKey(event.key)) { up = true; targetY = null; }
+      if (isDownKey(event.key)) { down = true; targetY = null; }
 
-      if (event.key === " " && !ended) {
+      if (event.key === " " && !ended && !event.repeat) {
         running = !running;
         lastTime = 0;
         status(running ? "Game resumed." : "Game paused.");
@@ -1387,11 +1358,12 @@
     }
 
     function keyUp(event) {
-      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") up = false;
-      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") down = false;
+      if (isUpKey(event.key)) up = false;
+      if (isDownKey(event.key)) down = false;
     }
 
     canvas.addEventListener("pointermove", moveFromPointer);
+    canvas.addEventListener("pointerdown", moveFromPointer);
     document.addEventListener("keydown", keyHandler);
     document.addEventListener("keyup", keyUp);
 
@@ -1414,12 +1386,13 @@
     return () => {
       cancelAnimationFrame(animation);
       canvas.removeEventListener("pointermove", moveFromPointer);
+      canvas.removeEventListener("pointerdown", moveFromPointer);
       document.removeEventListener("keydown", keyHandler);
       document.removeEventListener("keyup", keyUp);
     };
   }
 
-  /* ==================== GAME 5: BRICK BREAKER ==================== */
+  /* ==================== GAME: BRICK BREAKER ==================== */
 
   register(
     "brickbreaker",
@@ -1642,7 +1615,7 @@
       if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = true;
       if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = true;
 
-      if (event.key === " " && !ended) {
+      if (event.key === " " && !ended && !event.repeat) {
         running = !running;
         lastTime = 0;
         status(running ? "Game resumed." : "Game paused.");
@@ -1682,7 +1655,7 @@
     };
   }
 
-  /* ==================== GAME 6: ENDLESS RUNNER ==================== */
+  /* ==================== GAME: ENDLESS RUNNER ==================== */
 
   register(
     "runner",
@@ -1854,7 +1827,7 @@
     }
 
     function keyHandler(event) {
-      if (["Space", "ArrowUp", "w", "W"].includes(event.key)) {
+      if ([" ", "ArrowUp", "w", "W"].includes(event.key)) {
         event.preventDefault();
         if (event.repeat) return;
         jumpQueued = true;
@@ -1897,7 +1870,7 @@
     };
   }
 
-  /* ==================== GAME 7: SPACE SHOOTER ==================== */
+  /* ==================== GAME: SPACE SHOOTER ==================== */
 
   register(
     "space",
@@ -1909,7 +1882,7 @@
   );
 
   function startSpaceShooter(token) {
-    shell("Space Shooter", "Move with arrows or WASD. Hold Space to shoot.");
+    shell("Space Shooter", "Move with arrows, WASD, or drag on touch. Hold Space or the Fire button to shoot.");
     const playArea = area();
 
     const wrap = document.createElement("div");
@@ -2061,10 +2034,10 @@
     }
 
     function update(dt) {
-      if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) player.x -= player.speed * dt;
-      if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) player.x += player.speed * dt;
-      if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) player.y -= player.speed * dt;
-      if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) player.y += player.speed * dt;
+      if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * dt;
+      if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * dt;
+      if (keys.has("ArrowUp") || keys.has("w")) player.y -= player.speed * dt;
+      if (keys.has("ArrowDown") || keys.has("s")) player.y += player.speed * dt;
 
       player.x = Math.max(player.r, Math.min(W - player.r, player.x));
       player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
@@ -2204,6 +2177,11 @@
     document.addEventListener("keydown", keyDown);
     document.addEventListener("keyup", keyUp);
     canvas.addEventListener("pointermove", pointerMove);
+    canvas.addEventListener("pointerdown", pointerMove);
+
+    padRow(playArea, [
+      holdButton("🔥 Hold to Fire", () => keys.add(" "), () => keys.delete(" "))
+    ]);
 
     actions([
       { label: "Restart", onClick: reset },
@@ -2226,11 +2204,12 @@
       document.removeEventListener("keydown", keyDown);
       document.removeEventListener("keyup", keyUp);
       canvas.removeEventListener("pointermove", pointerMove);
+      canvas.removeEventListener("pointerdown", pointerMove);
       keys.clear();
     };
   }
 
-  /* ===================== GAME 8: MINESWEEPER ===================== */
+  /* ===================== GAME: MINESWEEPER ===================== */
 
   register(
     "minesweeper",
@@ -2403,28 +2382,28 @@
     function renderBoard() {
       const buttons = board.children;
       for (let i = 0; i < cells.length; i++) {
-        const button = buttons[i];
+        const cellButton = buttons[i];
         const cell = cells[i];
-        button.className = "nx-cell";
-        button.style.background = "";
-        button.style.color = "";
-        button.disabled = revealed.has(i) || ended;
+        cellButton.className = "nx-cell";
+        cellButton.style.background = "";
+        cellButton.style.color = "";
+        cellButton.disabled = revealed.has(i) || ended;
 
         if (revealed.has(i)) {
           if (cell.mine) {
-            button.textContent = "💣";
-            button.style.background = "#662b40";
+            cellButton.textContent = "💣";
+            cellButton.style.background = "#662b40";
           } else {
-            button.textContent = cell.count || "";
-            button.style.background = "#101c31";
+            cellButton.textContent = cell.count || "";
+            cellButton.style.background = "#101c31";
             const colors = { 1: "#67caff", 2: "#70e0a0", 3: "#ff8e8e", 4: "#bba5ff", 5: "#ffbd66" };
-            if (cell.count) button.style.color = colors[cell.count] || "#ffffff";
+            if (cell.count) cellButton.style.color = colors[cell.count] || "#ffffff";
           }
         } else if (flagged.has(i)) {
-          button.textContent = "🚩";
-          button.style.background = "#563a19";
+          cellButton.textContent = "🚩";
+          cellButton.style.background = "#563a19";
         } else {
-          button.textContent = "";
+          cellButton.textContent = "";
         }
       }
     }
@@ -2446,7 +2425,7 @@
     return () => clearInterval(timer);
   }
 
-  /* ==================== GAME 9: MATH CHALLENGE ==================== */
+  /* ==================== GAME: MATH CHALLENGE ==================== */
 
   register(
     "math",
@@ -2566,6 +2545,7 @@
       running = true;
       ended = false;
       questionLocked = false;
+      input.value = "";
       input.disabled = false;
       submit.disabled = false;
       nextButton.style.display = "none";
@@ -2614,7 +2594,7 @@
     return () => clearInterval(timer);
   }
 
-  /* ================= GAME 10: ROCK PAPER SCISSORS ================= */
+  /* ================= GAME: ROCK PAPER SCISSORS ================= */
 
   register(
     "rps",
@@ -2744,22 +2724,3 @@
     return () => {};
   }
 
-  /* ====================== INITIALIZATION ====================== */
-
-  function initializeNexoraGames() {
-    root = document.getElementById(ROOT_ID);
-    if (!root) {
-      root = document.createElement("div");
-      root.id = ROOT_ID;
-      document.body.appendChild(root);
-    }
-    showHub();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeNexoraGames, { once: true });
-  } else {
-    initializeNexoraGames();
-  }
-
-})();
