@@ -45,10 +45,12 @@ h1{font-size:clamp(32px,6vw,48px);margin:15px 0}
 .tool-heading{display:flex;align-items:center;gap:10px}
 .tool-icon{font-size:24px}
 .tool-heading h3{font-size:16px}
-.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px}
+.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px;flex-shrink:0}
+.tool-toggle:hover{border-color:var(--blue)}
 .tool-content{padding-top:13px}
 .tool-card.collapsed .tool-content{display:none}
 .tool-card.collapsed .tool-toggle{transform:rotate(-90deg)}
+.tool-toggle{transition:transform .2s}
 .tool-card .desc{color:var(--muted);font-size:12px;line-height:1.6;margin:9px 0 13px}
 label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
 input:not([type=checkbox]):not([type=range]):not([type=color]),textarea,select{
@@ -75,9 +77,28 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 .menu{display:none;position:fixed;z-index:50;right:10px;top:65px;width:min(300px,90vw);padding:15px;background:var(--surface);border:1px solid var(--border);border-radius:12px;max-height:80vh;overflow:auto}
 .menu.open{display:block}
 .menu a{display:block;padding:12px;border:1px solid var(--border);border-radius:8px;margin:6px 0;font-size:13px}
-@media(max-width:600px){.grid{grid-template-columns:1fr}.hero{padding:30px 0}.brand{font-size:20px}}
+
+/* CODE BOARD */
+.preview-wrapper{position:relative;border:2px solid var(--blue);border-radius:12px;overflow:hidden;background:white}
+.preview-frame{display:block;width:100%;height:260px;background:white;border:0}
+.preview-action{position:absolute;right:8px;top:8px;z-index:2;background:#071327;color:white;border:1px solid var(--blue);padding:9px 12px;border-radius:8px;font-weight:bold}
+.preview-hint{padding:10px;background:#071327;color:var(--blue);text-align:center;font-size:12px;cursor:pointer}
+.fullscreen-overlay{display:none;position:fixed;inset:0;z-index:99999;background:#030918;padding:10px}
+.fullscreen-layout{height:100%;display:flex;flex-direction:column;gap:8px}
+.fullscreen-header{display:flex;align-items:center;justify-content:space-between;gap:8px;color:white}
+.fullscreen-frame{flex:1;width:100%;min-height:0;background:white;border:1px solid var(--blue);border-radius:10px}
+.close-preview{padding:10px 14px;border:0;border-radius:8px;background:#ff3860;color:white;font-weight:bold}
+.file-list{font-size:12px;overflow-wrap:anywhere}
+.tool-card[hidden]{display:none!important}
+
+@media(max-width:600px){
+.grid{grid-template-columns:1fr}
+.hero{padding:30px 0}
+.brand{font-size:20px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -129,14 +150,14 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 
 <main class="container section">
 <h2>Explore Online Tools</h2>
-<p class="muted">Tap any arrow to expand or collapse a tool.</p>
+<p class="muted">Tap + to expand a tool and − to collapse it.</p>
 <input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools...">
 
 <div class="grid" id="toolsGrid">
 
 <!-- SCIENTIFIC CALCULATOR -->
-<article class="tool-card calc" data-name="scientific calculator math trigonometry">
-<div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Scientific Calculator">⌄</button></div>
+<article class="tool-card calc collapsed" data-name="scientific calculator math trigonometry">
+<div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Scientific Calculator">+</button></div>
 <div class="tool-content">
 <p class="desc">Scientific functions, powers, roots, trigonometry and arithmetic. Trigonometric functions use degrees.</p>
 <input id="calcDisplay" class="calc-display" placeholder="0" aria-label="Calculator display">
@@ -154,9 +175,9 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- ADVANCED TEXT COUNTER -->
-<article class="tool-card" data-name="text word character sentence paragraph counter reading time">
-<div class="tool-heading"><span class="tool-icon">📝</span><h3>Advanced Text Counter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Advanced Text Counter">⌄</button></div>
+<!-- TEXT COUNTER -->
+<article class="tool-card collapsed" data-name="text word character sentence paragraph counter reading time">
+<div class="tool-heading"><span class="tool-icon">📝</span><h3>Advanced Text Counter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Text Counter">+</button></div>
 <div class="tool-content">
 <p class="desc">Track words, characters, paragraphs, sentences, spaces, and estimated reading time.</p>
 <textarea id="wordInput" placeholder="Type or paste your text here..."></textarea>
@@ -166,8 +187,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- CASE CONVERTER -->
-<article class="tool-card" data-name="case converter uppercase lowercase title text">
-<div class="tool-heading"><span class="tool-icon">🔠</span><h3>Case Converter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Case Converter">⌄</button></div>
+<article class="tool-card collapsed" data-name="case converter uppercase lowercase title text">
+<div class="tool-heading"><span class="tool-icon">🔠</span><h3>Case Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Case Converter">+</button></div>
 <div class="tool-content">
 <p class="desc">Convert text into uppercase, lowercase, title case, or sentence case.</p>
 <textarea id="caseInput" placeholder="Enter your text..."></textarea>
@@ -178,12 +199,13 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 <button class="btn alt" data-case="sentence">Sentence case</button>
 </div>
 <div class="row"><button class="btn alt" id="copyCase">Copy Result</button></div>
+<div class="result" id="caseResult">Converted text appears in the editor above.</div>
 </div>
 </article>
 
 <!-- PASSWORD GENERATOR -->
-<article class="tool-card" data-name="password generator secure random">
-<div class="tool-heading"><span class="tool-icon">🔐</span><h3>Password Generator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Password Generator">⌄</button></div>
+<article class="tool-card collapsed" data-name="password generator secure random">
+<div class="tool-heading"><span class="tool-icon">🔐</span><h3>Password Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Password Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Create a random password locally in your browser.</p>
 <label>Password length: <span id="passLengthLabel">16</span></label>
@@ -195,26 +217,44 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- CODE BOARD -->
-<article class="tool-card" data-name="code board editor html css javascript coding preview">
-<div class="tool-heading"><span class="tool-icon">💻</span><h3>Code Board</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Code Board">⌄</button></div>
+<!-- ADVANCED CODE BOARD -->
+<article class="tool-card collapsed" data-name="code board html css javascript editor preview upload files fullscreen">
+<div class="tool-heading"><span class="tool-icon">💻</span><h3>Advanced Code Board</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Code Board">+</button></div>
 <div class="tool-content">
-<p class="desc">Write HTML, CSS, and JavaScript and preview your work in a sandboxed frame.</p>
-<label for="codeInput">HTML / CSS / JavaScript</label>
-<textarea id="codeInput" style="min-height:180px;font-family:monospace" spellcheck="false" placeholder="<!DOCTYPE html>
+<p class="desc">Write code, upload HTML/CSS/JS files, and preview your project. Tap the preview to open fullscreen.</p>
+
+<label>Live Preview — Tap to Open Fullscreen</label>
+<div class="preview-wrapper" id="previewWrapper">
+<button class="preview-action" id="fullscreenPreview" type="button">⛶ Fullscreen</button>
+<iframe id="codePreview" class="preview-frame" title="Live code preview" sandbox="allow-scripts"></iframe>
+<div class="preview-hint" id="previewHint">👆 Tap here to open fullscreen preview</div>
+</div>
+
+<label for="codeFiles">Upload HTML, CSS or JavaScript files</label>
+<input type="file" id="codeFiles" accept=".html,.htm,.css,.js,text/html,text/css,text/javascript,application/javascript" multiple>
+<p class="desc">Select your HTML file and any CSS or JavaScript files it needs.</p>
+<div class="result file-list" id="uploadedFiles">No files selected.</div>
+
+<label for="codeInput">HTML / CSS / JavaScript Editor</label>
+<textarea id="codeInput" style="min-height:220px;font-family:monospace" spellcheck="false" placeholder="<!DOCTYPE html>
 <html>
-<body>
-<h1>Hello RexWeb!</h1>
-</body>
+<head><title>My Project</title></head>
+<body><h1>Hello RexWeb!</h1></body>
 </html>"></textarea>
-<div class="row"><button class="btn" id="runCode">▶ Run Preview</button><button class="btn alt" id="copyCode">Copy Code</button><button class="btn alt" id="clearCode">Clear</button></div>
-<iframe id="codePreview" title="Code preview" sandbox="allow-scripts" style="width:100%;height:220px;background:white;border:1px solid var(--border);border-radius:9px;margin-top:12px"></iframe>
+
+<div class="row">
+<button class="btn" id="runCode">▶ Run Preview</button>
+<button class="btn alt" id="copyCode">Copy Code</button>
+<button class="btn alt" id="clearCode">Clear Editor</button>
+<button class="btn alt" id="clearFiles">Remove Files</button>
+</div>
+<div class="result" id="codeStatus">Ready to preview your project.</div>
 </div>
 </article>
 
 <!-- URL CONVERTER -->
-<article class="tool-card" data-name="url encoder decoder links">
-<div class="tool-heading"><span class="tool-icon">🔗</span><h3>URL Encoder / Decoder</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse URL Encoder / Decoder">⌄</button></div>
+<article class="tool-card collapsed" data-name="url encoder decoder links">
+<div class="tool-heading"><span class="tool-icon">🔗</span><h3>URL Encoder / Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand URL Encoder / Decoder">+</button></div>
 <div class="tool-content">
 <p class="desc">Encode or decode URL text.</p>
 <textarea id="urlInput" placeholder="Enter text..."></textarea>
@@ -224,8 +264,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- COLOR PICKER -->
-<article class="tool-card" data-name="color picker hex rgb colour design">
-<div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Picker</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Color Picker">⌄</button></div>
+<article class="tool-card collapsed" data-name="color picker hex rgb colour design">
+<div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Picker</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Picker">+</button></div>
 <div class="tool-content">
 <p class="desc">Select a color and obtain HEX and RGB values.</p>
 <input type="color" id="colorInput" value="#00c8ff">
@@ -235,8 +275,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- AGE CALCULATOR -->
-<article class="tool-card" data-name="age calculator date birthday">
-<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Age Calculator">⌄</button></div>
+<article class="tool-card collapsed" data-name="age calculator date birthday">
+<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Age Calculator">+</button></div>
 <div class="tool-content">
 <p class="desc">Calculate age from a date of birth.</p>
 <label>Date of birth</label><input type="date" id="birthDate">
@@ -246,8 +286,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- NUMBER BASE CONVERTER -->
-<article class="tool-card" data-name="number base binary decimal hexadecimal converter">
-<div class="tool-heading"><span class="tool-icon">🔢</span><h3>Number Base Converter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Number Base Converter">⌄</button></div>
+<article class="tool-card collapsed" data-name="number base binary decimal hexadecimal converter">
+<div class="tool-heading"><span class="tool-icon">🔢</span><h3>Number Base Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Number Base Converter">+</button></div>
 <div class="tool-content">
 <p class="desc">Convert whole numbers between binary, octal, decimal, and hexadecimal.</p>
 <label>Number</label><input id="baseInput" placeholder="Example: 1010">
@@ -259,8 +299,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- TEXT REVERSER -->
-<article class="tool-card" data-name="text reverse letters">
-<div class="tool-heading"><span class="tool-icon">🔄</span><h3>Text Reverser</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse Text Reverser">⌄</button></div>
+<article class="tool-card collapsed" data-name="text reverse letters">
+<div class="tool-heading"><span class="tool-icon">🔄</span><h3>Text Reverser</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Text Reverser">+</button></div>
 <div class="tool-content">
 <p class="desc">Reverse the order of characters in text.</p>
 <textarea id="reverseInput" placeholder="Enter text..."></textarea>
@@ -270,8 +310,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- HTML FORMATTER -->
-<article class="tool-card" data-name="html formatter code developer">
-<div class="tool-heading"><span class="tool-icon">🧩</span><h3>HTML Formatter</h3><button class="tool-toggle" aria-expanded="true" aria-label="Collapse HTML Formatter">⌄</button></div>
+<article class="tool-card collapsed" data-name="html formatter code developer">
+<div class="tool-heading"><span class="tool-icon">🧩</span><h3>HTML Formatter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Formatter">+</button></div>
 <div class="tool-content">
 <p class="desc">Format basic HTML with indentation for easier reading.</p>
 <textarea id="htmlInput" style="font-family:monospace" placeholder="<div><h1>Hello</h1></div>"></textarea>
@@ -283,11 +323,24 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </main>
 
-<footer><div class="container">
+<footer>
+<div class="container">
 <strong>RexWeb Nexora</strong>
 <p style="margin-top:8px">Explore · Create · Grow</p>
 <p style="margin-top:8px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
-</div></footer>
+</div>
+</footer>
+
+<!-- FULLSCREEN PREVIEW -->
+<div id="previewFullscreen" class="fullscreen-overlay">
+<div class="fullscreen-layout">
+<div class="fullscreen-header">
+<strong>💻 RexWeb Live Preview</strong>
+<button id="closeFullscreen" class="close-preview">✕ Close</button>
+</div>
+<iframe id="fullscreenFrame" class="fullscreen-frame" title="Fullscreen code preview" sandbox="allow-scripts"></iframe>
+</div>
+</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -314,9 +367,14 @@ if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle"))$("sideMenu").c
 /* EXPAND / COLLAPSE */
 document.querySelectorAll(".tool-card").forEach(card=>{
 const btn=card.querySelector(".tool-toggle");
+card.classList.add("collapsed");
+btn.textContent="+";
+btn.setAttribute("aria-expanded","false");
+btn.setAttribute("aria-label","Expand "+card.querySelector("h3").textContent);
+
 btn.onclick=()=>{
 const collapsed=card.classList.toggle("collapsed");
-btn.textContent=collapsed?"+":"⌄";
+btn.textContent=collapsed?"+":"−";
 btn.setAttribute("aria-expanded",String(!collapsed));
 btn.setAttribute("aria-label",(collapsed?"Expand ":"Collapse ")+card.querySelector("h3").textContent);
 };
@@ -337,53 +395,106 @@ try{
 await navigator.clipboard.writeText(value);
 show(id,"Copied successfully!");
 }catch(e){
-const t=document.createElement("textarea");t.value=value;
-document.body.appendChild(t);t.select();
-const ok=document.execCommand("copy");t.remove();
+const t=document.createElement("textarea");
+t.value=value;
+document.body.appendChild(t);
+t.select();
+const ok=document.execCommand("copy");
+t.remove();
 show(id,ok?"Copied successfully!":"Copy manually, please.");
 }
 }
 
 /* SCIENTIFIC CALCULATOR */
 let lastAnswer=0;
-$("calcDisplay").addEventListener("keydown",e=>{if(e.key==="Enter")$("calcEquals").click()});
-document.querySelectorAll("[data-calc]").forEach(b=>{
-b.onclick=()=>{$("calcDisplay").value+=b.dataset.calc;$("calcDisplay").focus()};
+$("calcDisplay").addEventListener("keydown",e=>{
+if(e.key==="Enter")$("calcEquals").click();
 });
-$("calcClear").onclick=()=>{$("calcDisplay").value="";show("calcResult","Cleared.")};
+document.querySelectorAll("[data-calc]").forEach(b=>{
+b.onclick=()=>{
+$("calcDisplay").value+=b.dataset.calc;
+$("calcDisplay").focus();
+};
+});
+$("calcClear").onclick=()=>{
+$("calcDisplay").value="";
+show("calcResult","Cleared.");
+};
 $("calcBack").onclick=()=>$("calcDisplay").value=$("calcDisplay").value.slice(0,-1);
 
 function factorial(n){
 if(!Number.isInteger(n)||n<0||n>170)throw Error("Factorial needs a whole number from 0 to 170.");
-let r=1;for(let i=2;i<=n;i++)r*=i;return r;
+let r=1;
+for(let i=2;i<=n;i++)r*=i;
+return r;
 }
+
 function sciCalc(source){
 let s=source.replace(/\s/g,"").replace(/π/g,"pi");
 if(!s||s.length>180)throw Error("Enter a valid expression.");
 if(!/^[0-9+\-*/().%^!,a-zA-Z]+$/.test(s))throw Error("Unsupported character.");
+
 const tokens=s.match(/sin|cos|tan|sqrt|log|ln|pi|Ans|e|[0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?|[()+\-*/%^!]/gi)||[];
 if(tokens.join("")!==s)throw Error("Check the expression.");
+
 let i=0;
-function expr(){let x=term();while(tokens[i]==="+"||tokens[i]==="-"){let op=tokens[i++],y=term();x=op==="+"?x+y:x-y}return x}
-function term(){let x=unary();while(["*","/","%"].includes(tokens[i])){let op=tokens[i++],y=unary();if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");x=op==="*"?x*y:op==="/"?x/y:x%y}return x}
-function unary(){if(tokens[i]==="+"){i++;return unary()}if(tokens[i]==="-"){i++;return-unary()}return power()}
-function power(){let x=atom();if(tokens[i]==="^"){i++;x=Math.pow(x,unary())}while(tokens[i]==="!"){i++;x=factorial(x)}return x}
+function expr(){
+let x=term();
+while(tokens[i]==="+"||tokens[i]==="-"){
+let op=tokens[i++],y=term();
+x=op==="+"?x+y:x-y;
+}
+return x;
+}
+function term(){
+let x=unary();
+while(["*","/","%"].includes(tokens[i])){
+let op=tokens[i++],y=unary();
+if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");
+x=op==="*"?x*y:op==="/"?x/y:x%y;
+}
+return x;
+}
+function unary(){
+if(tokens[i]==="+"){i++;return unary()}
+if(tokens[i]==="-"){i++;return-unary()}
+return power();
+}
+function power(){
+let x=atom();
+if(tokens[i]==="^"){i++;x=Math.pow(x,unary())}
+while(tokens[i]==="!"){i++;x=factorial(x)}
+return x;
+}
 function atom(){
 let t=tokens[i++];
-if(t==="("){let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");return x}
+if(t==="("){
+let x=expr();
+if(tokens[i++]!==")")throw Error("Check brackets.");
+return x;
+}
 if(/^\d/.test(t||""))return Number(t);
 if(t==="pi")return Math.PI;
 if(t==="e")return Math.E;
 if(t==="Ans")return lastAnswer;
+
 if(["sin","cos","tan","sqrt","log","ln"].includes(t)){
 if(tokens[i++]!=="(")throw Error("Use function(argument).");
-let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");
+let x=expr();
+if(tokens[i++]!==")")throw Error("Check brackets.");
 if(t==="sin")return Math.sin(x*Math.PI/180);
 if(t==="cos")return Math.cos(x*Math.PI/180);
 if(t==="tan")return Math.tan(x*Math.PI/180);
-if(t==="sqrt"){if(x<0)throw Error("Square root requires a non-negative number.");return Math.sqrt(x)}
-if(t==="log"){if(x<=0)throw Error("Log requires a positive number.");return Math.log10(x)}
-if(x<=0)throw Error("Natural log requires a positive number.");return Math.log(x);
+if(t==="sqrt"){
+if(x<0)throw Error("Square root requires a non-negative number.");
+return Math.sqrt(x);
+}
+if(t==="log"){
+if(x<=0)throw Error("Log requires a positive number.");
+return Math.log10(x);
+}
+if(x<=0)throw Error("Natural log requires a positive number.");
+return Math.log(x);
 }
 throw Error("Check the expression.");
 }
@@ -391,9 +502,15 @@ const result=expr();
 if(i<tokens.length||!Number.isFinite(result))throw Error("Invalid expression.");
 return result;
 }
+
 $("calcEquals").onclick=()=>{
-try{lastAnswer=sciCalc($("calcDisplay").value);$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));show("calcResult","Answer: "+$("calcDisplay").value)}
-catch(e){show("calcResult",e.message||"Invalid expression.")}
+try{
+lastAnswer=sciCalc($("calcDisplay").value);
+$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));
+show("calcResult","Answer: "+$("calcDisplay").value);
+}catch(e){
+show("calcResult",e.message||"Invalid expression.");
+}
 };
 
 /* ADVANCED TEXT COUNTER */
@@ -407,6 +524,7 @@ const paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
 const lines=t?t.split(/\n/).length:0;
 const reading=Math.ceil(words/200);
 const speaking=Math.ceil(words/130);
+
 show("wordResult",
 "Words: "+words+
 "\nCharacters (with spaces): "+chars+
@@ -417,7 +535,10 @@ show("wordResult",
 "\nEstimated reading time: "+reading+" min"+
 "\nEstimated speaking time: "+speaking+" min");
 });
-$("clearText").onclick=()=>{$("wordInput").value="";$("wordInput").dispatchEvent(new Event("input"))};
+$("clearText").onclick=()=>{
+$("wordInput").value="";
+$("wordInput").dispatchEvent(new Event("input"));
+};
 $("copyText").onclick=()=>copyValue($("wordInput").value,"wordResult");
 
 /* CASE CONVERTER */
@@ -428,8 +549,9 @@ if(b.dataset.case==="lower")t=t.toLowerCase();
 if(b.dataset.case==="title")t=t.toLowerCase().replace(/\b\p{L}/gu,m=>m.toUpperCase());
 if(b.dataset.case==="sentence")t=t.toLowerCase().replace(/(^\s*\p{L}|[.!?]\s+\p{L})/gu,m=>m.toUpperCase());
 $("caseInput").value=t;
+show("caseResult","Text converted successfully.");
 });
-$("copyCase").onclick=()=>copyValue($("caseInput").value,"caseInput");
+$("copyCase").onclick=()=>copyValue($("caseInput").value,"caseResult");
 
 /* PASSWORD GENERATOR */
 $("passLength").oninput=()=>$("passLengthLabel").textContent=$("passLength").value;
@@ -437,33 +559,180 @@ $("generatePass").onclick=()=>{
 let chars="abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
 if($("passNumbers").checked)chars+="23456789";
 if($("passSymbols").checked)chars+="!@#$%^&*()-_=+?";
+const length=+$("passLength").value;
 if(!chars){show("passResult","Choose at least one character type.");return}
-const arr=new Uint32Array(48);crypto.getRandomValues(arr);
-let p="";for(let i=0;i<+$("passLength").value;i++)p+=chars[arr[i]%chars.length];
+const arr=new Uint32Array(length);
+crypto.getRandomValues(arr);
+let p="";
+for(let i=0;i<length;i++)p+=chars[arr[i]%chars.length];
 show("passResult",p);
 };
 $("copyPass").onclick=()=>copyValue($("passResult").textContent,"passResult");
 
-/* CODE BOARD */
-$("runCode").onclick=()=>{
-const preview=$("codePreview");
-preview.srcdoc=$("codeInput").value;
-};
-$("copyCode").onclick=()=>copyValue($("codeInput").value,"codeInput");
-$("clearCode").onclick=()=>{$("codeInput").value="";$("codePreview").srcdoc=""};
+/* ADVANCED CODE BOARD */
+let uploadedCodeFiles={};
+let fullscreenOpen=false;
+let previousBodyOverflow="";
 
-/* URL ENCODER */
+function buildPreview(){
+let html=$("codeInput").value.trim();
+
+if(!html){
+html="<!DOCTYPE html><html><body>"+
+"<h2 style='font-family:Arial;text-align:center;margin-top:60px'>"+
+"Welcome to RexWeb Code Board</h2>"+
+"<p style='text-align:center'>Write or upload code to begin.</p>"+
+"</body></html>";
+}
+
+const css=Object.entries(uploadedCodeFiles)
+.filter(([name])=>/\.css$/i.test(name))
+.map(([,content])=>content).join("\n");
+
+const js=Object.entries(uploadedCodeFiles)
+.filter(([name])=>/\.js$/i.test(name))
+.map(([,content])=>content).join("\n");
+
+const safeCSS=css.replace(/<\/style/gi,"<\\/style");
+const safeJS=js.replace(/<\/script/gi,"<\\/script");
+
+const styles=css?"<style>\n"+safeCSS+"\n</style>":"";
+const scripts=js?"<script>\n"+safeJS+"\n<\/script>":"";
+
+if(styles){
+if(/<\/head\s*>/i.test(html)){
+html=html.replace(/<\/head\s*>/i,styles+"\n</head>");
+}else{
+html=styles+html;
+}
+}
+
+if(scripts){
+if(/<\/body\s*>/i.test(html)){
+html=html.replace(/<\/body\s*>/i,scripts+"\n</body>");
+}else{
+html+=scripts;
+}
+}
+return html;
+}
+
+function runCodePreview(){
+const html=buildPreview();
+$("codePreview").srcdoc=html;
+if(fullscreenOpen)$("fullscreenFrame").srcdoc=html;
+show("codeStatus","Preview updated successfully.");
+}
+
+$("runCode").onclick=runCodePreview;
+
+$("codeInput").addEventListener("input",()=>{
+show("codeStatus","Code changed. Tap Run Preview to update.");
+});
+
+/* UPLOAD HTML, CSS AND JS */
+$("codeFiles").addEventListener("change",async function(){
+const files=Array.from(this.files||[]);
+if(!files.length)return;
+
+try{
+const loaded={};
+for(const file of files){
+if(/\.(html?|css|js)$/i.test(file.name)){
+loaded[file.name]=await file.text();
+}
+}
+
+uploadedCodeFiles=loaded;
+
+const htmlEntry=Object.entries(loaded).find(([name])=>/\.html?$/i.test(name));
+if(htmlEntry)$("codeInput").value=htmlEntry[1];
+
+const names=Object.keys(loaded);
+show("uploadedFiles",names.length?
+"Loaded files:\n"+names.join("\n"):
+"No supported HTML, CSS or JavaScript files found.");
+
+runCodePreview();
+}catch(error){
+show("uploadedFiles","Could not read the selected files.");
+}
+});
+
+/* FULLSCREEN PREVIEW */
+function openFullscreenPreview(){
+if(fullscreenOpen)return;
+
+previousBodyOverflow=document.body.style.overflow;
+$("previewFullscreen").style.display="block";
+document.body.style.overflow="hidden";
+$("fullscreenFrame").srcdoc=buildPreview();
+fullscreenOpen=true;
+
+try{
+history.pushState({rexwebPreview:true},"");
+}catch(e){}
+}
+
+function closeFullscreenPreview(){
+if(!fullscreenOpen)return;
+
+$("previewFullscreen").style.display="none";
+document.body.style.overflow=previousBodyOverflow;
+$("fullscreenFrame").srcdoc="";
+fullscreenOpen=false;
+
+if(history.state&&history.state.rexwebPreview){
+history.back();
+}
+}
+
+$("fullscreenPreview").onclick=openFullscreenPreview;
+$("previewHint").onclick=openFullscreenPreview;
+$("closeFullscreen").onclick=closeFullscreenPreview;
+
+window.addEventListener("popstate",()=>{
+if(fullscreenOpen){
+$("previewFullscreen").style.display="none";
+document.body.style.overflow=previousBodyOverflow;
+$("fullscreenFrame").srcdoc="";
+fullscreenOpen=false;
+}
+});
+
+$("copyCode").onclick=()=>copyValue($("codeInput").value,"codeStatus");
+
+$("clearCode").onclick=()=>{
+$("codeInput").value="";
+runCodePreview();
+};
+
+$("clearFiles").onclick=()=>{
+uploadedCodeFiles={};
+$("codeFiles").value="";
+show("uploadedFiles","No files selected.");
+runCodePreview();
+};
+
+runCodePreview();
+
+/* URL ENCODER / DECODER */
 $("urlEncode").onclick=()=>show("urlResult",encodeURIComponent($("urlInput").value));
 $("urlDecode").onclick=()=>{
-try{show("urlResult",decodeURIComponent($("urlInput").value))}
-catch(e){show("urlResult","Invalid encoded text.")}
+try{
+show("urlResult",decodeURIComponent($("urlInput").value));
+}catch(e){
+show("urlResult","Invalid encoded text.");
+}
 };
 $("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
 
 /* COLOR PICKER */
 function updateColor(){
 const hex=$("colorInput").value.toUpperCase();
-const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+const r=parseInt(hex.slice(1,3),16);
+const g=parseInt(hex.slice(3,5),16);
+const b=parseInt(hex.slice(5,7),16);
 show("colorResult",`HEX: ${hex}\nRGB: ${r}, ${g}, ${b}`);
 }
 $("colorInput").oninput=updateColor;
@@ -471,49 +740,110 @@ $("copyColor").onclick=()=>copyValue($("colorInput").value.toUpperCase(),"colorR
 
 /* AGE CALCULATOR */
 $("birthDate").max=new Date().toISOString().slice(0,10);
+
 $("ageBtn").onclick=()=>{
 const value=$("birthDate").value;
-if(!value){show("ageResult","Select your date of birth.");return}
-const birth=new Date(value+"T00:00:00"),now=new Date();
-if(Number.isNaN(birth.getTime())||birth>now){show("ageResult","Choose a valid past date.");return}
+if(!value){
+show("ageResult","Select your date of birth.");
+return;
+}
+
+const birth=new Date(value+"T00:00:00");
+const now=new Date();
+
+if(Number.isNaN(birth.getTime())||birth>now){
+show("ageResult","Choose a valid past date.");
+return;
+}
+
 let y=now.getFullYear()-birth.getFullYear();
 let m=now.getMonth()-birth.getMonth();
 let d=now.getDate()-birth.getDate();
-if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate()}
-if(m<0){y--;m+=12}
+
+if(d<0){
+m--;
+d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();
+}
+if(m<0){
+y--;
+m+=12;
+}
+
 show("ageResult",`Age: ${y} years, ${m} months, ${d} days.`);
 };
 
 /* NUMBER BASE CONVERTER */
 $("convertBase").onclick=()=>{
-const raw=$("baseInput").value.trim(),base=+$("baseFrom").value;
-if(!raw||! /^[+-]?[0-9a-f]+$/i.test(raw)){show("baseResult","Enter a valid whole number.");return}
+const raw=$("baseInput").value.trim();
+const base=+$("baseFrom").value;
+
+if(!raw||!/^[+-]?[0-9a-f]+$/i.test(raw)){
+show("baseResult","Enter a valid whole number.");
+return;
+}
+
+const digits=raw.replace(/^[+-]/,"");
+const validDigits={
+2:/^[01]+$/,
+8:/^[0-7]+$/,
+10:/^[0-9]+$/,
+16:/^[0-9a-f]+$/i
+};
+
+if(!validDigits[base].test(digits)){
+show("baseResult","The number contains digits invalid for the selected base.");
+return;
+}
+
 const n=parseInt(raw,base);
-if(!Number.isSafeInteger(n)){show("baseResult","Invalid number or value too large.");return}
-show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);
+if(!Number.isSafeInteger(n)){
+show("baseResult","Invalid number or value too large.");
+return;
+}
+
+show("baseResult",
+`Binary: ${n.toString(2)}\n`+
+`Octal: ${n.toString(8)}\n`+
+`Decimal: ${n}\n`+
+`Hexadecimal: ${n.toString(16).toUpperCase()}`);
 };
 
 /* TEXT REVERSER */
-$("reverseBtn").onclick=()=>show("reverseResult",Array.from($("reverseInput").value).reverse().join("")||"Enter text first.");
+$("reverseBtn").onclick=()=>{
+show("reverseResult",Array.from($("reverseInput").value).reverse().join("")||"Enter text first.");
+};
 $("copyReverse").onclick=()=>copyValue($("reverseResult").textContent,"reverseResult");
 
 /* HTML FORMATTER */
 $("formatHtml").onclick=()=>{
 const src=$("htmlInput").value;
-if(!src.trim()){show("htmlResult","Paste some HTML first.");return}
+if(!src.trim()){
+show("htmlResult","Paste some HTML first.");
+return;
+}
+
 const tokens=src.replace(/>\s*</g,">\n<").split("\n").map(x=>x.trim()).filter(Boolean);
 let depth=0,out=[];
+
 for(const t of tokens){
 if(/^<\//.test(t))depth=Math.max(0,depth-1);
 out.push("  ".repeat(depth)+t);
-if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&!/^<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i.test(t)&&!/^<\//.test(t)&&! /\/>$/.test(t))depth++;
+
+if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&
+!/^<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i.test(t)&&
+!/^<\//.test(t)&&! /\/>$/.test(t)){
+depth++;
 }
+}
+
 show("htmlResult",out.join("\n"));
 };
+
 $("copyHtml").onclick=()=>copyValue($("htmlResult").textContent,"htmlResult");
 
 /* FOOTER */
 $("year").textContent=new Date().getFullYear();
 </script>
+
 </body>
 </html>
