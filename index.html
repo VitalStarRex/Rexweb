@@ -3,66 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080b18" id="themeColor">
+<meta name="theme-color" content="#050b19" id="themeColor">
 
-<title>RexWeb Nexora — Your Digital Universe</title>
-<meta name="description" content="Explore RexWeb Nexora for online tools, website themes, ebooks, games, and digital products.">
+<title>RexWeb Nexora | Your Digital World</title>
+<meta name="description" content="Explore digital tools, website templates, themes, ebooks, games, and creative resources at RexWeb Nexora.">
 
 <style>
-/* ==================================
-   1. THEME VARIABLES
-================================== */
-
 :root {
-  color-scheme: dark;
-  --bg: #080b18;
-  --header: rgba(8,11,24,.96);
-  --card: #11162a;
-  --card-hover: #191e38;
-  --text: #f5f7ff;
-  --muted: #9ba6c5;
-  --purple: #9865ff;
-  --cyan: #36e5f5;
-  --border: rgba(152,101,255,.25);
-  --shadow: rgba(86,51,180,.2);
+  --bg: #030918;
+  --surface: #071327;
+  --card: #081629;
+  --text: #f4f7ff;
+  --muted: #b5c4dd;
+  --border: #1e3b60;
+  --blue: #00c8ff;
+  --purple: #8650ff;
+  --pink: #ff43c6;
+  --green: #00e7b0;
+  --orange: #ff9b43;
+  --shadow: 0 12px 35px rgba(0,0,0,.25);
 }
 
 html[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f4f6ff;
-  --header: rgba(255,255,255,.96);
+  --bg: #f2f6ff;
+  --surface: #ffffff;
   --card: #ffffff;
-  --card-hover: #edf0ff;
-  --text: #17152b;
-  --muted: #626b85;
-  --purple: #7048e8;
-  --cyan: #008da5;
-  --border: rgba(112,72,232,.23);
-  --shadow: rgba(60,45,120,.1);
+  --text: #101b32;
+  --muted: #52627c;
+  --border: #d4e0f4;
+  --shadow: 0 12px 35px rgba(24,48,90,.09);
 }
 
-/* ==================================
-   2. GLOBAL STYLES
-================================== */
-
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 120px;
+  scroll-padding-top: 100px;
 }
 
 body {
-  min-height: 100vh;
-  overflow-x: hidden;
-  font-family: Arial, Helvetica, sans-serif;
-  color: var(--text);
   background: var(--bg);
-  transition: background .25s, color .25s;
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background .3s, color .3s;
+  overflow-x: hidden;
 }
 
 a {
@@ -72,391 +60,229 @@ a {
 
 button {
   font: inherit;
-  -webkit-tap-highlight-color: transparent;
   cursor: pointer;
 }
 
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--cyan);
-  outline-offset: 3px;
-}
-
 .container {
-  width: min(1200px, 100%);
+  width: min(1200px, 92%);
   margin: auto;
-  padding-left: 22px;
-  padding-right: 22px;
 }
 
-/* ==================================
-   3. TOP HEADER
-================================== */
+/* HEADER */
 
-.site-header {
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 1000;
+}
+
+.topbar {
+  min-height: 72px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 15px;
-  padding: 12px 18px;
-  background: var(--header);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--border);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   flex-shrink: 0;
-  color: var(--text);
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: -.5px;
-  white-space: nowrap;
 }
 
-.brand-icon {
+.brand-logo {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00c8ff, #7250ff);
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
   color: white;
-  background: linear-gradient(135deg,#9865ff,#36e5f5);
-  box-shadow: 0 0 20px var(--shadow);
+  font-size: 25px;
+  font-weight: 900;
+  box-shadow: 0 0 22px #087bff35;
+}
+
+.brand-name {
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: -.8px;
 }
 
 .brand-name span {
-  color: var(--purple);
+  color: var(--blue);
+}
+
+.brand small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 3px;
+  letter-spacing: 1px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 9px;
-  flex-shrink: 0;
+  gap: 12px;
 }
 
-.header-icon {
+.theme-btn,
+.menu-btn,
+.search-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  color: var(--text);
-  background: var(--card);
-  font-size: 18px;
-  transition: .2s;
+  font-size: 21px;
 }
 
-.header-icon:hover {
-  border-color: var(--cyan);
-  transform: translateY(-2px);
+.theme-btn:hover,
+.menu-btn:hover,
+.search-btn:hover {
+  border-color: var(--blue);
 }
 
-/* ==================================
-   4. HORIZONTAL NAVIGATION ROW
-================================== */
-
-.main-nav {
-  position: relative;
-  z-index: 900;
+.header-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  overflow-x: auto;
+  justify-content: center;
+  gap: 28px;
+}
+
+.header-nav a {
+  padding: 12px 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: bold;
   white-space: nowrap;
-  background: var(--header);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid transparent;
+}
+
+.header-nav a:hover,
+.header-nav a.active {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+/* SECOND NAVIGATION ROW */
+
+.category-nav {
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
   scrollbar-width: none;
 }
 
-.main-nav::-webkit-scrollbar {
+.category-nav::-webkit-scrollbar {
   display: none;
 }
 
-.nav-btn {
-  display: inline-flex;
+.category-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  min-width: max-content;
+}
+
+.category-link {
+  width: 145px;
+  min-height: 72px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex: 0 0 auto;
-  padding: 10px 14px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  color: var(--muted);
-  background: transparent;
-  font-size: 12px;
-  font-weight: 800;
-  transition: .2s;
-}
-
-.nav-btn:hover,
-.nav-btn.active {
-  color: var(--text);
-  background: var(--card);
-  border-color: var(--border);
-}
-
-.nav-btn.active {
-  box-shadow: inset 0 -2px var(--purple);
-}
-
-/* ==================================
-   5. SLIDING MENU
-================================== */
-
-.menu-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1998;
-  background: rgba(0,0,0,.65);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .25s, visibility .25s;
-}
-
-.menu-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.menu-panel {
-  position: fixed;
-  z-index: 1999;
-  top: 0;
-  right: 0;
-  width: min(370px, 88vw);
-  height: 100vh;
-  height: 100dvh;
-  padding: 24px 18px;
-  overflow-y: auto;
-  color: var(--text);
-  background: var(--bg);
-  border-left: 1px solid var(--border);
-  box-shadow: -15px 0 50px rgba(0,0,0,.3);
-  transform: translateX(105%);
-  visibility: hidden;
-  transition: transform .3s ease, visibility .3s;
-}
-
-.menu-panel.open {
-  transform: translateX(0);
-  visibility: visible;
-}
-
-.menu-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.menu-eyebrow {
-  color: var(--purple);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.menu-heading h2 {
-  margin-top: 7px;
-  font-size: 25px;
-}
-
-.close-menu {
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  background: var(--card);
-  font-size: 18px;
-}
-
-.menu-link {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 15px 12px;
-  margin-bottom: 9px;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  color: var(--text);
-  background: var(--card);
-  transition: .2s;
-}
-
-.menu-link:hover {
-  border-color: var(--purple);
-  transform: translateX(-3px);
-  background: var(--card-hover);
-}
-
-.menu-link-icon {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: rgba(152,101,255,.12);
-  font-size: 20px;
-}
-
-.menu-link-content {
-  flex: 1;
-}
-
-.menu-link strong {
-  display: block;
-  margin-bottom: 5px;
+  gap: 7px;
   font-size: 13px;
+  font-weight: bold;
+  transition: .25s;
 }
 
-.menu-link small {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.5;
+.category-link .icon {
+  font-size: 24px;
 }
 
-.menu-arrow {
-  color: var(--cyan);
+.category-link:hover {
+  transform: translateY(-3px);
+  border-color: var(--blue);
+  box-shadow: 0 5px 20px #00c8ff17;
 }
 
-.menu-footer {
-  padding-top: 20px;
-  margin-top: 20px;
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-body.menu-open {
-  overflow: hidden;
-}
-
-/* ==================================
-   6. HERO SECTION
-================================== */
+/* HERO */
 
 .hero {
-  position: relative;
+  min-height: 355px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 460px;
-  padding: 75px 20px;
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
-  text-align: center;
+  background:
+    linear-gradient(90deg, #030918 0%, #030918ed 34%, #03091845 75%),
+    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=85")
+    center 48% / cover no-repeat;
 }
 
-.hero::before,
-.hero::after {
-  content: "";
-  position: absolute;
-  width: 310px;
-  height: 310px;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: .17;
-  pointer-events: none;
-}
-
-.hero::before {
-  top: -150px;
-  left: -100px;
-  background: var(--purple);
-}
-
-.hero::after {
-  right: -120px;
-  bottom: -150px;
-  background: var(--cyan);
+html[data-theme="light"] .hero {
+  background:
+    linear-gradient(90deg, #f2f6ff 0%, #f2f6ffe8 34%, #f2f6ff35 100%),
+    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=85")
+    center 48% / cover no-repeat;
 }
 
 .hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 820px;
-  animation: heroEnter .8s ease both;
-}
-
-@keyframes heroEnter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  padding: 45px 0;
+  max-width: 570px;
 }
 
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  margin-bottom: 24px;
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  color: var(--cyan);
-  background: var(--card);
-  font-size: 10px;
+  display: inline-block;
+  border: 1px solid var(--blue);
+  border-radius: 30px;
+  padding: 8px 14px;
+  color: var(--blue);
+  font-size: 11px;
   font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #42e89b;
-  box-shadow: 0 0 10px #42e89b;
+  letter-spacing: 1.5px;
+  margin-bottom: 17px;
 }
 
 .hero h1 {
-  margin-bottom: 22px;
-  font-size: clamp(36px,7vw,76px);
-  line-height: 1.07;
+  font-size: clamp(36px, 5vw, 57px);
+  line-height: 1.08;
   font-weight: 900;
-  letter-spacing: -3px;
+  letter-spacing: -2px;
+  margin-bottom: 16px;
 }
 
 .gradient-text {
-  color: var(--purple);
-  background: linear-gradient(100deg,var(--purple),var(--cyan));
+  background: linear-gradient(90deg, #00c8ff, #a45bff, #ff43c6);
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .hero p {
-  max-width: 600px;
-  margin: auto;
   color: var(--muted);
   font-size: 15px;
-  line-height: 1.9;
+  line-height: 1.8;
+  max-width: 470px;
 }
 
 .hero-buttons {
   display: flex;
+  gap: 12px;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 13px;
-  margin-top: 30px;
+  margin-top: 23px;
 }
 
 .btn {
@@ -464,238 +290,225 @@ body.menu-open {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  min-height: 47px;
   padding: 13px 21px;
+  border-radius: 13px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 900;
-  transition: .2s;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px var(--shadow);
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  transition: .25s;
 }
 
 .btn-primary {
   color: white;
   border: none;
-  background: linear-gradient(110deg,#8755ef,#5b80ff,#20bfd8);
+  background: linear-gradient(110deg, #008dff, #7545ff);
+  box-shadow: 0 8px 24px #4c51ff28;
 }
 
-.btn-secondary {
-  color: var(--text);
-  background: var(--card);
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
 }
 
-/* ==================================
-   7. SECTION HEADINGS
-================================== */
+/* SECTION HEADINGS */
 
 .section {
-  padding-top: 38px;
-  padding-bottom: 38px;
+  padding: 38px 0 12px;
 }
 
 .section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 18px;
-  margin-bottom: 25px;
+  margin-bottom: 23px;
 }
 
 .section-label {
-  margin-bottom: 10px;
-  color: var(--purple);
-  font-size: 10px;
+  color: var(--blue);
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 2px;
+  margin-bottom: 9px;
 }
 
 .section-heading h2 {
-  font-size: clamp(24px,4vw,34px);
-  letter-spacing: -1px;
+  font-size: clamp(25px, 4vw, 34px);
+  margin-bottom: 8px;
+  letter-spacing: -.7px;
 }
 
-.section-description {
-  margin-top: 9px;
+.section-heading p {
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-.view-all {
-  flex-shrink: 0;
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 800;
-}
+/* FEATURE CARDS */
 
-/* ==================================
-   8. CATEGORY CARDS
-================================== */
-
-.category-grid {
+.cards-grid {
   display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
-.category-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 215px;
-  padding: 23px;
+.feature-card {
+  min-width: 0;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 15px;
+  overflow: hidden;
   background: var(--card);
-  transition: transform .25s,border-color .25s,background .25s;
+  transition: transform .25s, border-color .25s, box-shadow .25s;
 }
 
-.category-card:hover {
+.feature-card:hover {
   transform: translateY(-5px);
-  border-color: var(--purple);
-  background: var(--card-hover);
+  border-color: var(--accent, var(--blue));
+  box-shadow: var(--shadow);
 }
 
-.category-icon {
+.card-image {
+  height: 155px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #102d52, #261052);
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform .4s;
+}
+
+.feature-card:hover .card-image img {
+  transform: scale(1.06);
+}
+
+.card-image::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(3,9,24,.85));
+}
+
+.card-icon {
+  position: absolute;
+  z-index: 2;
+  left: 15px;
+  bottom: -1px;
+  transform: translateY(0);
+  width: 47px;
+  height: 47px;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: linear-gradient(135deg,rgba(152,101,255,.2),rgba(54,229,245,.1));
+  border-radius: 50%;
+  background: var(--accent, var(--blue));
+  color: white;
+  border: 3px solid var(--card);
   font-size: 23px;
 }
 
-.category-card h3 {
-  margin-bottom: 9px;
-  font-size: 17px;
+.card-body {
+  padding: 15px 16px 17px;
 }
 
-.category-card p {
-  flex: 1;
-  margin-bottom: 20px;
+.card-body h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.card-body p {
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 42px;
 }
 
 .card-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--cyan);
-  font-size: 11px;
+  display: inline-block;
+  margin-top: 13px;
+  color: var(--accent, var(--blue));
+  font-size: 13px;
   font-weight: 900;
 }
 
-/* ==================================
-   9. FEATURE BANNER
-================================== */
+/* FEATURE BANNER */
 
-.feature-banner {
+.cta-banner {
+  margin: 32px 0;
+  padding: 25px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 25px;
-  padding: 34px;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 16px;
   background:
-    radial-gradient(ellipse at 90% 10%,rgba(54,229,245,.13),transparent 40%),
-    radial-gradient(ellipse at 10% 90%,rgba(152,101,255,.2),transparent 45%),
-    var(--card);
+    radial-gradient(ellipse at 10% 120%, #6240ff26, transparent 45%),
+    var(--surface);
+  box-shadow: var(--shadow);
 }
 
-.feature-banner h2 {
-  margin-bottom: 12px;
-  font-size: clamp(23px,4vw,34px);
-}
-
-.feature-banner p {
-  max-width: 560px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-.feature-symbol {
-  flex-shrink: 0;
-  font-size: 75px;
-  filter: drop-shadow(0 0 20px var(--shadow));
-}
-
-/* ==================================
-   10. MARKETPLACE PREVIEW
-================================== */
-
-.marketplace-grid {
-  display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
+.cta-main {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
-.market-card {
-  display: block;
-  padding: 23px;
-  border: 1px solid var(--border);
-  border-radius: 17px;
-  background: var(--card);
-  transition: .2s;
+.rocket {
+  font-size: 47px;
 }
 
-.market-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--cyan);
+.cta-banner h2 {
+  font-size: 20px;
+  margin-bottom: 7px;
 }
 
-.market-card .emoji {
-  margin-bottom: 15px;
-  font-size: 29px;
-}
-
-.market-card h3 {
-  margin-bottom: 9px;
-  font-size: 16px;
-}
-
-.market-card p {
+.cta-banner p {
+  font-size: 13px;
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
+  line-height: 1.6;
 }
 
-/* ==================================
-   11. FOOTER
-================================== */
+.stats {
+  display: flex;
+  gap: 23px;
+  flex-wrap: wrap;
+}
 
-.site-footer {
-  margin-top: 35px;
-  padding: 32px 0;
+.stat strong {
+  display: block;
+  font-size: 21px;
+  margin-bottom: 4px;
+}
+
+.stat span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* FOOTER */
+
+footer {
+  margin-top: 30px;
   border-top: 1px solid var(--border);
-  background: var(--header);
+  background: var(--surface);
 }
 
 .footer-inner {
+  padding: 25px 0;
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.footer-brand {
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.footer-brand span {
-  color: var(--purple);
+.footer-inner p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
 }
 
 .footer-links {
@@ -706,188 +519,324 @@ body.menu-open {
 
 .footer-links a {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .footer-links a:hover {
-  color: var(--cyan);
+  color: var(--blue);
 }
 
-.copyright {
-  width: 100%;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+/* SLIDE MENU */
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,.65);
+  opacity: 0;
+  visibility: hidden;
+  transition: .25s;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -340px;
+  width: min(320px, 85vw);
+  height: 100dvh;
+  z-index: 2001;
+  padding: 23px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  transition: right .3s ease;
+  overflow-y: auto;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+.menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.menu-top h2 {
+  font-size: 20px;
+}
+
+.close-menu {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 39px;
+  height: 39px;
+  color: var(--text);
+  font-size: 23px;
+}
+
+.side-menu > p {
   color: var(--muted);
-  text-align: center;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 17px;
 }
 
-/* ==================================
-   12. MOBILE RESPONSIVENESS
-================================== */
+.side-menu a {
+  display: block;
+  padding: 14px 12px;
+  margin-bottom: 7px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
 
-@media(max-width:900px) {
-  .site-header {
-    gap: 9px;
-    padding: 10px;
+.side-menu a:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+/* SEARCH */
+
+.search-box {
+  display: none;
+  padding: 0 0 12px;
+}
+
+.search-box.open {
+  display: block;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--blue);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .header-nav {
+    gap: 17px;
   }
 
-  .brand {
-    font-size: 13px;
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-image {
+    height: 190px;
+  }
+}
+
+@media (max-width: 650px) {
+  .topbar {
+    min-height: 65px;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    width: 37px;
+    height: 37px;
+    font-size: 22px;
+  }
+
+  .brand-name {
+    font-size: 19px;
+  }
+
+  .brand small {
+    font-size: 8px;
+  }
+
+  .header-actions {
     gap: 6px;
   }
 
-  .brand-icon {
-    width: 30px;
-    height: 30px;
+  .theme-btn,
+  .menu-btn,
+  .search-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 10px;
   }
 
-  .nav-btn {
-    padding: 9px 10px;
+  .header-nav {
+    justify-content: flex-start;
+    gap: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .header-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-nav a {
+    font-size: 12px;
+    padding: 12px 0;
+  }
+
+  .category-row {
+    gap: 9px;
+    padding: 10px 0;
+  }
+
+  .category-link {
+    width: 112px;
+    min-height: 65px;
     font-size: 11px;
   }
 
-  .header-icon {
-    width: 35px;
-    height: 35px;
-  }
-}
-
-@media(max-width:650px) {
-  .site-header {
-    padding: 10px 11px;
-  }
-
-  .brand {
-    font-size: 12px;
-  }
-
-  .brand-icon {
-    width: 29px;
-    height: 29px;
-    font-size: 12px;
-  }
-
-  .header-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 16px;
-  }
-
-  .main-nav {
-    gap: 5px;
-    padding: 10px;
-  }
-
-  .nav-btn {
-    padding: 9px 10px;
-    font-size: 10px;
+  .category-link .icon {
+    font-size: 21px;
   }
 
   .hero {
-    min-height: 400px;
-    padding: 65px 17px;
+    min-height: 380px;
+    background-position: 58% center;
+  }
+
+  .hero-content {
+    padding: 36px 0;
   }
 
   .hero h1 {
-    letter-spacing: -1.7px;
+    font-size: 39px;
+    letter-spacing: -1.5px;
   }
 
   .hero p {
-    font-size: 13px;
+    font-size: 14px;
+    max-width: 350px;
   }
 
-  .container {
-    padding-left: 15px;
-    padding-right: 15px;
+  .btn {
+    padding: 12px 15px;
+    font-size: 12px;
   }
 
   .section {
     padding-top: 30px;
-    padding-bottom: 30px;
   }
 
-  .category-grid {
-    grid-template-columns: repeat(2,minmax(0,1fr));
+  .cards-grid {
     gap: 11px;
   }
 
-  .category-card {
-    min-height: 205px;
-    padding: 15px;
+  .card-image {
+    height: 125px;
   }
 
-  .category-icon {
-    width: 41px;
-    height: 41px;
-    margin-bottom: 15px;
-    font-size: 20px;
+  .card-icon {
+    width: 39px;
+    height: 39px;
+    font-size: 19px;
+    left: 10px;
   }
 
-  .category-card h3 {
-    font-size: 14px;
+  .card-body {
+    padding: 13px 11px 14px;
   }
 
-  .category-card p {
+  .card-body h3 {
+    font-size: 15px;
+  }
+
+  .card-body p {
+    font-size: 12px;
+    min-height: 58px;
+  }
+
+  .card-link {
     font-size: 11px;
+    line-height: 1.6;
   }
 
-  .feature-banner {
-    padding: 22px;
+  .cta-banner {
+    padding: 18px;
   }
 
-  .feature-symbol {
-    font-size: 42px;
+  .rocket {
+    font-size: 35px;
   }
 
-  .marketplace-grid {
-    grid-template-columns: repeat(2,minmax(0,1fr));
-    gap: 11px;
+  .cta-banner h2 {
+    font-size: 17px;
   }
 
-  .market-card {
-    padding: 15px;
+  .stats {
+    gap: 17px;
+    width: 100%;
+  }
+
+  .stat strong {
+    font-size: 18px;
   }
 
   .footer-inner {
-    flex-direction: column;
     align-items: flex-start;
+    flex-direction: column;
   }
 }
 
-@media(max-width:370px) {
-  .brand {
-    font-size: 10px;
+@media (max-width: 370px) {
+  .brand-name {
+    font-size: 16px;
   }
 
-  .nav-btn {
-    padding: 8px;
-    font-size: 9px;
+  .brand-logo {
+    width: 33px;
+    height: 33px;
   }
 
   .header-actions {
-    gap: 5px;
+    gap: 4px;
   }
 
-  .header-icon {
-    width: 31px;
-    height: 31px;
+  .theme-btn,
+  .menu-btn,
+  .search-btn {
+    width: 32px;
+    height: 32px;
   }
 
-  .category-card {
-    padding: 12px;
+  .hero h1 {
+    font-size: 33px;
   }
 
-  .feature-symbol {
-    display: none;
+  .card-image {
+    height: 105px;
   }
 }
 
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
     scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
   }
 }
 </style>
@@ -895,221 +844,83 @@ body.menu-open {
 
 <body>
 
-<!-- ==================================
-     TOP HEADER
-================================== -->
+<header>
+  <div class="container topbar">
 
-<header class="site-header">
+    <a href="index.html" class="brand" aria-label="RexWeb Nexora Home">
+      <div class="brand-logo">R</div>
+      <div>
+        <div class="brand-name">Rex<span>Web</span></div>
+        <small>Explore · Create · Grow</small>
+      </div>
+    </a>
 
-  <a href="index.html" class="brand" aria-label="RexWeb Nexora home">
-    <span class="brand-icon">R✦</span>
-    <span class="brand-name">REXWEB <span>NEXORA</span></span>
-  </a>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="index.html" class="active">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="themes.html">Themes</a>
+      <a href="ebooks.html">Ebooks</a>
+      <a href="games.html">Games</a>
+      <a href="marketplace.html">Marketplace</a>
+    </nav>
 
-  <div class="header-actions">
+    <div class="header-actions">
+      <button class="theme-btn" id="themeToggle"
+        aria-label="Switch colour theme" title="Switch theme">☀️</button>
 
-    <button
-      class="header-icon"
-      id="themeToggle"
-      type="button"
-      aria-label="Switch to light theme"
-      title="Switch theme">
-      ☀️
-    </button>
+      <button class="search-btn" id="searchToggle"
+        aria-label="Open search" title="Search">⌕</button>
 
-    <button
-      class="header-icon"
-      id="menuToggle"
-      type="button"
-      aria-label="Open navigation menu"
-      aria-controls="menuPanel"
-      aria-expanded="false">
-      ☰
-    </button>
+      <button class="menu-btn" id="menuToggle"
+        aria-label="Open menu" aria-expanded="false" title="Menu">☰</button>
+    </div>
+  </div>
 
+  <div class="container search-box" id="searchBox">
+    <input type="search" id="siteSearch"
+      placeholder="Search digital tools, games, templates..."
+      aria-label="Search RexWeb Nexora">
+  </div>
+
+  <div class="category-nav">
+    <div class="container category-row">
+      <a class="category-link" href="index.html">
+        <span class="icon">⌂</span>Home
+      </a>
+
+      <a class="category-link" href="tools.html">
+        <span class="icon">🛠️</span>Tools
+      </a>
+
+      <a class="category-link" href="themes.html">
+        <span class="icon">🎨</span>Themes
+      </a>
+
+      <a class="category-link" href="ebooks.html">
+        <span class="icon">📚</span>Ebooks
+      </a>
+
+      <a class="category-link" href="games.html">
+        <span class="icon">🎮</span>Games
+      </a>
+
+      <a class="category-link" href="marketplace.html">
+        <span class="icon">🛍️</span>Marketplace
+      </a>
+
+      <a class="category-link" href="templates.html">
+        <span class="icon">💻</span>Web Templates
+      </a>
+    </div>
   </div>
 </header>
 
-<!-- ==================================
-     NAVIGATION ROW
-================================== -->
+<!-- HERO -->
 
-<nav class="main-nav" aria-label="Main navigation">
-
-  <a href="index.html" class="nav-btn active">🏠 Home</a>
-
-  <a href="tools.html" class="nav-btn">🛠️ Tools</a>
-
-  <a href="themes.html" class="nav-btn">🎨 Themes</a>
-
-  <a href="ebooks.html" class="nav-btn">📚 Ebooks</a>
-
-  <a href="games.html" class="nav-btn">🎮 Games</a>
-
-  <a href="marketplace.html" class="nav-btn">🛍️ Marketplace</a>
-
-</nav>
-
-<!-- ==================================
-     MENU OVERLAY
-================================== -->
-
-<div class="menu-overlay" id="menuOverlay"></div>
-
-<!-- ==================================
-     SLIDING MENU PANEL
-================================== -->
-
-<aside
-  class="menu-panel"
-  id="menuPanel"
-  aria-label="More navigation options"
-  aria-hidden="true"
-  inert>
-
-  <div class="menu-heading">
-
-    <div>
-      <div class="menu-eyebrow">REXWEB NEXORA</div>
-      <h2>Explore More</h2>
-    </div>
-
-    <button
-      class="close-menu"
-      id="closeMenu"
-      type="button"
-      aria-label="Close menu">
-      ✕
-    </button>
-
-  </div>
-
-  <a href="https://vitalstar.web.app/" class="menu-link">
-
-    <span class="menu-link-icon">⭐</span>
-
-    <span class="menu-link-content">
-      <strong>Enter VitalStar</strong>
-      <small>Visit the VitalStar platform</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="#explore" class="menu-link">
-
-    <span class="menu-link-icon">🌌</span>
-
-    <span class="menu-link-content">
-      <strong>Explore Nexora</strong>
-      <small>Discover all our sections</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="login.html" class="menu-link">
-
-    <span class="menu-link-icon">🔑</span>
-
-    <span class="menu-link-content">
-      <strong>Login</strong>
-      <small>Access your account</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="register.html" class="menu-link">
-
-    <span class="menu-link-icon">👤</span>
-
-    <span class="menu-link-content">
-      <strong>Register</strong>
-      <small>Create a new account</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="about.html" class="menu-link">
-
-    <span class="menu-link-icon">ℹ️</span>
-
-    <span class="menu-link-content">
-      <strong>About RexWeb</strong>
-      <small>Learn about our platform</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="contact.html" class="menu-link">
-
-    <span class="menu-link-icon">💬</span>
-
-    <span class="menu-link-content">
-      <strong>Contact Us</strong>
-      <small>Get in touch with us</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="privacy.html" class="menu-link">
-
-    <span class="menu-link-icon">🔒</span>
-
-    <span class="menu-link-content">
-      <strong>Privacy Policy</strong>
-      <small>Learn about your privacy</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <a href="terms.html" class="menu-link">
-
-    <span class="menu-link-icon">📄</span>
-
-    <span class="menu-link-content">
-      <strong>Terms &amp; Conditions</strong>
-      <small>Read our platform terms</small>
-    </span>
-
-    <span class="menu-arrow">↗</span>
-
-  </a>
-
-  <div class="menu-footer">
-    REXWEB NEXORA · YOUR DIGITAL UNIVERSE
-  </div>
-
-</aside>
-
-<!-- ==================================
-     MAIN HOMEPAGE
-================================== -->
-
-<main>
-
-  <!-- HERO -->
-
-  <section class="hero" id="home">
-
+<section class="hero">
+  <div class="container">
     <div class="hero-content">
-
-      <div class="eyebrow">
-        <span class="status-dot"></span>
-        WELCOME TO THE NEXORA UNIVERSE
-      </div>
+      <div class="eyebrow">WELCOME TO REXWEB NEXORA</div>
 
       <h1>
         YOUR DIGITAL WORLD.<br>
@@ -1118,440 +929,398 @@ body.menu-open {
 
       <p>
         Discover powerful tools, stunning themes, digital ebooks,
-        exciting games, and creative resources—all in one destination.
-        Welcome to RexWeb Nexora.
+        exciting games, website templates, and creative resources
+        —all in one destination. Welcome to RexWeb Nexora.
       </p>
 
       <div class="hero-buttons">
-
-        <a href="#explore" class="btn btn-primary">
-          EXPLORE NEXORA ↗
+        <a class="btn btn-primary" href="#explore">
+          Explore Now <span>↗</span>
         </a>
 
-        <a href="https://vitalstar.web.app/" class="btn btn-secondary">
-          ⭐ ENTER VITALSTAR
+        <a class="btn" href="https://vitalstar.web.app/">
+          ⭐ Enter VitalStar
         </a>
-
       </div>
-
     </div>
-
-  </section>
-
-  <!-- EXPLORE CATEGORIES -->
-
-  <section class="section container" id="explore">
-
-    <div class="section-heading">
-
-      <div>
-        <div class="section-label">EXPLORE THE PLATFORM</div>
-
-        <h2>Discover Your Universe</h2>
-
-        <p class="section-description">
-          Your favourite digital experiences, organized in one place.
-        </p>
-      </div>
-
-    </div>
-
-    <div class="category-grid">
-
-      <a href="tools.html" class="category-card">
-
-        <div class="category-icon">🛠️</div>
-
-        <h3>Online Tools</h3>
-
-        <p>
-          Explore useful online utilities designed to make
-          everyday digital tasks easier.
-        </p>
-
-        <div class="card-link">
-          EXPLORE TOOLS <span>↗</span>
-        </div>
-
-      </a>
-
-      <a href="themes.html" class="category-card">
-
-        <div class="category-icon">🎨</div>
-
-        <h3>Themes &amp; Designs</h3>
-
-        <p>
-          Discover attractive website themes, visual designs,
-          and customization resources.
-        </p>
-
-        <div class="card-link">
-          VIEW THEMES <span>↗</span>
-        </div>
-
-      </a>
-
-      <a href="ebooks.html" class="category-card">
-
-        <div class="category-icon">📚</div>
-
-        <h3>Digital Ebooks</h3>
-
-        <p>
-          Explore ebooks, educational resources, and digital
-          reading materials.
-        </p>
-
-        <div class="card-link">
-          EXPLORE EBOOKS <span>↗</span>
-        </div>
-
-      </a>
-
-      <a href="games.html" class="category-card">
-
-        <div class="category-icon">🎮</div>
-
-        <h3>Gaming Zone</h3>
-
-        <p>
-          Discover browser games, explore different genres,
-          and find your next gaming experience.
-        </p>
-
-        <div class="card-link">
-          PLAY GAMES <span>↗</span>
-        </div>
-
-      </a>
-
-      <a href="marketplace.html" class="category-card">
-
-        <div class="category-icon">🛍️</div>
-
-        <h3>Marketplace</h3>
-
-        <p>
-          Browse digital products, creative resources,
-          and useful downloads.
-        </p>
-
-        <div class="card-link">
-          VISIT MARKETPLACE <span>↗</span>
-        </div>
-
-      </a>
-
-      <a href="https://vitalstar.web.app/" class="category-card">
-
-        <div class="category-icon">⭐</div>
-
-        <h3>VitalStar</h3>
-
-        <p>
-          Visit your VitalStar platform and explore another
-          part of your digital universe.
-        </p>
-
-        <div class="card-link">
-          ENTER VITALSTAR <span>↗</span>
-        </div>
-
-      </a>
-
-    </div>
-
-  </section>
-
-  <!-- FEATURE BANNER -->
-
-  <section class="section container">
-
-    <div class="feature-banner">
-
-      <div>
-
-        <div class="section-label">
-          YOUR NEXT EXPERIENCE STARTS HERE
-        </div>
-
-        <h2>Ready to Explore Nexora?</h2>
-
-        <p>
-          Whether you want useful tools, fresh website designs,
-          digital reading, or exciting games, your next discovery
-          is only a click away.
-        </p>
-
-        <div class="hero-buttons" style="justify-content:flex-start;margin-top:22px;">
-
-          <a href="games.html" class="btn btn-primary">
-            🎮 ENTER GAMING ZONE
-          </a>
-
-        </div>
-
-      </div>
-
-      <div class="feature-symbol" aria-hidden="true">🌌</div>
-
-    </div>
-
-  </section>
-
-  <!-- MARKETPLACE PREVIEW -->
-
-  <section class="section container" id="marketplace-preview">
-
-    <div class="section-heading">
-
-      <div>
-
-        <div class="section-label">DIGITAL DISCOVERIES</div>
-
-        <h2>Explore the Marketplace</h2>
-
-        <p class="section-description">
-          Discover digital resources and creative possibilities.
-        </p>
-
-      </div>
-
-      <a href="marketplace.html" class="view-all">
-        VIEW ALL ↗
-      </a>
-
-    </div>
-
-    <div class="marketplace-grid">
-
-      <a href="themes.html" class="market-card">
-
-        <div class="emoji">🖥️</div>
-
-        <h3>Website Resources</h3>
-
-        <p>
-          Explore website themes, templates, and design inspiration.
-        </p>
-
-      </a>
-
-      <a href="ebooks.html" class="market-card">
-
-        <div class="emoji">📖</div>
-
-        <h3>Reading Collection</h3>
-
-        <p>
-          Find ebooks and educational digital resources.
-        </p>
-
-      </a>
-
-      <a href="games.html" class="market-card">
-
-        <div class="emoji">🕹️</div>
-
-        <h3>Gaming Collection</h3>
-
-        <p>
-          Explore available games and interactive experiences.
-        </p>
-
-      </a>
-
-    </div>
-
-  </section>
-
-</main>
-
-<!-- ==================================
-     FOOTER
-================================== -->
-
-<footer class="site-footer">
-
-  <div class="container footer-inner">
-
-    <a href="index.html" class="footer-brand">
-      REXWEB <span>NEXORA</span> 🌌
-    </a>
-
-    <div class="footer-links">
-
-      <a href="index.html">Home</a>
-
-      <a href="about.html">About</a>
-
-      <a href="contact.html">Contact</a>
-
-      <a href="privacy.html">Privacy Policy</a>
-
-      <a href="terms.html">Terms &amp; Conditions</a>
-
-    </div>
-
-    <div class="copyright">
-      © <span id="currentYear"></span> RexWeb Nexora.
-      All rights reserved.
-    </div>
-
+  </div>
+</section>
+
+<!-- EXPLORE CATEGORIES -->
+
+<section class="section container" id="explore">
+  <div class="section-heading">
+    <div class="section-label">EXPLORE THE PLATFORM</div>
+    <h2>Discover Your Universe</h2>
+    <p>Your favourite digital experiences, organized in one place.</p>
   </div>
 
+  <div class="cards-grid" id="featureGrid">
+
+    <!-- DIGITAL TOOLS -->
+
+    <article class="feature-card" style="--accent:#00c8ff">
+      <a href="tools.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=80"
+            alt="Laptop displaying digital tools and a development workspace"
+            loading="lazy">
+          <div class="card-icon">🛠️</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Digital Tools</h3>
+          <p>Useful online utilities to make your digital life easier.</p>
+          <span class="card-link">Explore Tools →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- WEB TEMPLATES -->
+
+    <article class="feature-card" style="--accent:#a56aff">
+      <a href="templates.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=700&q=80"
+            alt="Website templates displayed on a computer screen"
+            loading="lazy">
+          <div class="card-icon">💻</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Web Templates</h3>
+          <p>Modern, responsive templates for your next website project.</p>
+          <span class="card-link">Browse Templates →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- THEMES -->
+
+    <article class="feature-card" style="--accent:#ff43c6">
+      <a href="themes.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80"
+            alt="Colourful digital design and creative technology"
+            loading="lazy">
+          <div class="card-icon">🎨</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Themes &amp; Designs</h3>
+          <p>Beautiful themes, designs, and customization resources.</p>
+          <span class="card-link">View Themes →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- EBOOKS -->
+
+    <article class="feature-card" style="--accent:#00e7b0">
+      <a href="ebooks.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=700&q=80"
+            alt="Bookshelves filled with books in a library"
+            loading="lazy">
+          <div class="card-icon">📖</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Digital Ebooks</h3>
+          <p>Explore ebooks, educational resources, and more.</p>
+          <span class="card-link">Explore Ebooks →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- GAMES -->
+
+    <article class="feature-card" style="--accent:#ff9b43">
+      <a href="games.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=700&q=80"
+            alt="Gaming equipment and a colourful gaming setup"
+            loading="lazy">
+          <div class="card-icon">🎮</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Gaming Zone</h3>
+          <p>Discover browser games, explore different genres, and play.</p>
+          <span class="card-link">Play Games →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- MARKETPLACE -->
+
+    <article class="feature-card" style="--accent:#00c8ff">
+      <a href="marketplace.html">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=700&q=80"
+            alt="Shopping bags and products in a retail marketplace"
+            loading="lazy">
+          <div class="card-icon">🛍️</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Marketplace</h3>
+          <p>Browse digital products, creative resources, and downloads.</p>
+          <span class="card-link">Visit Marketplace →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- VITALSTAR -->
+
+    <article class="feature-card" style="--accent:#8a5bff">
+      <a href="https://vitalstar.web.app/">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=700&q=80"
+            alt="Stars and a colourful galaxy representing VitalStar"
+            loading="lazy">
+          <div class="card-icon">⭐</div>
+        </div>
+
+        <div class="card-body">
+          <h3>VitalStar</h3>
+          <p>Explore another part of your digital universe.</p>
+          <span class="card-link">Enter VitalStar →</span>
+        </div>
+      </a>
+    </article>
+
+    <!-- COMMUNITY -->
+
+    <article class="feature-card" style="--accent:#ff43c6">
+      <a href="https://vitalstar.web.app/">
+        <div class="card-image">
+          <img
+            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80"
+            alt="Friends enjoying time together as a community"
+            loading="lazy">
+          <div class="card-icon">👥</div>
+        </div>
+
+        <div class="card-body">
+          <h3>Community</h3>
+          <p>Connect, share ideas, discover people, and grow together.</p>
+          <span class="card-link">Discover Community →</span>
+        </div>
+      </a>
+    </article>
+
+  </div>
+</section>
+
+<!-- CALL TO ACTION -->
+
+<div class="container">
+  <section class="cta-banner">
+    <div class="cta-main">
+      <div class="rocket">🚀</div>
+      <div>
+        <h2>Your Next Adventure Starts Here.</h2>
+        <p>Explore. Create. Discover. All in one place.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <strong>7+</strong>
+        <span>Digital Categories</span>
+      </div>
+
+      <div class="stat">
+        <strong>∞</strong>
+        <span>Possibilities</span>
+      </div>
+    </div>
+
+    <a class="btn btn-primary" href="#explore">
+      Explore Now →
+    </a>
+  </section>
+</div>
+
+<!-- FOOTER -->
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <a href="index.html" class="brand">
+        <div class="brand-logo">R</div>
+        <div>
+          <div class="brand-name">Rex<span>Web</span></div>
+          <small>Explore · Create · Grow</small>
+        </div>
+      </a>
+
+      <p style="margin-top:12px">
+        © <span id="year"></span> RexWeb Nexora. All rights reserved.
+      </p>
+    </div>
+
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="https://vitalstar.web.app/">VitalStar</a>
+    </nav>
+  </div>
 </footer>
 
-<!-- ==================================
-     JAVASCRIPT
-================================== -->
+<!-- SLIDE-OUT MENU -->
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<aside class="side-menu" id="sideMenu"
+  aria-label="Additional navigation" aria-hidden="true" inert>
+
+  <div class="menu-top">
+    <h2>🚀 RexWeb Menu</h2>
+    <button class="close-menu" id="closeMenu"
+      aria-label="Close menu">×</button>
+  </div>
+
+  <p>Explore more of the RexWeb Nexora universe.</p>
+
+  <a href="index.html">🏠 Home</a>
+  <a href="tools.html">🛠️ Digital Tools</a>
+  <a href="templates.html">💻 Web Templates</a>
+  <a href="themes.html">🎨 Themes &amp; Designs</a>
+  <a href="ebooks.html">📚 Digital Ebooks</a>
+  <a href="games.html">🎮 Gaming Zone</a>
+  <a href="marketplace.html">🛍️ Marketplace</a>
+  <a href="https://vitalstar.web.app/">⭐ Enter VitalStar</a>
+
+  <hr style="border:0;border-top:1px solid var(--border);margin:18px 0">
+
+  <a href="about.html">ℹ️ About RexWeb</a>
+  <a href="contact.html">✉️ Contact</a>
+  <a href="login.html">🔐 Login</a>
+  <a href="register.html">👤 Register</a>
+  <a href="privacy.html">🔒 Privacy Policy</a>
+  <a href="terms.html">📄 Terms &amp; Conditions</a>
+</aside>
 
 <script>
-(function () {
-  "use strict";
+/* THEME SWITCH */
 
-  const root = document.documentElement;
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
+const themeColor = document.getElementById("themeColor");
 
-  const themeToggle = document.getElementById("themeToggle");
-  const themeColor = document.getElementById("themeColor");
+function applyTheme(theme) {
+  root.setAttribute("data-theme", theme);
 
-  const menuToggle = document.getElementById("menuToggle");
-  const menuPanel = document.getElementById("menuPanel");
-  const menuOverlay = document.getElementById("menuOverlay");
-  const closeMenu = document.getElementById("closeMenu");
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  themeToggle.setAttribute(
+    "aria-label",
+    theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+  );
 
-  /* ==============================
-     THEME SWITCH
-  ============================== */
-
-  function applyTheme(theme) {
-    const selectedTheme = theme === "light" ? "light" : "dark";
-
-    root.dataset.theme = selectedTheme;
-
-    const isLight = selectedTheme === "light";
-
-    themeToggle.textContent = isLight ? "🌙" : "☀️";
-
-    themeToggle.setAttribute(
-      "aria-label",
-      isLight ? "Switch to dark theme" : "Switch to light theme"
-    );
-
-    themeColor.setAttribute(
-      "content",
-      isLight ? "#f4f6ff" : "#080b18"
-    );
-
-    try {
-      localStorage.setItem("rexweb-theme", selectedTheme);
-    } catch (error) {
-      // Theme switching still works if storage is unavailable.
-    }
-  }
-
-  let savedTheme = "dark";
+  themeColor.content = theme === "dark" ? "#050b19" : "#f2f6ff";
 
   try {
-    savedTheme = localStorage.getItem("rexweb-theme") || "dark";
-  } catch (error) {
-    savedTheme = "dark";
+    localStorage.setItem("rexweb-theme", theme);
+  } catch (error) {}
+}
+
+let savedTheme = "dark";
+
+try {
+  savedTheme = localStorage.getItem("rexweb-theme") || "dark";
+} catch (error) {}
+
+applyTheme(savedTheme);
+
+themeToggle.addEventListener("click", () => {
+  const currentTheme = root.getAttribute("data-theme");
+  applyTheme(currentTheme === "dark" ? "light" : "dark");
+});
+
+/* SLIDE MENU */
+
+const menuToggle = document.getElementById("menuToggle");
+const closeMenu = document.getElementById("closeMenu");
+const sideMenu = document.getElementById("sideMenu");
+const menuOverlay = document.getElementById("menuOverlay");
+
+function openMenu() {
+  sideMenu.classList.add("open");
+  menuOverlay.classList.add("open");
+  sideMenu.setAttribute("aria-hidden", "false");
+  sideMenu.inert = false;
+  menuToggle.setAttribute("aria-expanded", "true");
+  document.body.classList.add("menu-open");
+  closeMenu.focus();
+}
+
+function hideMenu() {
+  sideMenu.classList.remove("open");
+  menuOverlay.classList.remove("open");
+  sideMenu.setAttribute("aria-hidden", "true");
+  sideMenu.inert = true;
+  menuToggle.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("menu-open");
+}
+
+menuToggle.addEventListener("click", openMenu);
+closeMenu.addEventListener("click", hideMenu);
+menuOverlay.addEventListener("click", hideMenu);
+
+sideMenu.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", hideMenu);
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") hideMenu();
+});
+
+/* SEARCH */
+
+const searchToggle = document.getElementById("searchToggle");
+const searchBox = document.getElementById("searchBox");
+const siteSearch = document.getElementById("siteSearch");
+
+searchToggle.addEventListener("click", () => {
+  searchBox.classList.toggle("open");
+
+  if (searchBox.classList.contains("open")) {
+    siteSearch.focus();
+  } else {
+    siteSearch.value = "";
+    filterCards("");
   }
+});
 
-  applyTheme(savedTheme);
+function filterCards(query) {
+  const cards = document.querySelectorAll(".feature-card");
+  const normalizedQuery = query.trim().toLowerCase();
 
-  themeToggle.addEventListener("click", function () {
-    applyTheme(
-      root.dataset.theme === "dark" ? "light" : "dark"
-    );
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(normalizedQuery) ? "" : "none";
   });
+}
 
-  /* ==============================
-     SLIDING MENU
-  ============================== */
+siteSearch.addEventListener("input", event => {
+  filterCards(event.target.value);
+});
 
-  let previousFocus = null;
+/* FOOTER YEAR */
 
-  function openMenu() {
-    previousFocus = document.activeElement;
-
-    menuPanel.classList.add("open");
-    menuOverlay.classList.add("open");
-
-    menuPanel.setAttribute("aria-hidden", "false");
-    menuPanel.removeAttribute("inert");
-
-    menuToggle.setAttribute("aria-expanded", "true");
-
-    document.body.classList.add("menu-open");
-
-    closeMenu.focus();
-  }
-
-  function hideMenu() {
-    menuPanel.classList.remove("open");
-    menuOverlay.classList.remove("open");
-
-    menuPanel.setAttribute("aria-hidden", "true");
-    menuPanel.setAttribute("inert", "");
-
-    menuToggle.setAttribute("aria-expanded", "false");
-
-    document.body.classList.remove("menu-open");
-
-    if (previousFocus) {
-      previousFocus.focus();
-    }
-  }
-
-  menuToggle.addEventListener("click", function () {
-    if (menuPanel.classList.contains("open")) {
-      hideMenu();
-    } else {
-      openMenu();
-    }
-  });
-
-  closeMenu.addEventListener("click", hideMenu);
-
-  menuOverlay.addEventListener("click", hideMenu);
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && menuPanel.classList.contains("open")) {
-      hideMenu();
-    }
-  });
-
-  menuPanel.querySelectorAll("a").forEach(function (link) {
-    link.addEventListener("click", function () {
-      hideMenu();
-    });
-  });
-
-  /* ==============================
-     CURRENT YEAR
-  ============================== */
-
-  document.getElementById("currentYear").textContent =
-    new Date().getFullYear();
-
-  /* ==============================
-     ACTIVE NAVIGATION
-  ============================== */
-
-  const currentPage =
-    window.location.pathname.split("/").pop() || "index.html";
-
-  document.querySelectorAll(".nav-btn").forEach(function (link) {
-    if (link.getAttribute("href") === currentPage) {
-      link.classList.add("active");
-    } else {
-      link.classList.remove("active");
-    }
-  });
-
-})();
+document.getElementById("year").textContent =
+  new Date().getFullYear();
 </script>
 
 </body>
