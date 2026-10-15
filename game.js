@@ -1,55 +1,50 @@
-/* =========================================================
-   REXWEB NEXORA — 20-GAME ARCADE
-   COMPLETE SELF-CONTAINED GAME.JS
-   ========================================================= */
+/* ==========================================================
+   REXWEB NEXORA — 10-GAME ARCADE
+   Complete self-contained game.js
+   Mobile + Desktop | No external libraries
+   ========================================================== */
 
 (() => {
   "use strict";
 
   const ROOT_ID = "nexora-games";
-  const SAVE_KEY = "rexweb_nexora_arcade_v1";
+  const SCORE_KEY = "rexweb_nexora_arcade_scores_v1";
 
-  const games = Object.create(null);
-  let root;
-  let currentGame = null;
-  let cleanupCurrent = () => {};
-  let gameToken = 0;
+  const root = document.getElementById(ROOT_ID);
 
-  const state = {
-    scores: {},
-    recent: [],
-    sound: false
-  };
-
-  /* roundRect fallback for older browsers */
-  if (
-    typeof CanvasRenderingContext2D !== "undefined" &&
-    !CanvasRenderingContext2D.prototype.roundRect
-  ) {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-      r = Math.max(0, Math.min(typeof r === "number" ? r : 0, w / 2, h / 2));
-      this.moveTo(x + r, y);
-      this.arcTo(x + w, y, x + w, y + h, r);
-      this.arcTo(x + w, y + h, x, y + h, r);
-      this.arcTo(x, y + h, x, y, r);
-      this.arcTo(x, y, x + w, y, r);
-      this.closePath();
-    };
+  if (!root) {
+    console.error("RexWeb Nexora: #nexora-games was not found.");
+    return;
   }
 
-  try {
-    const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
-    if (saved && typeof saved === "object") {
-      state.scores = saved.scores || {};
-      state.recent = Array.isArray(saved.recent) ? saved.recent : [];
-      state.sound = !!saved.sound;
-    }
-  } catch (_) {}
+  let cleanup = null;
+  let currentScore = 0;
+  let currentGame = "";
+  let gameToken = 0;
 
-  function save() {
+  function getScores() {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      return JSON.parse(localStorage.getItem(SCORE_KEY)) || {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveScore(name, score) {
+    const scores = getScores();
+    const value = Math.max(0, Math.floor(Number(score) || 0));
+
+    scores[name] = Math.max(scores[name] || 0, value);
+
+    try {
+      localStorage.setItem(SCORE_KEY, JSON.stringify(scores));
     } catch (_) {}
+
+    return scores[name];
+  }
+
+  function bestScore(name) {
+    return getScores()[name] || 0;
   }
 
   function escapeHTML(value) {
@@ -62,736 +57,541 @@
     })[char]);
   }
 
-  function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  const games = [
+    { id: "snake", name: "Snake", icon: "🐍", description: "Eat food and grow longer." },
+    { id: "tictactoe", name: "Tic-Tac-Toe", icon: "❌", description: "Beat the computer." },
+    { id: "pong", name: "Pong", icon: "🏓", description: "Return the bouncing ball." },
+    { id: "brick", name: "Brick Breaker", icon: "🧱", description: "Break every brick." },
+    { id: "runner", name: "Endless Runner", icon: "🏃", description: "Jump over obstacles." },
+    { id: "shooter", name: "Space Shooter", icon: "🚀", description: "Defend space from enemies." },
+    { id: "math", name: "Math Challenge", icon: "🧠", description: "Solve sums against the clock." },
+    { id: "rps", name: "Rock Paper Scissors", icon: "✊", description: "Challenge the computer." },
+    { id: "hangman", name: "Hangman", icon: "🔤", description: "Guess the hidden word." },
+    { id: "flappy", name: "Flappy Flyer", icon: "🐦", description: "Fly through the gaps." }
+  ];
 
-  function shuffle(array) {
-    const result = array.slice();
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = randomInt(0, i);
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-  }
-
-  function recordScore(id, score) {
-    score = Math.max(0, Math.floor(Number(score) || 0));
-    const previous = Number(state.scores[id]) || 0;
-
-    if (score > previous) {
-      state.scores[id] = score;
-      save();
-      return true;
-    }
-
-    return false;
-  }
-
-  function getBest(id) {
-    return Number(state.scores[id]) || 0;
-  }
-
-  function register(id, title, description, icon, category, start) {
-    games[id] = { id, title, description, icon, category, start };
-  }
-
-  /* ---------------------- STYLES ---------------------- */
-
-  const style = document.createElement("style");
-  style.textContent = `
-    #${ROOT_ID} {
+  const styles = `
+    #nexora-games {
       --nx-bg: #050914;
-      --nx-panel: #0c1427;
-      --nx-panel2: #111d35;
+      --nx-panel: #0b1427;
+      --nx-border: #263b5d;
       --nx-blue: #37b6ff;
       --nx-purple: #a78bfa;
       --nx-text: #f4f7ff;
       --nx-muted: #9eabc5;
       color: var(--nx-text);
-      background: var(--nx-bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 100vh;
+      font-family: system-ui, Arial, sans-serif;
       padding: 16px;
-      box-sizing: border-box;
-      isolation: isolate;
     }
 
-    #${ROOT_ID} *,
-    #${ROOT_ID} *::before,
-    #${ROOT_ID} *::after {
-      box-sizing: border-box;
+    #nexora-games * { box-sizing: border-box; }
+
+    #nexora-games .nx-shell {
+      max-width: 1150px;
+      margin: auto;
     }
 
-    #${ROOT_ID} button,
-    #${ROOT_ID} input,
-    #${ROOT_ID} select {
-      font: inherit;
-    }
-
-    #${ROOT_ID} button {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    #${ROOT_ID} .nx-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    #${ROOT_ID} .nx-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-
-    #${ROOT_ID} .nx-brand {
-      font-size: clamp(23px, 5vw, 35px);
-      font-weight: 900;
-      letter-spacing: -1px;
-      margin: 0;
-      background: linear-gradient(100deg, #fff, #65caff, #b5a0ff);
+    #nexora-games .nx-title {
+      text-align: center;
+      font-size: clamp(25px, 5vw, 38px);
+      font-weight: 950;
+      margin: 8px 0;
+      background: linear-gradient(90deg,#fff,#37b6ff,#a78bfa);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
-    #${ROOT_ID} .nx-tagline {
+    #nexora-games .nx-subtitle {
       color: var(--nx-muted);
-      margin: 4px 0 0;
+      text-align: center;
+      margin: 0 0 22px;
       font-size: 13px;
     }
 
-    #${ROOT_ID} .nx-panel {
-      background: linear-gradient(145deg, var(--nx-panel), #080e1d);
-      border: 1px solid #233451;
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 12px 40px #0004;
+    #nexora-games .nx-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 22px;
     }
 
-    #${ROOT_ID} .nx-hero {
-      padding: clamp(20px, 5vw, 36px);
-      margin-bottom: 20px;
-      background:
-        radial-gradient(ellipse at top right, #17457966, transparent 55%),
-        linear-gradient(140deg, #101c34, #080d1a);
-    }
-
-    #${ROOT_ID} .nx-hero h2 {
-      font-size: clamp(25px, 6vw, 42px);
-      margin: 0 0 8px;
-      line-height: 1.12;
-    }
-
-    #${ROOT_ID} .nx-hero p {
-      color: var(--nx-muted);
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    #${ROOT_ID} .nx-search {
-      width: 100%;
-      padding: 13px 15px;
-      background: #080f20;
-      color: white;
-      border: 1px solid #2b3c5b;
+    #nexora-games .nx-stat {
+      background: #101d34;
+      border: 1px solid var(--nx-border);
       border-radius: 12px;
-      outline: none;
-      margin: 0 0 15px;
+      padding: 11px 17px;
+      text-align: center;
+      min-width: 115px;
     }
 
-    #${ROOT_ID} .nx-search:focus {
-      border-color: var(--nx-blue);
-      box-shadow: 0 0 0 3px #37b6ff20;
+    #nexora-games .nx-stat strong {
+      display: block;
+      color: var(--nx-blue);
+      font-size: 21px;
     }
 
-    #${ROOT_ID} .nx-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-      gap: 13px;
-    }
-
-    #${ROOT_ID} .nx-card {
-      border: 1px solid #22314c;
-      border-radius: 16px;
-      background: linear-gradient(145deg, #111c31, #0a1120);
-      padding: 17px;
-      transition: transform .18s ease, border-color .18s ease;
-    }
-
-    #${ROOT_ID} .nx-card:hover {
-      transform: translateY(-3px);
-      border-color: #398fd1;
-    }
-
-    #${ROOT_ID} .nx-icon {
-      font-size: 34px;
-      margin-bottom: 9px;
-    }
-
-    #${ROOT_ID} .nx-card h3 {
-      margin: 0 0 7px;
-      font-size: 17px;
-    }
-
-    #${ROOT_ID} .nx-card p {
+    #nexora-games .nx-stat span {
       color: var(--nx-muted);
-      font-size: 13px;
-      line-height: 1.5;
-      min-height: 39px;
+      font-size: 11px;
+    }
+
+    #nexora-games .nx-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    @media(min-width:650px) {
+      #nexora-games .nx-grid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+    }
+
+    @media(min-width:950px) {
+      #nexora-games .nx-grid {
+        grid-template-columns: repeat(5, minmax(0,1fr));
+      }
+    }
+
+    #nexora-games .nx-card {
+      min-width: 0;
+      background: linear-gradient(145deg,#101d34,#091120);
+      border: 1px solid var(--nx-border);
+      border-radius: 17px;
+      padding: 17px 12px;
+      text-align: center;
+      transition: transform .18s,border-color .18s,box-shadow .18s;
+    }
+
+    #nexora-games .nx-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--nx-blue);
+      box-shadow: 0 8px 28px #168bff16;
+    }
+
+    #nexora-games .nx-icon { font-size: 38px; }
+
+    #nexora-games .nx-card h3 {
+      font-size: 15px;
+      margin: 9px 0 5px;
+    }
+
+    #nexora-games .nx-card p {
+      min-height: 34px;
+      color: var(--nx-muted);
+      font-size: 12px;
       margin: 0 0 12px;
     }
 
-    #${ROOT_ID} .nx-best {
-      font-size: 12px;
-      color: #82d6ff;
+    #nexora-games button {
+      font: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #nexora-games .nx-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #36577f;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: white;
+      background: #142844;
+      font-weight: 750;
+    }
+
+    #nexora-games .nx-btn:hover { border-color: var(--nx-blue); }
+
+    #nexora-games .nx-primary {
+      color: #06101f;
+      border-color: transparent;
+      background: linear-gradient(100deg,#37b6ff,#a78bfa);
+    }
+
+    #nexora-games .nx-wide { width: 100%; }
+
+    #nexora-games .nx-game-panel {
+      max-width: 850px;
+      margin: auto;
+      border: 1px solid var(--nx-border);
+      border-radius: 18px;
+      padding: 15px;
+      background: linear-gradient(145deg,#0c172b,#070d19);
+    }
+
+    #nexora-games .nx-game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
       margin-bottom: 12px;
     }
 
-    #${ROOT_ID} .nx-btn {
-      background: linear-gradient(100deg, #138ee5, #6555dd);
-      color: white;
-      border: 0;
-      border-radius: 11px;
-      padding: 11px 15px;
-      font-weight: 800;
-      min-height: 42px;
+    #nexora-games .nx-game-header h2 {
+      margin: 0;
+      font-size: 22px;
     }
 
-    #${ROOT_ID} .nx-btn:hover {
-      filter: brightness(1.13);
-    }
-
-    #${ROOT_ID} .nx-btn:focus-visible {
-      outline: 3px solid #8fdcff;
-      outline-offset: 3px;
-    }
-
-    #${ROOT_ID} .nx-btn-secondary {
-      background: #17243c;
-      border: 1px solid #344765;
-    }
-
-    #${ROOT_ID} .nx-btn-danger {
-      background: #6f2437;
-      border: 1px solid #a33d55;
-    }
-
-    #${ROOT_ID} .nx-hold {
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-      min-width: 90px;
-      min-height: 52px;
-    }
-
-    #${ROOT_ID} .nx-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin: 12px 0;
-    }
-
-    #${ROOT_ID} .nx-pad-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px auto;
-    }
-
-    #${ROOT_ID} .nx-pad-row button {
-      min-width: 62px;
-      min-height: 50px;
-      font-size: 19px;
-    }
-
-    #${ROOT_ID} .nx-game-title {
-      font-size: clamp(23px, 5vw, 34px);
-      margin: 0 0 5px;
-    }
-
-    #${ROOT_ID} .nx-muted {
+    #nexora-games .nx-instructions {
       color: var(--nx-muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 10px 0 15px;
     }
 
-    #${ROOT_ID} .nx-status {
-      padding: 12px;
-      background: #101c31;
-      border: 1px solid #263a5a;
-      border-radius: 12px;
-      margin: 12px 0;
-      line-height: 1.5;
-    }
-
-    #${ROOT_ID} .nx-canvas-wrap {
-      width: 100%;
-      max-width: 700px;
+    #nexora-games .nx-board {
       margin: 12px auto;
-      position: relative;
+      max-width: 100%;
     }
 
-    #${ROOT_ID} canvas {
+    #nexora-games .nx-canvas {
       display: block;
       width: 100%;
+      max-width: 620px;
       height: auto;
-      background: #060b16;
-      border: 1px solid #263a5a;
-      border-radius: 13px;
+      margin: auto;
+      background: #030813;
+      border: 1px solid #233957;
+      border-radius: 12px;
       touch-action: none;
     }
 
-    #${ROOT_ID} .nx-board {
-      display: grid;
-      gap: 7px;
-      max-width: 440px;
-      margin: 16px auto;
+    #nexora-games .nx-game-stats {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 10px 0;
     }
 
-    #${ROOT_ID} .nx-cell {
-      aspect-ratio: 1;
-      display: grid;
-      place-items: center;
-      border-radius: 9px;
-      background: #17243c;
-      border: 1px solid #344765;
-      color: white;
-      font-size: clamp(18px, 5vw, 30px);
+    #nexora-games .nx-pill {
+      background: #101f37;
+      border: 1px solid var(--nx-border);
+      border-radius: 10px;
+      padding: 8px 13px;
+      font-size: 13px;
+    }
+
+    #nexora-games .nx-pill strong { color: var(--nx-blue); }
+
+    #nexora-games .nx-controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 13px 0;
+    }
+
+    #nexora-games .nx-controls .nx-btn { min-width: 48px; }
+
+    #nexora-games .nx-message {
+      text-align: center;
       font-weight: 800;
-      min-width: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
+      min-height: 25px;
+      margin: 10px 0;
+      color: #9de8ff;
     }
 
-    #${ROOT_ID} .nx-cell:disabled {
-      cursor: default;
-      opacity: 1;
-    }
-
-    #${ROOT_ID} .nx-cell.nx-selected {
-      background: #17518b;
-      border-color: #66caff;
-    }
-
-    #${ROOT_ID} .nx-cell.nx-matched {
-      background: #124b3d;
-      border-color: #31d6a0;
-    }
-
-    #${ROOT_ID} .nx-cell.nx-x {
-      color: #67caff;
-    }
-
-    #${ROOT_ID} .nx-cell.nx-o {
-      color: #c3a5ff;
-    }
-
-    #${ROOT_ID} .nx-controls {
+    #nexora-games .nx-tic-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(55px, 78px));
+      grid-template-columns: repeat(3,minmax(0,100px));
       justify-content: center;
       gap: 8px;
-      margin: 14px auto;
+      margin: 20px auto;
     }
 
-    #${ROOT_ID} .nx-controls button {
-      min-height: 48px;
-      border-radius: 12px;
-      border: 1px solid #344765;
-      background: #17243c;
+    #nexora-games .nx-tic-cell {
+      height: 90px;
+      font-size: 34px;
+      font-weight: 900;
+      background: #101f37;
+      border: 1px solid #36577f;
+      border-radius: 13px;
       color: white;
-      font-size: 20px;
-      touch-action: manipulation;
     }
 
-    #${ROOT_ID} .nx-controls .nx-up {
-      grid-column: 2;
+    #nexora-games .nx-tic-cell:disabled { cursor: default; }
+
+    #nexora-games .nx-answer {
+      background: #0a1324;
+      border: 1px solid var(--nx-border);
+      border-radius: 12px;
+      padding: 13px;
+      color: white;
+      font-size: 21px;
+      width: 100%;
+      outline: none;
     }
 
-    #${ROOT_ID} .nx-controls .nx-left {
-      grid-column: 1;
+    #nexora-games .nx-answer:focus { border-color: var(--nx-blue); }
+
+    #nexora-games .nx-letter-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 15px 0;
     }
 
-    #${ROOT_ID} .nx-controls .nx-down {
-      grid-column: 2;
+    #nexora-games .nx-letter {
+      min-width: 36px;
+      min-height: 40px;
+      border: 1px solid #36577f;
+      border-radius: 8px;
+      background: #142844;
+      color: white;
+      font-weight: 800;
     }
 
-    #${ROOT_ID} .nx-controls .nx-right {
-      grid-column: 3;
+    #nexora-games .nx-letter:disabled { opacity: .35; }
+
+    #nexora-games .nx-word {
+      text-align: center;
+      letter-spacing: 8px;
+      font-size: clamp(23px,6vw,34px);
+      font-weight: 900;
+      margin: 20px 0;
+      overflow-wrap: anywhere;
     }
 
-    #${ROOT_ID} .nx-small {
+    #nexora-games .nx-choice-grid {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 8px;
+      max-width: 430px;
+      margin: 20px auto;
+    }
+
+    #nexora-games .nx-choice {
+      padding: 15px 4px;
+      font-size: clamp(24px,5vw,36px);
+      background: #101f37;
+      border: 1px solid #36577f;
+      border-radius: 13px;
+      color: white;
+    }
+
+    #nexora-games .nx-choice span {
+      display: block;
       font-size: 12px;
-      color: var(--nx-muted);
+      margin-top: 5px;
     }
 
-    @media (max-width: 480px) {
-      #${ROOT_ID} {
-        padding: 10px;
-      }
-
-      #${ROOT_ID} .nx-panel {
-        padding: 13px;
-        border-radius: 15px;
-      }
-
-      #${ROOT_ID} .nx-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      #${ROOT_ID} .nx-card {
-        padding: 12px;
-      }
-
-      #${ROOT_ID} .nx-card p {
-        min-height: 55px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      #${ROOT_ID} *,
-      #${ROOT_ID} *::before,
-      #${ROOT_ID} *::after {
-        animation-duration: .01ms !important;
-        transition-duration: .01ms !important;
-        scroll-behavior: auto !important;
-      }
+    #nexora-games .nx-footer {
+      text-align: center;
+      color: #7384a4;
+      font-size: 11px;
+      margin-top: 25px;
     }
   `;
-  document.head.appendChild(style);
 
-  /* ---------------------- GAME HUB ---------------------- */
+  function injectStyles() {
+    if (document.getElementById("nexora-arcade-styles")) return;
 
-  function shell(title, description) {
+    const style = document.createElement("style");
+    style.id = "nexora-arcade-styles";
+    style.textContent = styles;
+    document.head.appendChild(style);
+  }
+
+  function setScore(score) {
+    currentScore = Math.max(0, Math.floor(Number(score) || 0));
+    saveScore(currentGame, currentScore);
+
+    const scoreEl = root.querySelector("[data-current-score]");
+    const bestEl = root.querySelector("[data-best-score]");
+
+    if (scoreEl) scoreEl.textContent = currentScore;
+    if (bestEl) bestEl.textContent = bestScore(currentGame);
+  }
+
+  function stopCurrentGame() {
+    gameToken++;
+
+    if (typeof cleanup === "function") {
+      try { cleanup(); } catch (error) {
+        console.error("Game cleanup error:", error);
+      }
+    }
+
+    cleanup = null;
+  }
+
+  function menu() {
+    stopCurrentGame();
+    currentGame = "";
+    currentScore = 0;
+
     root.innerHTML = `
-      <div class="nx-wrap">
-        <div class="nx-header">
-          <div>
-            <h1 class="nx-brand">REXWEB NEXORA</h1>
-            <p class="nx-tagline">PLAY. CREATE. TRADE. GROW.</p>
+      <div class="nx-shell">
+        <h2 class="nx-title">REXWEB NEXORA ARCADE</h2>
+        <p class="nx-subtitle">PLAY • COMPETE • BEAT YOUR HIGH SCORES</p>
+
+        <div class="nx-stats">
+          <div class="nx-stat">
+            <strong>10</strong>
+            <span>GAMES AVAILABLE</span>
           </div>
-          <button class="nx-btn nx-btn-secondary" id="nxBack">← All Games</button>
+          <div class="nx-stat">
+            <strong>${Object.keys(getScores()).length}</strong>
+            <span>GAMES WITH SAVED SCORES</span>
+          </div>
         </div>
 
-        <section class="nx-panel">
-          <h2 class="nx-game-title">${escapeHTML(title)}</h2>
-          <p class="nx-muted">${escapeHTML(description)}</p>
-          <div class="nx-actions" id="nxActions"></div>
-          <div id="nxStatus" class="nx-status" aria-live="polite">Ready to play.</div>
-          <div id="nxPlayArea"></div>
-        </section>
+        <div class="nx-grid">
+          ${games.map(game => `
+            <article class="nx-card">
+              <div class="nx-icon">${game.icon}</div>
+              <h3>${escapeHTML(game.name)}</h3>
+              <p>${escapeHTML(game.description)}</p>
+              <div class="nx-pill" style="margin-bottom:10px">
+                Best: <strong>${bestScore(game.id)}</strong>
+              </div>
+              <button class="nx-btn nx-primary nx-wide"
+                data-play="${game.id}">PLAY NOW</button>
+            </article>
+          `).join("")}
+        </div>
+
+        <div class="nx-footer">REXWEB NEXORA • YOUR ARCADE, YOUR RECORDS</div>
       </div>
     `;
 
-    root.querySelector("#nxBack").addEventListener("click", showHub);
-  }
-
-  function status(message) {
-    const element = root.querySelector("#nxStatus");
-    if (element) element.textContent = message;
-  }
-
-  function actions(items) {
-    const element = root.querySelector("#nxActions");
-    if (!element) return;
-
-    element.innerHTML = "";
-
-    items.forEach(item => {
-      const btn = document.createElement("button");
-      btn.className = "nx-btn " + (item.secondary ? "nx-btn-secondary" : "");
-      btn.textContent = item.label;
-      btn.addEventListener("click", item.onClick);
-      element.appendChild(btn);
-    });
-  }
-
-  function area() {
-    return root.querySelector("#nxPlayArea");
-  }
-
-  function button(label, onClick, secondary = false) {
-    const element = document.createElement("button");
-    element.className = "nx-btn" + (secondary ? " nx-btn-secondary" : "");
-    element.textContent = label;
-    element.addEventListener("click", onClick);
-    return element;
-  }
-
-  /* A button that stays "pressed" while a finger or mouse is held on it */
-  function holdButton(label, onDown, onUp) {
-    const element = document.createElement("button");
-    element.className = "nx-btn nx-btn-secondary nx-hold";
-    element.textContent = label;
-    element.addEventListener("pointerdown", event => {
-      event.preventDefault();
-      onDown();
-    });
-    ["pointerup", "pointerleave", "pointercancel"].forEach(type => {
-      element.addEventListener(type, () => onUp());
-    });
-    element.addEventListener("contextmenu", event => event.preventDefault());
-    return element;
-  }
-
-  function padRow(playArea, buttons) {
-    const row = document.createElement("div");
-    row.className = "nx-pad-row";
-    buttons.forEach(item => row.appendChild(item));
-    playArea.appendChild(row);
-    return row;
-  }
-
-  function smallButton(label, onClick, aria) {
-    const element = button(label, onClick, true);
-    if (aria) element.setAttribute("aria-label", aria);
-    return element;
-  }
-
-  function dpad(playArea, onMove) {
-    const controls = document.createElement("div");
-    controls.className = "nx-controls";
-
-    [
-      ["↑", "nx-up", 0, -1],
-      ["←", "nx-left", -1, 0],
-      ["↓", "nx-down", 0, 1],
-      ["→", "nx-right", 1, 0]
-    ].forEach(([label, className, x, y]) => {
-      const control = document.createElement("button");
-      control.className = className;
-      control.textContent = label;
-      control.setAttribute("aria-label", "Move " + label);
-      control.addEventListener("click", () => onMove(x, y));
-      controls.appendChild(control);
-    });
-
-    playArea.appendChild(controls);
-    return controls;
-  }
-
-  function makeCanvas(playArea, w, h, label, maxWidth) {
-    const wrap = document.createElement("div");
-    wrap.className = "nx-canvas-wrap";
-    if (maxWidth) wrap.style.maxWidth = maxWidth + "px";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    canvas.setAttribute("aria-label", label);
-    wrap.appendChild(canvas);
-    playArea.appendChild(wrap);
-
-    return { canvas, ctx: canvas.getContext("2d"), wrap };
-  }
-
-  /* Shared animation loop for the newer canvas games */
-  function makeLoop(token, update, draw, maxDt) {
-    let id = 0;
-    let last = 0;
-    let running = true;
-    let stopped = false;
-    const limit = maxDt || 0.03;
-
-    function frame(time) {
-      if (stopped || !isActive(token)) return;
-      if (!last) last = time;
-      const dt = Math.min((time - last) / 1000, limit);
-      last = time;
-      if (running) update(dt);
-      draw();
-      id = requestAnimationFrame(frame);
-    }
-
-    return {
-      start() {
-        cancelAnimationFrame(id);
-        last = 0;
-        stopped = false;
-        id = requestAnimationFrame(frame);
-      },
-      stop() {
-        stopped = true;
-        cancelAnimationFrame(id);
-      },
-      setRunning(value) {
-        running = !!value;
-        last = 0;
-      },
-      toggle() {
-        running = !running;
-        last = 0;
-        return running;
-      },
-      get running() {
-        return running;
-      }
-    };
-  }
-
-  function showHub() {
-    gameToken++;
-    cleanupCurrent();
-    cleanupCurrent = () => {};
-    currentGame = null;
-
-    const total = Object.keys(games).length;
-
-    root.innerHTML = `
-      <div class="nx-wrap">
-        <header class="nx-header">
-          <div>
-            <h1 class="nx-brand">REXWEB NEXORA</h1>
-            <p class="nx-tagline">PLAY. CREATE. TRADE. GROW.</p>
-          </div>
-          <div class="nx-small">${total} GAMES • FREE TO PLAY</div>
-        </header>
-
-        <section class="nx-panel nx-hero">
-          <h2>Your next high score starts here.</h2>
-          <p>${total} arcade games. One destination. Choose a game and beat your personal best.</p>
-        </section>
-
-        <input
-          class="nx-search"
-          id="nxSearch"
-          type="search"
-          placeholder="Search games..."
-          aria-label="Search games"
-        >
-
-        <div class="nx-grid" id="nxGameGrid"></div>
-
-        <p class="nx-small" style="text-align:center;margin:22px 0 8px">
-          RexWeb Nexora Arcade • High scores are saved on this device.
-        </p>
-      </div>
-    `;
-
-    const search = root.querySelector("#nxSearch");
-    search.addEventListener("input", renderCards);
-    renderCards();
-
-    try { window.scrollTo(0, 0); } catch (_) {}
-  }
-
-  function renderCards() {
-    const grid = root.querySelector("#nxGameGrid");
-    if (!grid) return;
-
-    const query = root.querySelector("#nxSearch").value.trim().toLowerCase();
-
-    const list = Object.values(games).filter(game =>
-      (game.title + " " + game.description + " " + game.category)
-        .toLowerCase()
-        .includes(query)
-    );
-
-    grid.innerHTML = "";
-
-    if (!list.length) {
-      grid.innerHTML = `<div class="nx-panel">No games found. Try another search.</div>`;
-      return;
-    }
-
-    list.forEach(game => {
-      const card = document.createElement("article");
-      card.className = "nx-card";
-
-      card.innerHTML = `
-        <div class="nx-icon">${game.icon}</div>
-        <h3>${escapeHTML(game.title)}</h3>
-        <p>${escapeHTML(game.description)}</p>
-        <div class="nx-best">Personal best: ${getBest(game.id)}</div>
-      `;
-
-      card.appendChild(button("Play Now →", () => openGame(game.id)));
-      grid.appendChild(card);
+    root.querySelectorAll("[data-play]").forEach(button => {
+      button.addEventListener("click", () => openGame(button.dataset.play));
     });
   }
 
   function openGame(id) {
-    const game = games[id];
+    const game = games.find(item => item.id === id);
     if (!game) return;
 
-    gameToken++;
+    stopCurrentGame();
+
+    currentGame = id;
+    currentScore = 0;
+
     const token = gameToken;
 
-    cleanupCurrent();
-    cleanupCurrent = () => {};
-    currentGame = id;
+    root.innerHTML = `
+      <div class="nx-shell">
+        <section class="nx-game-panel">
+          <div class="nx-game-header">
+            <h2>${game.icon} ${escapeHTML(game.name)}</h2>
+            <button class="nx-btn" data-menu>← All Games</button>
+          </div>
 
-    state.recent = [id, ...state.recent.filter(item => item !== id)].slice(0, 10);
-    save();
+          <div class="nx-game-stats">
+            <div class="nx-pill">Score: <strong data-current-score>0</strong></div>
+            <div class="nx-pill">Best: <strong data-best-score>${bestScore(id)}</strong></div>
+          </div>
 
-    try { window.scrollTo(0, 0); } catch (_) {}
+          <div class="nx-instructions">${escapeHTML(game.description)}</div>
+          <div data-game-area class="nx-board"></div>
+          <div class="nx-message" data-message></div>
+
+          <div class="nx-controls">
+            <button class="nx-btn" data-restart>↻ Restart</button>
+          </div>
+        </section>
+      </div>
+    `;
+
+    root.querySelector("[data-menu]").addEventListener("click", menu);
+
+    root.querySelector("[data-restart]").addEventListener("click", () => {
+      if (token === gameToken) openGame(id);
+    });
+
+    const area = root.querySelector("[data-game-area]");
+    const message = root.querySelector("[data-message]");
+
+    function say(text) {
+      if (message) message.textContent = text;
+    }
+
+    function addCleanup(fn) {
+      cleanup = fn;
+    }
+
+    const context = {
+      area,
+      say,
+      setScore,
+      bestScore,
+      addCleanup,
+      token
+    };
 
     try {
-      cleanupCurrent = game.start(token) || (() => {});
+      const handlers = {
+        snake: playSnake,
+        tictactoe: playTicTacToe,
+        pong: playPong,
+        brick: playBrickBreaker,
+        runner: playRunner,
+        shooter: playShooter,
+        math: playMath,
+        rps: playRPS,
+        hangman: playHangman,
+        flappy: playFlappy
+      };
+
+      handlers[id](context);
     } catch (error) {
-      console.error("Game failed to start:", id, error);
-      shell("Game Error", "This game could not start.");
-      status("Sorry, this game encountered an error. Return to the menu and try again.");
+      console.error("Arcade game error:", error);
+      area.innerHTML = `
+        <p style="text-align:center;color:#ff9eae">
+          This game encountered an error. Press Restart to try again.
+        </p>`;
     }
   }
 
-  function isActive(token) {
-    return token === gameToken && currentGame !== null;
+  /* ==========================================================
+     SHARED CANVAS HELPERS
+     ========================================================== */
+
+  function makeCanvas(area, width, height) {
+    area.innerHTML = `
+      <canvas class="nx-canvas"
+        width="${width}" height="${height}"
+        aria-label="Game play area"></canvas>
+    `;
+
+    return area.querySelector("canvas");
   }
 
-  /* ====================== GAME: SNAKE ====================== */
+  function listen(target, event, handler, options) {
+    target.addEventListener(event, handler, options);
+    return () => target.removeEventListener(event, handler, options);
+  }
 
-  register(
-    "snake",
-    "Snake",
-    "Eat food, grow longer, and avoid hitting yourself or the walls.",
-    "🐍",
-    "Arcade",
-    startSnake
-  );
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
 
-  function startSnake(token) {
-    shell("Snake", "Use the arrow buttons, WASD, or keyboard arrows to steer.");
-    const playArea = area();
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-    const canvas = document.createElement("canvas");
-    canvas.width = 480;
-    canvas.height = 480;
-    canvas.setAttribute("aria-label", "Snake game board");
-    playArea.appendChild(canvas);
+  /* ==========================================================
+     1. SNAKE
+     ========================================================== */
 
-    const ctx = canvas.getContext("2d");
-    const cell = 24;
-    const count = canvas.width / cell;
+  function playSnake(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const size = 20;
+    const canvas = makeCanvas(area, 400, 400);
+    const c = canvas.getContext("2d");
 
-    let snake;
-    let food;
-    let direction;
-    let nextDirection;
-    let score;
-    let running;
-    let ended;
-    let timer = null;
-
-    function newFood() {
-      let candidate;
-      do {
-        candidate = {
-          x: randomInt(0, count - 1),
-          y: randomInt(0, count - 1)
-        };
-      } while (snake.some(part =>
-        part.x === candidate.x && part.y === candidate.y
-      ));
-
-      food = candidate;
-    }
+    let snake, food, direction, nextDirection, score, timer, dead;
+    let lastTouch = null;
 
     function reset() {
       clearInterval(timer);
@@ -800,27 +600,31 @@
         { x: 9, y: 10 },
         { x: 8, y: 10 }
       ];
-
       direction = { x: 1, y: 0 };
-      nextDirection = { x: 1, y: 0 };
+      nextDirection = direction;
       score = 0;
-      running = true;
-      ended = false;
+      dead = false;
+      setScore(0);
+      say("Use arrow keys or the direction buttons.");
 
-      newFood();
-      status("Score: 0 • Eat the glowing food!");
+      spawnFood();
       draw();
-      timer = setInterval(step, 125);
+      timer = setInterval(step, 120);
     }
 
-    function changeDirection(x, y) {
-      if (!running || ended) return;
+    function spawnFood() {
+      do {
+        food = { x: randomInt(0, 19), y: randomInt(0, 19) };
+      } while (snake.some(part => part.x === food.x && part.y === food.y));
+    }
+
+    function setDirection(x, y) {
       if (x === -direction.x && y === -direction.y) return;
       nextDirection = { x, y };
     }
 
     function step() {
-      if (!isActive(token) || !running || ended) return;
+      if (dead) return;
 
       direction = nextDirection;
 
@@ -830,19 +634,16 @@
       };
 
       const eating = head.x === food.x && head.y === food.y;
-      const collisionBody = eating ? snake : snake.slice(0, -1);
 
       if (
         head.x < 0 || head.y < 0 ||
-        head.x >= count || head.y >= count ||
-        collisionBody.some(part => part.x === head.x && part.y === head.y)
+        head.x >= 20 || head.y >= 20 ||
+        snake.slice(0, eating ? snake.length : -1)
+          .some(part => part.x === head.x && part.y === head.y)
       ) {
-        ended = true;
-        running = false;
+        dead = true;
         clearInterval(timer);
-        recordScore("snake", score);
-        status(`Game over! Score: ${score}. Best: ${getBest("snake")}. Press Restart to play again.`);
-        draw();
+        say("Game over! Score: " + score + ". Press Restart.");
         return;
       }
 
@@ -850,8 +651,8 @@
 
       if (eating) {
         score += 10;
-        newFood();
-        status(`Score: ${score} • Best: ${Math.max(score, getBest("snake"))}`);
+        setScore(score);
+        spawnFood();
       } else {
         snake.pop();
       }
@@ -860,1867 +661,1396 @@
     }
 
     function draw() {
-      ctx.fillStyle = "#060b16";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      c.fillStyle = "#030813";
+      c.fillRect(0, 0, 400, 400);
 
-      ctx.strokeStyle = "#13213a";
-      ctx.lineWidth = 1;
+      c.strokeStyle = "#101d32";
+      for (let i = 0; i <= 20; i++) {
+        c.beginPath();
+        c.moveTo(i * size, 0);
+        c.lineTo(i * size, 400);
+        c.stroke();
 
-      for (let i = 0; i <= count; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * cell, 0);
-        ctx.lineTo(i * cell, canvas.height);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, i * cell);
-        ctx.lineTo(canvas.width, i * cell);
-        ctx.stroke();
+        c.beginPath();
+        c.moveTo(0, i * size);
+        c.lineTo(400, i * size);
+        c.stroke();
       }
 
-      if (food) {
-        ctx.fillStyle = "#ff5d86";
-        ctx.beginPath();
-        ctx.arc(
-          food.x * cell + cell / 2,
-          food.y * cell + cell / 2,
-          cell * 0.38,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-      }
+      c.fillStyle = "#ff6384";
+      c.beginPath();
+      c.arc(food.x * size + 10, food.y * size + 10, 7, 0, Math.PI * 2);
+      c.fill();
 
       snake.forEach((part, index) => {
-        ctx.fillStyle = index === 0 ? "#83f7d4" : "#28b99b";
-        ctx.beginPath();
-        ctx.roundRect(
-          part.x * cell + 2,
-          part.y * cell + 2,
-          cell - 4,
-          cell - 4,
-          6
-        );
-        ctx.fill();
+        c.fillStyle = index === 0 ? "#b6ff8c" : "#37d6a4";
+        c.fillRect(part.x * size + 2, part.y * size + 2, 16, 16);
       });
     }
 
-    function keyHandler(event) {
-      const keys = {
-        ArrowUp: [0, -1], w: [0, -1], W: [0, -1],
-        ArrowDown: [0, 1], s: [0, 1], S: [0, 1],
-        ArrowLeft: [-1, 0], a: [-1, 0], A: [-1, 0],
-        ArrowRight: [1, 0], d: [1, 0], D: [1, 0]
+    const keyHandler = event => {
+      const map = {
+        ArrowUp: [0, -1],
+        w: [0, -1],
+        ArrowDown: [0, 1],
+        s: [0, 1],
+        ArrowLeft: [-1, 0],
+        a: [-1, 0],
+        ArrowRight: [1, 0],
+        d: [1, 0]
       };
 
-      if (keys[event.key]) {
+      if (map[event.key]) {
         event.preventDefault();
-        changeDirection(...keys[event.key]);
+        setDirection(...map[event.key]);
       }
-    }
+    };
 
     document.addEventListener("keydown", keyHandler);
 
-    dpad(playArea, changeDirection);
+    area.insertAdjacentHTML("beforeend", `
+      <div class="nx-controls">
+        <button class="nx-btn" data-dir="up">⬆️</button>
+      </div>
+      <div class="nx-controls">
+        <button class="nx-btn" data-dir="left">⬅️</button>
+        <button class="nx-btn" data-dir="down">⬇️</button>
+        <button class="nx-btn" data-dir="right">➡️</button>
+      </div>
+    `);
 
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Pause / Resume",
-        secondary: true,
-        onClick: () => {
-          if (ended) return;
-          running = !running;
-          if (running) {
-            timer = setInterval(step, 125);
-            status(`Resumed • Score: ${score}`);
-          } else {
-            clearInterval(timer);
-            status(`Paused • Score: ${score}`);
-          }
+    const directions = {
+      up: [0, -1],
+      down: [0, 1],
+      left: [-1, 0],
+      right: [1, 0]
+    };
+
+    area.querySelectorAll("[data-dir]").forEach(button => {
+      button.addEventListener("click", () => {
+        setDirection(...directions[button.dataset.dir]);
+      });
+    });
+
+    const touchStart = event => {
+      const touch = event.changedTouches[0];
+      lastTouch = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const touchEnd = event => {
+      if (!lastTouch) return;
+
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - lastTouch.x;
+      const dy = touch.clientY - lastTouch.y;
+
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          setDirection(dx > 0 ? 1 : -1, 0);
+        } else {
+          setDirection(0, dy > 0 ? 1 : -1);
         }
       }
-    ]);
 
-    reset();
+      lastTouch = null;
+    };
 
-    return () => {
+    canvas.addEventListener("touchstart", touchStart, { passive: true });
+    canvas.addEventListener("touchend", touchEnd, { passive: true });
+
+    addCleanup(() => {
       clearInterval(timer);
       document.removeEventListener("keydown", keyHandler);
-    };
+      canvas.removeEventListener("touchstart", touchStart);
+      canvas.removeEventListener("touchend", touchEnd);
+    });
+
+    reset();
   }
 
-  /* ================== GAME: TIC-TAC-TOE ================== */
+  /* ==========================================================
+     2. TIC-TAC-TOE
+     ========================================================== */
 
-  register(
-    "tictactoe",
-    "Tic-Tac-Toe",
-    "Play X against the computer or challenge another player on your device.",
-    "❌",
-    "Board",
-    startTicTacToe
-  );
+  function playTicTacToe(ctx) {
+    const { area, say, setScore } = ctx;
 
-  function startTicTacToe(token) {
-    shell("Tic-Tac-Toe", "Get three symbols in a row, column, or diagonal.");
-    const playArea = area();
+    let board, finished, busy, roundScore;
 
-    let boardState;
-    let turn;
-    let ended;
-    let mode = "computer";
-    const pendingTimers = new Set();
+    function reset() {
+      board = Array(9).fill("");
+      finished = false;
+      busy = false;
+      roundScore = 0;
+      setScore(0);
 
-    const modeLabel = document.createElement("div");
-    modeLabel.className = "nx-status";
-    modeLabel.textContent = "Mode: Play against the computer";
-    playArea.appendChild(modeLabel);
+      area.innerHTML = `
+        <p style="text-align:center">You are <strong style="color:#37b6ff">X</strong>.
+        The computer is O.</p>
+        <div class="nx-tic-grid">
+          ${board.map((_, i) => `
+            <button class="nx-tic-cell" data-cell="${i}"></button>
+          `).join("")}
+        </div>
+      `;
 
-    const board = document.createElement("div");
-    board.className = "nx-board";
-    board.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
-    board.style.maxWidth = "330px";
-    playArea.appendChild(board);
+      area.querySelectorAll("[data-cell]").forEach(button => {
+        button.addEventListener("click", () => playerMove(Number(button.dataset.cell)));
+      });
 
-    function winner(cells) {
-      const lines = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
-      ];
+      say("Make your move.");
+    }
 
-      for (const [a, b, c] of lines) {
-        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-          return cells[a];
+    const wins = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function winner(b) {
+      for (const line of wins) {
+        const [a, m, z] = line;
+        if (b[a] && b[a] === b[m] && b[a] === b[z]) {
+          return b[a];
         }
       }
-      return cells.every(Boolean) ? "draw" : null;
+      return b.every(Boolean) ? "draw" : "";
     }
 
     function paint() {
-      board.innerHTML = "";
-
-      boardState.forEach((value, index) => {
-        const cellButton = document.createElement("button");
-        cellButton.className = "nx-cell";
-        cellButton.textContent = value || "";
-        cellButton.disabled = !!value || ended;
-        cellButton.setAttribute(
-          "aria-label",
-          value ? `Square ${index + 1}: ${value}` : `Empty square ${index + 1}`
-        );
-
-        if (value === "X") cellButton.classList.add("nx-x");
-        if (value === "O") cellButton.classList.add("nx-o");
-
-        cellButton.addEventListener("click", () => playMove(index));
-        board.appendChild(cellButton);
+      area.querySelectorAll("[data-cell]").forEach(button => {
+        const i = Number(button.dataset.cell);
+        button.textContent = board[i];
+        button.disabled = !!board[i] || finished || busy;
+        button.style.color = board[i] === "X" ? "#37b6ff" : "#ff9bca";
       });
     }
 
-    function clearTimers() {
-      pendingTimers.forEach(clearTimeout);
-      pendingTimers.clear();
-    }
+    function endRound(result) {
+      finished = true;
 
-    function reset() {
-      clearTimers();
-      boardState = Array(9).fill("");
-      turn = "X";
-      ended = false;
-
-      status(mode === "computer"
-        ? "You are X. The computer is O."
-        : "Two-player mode. X goes first.");
-
-      paint();
-    }
-
-    function finishIfNeeded() {
-      const result = winner(boardState);
-      if (!result) return false;
-
-      ended = true;
-      paint();
-
-      if (result === "draw") {
-        status("It's a draw! Restart for another round.");
+      if (result === "X") {
+        roundScore += 10;
+        setScore(roundScore);
+        say("You win! +10 points. Press Restart for another round.");
+      } else if (result === "O") {
+        say("The computer wins. Press Restart to try again.");
       } else {
-        status(result === "X" ? "X wins!" : "O wins!");
-        if (result === "X" && mode === "computer") {
-          recordScore("tictactoe", getBest("tictactoe") + 1);
-        }
+        say("It's a draw! Press Restart to play again.");
       }
 
-      return true;
+      paint();
     }
 
-    function playMove(index) {
-      if (ended || boardState[index] || !isActive(token)) return;
-      if (mode === "computer" && turn === "O") return;
+    function playerMove(index) {
+      if (finished || busy || board[index]) return;
 
-      boardState[index] = turn;
-      if (finishIfNeeded()) return;
-
-      if (mode === "two") {
-        turn = turn === "X" ? "O" : "X";
-        status(`${turn}'s turn.`);
-        paint();
-        return;
-      }
-
-      turn = "O";
-      status("Computer is thinking...");
+      board[index] = "X";
       paint();
 
-      const timer = setTimeout(() => {
-        pendingTimers.delete(timer);
-        if (!isActive(token) || ended) return;
+      const result = winner(board);
+      if (result) return endRound(result);
 
-        const selected = chooseComputerMove(boardState);
-        if (selected < 0) return;
+      busy = true;
+      paint();
 
-        boardState[selected] = "O";
+      setTimeout(() => {
+        if (!area.isConnected || finished) return;
 
-        if (!finishIfNeeded()) {
-          turn = "X";
-          status("Your turn. You are X.");
-          paint();
+        const empty = board
+          .map((value, i) => value ? -1 : i)
+          .filter(i => i >= 0);
+
+        if (!empty.length) {
+          busy = false;
+          return endRound("draw");
         }
+
+        // Try to win, then block, then choose a sensible square.
+        let move = findWinningMove("O");
+
+        if (move < 0) move = findWinningMove("X");
+        if (move < 0 && !board[4]) move = 4;
+
+        if (move < 0) {
+          const corners = [0, 2, 6, 8].filter(i => !board[i]);
+          if (corners.length) move = corners[randomInt(0, corners.length - 1)];
+        }
+
+        if (move < 0) move = empty[randomInt(0, empty.length - 1)];
+
+        board[move] = "O";
+        busy = false;
+        paint();
+
+        const outcome = winner(board);
+        if (outcome) endRound(outcome);
       }, 280);
-
-      pendingTimers.add(timer);
     }
 
-    function chooseComputerMove(cells) {
+    function findWinningMove(symbol) {
       for (let i = 0; i < 9; i++) {
-        if (!cells[i]) {
-          cells[i] = "O";
-          const result = winner(cells);
-          cells[i] = "";
-          if (result === "O") return i;
-        }
+        if (board[i]) continue;
+        board[i] = symbol;
+        const result = winner(board);
+        board[i] = "";
+        if (result === symbol) return i;
       }
-
-      for (let i = 0; i < 9; i++) {
-        if (!cells[i]) {
-          cells[i] = "X";
-          const result = winner(cells);
-          cells[i] = "";
-          if (result === "X") return i;
-        }
-      }
-
-      if (!cells[4]) return 4;
-
-      const corners = shuffle([0, 2, 6, 8]).filter(i => !cells[i]);
-      if (corners.length) return corners[0];
-
-      const sides = [1, 3, 5, 7].filter(i => !cells[i]);
-      if (sides.length) return sides[0];
-
-      return cells.findIndex(value => !value);
+      return -1;
     }
 
-    function renderActions() {
-      actions([
-        { label: "Restart", onClick: reset },
-        {
-          label: mode === "computer" ? "Switch to Two Players" : "Play Against Computer",
-          secondary: true,
-          onClick: () => {
-            mode = mode === "computer" ? "two" : "computer";
-            modeLabel.textContent = mode === "computer"
-              ? "Mode: Play against the computer"
-              : "Mode: Two players on one device";
-            renderActions();
-            reset();
-          }
-        }
-      ]);
-    }
-
-    renderActions();
     reset();
-
-    return () => clearTimers();
   }
 
-  /* ======================== GAME: PONG ======================== */
+  /* ==========================================================
+     3. PONG
+     ========================================================== */
 
-  register(
-    "pong",
-    "Pong",
-    "Beat the computer by bouncing the ball past its paddle.",
-    "🏓",
-    "Arcade",
-    startPong
-  );
+  function playPong(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const canvas = makeCanvas(area, 600, 380);
+    const c = canvas.getContext("2d");
 
-  function startPong(token) {
-    shell("Pong", "Move your paddle with the mouse, touch, or arrow keys.");
-
-    const playArea = area();
-    const wrap = document.createElement("div");
-    wrap.className = "nx-canvas-wrap";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 700;
-    canvas.height = 420;
-    canvas.setAttribute("aria-label", "Pong game");
-    wrap.appendChild(canvas);
-    playArea.appendChild(wrap);
-
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width;
-    const H = canvas.height;
-    const paddleH = 82;
-    const paddleW = 12;
-
-    let playerY, cpuY, ballX, ballY, ballVX, ballVY, playerScore, cpuScore;
-    let running = false;
-    let ended = false;
-    let animation = 0;
-    let lastTime = 0;
-    let up = false;
-    let down = false;
-    let targetY = null;
-
-    function resetBall(direction) {
-      ballX = W / 2;
-      ballY = H / 2;
-      const speed = 270;
-      ballVX = speed * direction;
-      ballVY = randomInt(-150, 150);
-    }
+    let playerY, cpuY, ballX, ballY, vx, vy, score, raf, running;
+    const keys = new Set();
 
     function reset() {
-      cancelAnimationFrame(animation);
-      playerY = H / 2 - paddleH / 2;
-      cpuY = H / 2 - paddleH / 2;
-      playerScore = 0;
-      cpuScore = 0;
+      score = 0;
+      playerY = cpuY = 150;
+      ballX = 300;
+      ballY = 190;
+      vx = 4;
+      vy = Math.random() * 4 - 2;
       running = true;
-      ended = false;
-      lastTime = 0;
-      targetY = null;
-      resetBall(Math.random() < 0.5 ? -1 : 1);
-      status("First to 5 points wins. Good luck!");
-      draw();
-      animation = requestAnimationFrame(frame);
+      setScore(0);
+      say("Move with ↑/↓, W/S, or the buttons. First to 5 wins.");
     }
 
     function draw() {
-      ctx.fillStyle = "#060b16";
-      ctx.fillRect(0, 0, W, H);
+      c.fillStyle = "#030813";
+      c.fillRect(0, 0, 600, 380);
 
-      ctx.strokeStyle = "#273955";
-      ctx.setLineDash([8, 10]);
-      ctx.beginPath();
-      ctx.moveTo(W / 2, 0);
-      ctx.lineTo(W / 2, H);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      c.setLineDash([8, 9]);
+      c.strokeStyle = "#29415e";
+      c.beginPath();
+      c.moveTo(300, 0);
+      c.lineTo(300, 380);
+      c.stroke();
+      c.setLineDash([]);
 
-      ctx.fillStyle = "#67caff";
-      ctx.fillRect(22, playerY, paddleW, paddleH);
+      c.fillStyle = "#37b6ff";
+      c.fillRect(20, playerY, 12, 80);
 
-      ctx.fillStyle = "#c4a5ff";
-      ctx.fillRect(W - 22 - paddleW, cpuY, paddleW, paddleH);
+      c.fillStyle = "#a78bfa";
+      c.fillRect(568, cpuY, 12, 80);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(ballX, ballY, 9, 0, Math.PI * 2);
-      ctx.fill();
+      c.fillStyle = "#ffffff";
+      c.beginPath();
+      c.arc(ballX, ballY, 8, 0, Math.PI * 2);
+      c.fill();
 
-      ctx.font = "bold 36px system-ui";
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#67caff";
-      ctx.fillText(playerScore, W * 0.35, 52);
-
-      ctx.fillStyle = "#c4a5ff";
-      ctx.fillText(cpuScore, W * 0.65, 52);
-
-      if (!running && !ended) {
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "18px system-ui";
-        ctx.fillText("Paused", W / 2, H / 2);
-      }
+      c.font = "28px system-ui";
+      c.textAlign = "center";
+      c.fillText(score, 250, 40);
+      c.fillText("CPU", 350, 40);
     }
 
-    function frame(time) {
-      if (!isActive(token) || ended) return;
-      if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 1000, 0.03);
-      lastTime = time;
+    function frame() {
+      if (!running) return;
 
-      if (running) update(dt);
-      draw();
-      animation = requestAnimationFrame(frame);
-    }
+      if (keys.has("ArrowUp") || keys.has("w")) playerY -= 6;
+      if (keys.has("ArrowDown") || keys.has("s")) playerY += 6;
 
-    function update(dt) {
-      if (up) playerY -= 360 * dt;
-      if (down) playerY += 360 * dt;
+      playerY = clamp(playerY, 0, 300);
+      cpuY = clamp(cpuY + (ballY - 40 - cpuY) * 0.055, 0, 300);
 
-      if (targetY !== null) {
-        const center = playerY + paddleH / 2;
-        playerY += Math.max(-360 * dt, Math.min(360 * dt, targetY - center));
-      }
+      ballX += vx;
+      ballY += vy;
 
-      playerY = Math.max(0, Math.min(H - paddleH, playerY));
+      if (ballY < 8 || ballY > 372) vy *= -1;
 
-      const cpuCenter = cpuY + paddleH / 2;
-      const cpuSpeed = 265;
-      const difference = ballY - cpuCenter;
-
-      cpuY += Math.max(-cpuSpeed * dt, Math.min(cpuSpeed * dt, difference));
-      cpuY = Math.max(0, Math.min(H - paddleH, cpuY));
-
-      ballX += ballVX * dt;
-      ballY += ballVY * dt;
-
-      if (ballY < 9 || ballY > H - 9) {
-        ballVY *= -1;
-        ballY = Math.max(9, Math.min(H - 9, ballY));
+      if (
+        vx < 0 && ballX < 40 &&
+        ballY > playerY && ballY < playerY + 80
+      ) {
+        vx = Math.abs(vx) + 0.2;
+        vy += (ballY - (playerY + 40)) * 0.08;
       }
 
       if (
-        ballVX < 0 &&
-        ballX - 9 <= 34 &&
-        ballX > 22 &&
-        ballY >= playerY &&
-        ballY <= playerY + paddleH
+        vx > 0 && ballX > 560 &&
+        ballY > cpuY && ballY < cpuY + 80
       ) {
-        ballX = 35;
-        ballVX = Math.abs(ballVX) * 1.045;
-        const offset = (ballY - (playerY + paddleH / 2)) / (paddleH / 2);
-        ballVY = offset * 320;
+        vx = -Math.abs(vx) - 0.15;
+        vy += (ballY - (cpuY + 40)) * 0.06;
       }
 
-      if (
-        ballVX > 0 &&
-        ballX + 9 >= W - 34 &&
-        ballX < W - 22 &&
-        ballY >= cpuY &&
-        ballY <= cpuY + paddleH
-      ) {
-        ballX = W - 35;
-        ballVX = -Math.abs(ballVX) * 1.045;
-        const offset = (ballY - (cpuY + paddleH / 2)) / (paddleH / 2);
-        ballVY = offset * 300;
-      }
-
-      if (ballX < -15) {
-        cpuScore++;
-        pointScored(-1);
-      } else if (ballX > W + 15) {
-        playerScore++;
-        pointScored(1);
-      }
-    }
-
-    function pointScored(direction) {
-      if (playerScore >= 5 || cpuScore >= 5) {
-        ended = true;
+      if (ballX < 0) {
         running = false;
-        const won = playerScore >= 5;
-        if (won) recordScore("pong", playerScore);
-        status(won ? `You win ${playerScore}–${cpuScore}!` : `Computer wins ${cpuScore}–${playerScore}. Try again!`);
-        return;
+        say("CPU scores. Press Restart to try again.");
       }
-      status(`You ${playerScore} — ${cpuScore} Computer`);
-      resetBall(direction);
-    }
 
-    function moveFromPointer(event) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleY = H / rect.height;
-      targetY = (event.clientY - rect.top) * scaleY;
-      targetY = Math.max(0, Math.min(H, targetY));
-    }
+      if (ballX > 600) {
+        score++;
+        setScore(score);
 
-    function isUpKey(key) { return key === "ArrowUp" || key === "w" || key === "W"; }
-    function isDownKey(key) { return key === "ArrowDown" || key === "s" || key === "S"; }
-
-    function keyHandler(event) {
-      if (isUpKey(event.key) || isDownKey(event.key) || event.key === " ") {
-        event.preventDefault();
-      }
-      if (isUpKey(event.key)) { up = true; targetY = null; }
-      if (isDownKey(event.key)) { down = true; targetY = null; }
-
-      if (event.key === " " && !ended && !event.repeat) {
-        running = !running;
-        lastTime = 0;
-        status(running ? "Game resumed." : "Game paused.");
-      }
-    }
-
-    function keyUp(event) {
-      if (isUpKey(event.key)) up = false;
-      if (isDownKey(event.key)) down = false;
-    }
-
-    canvas.addEventListener("pointermove", moveFromPointer);
-    canvas.addEventListener("pointerdown", moveFromPointer);
-    document.addEventListener("keydown", keyHandler);
-    document.addEventListener("keyup", keyUp);
-
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Pause / Resume",
-        secondary: true,
-        onClick: () => {
-          if (ended) return;
-          running = !running;
-          lastTime = 0;
-          status(running ? "Game resumed." : "Game paused.");
+        if (score >= 5) {
+          running = false;
+          say("You win! Press Restart for another match.");
+        } else {
+          ballX = 300;
+          ballY = 190;
+          vx = -4;
+          vy = Math.random() * 4 - 2;
         }
       }
-    ]);
+
+      draw();
+
+      if (running) raf = requestAnimationFrame(frame);
+    }
+
+    function movePlayer(event) {
+      if (event.key.startsWith("Arrow")) event.preventDefault();
+      keys.add(event.key);
+    }
+
+    function stopPlayer(event) {
+      keys.delete(event.key);
+    }
+
+    document.addEventListener("keydown", movePlayer);
+    document.addEventListener("keyup", stopPlayer);
+
+    area.insertAdjacentHTML("beforeend", `
+      <div class="nx-controls">
+        <button class="nx-btn" data-pong="-1">⬆️ UP</button>
+        <button class="nx-btn" data-pong="1">⬇️ DOWN</button>
+      </div>
+    `);
+
+    let moveInterval = null;
+
+    area.querySelectorAll("[data-pong]").forEach(button => {
+      const amount = Number(button.dataset.pong);
+
+      const start = event => {
+        event.preventDefault();
+        clearInterval(moveInterval);
+        moveInterval = setInterval(() => {
+          playerY = clamp(playerY + amount * 7, 0, 300);
+        }, 30);
+      };
+
+      const stop = () => {
+        clearInterval(moveInterval);
+        moveInterval = null;
+      };
+
+      button.addEventListener("pointerdown", start);
+      button.addEventListener("pointerup", stop);
+      button.addEventListener("pointerleave", stop);
+      button.addEventListener("pointercancel", stop);
+    });
+
+    addCleanup(() => {
+      running = false;
+      cancelAnimationFrame(raf);
+      clearInterval(moveInterval);
+      document.removeEventListener("keydown", movePlayer);
+      document.removeEventListener("keyup", stopPlayer);
+    });
 
     reset();
-
-    return () => {
-      cancelAnimationFrame(animation);
-      canvas.removeEventListener("pointermove", moveFromPointer);
-      canvas.removeEventListener("pointerdown", moveFromPointer);
-      document.removeEventListener("keydown", keyHandler);
-      document.removeEventListener("keyup", keyUp);
-    };
+    frame();
   }
 
-  /* ==================== GAME: BRICK BREAKER ==================== */
+  /* ==========================================================
+     4. BRICK BREAKER
+     ========================================================== */
 
-  register(
-    "brickbreaker",
-    "Brick Breaker",
-    "Bounce the ball off your paddle and destroy every brick.",
-    "🧱",
-    "Arcade",
-    startBrickBreaker
-  );
+  function playBrickBreaker(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const canvas = makeCanvas(area, 600, 420);
+    const c = canvas.getContext("2d");
 
-  function startBrickBreaker(token) {
-    shell("Brick Breaker", "Move the paddle with touch, mouse, or arrow keys.");
-    const playArea = area();
-
-    const wrap = document.createElement("div");
-    wrap.className = "nx-canvas-wrap";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 700;
-    canvas.height = 480;
-    canvas.setAttribute("aria-label", "Brick Breaker game");
-    wrap.appendChild(canvas);
-    playArea.appendChild(wrap);
-
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width;
-    const H = canvas.height;
-
-    const paddle = { x: W / 2 - 52, y: H - 35, w: 104, h: 12 };
-    const ball = { x: W / 2, y: H - 65, r: 8, vx: 210, vy: -250 };
-
-    let bricks = [];
-    let score = 0;
-    let lives = 3;
-    let running = false;
-    let ended = false;
-    let animation = 0;
-    let lastTime = 0;
-    let left = false;
-    let right = false;
-
-    function makeBricks() {
-      bricks = [];
-      const rows = 6;
-      const cols = 10;
-      const gap = 7;
-      const margin = 20;
-      const brickW = (W - margin * 2 - gap * (cols - 1)) / cols;
-      const brickH = 20;
-
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          bricks.push({
-            x: margin + col * (brickW + gap),
-            y: 48 + row * (brickH + gap),
-            w: brickW,
-            h: brickH,
-            alive: true,
-            color: row
-          });
-        }
-      }
-    }
-
-    function resetBall() {
-      ball.x = W / 2;
-      ball.y = H - 65;
-      ball.vx = (Math.random() < 0.5 ? -1 : 1) * 210;
-      ball.vy = -250;
-      paddle.x = W / 2 - paddle.w / 2;
-    }
+    let paddleX, ballX, ballY, vx, vy, bricks, score, lives, raf, running;
+    let pointerX = null;
 
     function reset() {
-      cancelAnimationFrame(animation);
+      paddleX = 250;
+      ballX = 300;
+      ballY = 350;
+      vx = 3;
+      vy = -4;
       score = 0;
       lives = 3;
       running = true;
-      ended = false;
-      lastTime = 0;
-      makeBricks();
-      resetBall();
-      status("Destroy all the bricks. You have 3 lives.");
-      draw();
-      animation = requestAnimationFrame(frame);
+      bricks = [];
+
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 9; col++) {
+          bricks.push({
+            x: 18 + col * 63,
+            y: 35 + row * 25,
+            w: 55,
+            h: 16,
+            alive: true
+          });
+        }
+      }
+
+      setScore(0);
+      say("Move the paddle with your mouse, finger, or ← → keys.");
     }
 
     function draw() {
-      ctx.fillStyle = "#060b16";
-      ctx.fillRect(0, 0, W, H);
+      c.fillStyle = "#030813";
+      c.fillRect(0, 0, 600, 420);
 
-      const colors = ["#ff628d", "#ff9f59", "#ffd166", "#58dfb5", "#5dc6ff", "#a78bfa"];
+      const colors = ["#37b6ff", "#a78bfa", "#ff7cc8", "#45e5b0", "#ffc857"];
 
-      bricks.forEach(brick => {
+      bricks.forEach((brick, i) => {
         if (!brick.alive) return;
-        ctx.fillStyle = colors[brick.color];
-        ctx.beginPath();
-        ctx.roundRect(brick.x, brick.y, brick.w, brick.h, 4);
-        ctx.fill();
+        c.fillStyle = colors[Math.floor(i / 9) % colors.length];
+        c.fillRect(brick.x, brick.y, brick.w, brick.h);
       });
 
-      ctx.fillStyle = "#67caff";
-      ctx.beginPath();
-      ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
-      ctx.fill();
+      c.fillStyle = "#ffffff";
+      c.fillRect(paddleX, 390, 100, 10);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-      ctx.fill();
+      c.beginPath();
+      c.arc(ballX, ballY, 7, 0, Math.PI * 2);
+      c.fill();
 
-      ctx.font = "bold 18px system-ui";
-      ctx.textAlign = "left";
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(`Score: ${score}`, 20, 27);
-
-      ctx.textAlign = "right";
-      ctx.fillText(`Lives: ${lives}`, W - 20, 27);
+      c.font = "16px system-ui";
+      c.fillText("Lives: " + lives, 15, 410);
     }
 
-    function frame(time) {
-      if (!isActive(token) || ended) return;
-      if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 1000, 0.025);
-      lastTime = time;
+    function frame() {
+      if (!running) return;
 
-      if (running) update(dt);
-      draw();
-      animation = requestAnimationFrame(frame);
-    }
+      if (pointerX !== null) paddleX = pointerX - 50;
+      paddleX = clamp(paddleX, 0, 500);
 
-    function update(dt) {
-      if (left) paddle.x -= 430 * dt;
-      if (right) paddle.x += 430 * dt;
+      ballX += vx;
+      ballY += vy;
 
-      paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
-
-      ball.x += ball.vx * dt;
-      ball.y += ball.vy * dt;
-
-      if (ball.x - ball.r <= 0 || ball.x + ball.r >= W) {
-        ball.vx *= -1;
-        ball.x = Math.max(ball.r, Math.min(W - ball.r, ball.x));
-      }
-
-      if (ball.y - ball.r <= 0) {
-        ball.vy = Math.abs(ball.vy);
-        ball.y = ball.r;
-      }
+      if (ballX < 7 || ballX > 593) vx *= -1;
+      if (ballY < 7) vy *= -1;
 
       if (
-        ball.vy > 0 &&
-        ball.y + ball.r >= paddle.y &&
-        ball.y - ball.r <= paddle.y + paddle.h &&
-        ball.x >= paddle.x &&
-        ball.x <= paddle.x + paddle.w
+        vy > 0 && ballY >= 382 &&
+        ballX >= paddleX && ballX <= paddleX + 100
       ) {
-        ball.y = paddle.y - ball.r;
-        const offset = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
-        ball.vx = offset * 340;
-        ball.vy = -Math.max(200, Math.sqrt(210 * 210 + 250 * 250));
-
-        const speed = Math.hypot(ball.vx, ball.vy);
-        const targetSpeed = Math.min(440, speed + 4);
-        ball.vx = (ball.vx / speed) * targetSpeed;
-        ball.vy = (ball.vy / speed) * targetSpeed;
+        vy = -Math.abs(vy);
+        vx = clamp((ballX - (paddleX + 50)) * 0.12, -6, 6);
+        if (Math.abs(vx) < 1) vx = vx < 0 ? -1 : 1;
       }
 
       for (const brick of bricks) {
-        if (!brick.alive) continue;
-        const insideX = ball.x + ball.r >= brick.x && ball.x - ball.r <= brick.x + brick.w;
-        const insideY = ball.y + ball.r >= brick.y && ball.y - ball.r <= brick.y + brick.h;
-
-        if (insideX && insideY) {
+        if (
+          brick.alive &&
+          ballX >= brick.x && ballX <= brick.x + brick.w &&
+          ballY >= brick.y && ballY <= brick.y + brick.h
+        ) {
           brick.alive = false;
+          vy *= -1;
           score += 10;
-
-          const previousX = ball.x - ball.vx * dt;
-          if (previousX + ball.r <= brick.x || previousX - ball.r >= brick.x + brick.w) {
-            ball.vx *= -1;
-          } else {
-            ball.vy *= -1;
-          }
+          setScore(score);
           break;
         }
       }
 
-      if (bricks.every(brick => !brick.alive)) {
-        ended = true;
-        running = false;
-        recordScore("brickbreaker", score);
-        status(`Victory! You destroyed every brick. Score: ${score}.`);
-        return;
-      }
-
-      if (ball.y - ball.r > H) {
+      if (ballY > 420) {
         lives--;
         if (lives <= 0) {
-          ended = true;
           running = false;
-          recordScore("brickbreaker", score);
-          status(`Game over! Score: ${score}. Best: ${getBest("brickbreaker")}.`);
+          say("Game over! Final score: " + score);
         } else {
-          resetBall();
-          status(`Ball lost. ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
+          ballX = 300;
+          ballY = 350;
+          vx = 3;
+          vy = -4;
         }
       }
+
+      if (bricks.every(brick => !brick.alive)) {
+        running = false;
+        say("Amazing! You cleared every brick!");
+      }
+
+      draw();
+      if (running) raf = requestAnimationFrame(frame);
     }
 
-    function movePointer(event) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = W / rect.width;
-      const x = (event.clientX - rect.left) * scaleX;
-      paddle.x = Math.max(0, Math.min(W - paddle.w, x - paddle.w / 2));
-    }
-
-    function keyHandler(event) {
-      if (["ArrowLeft", "ArrowRight", "a", "A", "d", "D", " "].includes(event.key)) {
+    const keydown = event => {
+      if (event.key === "ArrowLeft") {
         event.preventDefault();
+        paddleX -= 25;
       }
-      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = true;
-      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = true;
-
-      if (event.key === " " && !ended && !event.repeat) {
-        running = !running;
-        lastTime = 0;
-        status(running ? "Game resumed." : "Game paused.");
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        paddleX += 25;
       }
-    }
+    };
 
-    function keyUp(event) {
-      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") left = false;
-      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") right = false;
-    }
+    const pointer = event => {
+      const rect = canvas.getBoundingClientRect();
+      pointerX = (event.clientX - rect.left) * 600 / rect.width;
+    };
 
-    canvas.addEventListener("pointermove", movePointer);
-    document.addEventListener("keydown", keyHandler);
-    document.addEventListener("keyup", keyUp);
+    canvas.addEventListener("pointermove", pointer);
+    document.addEventListener("keydown", keydown);
 
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Pause / Resume",
-        secondary: true,
-        onClick: () => {
-          if (ended) return;
-          running = !running;
-          lastTime = 0;
-          status(running ? "Game resumed." : "Game paused.");
-        }
-      }
-    ]);
+    addCleanup(() => {
+      running = false;
+      cancelAnimationFrame(raf);
+      canvas.removeEventListener("pointermove", pointer);
+      document.removeEventListener("keydown", keydown);
+    });
 
     reset();
-
-    return () => {
-      cancelAnimationFrame(animation);
-      canvas.removeEventListener("pointermove", movePointer);
-      document.removeEventListener("keydown", keyHandler);
-      document.removeEventListener("keyup", keyUp);
-    };
+    frame();
   }
 
-  /* ==================== GAME: ENDLESS RUNNER ==================== */
+  /* ==========================================================
+     5. ENDLESS RUNNER
+     ========================================================== */
 
-  register(
-    "runner",
-    "Endless Runner",
-    "Jump over obstacles, survive longer, and beat your best distance.",
-    "🏃",
-    "Arcade",
-    startRunner
-  );
+  function playRunner(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const canvas = makeCanvas(area, 600, 320);
+    const c = canvas.getContext("2d");
 
-  function startRunner(token) {
-    shell("Endless Runner", "Tap the game, press Space, or use the Jump button.");
-    const playArea = area();
-
-    const wrap = document.createElement("div");
-    wrap.className = "nx-canvas-wrap";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 700;
-    canvas.height = 340;
-    canvas.setAttribute("aria-label", "Endless Runner game");
-    wrap.appendChild(canvas);
-    playArea.appendChild(wrap);
-
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width;
-    const H = canvas.height;
-    const ground = H - 48;
-
-    let player, obstacles, score, speed, spawnIn, running, ended;
-    let animation = 0;
+    let playerY, velocity, obstacles, score, speed, raf, running, grounded;
     let lastTime = 0;
-    let jumpQueued = false;
 
     function reset() {
-      cancelAnimationFrame(animation);
-      player = { x: 80, y: ground - 38, w: 30, h: 38, vy: 0, onGround: true };
+      playerY = 230;
+      velocity = 0;
+      grounded = true;
       obstacles = [];
       score = 0;
-      speed = 280;
-      spawnIn = 1;
+      speed = 4;
       running = true;
-      ended = false;
       lastTime = 0;
-      jumpQueued = false;
-
-      status("Jump over obstacles. Your distance is your score.");
-      draw();
-      animation = requestAnimationFrame(frame);
+      setScore(0);
+      say("Tap Jump or press Space to avoid obstacles.");
     }
 
     function jump() {
-      if (ended) return;
-      if (!running) {
-        running = true;
-        lastTime = 0;
-        return;
-      }
-      if (player.onGround) {
-        player.vy = -570;
-        player.onGround = false;
+      if (!running) return;
+      if (grounded) {
+        velocity = -11;
+        grounded = false;
       }
     }
 
     function draw() {
-      ctx.fillStyle = "#060b16";
-      ctx.fillRect(0, 0, W, H);
+      c.fillStyle = "#030813";
+      c.fillRect(0, 0, 600, 320);
 
-      ctx.fillStyle = "#1c3557";
-      for (let i = 0; i < 25; i++) {
-        const x = (i * 97 + Math.floor(score * 0.3)) % W;
-        const y = 25 + (i * 43) % 170;
-        ctx.fillRect(x, y, 2, 2);
-      }
+      c.fillStyle = "#10243e";
+      c.fillRect(0, 265, 600, 55);
 
-      ctx.strokeStyle = "#35577d";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, ground);
-      ctx.lineTo(W, ground);
-      ctx.stroke();
+      c.strokeStyle = "#37b6ff";
+      c.beginPath();
+      c.moveTo(0, 265);
+      c.lineTo(600, 265);
+      c.stroke();
 
-      ctx.fillStyle = "#67caff";
-      ctx.beginPath();
-      ctx.roundRect(player.x, player.y, player.w, player.h, 7);
-      ctx.fill();
+      c.fillStyle = "#37b6ff";
+      c.fillRect(65, playerY, 30, 35);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(player.x + 18, player.y + 8, 5, 5);
-
+      c.fillStyle = "#ff6384";
       obstacles.forEach(obstacle => {
-        ctx.fillStyle = "#ff658b";
-        ctx.beginPath();
-        ctx.roundRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h, 5);
-        ctx.fill();
+        c.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
       });
 
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 18px system-ui";
-      ctx.textAlign = "left";
-      ctx.fillText(`Distance: ${Math.floor(score)}`, 18, 28);
-      ctx.fillText(`Speed: ${Math.floor(speed)}`, 18, 53);
+      c.fillStyle = "#ffffff";
+      c.font = "17px system-ui";
+      c.fillText("Score: " + score, 15, 25);
     }
 
     function frame(time) {
-      if (!isActive(token) || ended) return;
+      if (!running) return;
+
       if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 1000, 0.025);
+      const dt = Math.min((time - lastTime) / 16.67, 2);
       lastTime = time;
 
-      if (running) update(dt);
-      draw();
-      animation = requestAnimationFrame(frame);
-    }
+      velocity += 0.55 * dt;
+      playerY += velocity * dt;
 
-    function update(dt) {
-      score += dt * 10;
-      speed = Math.min(560, 280 + score * 0.8);
-
-      if (jumpQueued) {
-        jumpQueued = false;
-        jump();
+      if (playerY >= 230) {
+        playerY = 230;
+        velocity = 0;
+        grounded = true;
       }
 
-      player.vy += 1450 * dt;
-      player.y += player.vy * dt;
-
-      if (player.y + player.h >= ground) {
-        player.y = ground - player.h;
-        player.vy = 0;
-        player.onGround = true;
-      }
-
-      spawnIn -= dt;
-      if (spawnIn <= 0) {
-        const height = randomInt(25, 48);
-        const width = randomInt(18, 30);
+      if (Math.random() < 0.018 * dt) {
         obstacles.push({
-          x: W + 10,
-          y: ground - height,
-          w: width,
-          h: height
+          x: 610,
+          y: 230 + randomInt(0, 15),
+          w: randomInt(20, 32),
+          h: randomInt(25, 35)
         });
-        spawnIn = Math.max(0.65, randomInt(90, 155) / 100 - score / 1200);
       }
 
-      obstacles.forEach(obstacle => {
-        obstacle.x -= speed * dt;
-      });
-
-      obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -10);
+      obstacles.forEach(obstacle => obstacle.x -= speed * dt);
+      obstacles = obstacles.filter(obstacle => obstacle.x > -50);
 
       for (const obstacle of obstacles) {
-        const collided =
-          player.x + player.w > obstacle.x &&
-          player.x < obstacle.x + obstacle.w &&
-          player.y + player.h > obstacle.y &&
-          player.y < obstacle.y + obstacle.h;
-
-        if (collided) {
-          ended = true;
+        if (
+          65 + 30 > obstacle.x &&
+          65 < obstacle.x + obstacle.w &&
+          playerY + 35 > obstacle.y &&
+          playerY < obstacle.y + obstacle.h
+        ) {
           running = false;
-          const finalScore = Math.floor(score);
-          recordScore("runner", finalScore);
-          status(`Game over! Distance: ${finalScore}. Best: ${getBest("runner")}. Press Restart to try again.`);
+          say("Game over! Score: " + score + ". Press Restart.");
+          draw();
           return;
         }
       }
+
+      score += Math.floor(dt);
+      speed = Math.min(9, 4 + score / 400);
+      setScore(score);
+      draw();
+      raf = requestAnimationFrame(frame);
     }
 
-    function keyHandler(event) {
-      if ([" ", "ArrowUp", "w", "W"].includes(event.key)) {
+    const keydown = event => {
+      if (event.code === "Space" || event.key === "ArrowUp") {
         event.preventDefault();
-        if (event.repeat) return;
-        jumpQueued = true;
+        jump();
       }
-    }
+    };
 
-    function pointerJump(event) {
-      if (event.target.closest("button")) return;
-      jumpQueued = true;
-    }
+    document.addEventListener("keydown", keydown);
+    canvas.addEventListener("pointerdown", jump);
 
-    document.addEventListener("keydown", keyHandler);
-    canvas.addEventListener("pointerdown", pointerJump);
+    area.insertAdjacentHTML("beforeend", `
+      <div class="nx-controls">
+        <button class="nx-btn nx-primary" data-jump>⬆ JUMP</button>
+      </div>
+    `);
 
-    const jumpButton = button("⬆ Jump", () => {
-      jumpQueued = true;
+    area.querySelector("[data-jump]").addEventListener("click", jump);
+
+    addCleanup(() => {
+      running = false;
+      cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", keydown);
+      canvas.removeEventListener("pointerdown", jump);
     });
-    playArea.appendChild(jumpButton);
-
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Pause / Resume",
-        secondary: true,
-        onClick: () => {
-          if (ended) return;
-          running = !running;
-          lastTime = 0;
-          status(running ? "Game resumed." : "Game paused.");
-        }
-      }
-    ]);
 
     reset();
-
-    return () => {
-      cancelAnimationFrame(animation);
-      document.removeEventListener("keydown", keyHandler);
-      canvas.removeEventListener("pointerdown", pointerJump);
-    };
+    raf = requestAnimationFrame(frame);
   }
 
-  /* ==================== GAME: SPACE SHOOTER ==================== */
+  /* ==========================================================
+     6. SPACE SHOOTER
+     ========================================================== */
 
-  register(
-    "space",
-    "Space Shooter",
-    "Pilot your ship, shoot enemies, dodge collisions, and survive waves.",
-    "🚀",
-    "Arcade",
-    startSpaceShooter
-  );
+  function playShooter(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const canvas = makeCanvas(area, 600, 420);
+    const c = canvas.getContext("2d");
 
-  function startSpaceShooter(token) {
-    shell("Space Shooter", "Move with arrows, WASD, or drag on touch. Hold Space or the Fire button to shoot.");
-    const playArea = area();
-
-    const wrap = document.createElement("div");
-    wrap.className = "nx-canvas-wrap";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 700;
-    canvas.height = 460;
-    canvas.setAttribute("aria-label", "Space Shooter game");
-    wrap.appendChild(canvas);
-    playArea.appendChild(wrap);
-
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width;
-    const H = canvas.height;
-
-    let player, bullets, enemies, enemyBullets, particles, score, lives, wave;
-    let spawnTimer, shootTimer, running, ended;
-    let animation = 0;
-    let lastTime = 0;
+    let player, bullets, enemies, score, raf, running, lastSpawn;
     const keys = new Set();
+    let lastTime = 0;
+    let lastShot = 0;
 
     function reset() {
-      cancelAnimationFrame(animation);
-      player = { x: W / 2, y: H - 65, r: 15, speed: 310, invincible: 0 };
+      player = { x: 300, y: 370 };
       bullets = [];
       enemies = [];
-      enemyBullets = [];
-      particles = [];
       score = 0;
-      lives = 3;
-      wave = 1;
-      spawnTimer = 0.5;
-      shootTimer = 0;
       running = true;
-      ended = false;
+      lastSpawn = 0;
       lastTime = 0;
-
-      status("Destroy enemies and dodge incoming fire.");
-      draw();
-      animation = requestAnimationFrame(frame);
-    }
-
-    function spawnEnemy() {
-      const type = Math.random();
-      enemies.push({
-        x: randomInt(28, W - 28),
-        y: -25,
-        r: type < 0.25 ? 18 : 13,
-        hp: type < 0.25 ? 2 : 1,
-        speed: randomInt(65, 105) + wave * 7,
-        fire: randomInt(10, 30) / 10,
-        drift: randomInt(-40, 40),
-        points: type < 0.25 ? 30 : 10
-      });
+      lastShot = 0;
+      setScore(0);
+      say("Move with ← → or drag your finger. Tap SHOOT to fire.");
     }
 
     function shoot() {
-      bullets.push({ x: player.x, y: player.y - 16, r: 4, speed: 440 });
-    }
-
-    function addExplosion(x, y) {
-      for (let i = 0; i < 8; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = randomInt(40, 160);
-        particles.push({
-          x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 0.45
-        });
-      }
+      if (!running) return;
+      const now = performance.now();
+      if (now - lastShot < 170) return;
+      lastShot = now;
+      bullets.push({ x: player.x, y: player.y - 15 });
     }
 
     function draw() {
-      ctx.fillStyle = "#060b16";
-      ctx.fillRect(0, 0, W, H);
+      c.fillStyle = "#030813";
+      c.fillRect(0, 0, 600, 420);
 
-      ctx.fillStyle = "#9ccfff";
-      for (let i = 0; i < 75; i++) {
-        const x = (i * 89 + Math.floor(score * 0.5)) % W;
-        const y = (i * 47 + Math.floor(score * 1.8)) % H;
-        ctx.fillRect(x, y, 2, 2);
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 97) % 600;
+        const y = (i * 67) % 420;
+        c.fillStyle = "#243b5c";
+        c.fillRect(x, y, 2, 2);
       }
 
-      ctx.save();
-      ctx.translate(player.x, player.y);
-      ctx.fillStyle = player.invincible > 0 ? "#ffffff" : "#67caff";
-      ctx.beginPath();
-      ctx.moveTo(0, -19);
-      ctx.lineTo(15, 15);
-      ctx.lineTo(0, 8);
-      ctx.lineTo(-15, 15);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
+      c.fillStyle = "#37b6ff";
+      c.beginPath();
+      c.moveTo(player.x, player.y - 17);
+      c.lineTo(player.x - 14, player.y + 12);
+      c.lineTo(player.x + 14, player.y + 12);
+      c.closePath();
+      c.fill();
 
-      ctx.fillStyle = "#83f7d4";
-      bullets.forEach(bullet => {
-        ctx.beginPath();
-        ctx.roundRect(bullet.x - 2, bullet.y - 8, 4, 13, 2);
-        ctx.fill();
+      c.fillStyle = "#b6ff8c";
+      bullets.forEach(b => c.fillRect(b.x - 2, b.y - 7, 4, 12));
+
+      c.fillStyle = "#ff6384";
+      enemies.forEach(e => {
+        c.beginPath();
+        c.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+        c.fill();
       });
 
-      enemies.forEach(enemy => {
-        ctx.fillStyle = enemy.hp > 1 ? "#ffb45d" : "#ff658b";
-        ctx.beginPath();
-        ctx.moveTo(enemy.x, enemy.y + enemy.r);
-        ctx.lineTo(enemy.x + enemy.r, enemy.y - enemy.r * 0.6);
-        ctx.lineTo(enemy.x, enemy.y - enemy.r * 0.2);
-        ctx.lineTo(enemy.x - enemy.r, enemy.y - enemy.r * 0.6);
-        ctx.closePath();
-        ctx.fill();
-      });
-
-      ctx.fillStyle = "#d6a5ff";
-      enemyBullets.forEach(bullet => {
-        ctx.beginPath();
-        ctx.arc(bullet.x, bullet.y, bullet.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      particles.forEach(particle => {
-        ctx.globalAlpha = Math.max(0, particle.life / 0.45);
-        ctx.fillStyle = "#ffd166";
-        ctx.fillRect(particle.x, particle.y, 4, 4);
-      });
-      ctx.globalAlpha = 1;
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 17px system-ui";
-      ctx.textAlign = "left";
-      ctx.fillText(`Score: ${score}`, 16, 26);
-      ctx.fillText(`Lives: ${lives}`, 16, 50);
-
-      ctx.textAlign = "right";
-      ctx.fillText(`Wave: ${wave}`, W - 16, 26);
+      c.fillStyle = "#fff";
+      c.font = "16px system-ui";
+      c.fillText("Score: " + score, 12, 24);
     }
 
     function frame(time) {
-      if (!isActive(token) || ended) return;
+      if (!running) return;
+
       if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 1000, 0.025);
+      const dt = Math.min((time - lastTime) / 16.67, 2);
       lastTime = time;
 
-      if (running) update(dt);
-      draw();
-      animation = requestAnimationFrame(frame);
-    }
+      if (keys.has("ArrowLeft") || keys.has("a")) player.x -= 5 * dt;
+      if (keys.has("ArrowRight") || keys.has("d")) player.x += 5 * dt;
 
-    function update(dt) {
-      if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * dt;
-      if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * dt;
-      if (keys.has("ArrowUp") || keys.has("w")) player.y -= player.speed * dt;
-      if (keys.has("ArrowDown") || keys.has("s")) player.y += player.speed * dt;
+      player.x = clamp(player.x, 18, 582);
 
-      player.x = Math.max(player.r, Math.min(W - player.r, player.x));
-      player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
-      player.invincible = Math.max(0, player.invincible - dt);
-
-      shootTimer -= dt;
-      if (keys.has(" ") && shootTimer <= 0) {
-        shoot();
-        shootTimer = 0.19;
+      if (time - lastSpawn > Math.max(300, 950 - score * 3)) {
+        enemies.push({
+          x: randomInt(20, 580),
+          y: -15,
+          r: randomInt(10, 16),
+          speed: 1.6 + Math.random() * 1.5 + score / 250
+        });
+        lastSpawn = time;
       }
 
-      spawnTimer -= dt;
-      if (spawnTimer <= 0) {
-        spawnEnemy();
-        spawnTimer = Math.max(0.3, 1.05 - wave * 0.07);
-      }
+      bullets.forEach(b => b.y -= 7 * dt);
+      enemies.forEach(e => e.y += e.speed * dt);
 
-      bullets.forEach(bullet => { bullet.y -= bullet.speed * dt; });
-      bullets = bullets.filter(bullet => bullet.y > -15);
-
-      enemies.forEach(enemy => {
-        enemy.y += enemy.speed * dt;
-        enemy.x += enemy.drift * dt;
-        if (enemy.x < enemy.r || enemy.x > W - enemy.r) enemy.drift *= -1;
-
-        enemy.fire -= dt;
-        if (enemy.fire <= 0 && enemy.y > 0 && enemy.y < H - 100) {
-          const dx = player.x - enemy.x;
-          const dy = player.y - enemy.y;
-          const length = Math.hypot(dx, dy) || 1;
-          enemyBullets.push({
-            x: enemy.x,
-            y: enemy.y + enemy.r,
-            vx: (dx / length) * 150,
-            vy: (dy / length) * 150,
-            r: 5
-          });
-          enemy.fire = randomInt(20, 40) / 10;
-        }
-      });
-
-      enemyBullets.forEach(bullet => {
-        bullet.x += bullet.vx * dt;
-        bullet.y += bullet.vy * dt;
-      });
-      enemyBullets = enemyBullets.filter(bullet => bullet.y < H + 10 && bullet.x > -10 && bullet.x < W + 10);
-
-      particles.forEach(particle => {
-        particle.x += particle.vx * dt;
-        particle.y += particle.vy * dt;
-        particle.life -= dt;
-      });
-      particles = particles.filter(particle => particle.life > 0);
-
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        for (let j = bullets.length - 1; j >= 0; j--) {
-          const bullet = bullets[j];
-          if (Math.hypot(enemy.x - bullet.x, enemy.y - bullet.y) < enemy.r + bullet.r) {
-            bullets.splice(j, 1);
-            enemy.hp--;
-            if (enemy.hp <= 0) {
-              score += enemy.points;
-              addExplosion(enemy.x, enemy.y);
-              enemies.splice(i, 1);
-            }
-            break;
+      for (const bullet of bullets) {
+        for (const enemy of enemies) {
+          if (
+            !enemy.dead &&
+            Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y) <
+              enemy.r + 5
+          ) {
+            enemy.dead = true;
+            bullet.dead = true;
+            score += 10;
+            setScore(score);
           }
         }
       }
 
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        if (enemy.y > H + 25) {
-          enemies.splice(i, 1);
-          continue;
-        }
-        if (player.invincible <= 0 && Math.hypot(player.x - enemy.x, player.y - enemy.y) < player.r + enemy.r) {
-          enemies.splice(i, 1);
-          damagePlayer();
-        }
-      }
+      bullets = bullets.filter(b => !b.dead && b.y > -15);
+      enemies = enemies.filter(e => !e.dead && e.y < 450);
 
-      if (player.invincible <= 0) {
-        for (let i = enemyBullets.length - 1; i >= 0; i--) {
-          const bullet = enemyBullets[i];
-          if (Math.hypot(player.x - bullet.x, player.y - bullet.y) < player.r + bullet.r) {
-            enemyBullets.splice(i, 1);
-            damagePlayer();
-            break;
-          }
-        }
-      }
-
-      const newWave = 1 + Math.floor(score / 150);
-      if (newWave > wave) {
-        wave = newWave;
-        status(`Wave ${wave}! Enemies are getting faster.`);
-      }
-    }
-
-    function damagePlayer() {
-      if (player.invincible > 0 || ended) return;
-      lives--;
-      player.invincible = 1.3;
-      status(`Hit! ${lives} ${lives === 1 ? "life" : "lives"} remaining.`);
-      if (lives <= 0) {
-        ended = true;
+      if (enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < e.r + 12)) {
         running = false;
-        recordScore("space", score);
-        status(`Game over! Score: ${score}. Best: ${getBest("space")}. Press Restart to play again.`);
-      }
-    }
-
-    function keyDown(event) {
-      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(key)) {
-        event.preventDefault();
-      }
-      keys.add(key);
-    }
-
-    function keyUp(event) {
-      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-      keys.delete(key);
-    }
-
-    function pointerMove(event) {
-      if (event.pointerType === "mouse") return;
-      const rect = canvas.getBoundingClientRect();
-      player.x = (event.clientX - rect.left) * W / rect.width;
-      player.y = (event.clientY - rect.top) * H / rect.height;
-      player.x = Math.max(player.r, Math.min(W - player.r, player.x));
-      player.y = Math.max(player.r + 15, Math.min(H - player.r, player.y));
-    }
-
-    document.addEventListener("keydown", keyDown);
-    document.addEventListener("keyup", keyUp);
-    canvas.addEventListener("pointermove", pointerMove);
-    canvas.addEventListener("pointerdown", pointerMove);
-
-    padRow(playArea, [
-      holdButton("🔥 Hold to Fire", () => keys.add(" "), () => keys.delete(" "))
-    ]);
-
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "Pause / Resume",
-        secondary: true,
-        onClick: () => {
-          if (ended) return;
-          running = !running;
-          lastTime = 0;
-          status(running ? "Game resumed." : "Game paused.");
-        }
-      }
-    ]);
-
-    reset();
-
-    return () => {
-      cancelAnimationFrame(animation);
-      document.removeEventListener("keydown", keyDown);
-      document.removeEventListener("keyup", keyUp);
-      canvas.removeEventListener("pointermove", pointerMove);
-      canvas.removeEventListener("pointerdown", pointerMove);
-      keys.clear();
-    };
-  }
-
-  /* ===================== GAME: MINESWEEPER ===================== */
-
-  register(
-    "minesweeper",
-    "Minesweeper",
-    "Reveal safe squares, follow the number clues, and avoid mines.",
-    "💣",
-    "Puzzle",
-    startMinesweeper
-  );
-
-  function startMinesweeper(token) {
-    shell("Minesweeper", "Reveal every safe square. Use Flag Mode or right-click to mark suspected mines.");
-    const playArea = area();
-
-    const SIZE = 10;
-    const MINE_COUNT = 15;
-
-    let cells, revealed, flagged, started, ended, flagMode, seconds, timer, revealedSafe;
-
-    const info = document.createElement("div");
-    info.className = "nx-status";
-    playArea.appendChild(info);
-
-    const board = document.createElement("div");
-    board.className = "nx-board";
-    board.style.gridTemplateColumns = `repeat(${SIZE}, minmax(0, 1fr))`;
-    board.style.maxWidth = "500px";
-    board.style.gap = "3px";
-    playArea.appendChild(board);
-
-    function indexOf(x, y) { return y * SIZE + x; }
-
-    function neighbors(index) {
-      const x = index % SIZE;
-      const y = Math.floor(index / SIZE);
-      const result = [];
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          if (dx === 0 && dy === 0) continue;
-          const nx = x + dx;
-          const ny = y + dy;
-          if (nx >= 0 && nx < SIZE && ny >= 0 && ny < SIZE) {
-            result.push(indexOf(nx, ny));
-          }
-        }
-      }
-      return result;
-    }
-
-    function placeMines(firstIndex) {
-      const forbidden = new Set([firstIndex, ...neighbors(firstIndex)]);
-      const candidates = [];
-      for (let i = 0; i < SIZE * SIZE; i++) {
-        if (!forbidden.has(i)) candidates.push(i);
-      }
-      const mineLocations = shuffle(candidates).slice(0, MINE_COUNT);
-      mineLocations.forEach(index => { cells[index].mine = true; });
-
-      cells.forEach((cell, index) => {
-        if (cell.mine) return;
-        cell.count = neighbors(index).filter(neighbor => cells[neighbor].mine).length;
-      });
-
-      started = true;
-      seconds = 0;
-      timer = setInterval(() => {
-        if (!isActive(token) || ended) return;
-        seconds++;
-        updateInfo();
-      }, 1000);
-    }
-
-    function reset() {
-      clearInterval(timer);
-      cells = Array.from({ length: SIZE * SIZE }, () => ({ mine: false, count: 0 }));
-      revealed = new Set();
-      flagged = new Set();
-      started = false;
-      ended = false;
-      flagMode = false;
-      seconds = 0;
-      revealedSafe = 0;
-
-      board.innerHTML = "";
-      for (let i = 0; i < SIZE * SIZE; i++) {
-        const cellButton = document.createElement("button");
-        cellButton.className = "nx-cell";
-        cellButton.style.aspectRatio = "1";
-        cellButton.setAttribute("aria-label", `Hidden square ${i + 1}`);
-
-        cellButton.addEventListener("click", () => {
-          if (flagMode) toggleFlag(i);
-          else reveal(i);
-        });
-
-        cellButton.addEventListener("contextmenu", event => {
-          event.preventDefault();
-          toggleFlag(i);
-        });
-
-        board.appendChild(cellButton);
-      }
-      updateInfo();
-      status("Choose any square to begin. Your first area will be safe.");
-    }
-
-    function updateInfo() {
-      info.textContent = `Mines: ${MINE_COUNT} • Flags: ${flagged.size} • Safe squares: ${revealedSafe}/${SIZE * SIZE - MINE_COUNT} • Time: ${seconds}s`;
-    }
-
-    function toggleFlag(index) {
-      if (ended || revealed.has(index)) return;
-      if (flagged.has(index)) {
-        flagged.delete(index);
-      } else {
-        if (flagged.size >= MINE_COUNT) {
-          status("You have used all 15 flags.");
-          return;
-        }
-        flagged.add(index);
-      }
-      renderBoard();
-      updateInfo();
-    }
-
-    function reveal(index) {
-      if (ended || revealed.has(index) || flagged.has(index)) return;
-      if (!started) placeMines(index);
-
-      if (cells[index].mine) {
-        ended = true;
-        clearInterval(timer);
-        cells.forEach((cell, i) => { if (cell.mine) revealed.add(i); });
-        renderBoard();
-        status(`Boom! You found a mine after ${seconds} seconds.`);
+        say("Your ship was hit! Score: " + score);
+        draw();
         return;
       }
 
-      floodReveal(index);
-      renderBoard();
-      updateInfo();
-
-      if (revealedSafe === SIZE * SIZE - MINE_COUNT) {
-        ended = true;
-        clearInterval(timer);
-        const score = Math.max(100, 1500 - seconds * 5);
-        recordScore("minesweeper", score);
-        status(`You win! Revealed in ${seconds} seconds. Score: ${score}.`);
-      }
+      draw();
+      raf = requestAnimationFrame(frame);
     }
 
-    function floodReveal(startIndex) {
-      const stack = [startIndex];
-      while (stack.length) {
-        const index = stack.pop();
-        if (revealed.has(index) || flagged.has(index) || cells[index].mine) continue;
-        revealed.add(index);
-        revealedSafe++;
-
-        if (cells[index].count === 0) {
-          neighbors(index).forEach(neighbor => {
-            if (!revealed.has(neighbor) && !flagged.has(neighbor) && !cells[neighbor].mine) {
-              stack.push(neighbor);
-            }
-          });
-        }
+    const keydown = event => {
+      keys.add(event.key);
+      if (event.code === "Space") {
+        event.preventDefault();
+        shoot();
       }
-    }
+    };
 
-    function renderBoard() {
-      const buttons = board.children;
-      for (let i = 0; i < cells.length; i++) {
-        const cellButton = buttons[i];
-        const cell = cells[i];
-        cellButton.className = "nx-cell";
-        cellButton.style.background = "";
-        cellButton.style.color = "";
-        cellButton.disabled = revealed.has(i) || ended;
+    const keyup = event => keys.delete(event.key);
 
-        if (revealed.has(i)) {
-          if (cell.mine) {
-            cellButton.textContent = "💣";
-            cellButton.style.background = "#662b40";
-          } else {
-            cellButton.textContent = cell.count || "";
-            cellButton.style.background = "#101c31";
-            const colors = { 1: "#67caff", 2: "#70e0a0", 3: "#ff8e8e", 4: "#bba5ff", 5: "#ffbd66" };
-            if (cell.count) cellButton.style.color = colors[cell.count] || "#ffffff";
-          }
-        } else if (flagged.has(i)) {
-          cellButton.textContent = "🚩";
-          cellButton.style.background = "#563a19";
-        } else {
-          cellButton.textContent = "";
-        }
-      }
-    }
+    const pointermove = event => {
+      if (event.pointerType === "mouse" && event.buttons === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      player.x = clamp((event.clientX - rect.left) * 600 / rect.width, 18, 582);
+    };
 
-    actions([
-      { label: "Restart", onClick: reset },
-      {
-        label: "🚩 Flag Mode: OFF",
-        secondary: true,
-        onClick: event => {
-          flagMode = !flagMode;
-          event.currentTarget.textContent = `🚩 Flag Mode: ${flagMode ? "ON" : "OFF"}`;
-          status(flagMode ? "Flag Mode is ON." : "Flag Mode is OFF.");
-        }
-      }
-    ]);
+    document.addEventListener("keydown", keydown);
+    document.addEventListener("keyup", keyup);
+    canvas.addEventListener("pointermove", pointermove);
+
+    area.insertAdjacentHTML("beforeend", `
+      <div class="nx-controls">
+        <button class="nx-btn" data-move="-1">⬅ LEFT</button>
+        <button class="nx-btn nx-primary" data-shoot>🚀 SHOOT</button>
+        <button class="nx-btn" data-move="1">RIGHT ➡</button>
+      </div>
+    `);
+
+    const intervals = [];
+
+    area.querySelectorAll("[data-move]").forEach(button => {
+      let interval = null;
+      const amount = Number(button.dataset.move);
+
+      const start = event => {
+        event.preventDefault();
+        clearInterval(interval);
+        interval = setInterval(() => {
+          player.x = clamp(player.x + amount * 8, 18, 582);
+        }, 25);
+      };
+
+      const stop = () => {
+        clearInterval(interval);
+        interval = null;
+      };
+
+      button.addEventListener("pointerdown", start);
+      button.addEventListener("pointerup", stop);
+      button.addEventListener("pointerleave", stop);
+      button.addEventListener("pointercancel", stop);
+      intervals.push(() => clearInterval(interval));
+    });
+
+    area.querySelector("[data-shoot]").addEventListener("click", shoot);
+
+    addCleanup(() => {
+      running = false;
+      cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", keydown);
+      document.removeEventListener("keyup", keyup);
+      canvas.removeEventListener("pointermove", pointermove);
+      intervals.forEach(fn => fn());
+    });
 
     reset();
-    return () => clearInterval(timer);
+    raf = requestAnimationFrame(frame);
   }
 
-  /* ==================== GAME: MATH CHALLENGE ==================== */
+  /* ==========================================================
+     7. MATH CHALLENGE
+     ========================================================== */
 
-  register(
-    "math",
-    "Math Challenge",
-    "Solve arithmetic questions before the 30-second timer reaches zero.",
-    "🔢",
-    "Puzzle",
-    startMath
-  );
+  function playMath(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
 
-  function startMath(token) {
-    shell("Math Challenge", "Answer as many arithmetic questions as you can in 30 seconds.");
-    const playArea = area();
+    let score = 0;
+    let timeLeft = 30;
+    let a, b, answer, interval, ended = false;
 
-    const question = document.createElement("div");
-    question.className = "nx-panel";
-    question.style.textAlign = "center";
-    question.style.marginTop = "15px";
-    question.style.fontSize = "clamp(25px, 7vw, 42px)";
-    question.style.fontWeight = "900";
-    playArea.appendChild(question);
-
-    const form = document.createElement("form");
-    form.style.display = "flex";
-    form.style.gap = "9px";
-    form.style.flexWrap = "wrap";
-    form.style.margin = "15px 0";
-    playArea.appendChild(form);
-
-    const input = document.createElement("input");
-    input.type = "number";
-    input.inputMode = "numeric";
-    input.placeholder = "Your answer";
-    input.required = true;
-    input.style.flex = "1 1 130px";
-    input.style.padding = "13px";
-    input.style.background = "#080f20";
-    input.style.color = "white";
-    input.style.border = "1px solid #344765";
-    input.style.borderRadius = "10px";
-
-    const submit = document.createElement("button");
-    submit.className = "nx-btn";
-    submit.type = "submit";
-    submit.textContent = "Submit Answer";
-    form.append(input, submit);
-
-    const nextButton = button("Next Question", nextQuestion, true);
-    nextButton.style.display = "none";
-    playArea.appendChild(nextButton);
-
-    let answer = 0, score = 0, correct = 0, attempted = 0, remaining = 30;
-    let running = false, ended = false, timer = null, questionLocked = false;
-
-    function makeQuestion() {
-      const difficulty = Math.min(4, Math.floor(score / 5));
-      const operation = randomInt(0, Math.min(3, difficulty + 1));
-      let a, b, symbol;
+    function question() {
+      const operation = randomInt(0, 2);
 
       if (operation === 0) {
-        a = randomInt(1, 10 + difficulty * 10);
-        b = randomInt(1, 10 + difficulty * 10);
+        a = randomInt(1, 30);
+        b = randomInt(1, 30);
         answer = a + b;
-        symbol = "+";
       } else if (operation === 1) {
-        a = randomInt(1, 10 + difficulty * 10);
+        a = randomInt(10, 40);
         b = randomInt(1, a);
         answer = a - b;
-        symbol = "−";
-      } else if (operation === 2) {
-        a = randomInt(2, 10 + difficulty * 2);
+      } else {
+        a = randomInt(2, 12);
         b = randomInt(2, 10);
         answer = a * b;
-        symbol = "×";
-      } else {
-        b = randomInt(2, 12);
-        answer = randomInt(2, 12);
-        a = b * answer;
-        symbol = "÷";
       }
-      question.textContent = `${a} ${symbol} ${b} = ?`;
+
+      const symbols = operation === 0 ? "+" : operation === 1 ? "−" : "×";
+      area.querySelector("[data-question]").textContent = `${a} ${symbols} ${b} = ?`;
+      area.querySelector("[data-answer]").value = "";
+      area.querySelector("[data-answer]").focus();
     }
 
-    function updateStatus() {
-      status(`Time: ${remaining}s • Score: ${score} • Correct: ${correct}/${attempted}`);
-    }
+    function render() {
+      area.innerHTML = `
+        <div style="max-width:420px;margin:auto;text-align:center">
+          <div class="nx-game-stats">
+            <div class="nx-pill">Time: <strong data-time>30</strong>s</div>
+            <div class="nx-pill">Correct: <strong data-correct>0</strong></div>
+          </div>
+          <h2 data-question style="font-size:38px;margin:30px 0"></h2>
+          <form data-form>
+            <input class="nx-answer" data-answer type="number"
+              inputmode="numeric" autocomplete="off"
+              placeholder="Your answer" required>
+            <button class="nx-btn nx-primary nx-wide" style="margin-top:12px">
+              SUBMIT ANSWER
+            </button>
+          </form>
+        </div>
+      `;
 
-    function nextQuestion() {
-      if (ended) return;
-      questionLocked = false;
-      input.value = "";
-      input.disabled = false;
-      submit.disabled = false;
-      nextButton.style.display = "none";
-      makeQuestion();
-      input.focus();
+      area.querySelector("[data-form]").addEventListener("submit", event => {
+        event.preventDefault();
+        if (ended) return;
+
+        const input = area.querySelector("[data-answer]");
+        if (input.value.trim() === "") return;
+
+        if (Number(input.value) === answer) {
+          score += 10;
+          setScore(score);
+          area.querySelector("[data-correct]").textContent = score / 10;
+          say("Correct! +10 points.");
+        } else {
+          say("Not quite! The correct answer was " + answer + ".");
+        }
+
+        question();
+      });
+
+      question();
     }
 
     function finish() {
       ended = true;
-      running = false;
-      clearInterval(timer);
-      input.disabled = true;
-      submit.disabled = true;
-      nextButton.style.display = "none";
-      recordScore("math", score);
-      question.textContent = "Time's up!";
-      status(`Final score: ${score}. Correct: ${correct}/${attempted}. Best: ${getBest("math")}.`);
+      clearInterval(interval);
+
+      area.innerHTML = `
+        <div style="text-align:center;padding:25px">
+          <div style="font-size:50px">🧠</div>
+          <h2>Time's up!</h2>
+          <p>You earned <strong>${score}</strong> points.</p>
+          <p>Press Restart to try again.</p>
+        </div>
+      `;
+
+      say("Challenge completed.");
     }
 
-    function reset() {
-      clearInterval(timer);
-      score = 0;
-      correct = 0;
-      attempted = 0;
-      remaining = 30;
-      running = true;
-      ended = false;
-      questionLocked = false;
-      input.value = "";
-      input.disabled = false;
-      submit.disabled = false;
-      nextButton.style.display = "none";
-      makeQuestion();
-      updateStatus();
+    render();
+    setScore(0);
+    say("You have 30 seconds. Each correct answer earns 10 points.");
 
-      timer = setInterval(() => {
-        if (!isActive(token) || ended) return;
-        remaining--;
-        updateStatus();
-        if (remaining <= 0) finish();
-      }, 1000);
-      input.focus();
-    }
+    interval = setInterval(() => {
+      if (ended) return;
 
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-      if (ended || questionLocked) return;
-      if (input.value.trim() === "") return;
+      timeLeft--;
 
-      const submitted = Number(input.value);
-      attempted++;
-      questionLocked = true;
-      input.disabled = true;
-      submit.disabled = true;
+      const timeEl = area.querySelector("[data-time]");
+      if (timeEl) timeEl.textContent = timeLeft;
 
-      if (submitted === answer) {
-        correct++;
-        score += 10;
-        status(`Correct! +10 points.`);
-      } else {
-        status(`Not quite. The correct answer was ${answer}.`);
-      }
+      if (timeLeft <= 0) finish();
+    }, 1000);
 
-      recordScore("math", score);
-      updateStatus();
-
-      if (remaining > 0) {
-        nextButton.style.display = "inline-block";
-      }
-    });
-
-    actions([{ label: "Restart", onClick: reset }]);
-    reset();
-
-    return () => clearInterval(timer);
+    addCleanup(() => clearInterval(interval));
   }
 
-  /* ================= GAME: ROCK PAPER SCISSORS ================= */
+  /* ==========================================================
+     8. ROCK PAPER SCISSORS
+     ========================================================== */
 
-  register(
-    "rps",
-    "Rock Paper Scissors",
-    "Choose rock, paper, or scissors and challenge the computer.",
-    "✊",
-    "Casual",
-    startRPS
-  );
+  function playRPS(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
 
-  function startRPS(token) {
-    shell("Rock Paper Scissors", "Rock beats scissors. Scissors beat paper. Paper beats rock.");
-    const playArea = area();
-
-    let playerScore = 0, computerScore = 0, draws = 0, round = 0, ended = false;
+    let score = 0;
+    let round = 0;
+    let ended = false;
 
     const choices = [
-      { name: "Rock", icon: "✊" },
-      { name: "Paper", icon: "✋" },
-      { name: "Scissors", icon: "✌️" }
+      { id: "rock", name: "Rock", icon: "✊" },
+      { id: "paper", name: "Paper", icon: "✋" },
+      { id: "scissors", name: "Scissors", icon: "✌️" }
     ];
 
-    const resultBox = document.createElement("div");
-    resultBox.className = "nx-panel";
-    resultBox.style.textAlign = "center";
-    resultBox.style.marginTop = "15px";
-    playArea.appendChild(resultBox);
-
-    const scoreBox = document.createElement("div");
-    scoreBox.className = "nx-status";
-    playArea.appendChild(scoreBox);
-
-    const choiceGrid = document.createElement("div");
-    choiceGrid.className = "nx-grid";
-    choiceGrid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
-    playArea.appendChild(choiceGrid);
-
-    function updateScore() {
-      scoreBox.textContent = `You: ${playerScore} • Computer: ${computerScore} • Draws: ${draws} • Rounds: ${round}`;
-    }
-
     function reset() {
-      playerScore = 0;
-      computerScore = 0;
-      draws = 0;
+      score = 0;
       round = 0;
       ended = false;
+      setScore(0);
 
-      resultBox.innerHTML = `
-        <div style="font-size:46px">✊ ✋ ✌️</div>
-        <h3>Ready for a match?</h3>
-        <p class="nx-muted">Choose your move below.</p>
+      area.innerHTML = `
+        <div style="max-width:520px;margin:auto;text-align:center">
+          <p>Play 10 rounds. Each win earns 10 points.</p>
+          <div class="nx-pill">Round: <strong data-round>0</strong> / 10</div>
+
+          <div class="nx-choice-grid">
+            ${choices.map(choice => `
+              <button class="nx-choice" data-choice="${choice.id}">
+                ${choice.icon}<span>${choice.name}</span>
+              </button>
+            `).join("")}
+          </div>
+
+          <div class="nx-message" data-result></div>
+          <p data-record></p>
+        </div>
       `;
-      updateScore();
-      status("Make your first move!");
+
+      area.querySelectorAll("[data-choice]").forEach(button => {
+        button.addEventListener("click", () => play(button.dataset.choice));
+      });
+
+      say("Choose rock, paper, or scissors.");
     }
 
-    function play(playerChoice) {
-      if (ended || !isActive(token)) return;
+    function play(userChoice) {
+      if (ended) return;
 
-      const computerChoice = randomInt(0, 2);
-      const player = choices[playerChoice];
-      const computer = choices[computerChoice];
+      const computerChoice = choices[randomInt(0, 2)].id;
       round++;
 
-      let outcome;
-      if (playerChoice === computerChoice) {
-        draws++;
-        outcome = "It's a draw!";
+      let result;
+
+      if (userChoice === computerChoice) {
+        result = "Draw!";
       } else if (
-        (playerChoice === 0 && computerChoice === 2) ||
-        (playerChoice === 1 && computerChoice === 0) ||
-        (playerChoice === 2 && computerChoice === 1)
+        (userChoice === "rock" && computerChoice === "scissors") ||
+        (userChoice === "paper" && computerChoice === "rock") ||
+        (userChoice === "scissors" && computerChoice === "paper")
       ) {
-        playerScore++;
-        outcome = "You win this round!";
+        result = "You win this round! +10 points.";
+        score += 10;
+        setScore(score);
       } else {
-        computerScore++;
-        outcome = "Computer wins this round!";
+        result = "Computer wins this round.";
       }
 
-      resultBox.innerHTML = `
-        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap">
-          <div>
-            <div style="font-size:48px">${player.icon}</div>
-            <strong>You</strong>
-            <div class="nx-small">${player.name}</div>
-          </div>
-          <div style="font-size:22px;font-weight:900;color:#67caff">VS</div>
-          <div>
-            <div style="font-size:48px">${computer.icon}</div>
-            <strong>Computer</strong>
-            <div class="nx-small">${computer.name}</div>
-          </div>
-        </div>
-        <h3 style="margin-bottom:5px">${outcome}</h3>
-      `;
+      const names = Object.fromEntries(choices.map(c => [c.id, c.name]));
 
-      recordScore("rps", playerScore);
-      updateScore();
-      status(`Round ${round}: ${outcome} Best win count: ${getBest("rps")}.`);
+      area.querySelector("[data-result]").textContent =
+        `You: ${names[userChoice]} • Computer: ${names[computerChoice]} — ${result}`;
+
+      area.querySelector("[data-round]").textContent = round;
+
+      if (round >= 10) {
+        ended = true;
+        area.querySelectorAll("[data-choice]").forEach(button => {
+          button.disabled = true;
+        });
+
+        area.querySelector("[data-record]").textContent =
+          `Game finished! Your score: ${score}. Press Restart to play again.`;
+
+        say("Match complete.");
+      }
     }
 
-    choices.forEach((choice, index) => {
-      const card = document.createElement("div");
-      card.className = "nx-card";
-      card.style.textAlign = "center";
-
-      const icon = document.createElement("div");
-      icon.className = "nx-icon";
-      icon.style.fontSize = "42px";
-      icon.textContent = choice.icon;
-
-      const title = document.createElement("h3");
-      title.textContent = choice.name;
-
-      const playButton = button("Choose " + choice.name, () => play(index));
-      playButton.style.width = "100%";
-
-      card.append(icon, title, playButton);
-      choiceGrid.appendChild(card);
-    });
-
-    actions([{ label: "Restart Match", onClick: reset }]);
     reset();
-
-    return () => {};
+    addCleanup(() => {});
   }
 
+  /* ==========================================================
+     9. HANGMAN
+     ========================================================== */
+
+  function playHangman(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+
+    const words = [
+      "JAVASCRIPT", "COMPUTER", "GALAXY", "KEYBOARD",
+      "PROGRAM", "NETWORK", "ROBOT", "PLANET",
+      "BROWSER", "PUZZLE", "ARCADE", "RAINBOW",
+      "MONITOR", "PIXEL", "GAMING", "NEXORA"
+    ];
+
+    let word, guessed, mistakes, score, finished;
+
+    function reset() {
+      word = words[randomInt(0, words.length - 1)];
+      guessed = [];
+      mistakes = 0;
+      score = 0;
+      finished = false;
+      setScore(0);
+      render();
+      say("Guess the hidden word. You have 6 incorrect guesses.");
+    }
+
+    function render() {
+      const display = [...word]
+        .map(letter => guessed.includes(letter) ? letter : "_")
+        .join(" ");
+
+      area.innerHTML = `
+        <div style="max-width:600px;margin:auto;text-align:center">
+          <div style="font-size:52px">${["🙂","😐","😕","😟","😣","😵","💀"][mistakes]}</div>
+          <div class="nx-game-stats">
+            <div class="nx-pill">Mistakes: <strong>${mistakes}</strong>/6</div>
+            <div class="nx-pill">Letters found: <strong>${guessed.length}</strong></div>
+          </div>
+          <div class="nx-word">${display}</div>
+          <div class="nx-letter-grid">
+            ${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(letter => `
+              <button class="nx-letter" data-letter="${letter}"
+                ${guessed.includes(letter) || finished ? "disabled" : ""}>
+                ${letter}
+              </button>
+            `).join("")}
+          </div>
+          <p style="color:#9eabc5">Category: Everyday words and technology</p>
+        </div>
+      `;
+
+      area.querySelectorAll("[data-letter]").forEach(button => {
+        button.addEventListener("click", () => guess(button.dataset.letter));
+      });
+    }
+
+    function guess(letter) {
+      if (finished || guessed.includes(letter)) return;
+
+      guessed.push(letter);
+
+      if (word.includes(letter)) {
+        score += 5;
+        setScore(score);
+      } else {
+        mistakes++;
+      }
+
+      const won = [...word].every(char => guessed.includes(char));
+
+      if (won) {
+        finished = true;
+        score += 20;
+        setScore(score);
+        say("You guessed the word! +20 bonus points.");
+      } else if (mistakes >= 6) {
+        finished = true;
+        say("Game over! The word was " + word + ".");
+      } else if (word.includes(letter)) {
+        say("Correct letter!");
+      } else {
+        say("Wrong letter. Try another.");
+      }
+
+      render();
+
+      if (finished) {
+        area.insertAdjacentHTML("beforeend", `
+          <div style="text-align:center;margin:15px">
+            <p>The word was <strong>${word}</strong>.</p>
+            <button class="nx-btn nx-primary" data-next-word>New Word</button>
+          </div>
+        `);
+
+        area.querySelector("[data-next-word]").addEventListener("click", reset);
+      }
+    }
+
+    const keyHandler = event => {
+      if (/^[a-z]$/i.test(event.key)) guess(event.key.toUpperCase());
+    };
+
+    document.addEventListener("keydown", keyHandler);
+
+    addCleanup(() => document.removeEventListener("keydown", keyHandler));
+
+    reset();
+  }
+
+  /* ==========================================================
+     10. FLAPPY FLYER
+     ========================================================== */
+
+  function playFlappy(ctx) {
+    const { area, say, setScore, addCleanup } = ctx;
+    const canvas = makeCanvas(area, 400, 560);
+    const c = canvas.getContext("2d");
+
+    let birdY, velocity, pipes, score, raf, running, passed;
+    let lastTime = 0;
+    const birdX = 90;
+    const birdR = 12;
+
+    function reset() {
+      birdY = 270;
+      velocity = 0;
+      pipes = [];
+      score = 0;
+      passed = 0;
+      running = true;
+      lastTime = 0;
+      setScore(0);
+      say("Tap the game or press Space to flap. Avoid the pipes!");
+      pipes.push(makePipe(420));
+    }
+
+    function makePipe(x) {
+      const gap = 155;
+      const top = randomInt(70, 330);
+
+      return {
+        x,
+        top,
+        bottom: top + gap,
+        gap,
+        passed: false
+      };
+    }
+
+    function flap() {
+      if (!running) return;
+      velocity = -6.2;
+    }
+
+    function draw() {
+      const gradient = c.createLinearGradient(0, 0, 0, 560);
+      gradient.addColorStop(0, "#08152c");
+      gradient.addColorStop(1, "#15314d");
+
+      c.fillStyle = gradient;
+      c.fillRect(0, 0, 400, 560);
+
+      // Stars
+      for (let i = 0; i < 32; i++) {
+        c.fillStyle = "#ffffff";
+        c.fillRect((i * 83) % 400, (i * 97) % 560, 2, 2);
+      }
+
+      pipes.forEach(pipe => {
+        c.fillStyle = "#35d39a";
+        c.fillRect(pipe.x, 0, 52, pipe.top);
+        c.fillRect(pipe.x, pipe.bottom, 52, 560 - pipe.bottom);
+
+        c.fillStyle = "#1c9f75";
+        c.fillRect(pipe.x - 4, pipe.top - 12, 60, 12);
+        c.fillRect(pipe.x - 4, pipe.bottom, 60, 12);
+      });
+
+      c.fillStyle = "#ffd166";
+      c.beginPath();
+      c.arc(birdX, birdY, birdR, 0, Math.PI * 2);
+      c.fill();
+
+      c.fillStyle = "#ffffff";
+      c.beginPath();
+      c.arc(birdX + 4, birdY - 3, 3, 0, Math.PI * 2);
+      c.fill();
+
+      c.fillStyle = "#07101c";
+      c.beginPath();
+      c.arc(birdX + 5, birdY - 3, 1.3, 0, Math.PI * 2);
+      c.fill();
+
+      c.fillStyle = "#ff8b4a";
+      c.beginPath();
+      c.moveTo(birdX + 10, birdY + 1);
+      c.lineTo(birdX + 20, birdY + 4);
+      c.lineTo(birdX + 10, birdY + 7);
+      c.closePath();
+      c.fill();
+
+      c.fillStyle = "#fff";
+      c.font = "bold 24px system-ui";
+      c.textAlign = "center";
+      c.fillText(score, 200, 38);
+    }
+
+    function frame(time) {
+      if (!running) return;
+
+      if (!lastTime) lastTime = time;
+      const dt = Math.min((time - lastTime) / 16.67, 2);
+      lastTime = time;
+
+      velocity += 0.3 * dt;
+      birdY += velocity * dt;
+
+      pipes.forEach(pipe => pipe.x -= 2.6 * dt);
+
+      if (pipes.length && pipes[pipes.length - 1].x < 230) {
+        pipes.push(makePipe(420));
+      }
+
+      pipes = pipes.filter(pipe => pipe.x > -70);
+
+      for (const pipe of pipes) {
+        const overlaps = birdX + birdR > pipe.x && birdX - birdR < pipe.x + 52;
+        const hitsPipe = birdY - birdR < pipe.top || birdY + birdR > pipe.bottom;
+
+        if (overlaps && hitsPipe) {
+          running = false;
+          say("You hit a pipe! Score: " + score + ". Press Restart.");
+          draw();
+          return;
+        }
+
+        if (!pipe.passed && pipe.x + 52 < birdX) {
+          pipe.passed = true;
+          score++;
+          setScore(score);
+        }
+      }
+
+      if (birdY - birdR < 0 || birdY + birdR > 560) {
+        running = false;
+        say("Game over! Score: " + score + ". Press Restart.");
+        draw();
+        return;
+      }
+
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+
+    const keydown = event => {
+      if (event.code === "Space" || event.key === "ArrowUp") {
+        event.preventDefault();
+        flap();
+      }
+    };
+
+    document.addEventListener("keydown", keydown);
+    canvas.addEventListener("pointerdown", flap);
+
+    area.insertAdjacentHTML("beforeend", `
+      <div class="nx-controls">
+        <button class="nx-btn nx-primary" data-flap>🐦 FLAP</button>
+      </div>
+    `);
+
+    area.querySelector("[data-flap]").addEventListener("click", flap);
+
+    addCleanup(() => {
+      running = false;
+      cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", keydown);
+      canvas.removeEventListener("pointerdown", flap);
+    });
+
+    reset();
+    raf = requestAnimationFrame(frame);
+  }
+
+  /* ==========================================================
+     STARTUP
+     ========================================================== */
+
+  try {
+    injectStyles();
+    menu();
+
+    const loadingMessage = document.getElementById("loading-error");
+    if (loadingMessage) loadingMessage.remove();
+
+    console.log("RexWeb Nexora Arcade loaded successfully.");
+  } catch (error) {
+    console.error("RexWeb Nexora Arcade failed to start:", error);
+
+    root.innerHTML = `
+      <div style="padding:20px;text-align:center;color:#ffb4c4">
+        <h2>Arcade loading error</h2>
+        <p>Reload the page and check that game.js is saved correctly.</p>
+        <button onclick="location.reload()">Reload Arcade</button>
+      </div>
+    `;
+  }
+})();
