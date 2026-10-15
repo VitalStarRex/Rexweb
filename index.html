@@ -2,1116 +2,727 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080b18" id="themeColor">
-<title>RexWeb Nexora</title>
-<meta name="description" content="RexWeb Nexora — Play. Create. Trade. Grow.">
 
-<script>
-(function () {
-  try {
-    const saved = localStorage.getItem("nexoraTheme");
-    if (saved === "light" || saved === "dark") {
-      document.documentElement.dataset.theme = saved;
-    }
-  } catch (_) {}
-})();
-</script>
+<title>RexWeb Nexora — Your Digital Universe</title>
+<meta name="description" content="Explore RexWeb Nexora: discover online tools, beautiful themes, ebooks, games, and digital products in one place.">
 
 <style>
+/* =========================
+   REXWEB NEXORA
+   MAIN STYLES
+========================= */
+
 :root {
-  color-scheme: dark;
-  --bg:#080b18;
-  --surface:#10162a;
-  --surface2:#171f38;
-  --primary:#6575ff;
-  --secondary:#a855f7;
-  --cyan:#39d9ff;
-  --text:#f5f7ff;
-  --muted:#a7b0cb;
-  --border:rgba(255,255,255,.1);
-  --header-bg:rgba(8,11,24,.96);
-  --card-bg:linear-gradient(145deg,#151d37,#0d1223);
-  --input-bg:#080c18;
-  --input-text:#f3f5ff;
-  --editor-bg:#080c18;
-  --editor-text:#d5e1ff;
-  --preview-bg:#ffffff;
-  --shadow:0 15px 35px rgba(0,0,0,.2);
+  --bg: #080b18;
+  --header: rgba(8, 11, 24, 0.96);
+  --card: #11162a;
+  --card-hover: #191e38;
+  --text: #f5f7ff;
+  --muted: #9ba6c5;
+  --purple: #9865ff;
+  --cyan: #36e5f5;
+  --border: rgba(152, 101, 255, 0.25);
+  --shadow: rgba(86, 51, 180, 0.18);
 }
 
-:root[data-theme="light"] {
-  color-scheme:light;
-  --bg:#f2f5fc;
-  --surface:#ffffff;
-  --surface2:#e9eef9;
-  --primary:#4e5ee8;
-  --secondary:#9146d9;
-  --cyan:#007caa;
-  --text:#18213a;
-  --muted:#596680;
-  --border:rgba(31,48,82,.16);
-  --header-bg:rgba(255,255,255,.96);
-  --card-bg:linear-gradient(145deg,#ffffff,#f0f4fc);
-  --input-bg:#ffffff;
-  --input-text:#18213a;
-  --editor-bg:#f7f9ff;
-  --editor-text:#18213a;
-  --preview-bg:#ffffff;
-  --shadow:0 12px 30px rgba(31,48,82,.09);
+html[data-theme="light"] {
+  --bg: #f4f6ff;
+  --header: rgba(255, 255, 255, 0.96);
+  --card: #ffffff;
+  --card-hover: #edf0ff;
+  --text: #17152b;
+  --muted: #626b85;
+  --purple: #7048e8;
+  --cyan: #008da5;
+  --border: rgba(112, 72, 232, 0.23);
+  --shadow: rgba(60, 45, 120, 0.08);
 }
 
 * {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-  min-height:100%;
-  scroll-behavior:smooth;
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
 }
 
 body {
-  width:100%;
-  min-height:100vh;
-  overflow-x:hidden;
-  background:
-    radial-gradient(ellipse at top left,rgba(101,117,255,.13),transparent 38%),
-    var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-  line-height:1.6;
-  transition:background-color .2s,color .2s;
-}
-
-button,input,textarea,select {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline:3px solid var(--cyan);
-  outline-offset:3px;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background .25s, color .25s;
+  overflow-x: hidden;
 }
 
 a {
-  color:inherit;
-  text-decoration:none;
+  color: inherit;
+  text-decoration: none;
 }
 
-.container {
-  width:min(1600px,96%);
-  margin-inline:auto;
+button {
+  font: inherit;
 }
 
-/* HEADER */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   HEADER
+========================= */
 
 .site-header {
-  position:sticky;
-  top:0;
-  z-index:1000;
-  background:var(--header-bg);
-  backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
-}
-
-.header-top {
-  min-height:70px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  padding:8px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--header);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
 }
 
 .brand {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  letter-spacing:.5px;
-  font-size:20px;
-  white-space:nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
 }
 
 .brand-icon {
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border-radius:13px;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  font-size:23px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  color: white;
+  background: linear-gradient(135deg, #9865ff, #36e5f5);
+  box-shadow: 0 0 20px var(--shadow);
 }
 
-.brand span span {
-  color:var(--cyan);
+.brand-name span {
+  color: var(--purple);
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.main-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  color: var(--text);
+  background: var(--card);
+  border-color: var(--border);
+}
+
+.nav-btn.active {
+  box-shadow: inset 0 -2px var(--purple);
 }
 
 .header-actions {
-  display:flex;
-  gap:7px;
-  align-items:center;
-  flex-wrap:wrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.header-btn {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  min-height:40px;
-  padding:8px 13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--surface);
-  color:var(--text);
-  font-size:13px;
-  font-weight:700;
-  white-space:nowrap;
-  flex-shrink:0;
-  transition:background .2s,border-color .2s,transform .2s;
+.header-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  transition: .2s ease;
 }
 
-.header-btn:hover,
-.header-btn.active {
-  border-color:var(--primary);
-  background:var(--surface2);
+.header-icon:hover {
+  border-color: var(--purple);
+  transform: translateY(-1px);
 }
 
-.header-btn.primary {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  border:0;
+.menu-toggle {
+  display: none;
 }
 
-.header-btn:hover {
-  transform:translateY(-1px);
-}
-
-.theme-toggle {
-  min-width:115px;
-}
-
-/* NAVIGATION */
-
-.nav-wrap {
-  border-top:1px solid var(--border);
-}
-
-.nav-buttons {
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  padding:10px 0;
-}
-
-.more-wrapper {
-  position:relative;
-}
-
-.more-menu {
-  display:none;
-  position:absolute;
-  top:calc(100% + 8px);
-  right:0;
-  width:230px;
-  padding:8px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:var(--shadow);
-}
-
-.more-menu.open {
-  display:block;
-}
-
-.more-menu button {
-  display:block;
-  width:100%;
-  text-align:left;
-  padding:11px;
-  border:0;
-  border-radius:8px;
-  background:transparent;
-  color:var(--text);
-}
-
-.more-menu button:hover {
-  background:var(--surface2);
-}
-
-/* PAGE NAVIGATION */
-
-.app-page {
-  display:none;
-  min-height:calc(100vh - 150px);
-}
-
-.app-page.active {
-  display:block;
-  animation:appear .2s ease;
-}
-
-@keyframes appear {
-  from {opacity:0;transform:translateY(4px)}
-  to {opacity:1;transform:translateY(0)}
-}
-
-.section {
-  padding:40px 0 65px;
-}
-
-.section-label {
-  display:inline-block;
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:2px;
-  margin-bottom:10px;
-}
-
-h1 {
-  font-size:clamp(28px,4vw,52px);
-  line-height:1.2;
-}
-
-h2 {
-  font-size:clamp(23px,2.5vw,32px);
-  line-height:1.3;
-  margin-bottom:10px;
-}
-
-h3 {
-  line-height:1.35;
-}
-
-p {
-  color:var(--muted);
-}
-
-/* HOME HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero {
-  padding:clamp(55px,8vw,110px) 0;
-  text-align:center;
+  position: relative;
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 75px 20px 65px;
+  text-align: center;
+  overflow: hidden;
 }
 
-.hero h1 {
-  font-size:clamp(38px,6vw,82px);
-  margin:20px 0;
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .18;
+  pointer-events: none;
 }
 
-.gradient-text {
-  background:linear-gradient(100deg,#6d8cff,#bf81ff,#40dfff);
-  background-clip:text;
-  -webkit-background-clip:text;
-  color:transparent;
+.hero::before {
+  background: var(--purple);
+  top: -140px;
+  left: -100px;
 }
 
-.hero p {
-  max-width:800px;
-  margin:12px auto 22px;
-  font-size:clamp(14px,1.4vw,19px);
+.hero::after {
+  background: var(--cyan);
+  right: -120px;
+  bottom: -150px;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
 }
 
 .eyebrow {
-  display:inline-block;
-  border:1px solid rgba(101,117,255,.4);
-  background:rgba(101,117,255,.1);
-  padding:7px 14px;
-  border-radius:30px;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--card);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
 
-/* HOME CARDS */
-
-.feature-grid {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:17px;
-  margin-top:25px;
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #42e89b;
+  box-shadow: 0 0 10px #42e89b;
 }
 
-.feature-card {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  text-align:left;
-  padding:23px;
-  min-height:210px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:var(--card-bg);
-  color:var(--text);
-  transition:transform .2s,border-color .2s,box-shadow .2s;
+.hero h1 {
+  font-size: clamp(37px, 7vw, 76px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -3px;
+  margin-bottom: 22px;
 }
 
-.feature-card:hover {
-  border-color:var(--primary);
-  transform:translateY(-3px);
-  box-shadow:var(--shadow);
+.gradient-text {
+  color: var(--purple);
+  background: linear-gradient(100deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.feature-icon {
-  font-size:32px;
-  margin-bottom:13px;
+.hero p {
+  max-width: 580px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
 }
 
-.feature-card h3 {
-  font-size:18px;
-  margin-bottom:8px;
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-top: 32px;
 }
 
-.feature-card p {
-  font-size:13px;
-  margin-bottom:16px;
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 13px 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px var(--shadow);
+}
+
+.btn-primary {
+  color: #fff;
+  border: none;
+  background: linear-gradient(110deg, #8755ef, #5b80ff, #20bfd8);
+}
+
+.btn-secondary {
+  color: var(--text);
+  background: var(--card);
+}
+
+/* =========================
+   GENERAL SECTIONS
+========================= */
+
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 42px 22px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.section-label {
+  margin-bottom: 10px;
+  color: var(--purple);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.section-heading h2 {
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -1px;
+}
+
+.section-description {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.view-all {
+  flex-shrink: 0;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* =========================
+   CATEGORY CARDS
+========================= */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 205px;
+  padding: 23px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  transition: transform .25s, border-color .25s, background .25s;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--purple);
+  background: var(--card-hover);
+}
+
+.category-icon {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  margin-bottom: 21px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(152,101,255,.2), rgba(54,229,245,.1));
+  font-size: 24px;
+}
+
+.category-card h3 {
+  margin-bottom: 9px;
+  font-size: 18px;
+}
+
+.category-card p {
+  flex: 1;
+  margin-bottom: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 .card-link {
-  margin-top:auto;
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-/* PANELS */
+/* =========================
+   FEATURED BANNER
+========================= */
 
-.panel {
-  padding:clamp(18px,3vw,34px);
-  margin-top:22px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:var(--card-bg);
-  box-shadow:var(--shadow);
+.feature-banner {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 34px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 90% 10%, rgba(54,229,245,.13), transparent 40%),
+    radial-gradient(ellipse at 10% 90%, rgba(152,101,255,.2), transparent 45%),
+    var(--card);
 }
 
-.action-row {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:17px;
+.feature-banner h2 {
+  margin-bottom: 12px;
+  font-size: clamp(23px, 4vw, 34px);
 }
 
-.action-btn {
-  padding:10px 14px;
-  border-radius:9px;
-  background:var(--surface2);
-  border:1px solid var(--border);
-  color:var(--text);
-  font-weight:bold;
-  font-size:12px;
+.feature-banner p {
+  max-width: 550px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
 }
 
-.action-btn.primary {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  border:0;
+.feature-symbol {
+  flex-shrink: 0;
+  font-size: 75px;
+  filter: drop-shadow(0 0 20px var(--shadow));
 }
 
-.action-btn:hover {
-  border-color:var(--primary);
+/* =========================
+   MARKETPLACE
+========================= */
+
+.marketplace-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-footer {
-  border-top:1px solid var(--border);
-  padding:24px 0;
-  color:var(--muted);
-  font-size:12px;
-  background:var(--surface);
+.market-card {
+  padding: 23px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  transition: .2s;
 }
 
-/* CODING STUDIO */
-
-.coding-heading {
-  margin-bottom:22px;
+.market-card:hover {
+  border-color: var(--cyan);
+  transform: translateY(-3px);
 }
 
-.coding-heading p {
-  margin-top:9px;
+.market-card .emoji {
+  font-size: 29px;
+  margin-bottom: 15px;
 }
 
-.tool-card {
-  border:1px solid var(--border);
-  border-radius:15px;
-  overflow:hidden;
-  background:var(--surface);
-  margin-bottom:20px;
-  box-shadow:var(--shadow);
+.market-card h3 {
+  font-size: 16px;
+  margin-bottom: 9px;
 }
 
-.tool-bar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:12px 15px;
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
+.market-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
-.tool-bar strong {
-  font-size:14px;
+/* =========================
+   FOOTER
+========================= */
+
+.site-footer {
+  margin-top: 45px;
+  padding: 32px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--header);
 }
 
-.tool-bar .action-row {
-  gap:6px;
+.footer-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.preview-screen {
-  height:400px;
-  background:var(--preview-bg);
-  position:relative;
+.footer-brand {
+  font-weight: 900;
+  font-size: 15px;
 }
 
-.preview-screen iframe {
-  width:100%;
-  height:100%;
-  border:0;
-  display:block;
-  background:white;
+.footer-brand span {
+  color: var(--purple);
 }
 
-.editor-tabs {
-  display:flex;
-  overflow-x:auto;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  scrollbar-width:thin;
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
 }
 
-.editor-tab {
-  padding:11px 19px;
-  border:0;
-  border-bottom:3px solid transparent;
-  color:var(--muted);
-  background:transparent;
-  font-weight:bold;
-  font-size:13px;
-  white-space:nowrap;
+.footer-links a {
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.editor-tab.active {
-  color:var(--text);
-  border-bottom-color:var(--primary);
-  background:var(--surface2);
+.footer-links a:hover {
+  color: var(--cyan);
 }
 
-.editor-panel {
-  display:none;
+.copyright {
+  width: 100%;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
 }
 
-.editor-panel.active {
-  display:block;
-}
+/* =========================
+   MOBILE RESPONSIVENESS
+========================= */
 
-.file-label {
-  padding:8px 13px;
-  background:var(--surface2);
-  color:var(--muted);
-  font-size:11px;
-  border-bottom:1px solid var(--border);
-}
-
-.code-input {
-  display:block;
-  width:100%;
-  min-height:300px;
-  padding:15px;
-  resize:vertical;
-  border:0;
-  outline:none;
-  background:var(--editor-bg);
-  color:var(--editor-text);
-  font-family:monospace;
-  font-size:13px;
-  line-height:1.7;
-  tab-size:2;
-  white-space:pre;
-  overflow:auto;
-  border-radius:0;
-}
-
-.editor-footer {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:12px;
-  flex-wrap:wrap;
-  background:var(--surface2);
-  border-top:1px solid var(--border);
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* FULLSCREEN PREVIEW */
-
-.preview-screen:fullscreen {
-  width:100%;
-  height:100%;
-  background:white;
-}
-
-.preview-screen:fullscreen iframe {
-  width:100%;
-  height:100%;
-}
-
-.preview-screen:-webkit-full-screen {
-  width:100%;
-  height:100%;
-  background:white;
-}
-
-.preview-screen:-webkit-full-screen iframe {
-  width:100%;
-  height:100%;
-}
-
-.preview-fullscreen-btn {
-  position:absolute;
-  right:10px;
-  bottom:10px;
-  z-index:5;
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border:1px solid rgba(255,255,255,.3);
-  border-radius:10px;
-  background:#11182be8;
-  color:white;
-  font-size:19px;
-  box-shadow:0 4px 15px #0003;
-}
-
-.preview-fullscreen-btn:hover {
-  background:#27345a;
-}
-
-/* SCIENTIFIC CALCULATOR */
-
-.calculator {
-  width:100%;
-  max-width:720px;
-  margin:25px auto;
-  padding:clamp(12px,2.5vw,22px);
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:var(--card-bg);
-  box-shadow:var(--shadow);
-}
-
-.calc-top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:10px;
-  flex-wrap:wrap;
-}
-
-.calc-top strong {
-  font-size:16px;
-}
-
-.calc-display {
-  display:block;
-  width:100%;
-  min-width:0;
-  min-height:60px;
-  padding:12px;
-  margin-bottom:10px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--input-bg);
-  color:var(--cyan);
-  text-align:right;
-  font-family:monospace;
-  font-size:clamp(22px,4vw,34px);
-  outline:none;
-}
-
-.calc-expression {
-  min-height:20px;
-  color:var(--muted);
-  text-align:right;
-  overflow-wrap:anywhere;
-  font-family:monospace;
-  font-size:12px;
-  margin-bottom:4px;
-}
-
-.calc-status {
-  min-height:20px;
-  color:#c77726;
-  font-size:11px;
-  margin-bottom:7px;
-  overflow-wrap:anywhere;
-}
-
-.calc-grid {
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;
-}
-
-.calc-key {
-  min-width:0;
-  min-height:48px;
-  padding:8px 3px;
-  border:1px solid var(--border);
-  border-radius:9px;
-  color:var(--text);
-  background:var(--surface2);
-  font-size:14px;
-  font-weight:bold;
-  touch-action:manipulation;
-}
-
-.calc-key:hover {
-  border-color:var(--primary);
-  filter:brightness(1.06);
-}
-
-.calc-key.function {
-  background:var(--surface);
-  color:var(--cyan);
-}
-
-.calc-key.operator {
-  background:rgba(168,85,247,.15);
-  color:var(--text);
-}
-
-.calc-key.danger {
-  background:rgba(220,60,100,.13);
-  color:#e34d70;
-}
-
-.calc-key.equal {
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-}
-
-.calc-key.wide {
-  grid-column:span 2;
-}
-
-.calc-mode {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:11px;
-  color:var(--muted);
-}
-
-.calc-mode select {
-  padding:6px 8px;
-  border-radius:7px;
-  border:1px solid var(--border);
-  background:var(--surface);
-  color:var(--text);
-}
-
-/* TEXT COUNTER */
-
-.text-counter {
-  margin-top:20px;
-}
-
-.counter-input {
-  display:block;
-  width:100%;
-  min-height:190px;
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  outline:none;
-  resize:vertical;
-  background:var(--input-bg);
-  color:var(--input-text);
-  font-family:monospace;
-  font-size:14px;
-  line-height:1.7;
-}
-
-.counter-input:focus {
-  border-color:var(--primary);
-}
-
-.counter-stats {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  margin-top:15px;
-}
-
-.counter-stat {
-  padding:16px 12px;
-  border:1px solid var(--border);
-  border-radius:11px;
-  background:var(--surface);
-  min-width:0;
-}
-
-.counter-stat strong {
-  display:block;
-  font-size:clamp(20px,2vw,27px);
-  overflow-wrap:anywhere;
-  line-height:1.4;
-}
-
-.counter-stat span {
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* NOTICES */
-
-.notice {
-  position:fixed;
-  z-index:3000;
-  bottom:18px;
-  left:50%;
-  transform:translate(-50%,15px);
-  width:max-content;
-  max-width:90%;
-  padding:11px 15px;
-  border:1px solid var(--primary);
-  border-radius:10px;
-  background:var(--surface);
-  color:var(--text);
-  font-size:12px;
-  box-shadow:var(--shadow);
-  opacity:0;
-  pointer-events:none;
-  transition:.2s;
-}
-
-.notice.show {
-  opacity:1;
-  transform:translate(-50%,0);
-}
-
-/* LIGHT MODE */
-
-:root[data-theme="light"] .feature-card:hover,
-:root[data-theme="light"] .panel,
-:root[data-theme="light"] .calculator,
-:root[data-theme="light"] .tool-card {
-  box-shadow:0 12px 30px rgba(31,48,82,.08);
-}
-
-:root[data-theme="light"] .calc-key.danger {
-  color:#a51e43;
-}
-
-:root[data-theme="light"] .calc-status {
-  color:#9a4a00;
-}
-
-/* TABLETS */
-
-@media(max-width:1200px) {
-  .feature-grid {
-    grid-template-columns:repeat(3,minmax(0,1fr));
+@media (max-width: 900px) {
+  .site-header {
+    gap: 9px;
+    padding: 10px;
   }
 
-  .nav-buttons {
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    scrollbar-width:thin;
-  }
-}
-
-@media(max-width:850px) {
-  .container {
-    width:94%;
-  }
-
-  .feature-grid {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .preview-screen {
-    height:320px;
-  }
-
-  .code-input {
-    min-height:260px;
-  }
-
-  .counter-stats {
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-/* MOBILE PHONES */
-
-@media(max-width:550px) {
   .brand {
-    font-size:15px;
-    gap:7px;
+    font-size: 13px;
+    gap: 5px;
   }
 
   .brand-icon {
-    width:34px;
-    height:34px;
-    border-radius:10px;
-    font-size:19px;
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    font-size: 13px;
   }
 
-  .header-top {
-    padding:9px 0;
-    align-items:center;
-    gap:8px;
+  .main-nav {
+    gap: 3px;
+  }
+
+  .nav-btn {
+    padding: 9px 9px;
+    font-size: 11px;
+  }
+
+  .header-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    gap: 7px;
+    padding: 9px 8px;
+  }
+
+  .brand {
+    font-size: 11px;
+  }
+
+  .brand-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nav-btn {
+    gap: 4px;
+    padding: 9px 8px;
+    font-size: 10px;
   }
 
   .header-actions {
-    gap:5px;
+    gap: 5px;
   }
 
-  .header-actions .header-btn {
-    min-height:34px;
-    padding:6px 8px;
-    font-size:10px;
-    border-radius:8px;
+  .header-icon {
+    width: 31px;
+    height: 31px;
+    font-size: 14px;
   }
 
-  .theme-toggle {
-    min-width:0;
-  }
-
-  .container {
-    width:92%;
-  }
-
-  .nav-buttons {
-    gap:6px;
-    padding:8px 0;
-  }
-
-  .nav-buttons .header-btn {
-    min-height:34px;
-    padding:7px 10px;
-    font-size:11px;
-  }
-
-  .feature-grid {
-    grid-template-columns:1fr;
-    gap:11px;
-  }
-
-  .feature-card {
-    min-height:145px;
-    padding:18px;
-  }
-
-  .feature-icon {
-    font-size:27px;
-    margin-bottom:8px;
-  }
-
-  .feature-card h3 {
-    font-size:16px;
-  }
-
-  .section {
-    padding:25px 0 40px;
+  .menu-toggle {
+    display: grid;
   }
 
   .hero {
-    padding:48px 0;
+    min-height: 390px;
+    padding: 65px 18px;
   }
 
   .hero h1 {
-    margin:15px 0;
+    letter-spacing: -1.7px;
   }
 
   .hero p {
-    font-size:13px;
+    font-size: 14px;
   }
 
-  .calculator {
-    padding:9px;
-    margin:18px auto;
-    border-radius:13px;
+  .section {
+    padding: 30px 15px;
   }
 
-  .calc-top {
-    margin-bottom:7px;
+  .section-heading {
+    align-items: flex-start;
   }
 
-  .calc-top strong {
-    font-size:13px;
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
   }
 
-  .calc-display {
-    min-height:49px;
-    padding:9px;
-    margin-bottom:7px;
-    font-size:23px;
-    border-radius:8px;
+  .category-card {
+    min-height: 200px;
+    padding: 16px;
   }
 
-  .calc-expression {
-    font-size:10px;
-    min-height:16px;
+  .category-icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 15px;
+    font-size: 21px;
   }
 
-  .calc-status {
-    min-height:16px;
-    font-size:10px;
-    margin-bottom:5px;
+  .category-card h3 {
+    font-size: 15px;
   }
 
-  .calc-grid {
-    gap:4px;
+  .category-card p {
+    font-size: 12px;
   }
 
-  .calc-key {
-    min-height:39px;
-    padding:5px 1px;
-    font-size:12px;
-    border-radius:7px;
+  .feature-banner {
+    padding: 23px;
   }
 
-  .calc-mode {
-    font-size:10px;
+  .feature-symbol {
+    font-size: 43px;
   }
 
-  .calc-mode select {
-    padding:5px;
+  .marketplace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
   }
 
-  .counter-input {
-    min-height:145px;
-    padding:11px;
-    font-size:13px;
+  .market-card {
+    padding: 16px;
   }
 
-  .counter-stats {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:7px;
-    margin-top:10px;
-  }
-
-  .counter-stat {
-    padding:12px 9px;
-  }
-
-  .counter-stat strong {
-    font-size:21px;
-  }
-
-  .counter-stat span {
-    font-size:10px;
-  }
-
-  .preview-screen {
-    height:230px;
-  }
-
-  .preview-fullscreen-btn {
-    right:7px;
-    bottom:7px;
-    width:36px;
-    height:36px;
-    font-size:16px;
-  }
-
-  .code-input {
-    min-height:200px;
-    padding:11px;
-    font-size:12px;
-    line-height:1.6;
-  }
-
-  .editor-tab {
-    padding:10px 13px;
-    font-size:11px;
-  }
-
-  .tool-bar {
-    padding:9px;
-  }
-
-  .tool-bar strong {
-    font-size:12px;
-  }
-
-  .tool-bar .action-btn,
-  .editor-footer .action-btn {
-    padding:8px 10px;
-    font-size:11px;
-  }
-
-  .editor-footer {
-    padding:9px;
-  }
-
-  .panel {
-    padding:15px;
-  }
-
-  .app-page {
-    min-height:65vh;
-  }
-
-  footer {
-    padding:19px 0;
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
-@media(max-width:360px) {
-  .brand {
-    font-size:13px;
+@media (max-width: 370px) {
+  .brand-name {
+    max-width: 70px;
+    white-space: normal;
+    line-height: 1.2;
   }
 
-  .header-actions .header-btn {
-    padding:5px 6px;
-    font-size:9px;
+  .nav-btn {
+    padding: 8px 7px;
+    font-size: 9px;
   }
 
-  .calc-key {
-    min-height:35px;
-    font-size:11px;
-  }
-
-  .calc-grid {
-    gap:3px;
-  }
-
-  .calc-display {
-    font-size:20px;
-  }
-
-  .counter-stat strong {
-    font-size:18px;
+  .category-card {
+    padding: 13px;
   }
 }
 
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    animation:none!important;
-    transition:none!important;
-    scroll-behavior:auto!important;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }
 </style>
@@ -1119,1207 +730,381 @@ footer {
 
 <body>
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header class="site-header">
-  <div class="container">
 
-    <div class="header-top">
-      <a class="brand" href="#home" data-page="home">
-        <span class="brand-icon">⚡</span>
-        <span>REXWEB <span>NEXORA</span></span>
-      </a>
+  <a href="index.html" class="brand" aria-label="RexWeb Nexora Home">
+    <span class="brand-icon">R✦</span>
+    <span class="brand-name">REXWEB <span>NEXORA</span></span>
+  </a>
 
-      <div class="header-actions">
-        <button class="header-btn theme-toggle" id="themeToggle" type="button">
-          ☀️ Light Mode
-        </button>
+  <nav class="main-nav" id="mainNav" aria-label="Main navigation">
+    <a href="index.html" class="nav-btn active">⌂ Home</a>
+    <a href="tools.html" class="nav-btn">⚒ Tools</a>
+    <a href="themes.html" class="nav-btn">◈ Themes</a>
+    <a href="ebooks.html" class="nav-btn">▤ Ebooks</a>
+    <a href="games.html" class="nav-btn">🎮 Games</a>
+    <a href="marketplace.html" class="nav-btn">🛍 Market</a>
+  </nav>
 
-        <button class="header-btn" data-notice="Login requires account authentication to be connected.">
-          👤 Login
-        </button>
+  <div class="header-actions">
 
-        <button class="header-btn primary" data-notice="Registration requires account authentication to be connected.">
-          Sign Up
-        </button>
+    <button
+      class="header-icon"
+      id="themeToggle"
+      type="button"
+      aria-label="Switch to light theme"
+      title="Switch theme">
+      ☀️
+    </button>
 
-        <div class="more-wrapper">
-          <button class="header-btn" id="moreButton" aria-expanded="false" aria-controls="moreMenu">
-            ☰ More
-          </button>
-
-          <div class="more-menu" id="moreMenu">
-            <button data-page="rewards">💰 Rewards Centre</button>
-            <button data-page="help">🛟 Help Centre</button>
-            <button data-page="about">ℹ️ About RexWeb</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav-wrap" aria-label="Main navigation">
-      <div class="nav-buttons" id="mainNav">
-        <button class="header-btn active" data-page="home">🏠 Home</button>
-        <button class="header-btn" data-page="games">🎮 Games</button>
-        <button class="header-btn" data-page="creator-hub">🎨 Creator Hub</button>
-        <button class="header-btn" data-page="marketplace">🛍️ Marketplace</button>
-        <button class="header-btn" data-page="learning">📚 Learning</button>
-        <button class="header-btn" data-page="web-dev">💻 Web Dev</button>
-        <button class="header-btn" data-page="coding-studio">🧑‍💻 Coding Studio</button>
-        <button class="header-btn" data-page="calculator">🧮 Calculator</button>
-        <button class="header-btn" data-page="text-counter">🔢 Text Counter</button>
-        <button class="header-btn" data-page="competitions">🏆 Competitions</button>
-        <button class="header-btn" data-page="rewards">💰 Rewards</button>
-      </div>
-    </nav>
+    <button
+      class="header-icon menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-label="Show navigation links"
+      aria-expanded="false"
+      title="Navigation menu">
+      ☰
+    </button>
 
   </div>
+
 </header>
+
+<!-- =========================
+     HERO
+========================= -->
 
 <main>
 
-<!-- HOME -->
+<section class="hero" id="home">
+  <div class="hero-content">
 
-<section class="app-page active" id="page-home">
-  <div class="hero container">
-    <div class="eyebrow">YOUR DIGITAL DESTINATION</div>
+    <div class="eyebrow">
+      <span class="status-dot"></span>
+      WELCOME TO THE NEXORA UNIVERSE
+    </div>
 
     <h1>
-      Welcome to<br>
-      <span class="gradient-text">RexWeb Nexora</span>
+      YOUR DIGITAL WORLD.<br>
+      <span class="gradient-text">WITHOUT LIMITS.</span>
     </h1>
 
-    <p>Play. Create. Trade. Grow.</p>
-
     <p>
-      Discover gaming, creative resources, coding tools, digital products,
-      and learning resources in one place.
+      One destination for powerful online tools, stunning website themes,
+      digital ebooks, exciting games, and creative digital resources.
+      Discover what's possible with RexWeb Nexora.
     </p>
 
-    <button class="header-btn primary" data-page="coding-studio">
-      🧑‍💻 Open Coding Studio
-    </button>
-  </div>
+    <div class="hero-buttons">
+      <a href="tools.html" class="btn btn-primary">
+        EXPLORE TOOLS <span>↗</span>
+      </a>
 
-  <div class="container section">
-    <h2>Explore RexWeb</h2>
-    <p>Choose a destination to get started.</p>
-
-    <div class="feature-grid">
-      <button class="feature-card" data-page="games">
-        <span class="feature-icon">🎮</span>
-        <h3>Games</h3>
-        <p>Discover games and challenges.</p>
-        <span class="card-link">Explore Games →</span>
-      </button>
-
-      <button class="feature-card" data-page="creator-hub">
-        <span class="feature-icon">🎨</span>
-        <h3>Creator Hub</h3>
-        <p>Explore creative resources and projects.</p>
-        <span class="card-link">Open Creator Hub →</span>
-      </button>
-
-      <button class="feature-card" data-page="marketplace">
-        <span class="feature-icon">🛍️</span>
-        <h3>Marketplace</h3>
-        <p>Discover digital products.</p>
-        <span class="card-link">Browse Products →</span>
-      </button>
-
-      <button class="feature-card" data-page="learning">
-        <span class="feature-icon">📚</span>
-        <h3>Learning Centre</h3>
-        <p>Explore lessons and tutorials.</p>
-        <span class="card-link">Start Learning →</span>
-      </button>
-
-      <button class="feature-card" data-page="web-dev">
-        <span class="feature-icon">💻</span>
-        <h3>Web Development</h3>
-        <p>Explore code and website resources.</p>
-        <span class="card-link">Explore Web Dev →</span>
-      </button>
-
-      <button class="feature-card" data-page="coding-studio">
-        <span class="feature-icon">🧑‍💻</span>
-        <h3>Coding Studio</h3>
-        <p>Write HTML, CSS and JavaScript with a live preview.</p>
-        <span class="card-link">Start Coding →</span>
-      </button>
-
-      <button class="feature-card" data-page="calculator">
-        <span class="feature-icon">🧮</span>
-        <h3>Scientific Calculator</h3>
-        <p>Calculate expressions with scientific functions.</p>
-        <span class="card-link">Open Calculator →</span>
-      </button>
-
-      <button class="feature-card" data-page="text-counter">
-        <span class="feature-icon">🔢</span>
-        <h3>Text Counter</h3>
-        <p>Count words, characters, lines, digits, and letters.</p>
-        <span class="card-link">Count Text →</span>
-      </button>
-
-      <button class="feature-card" data-page="competitions">
-        <span class="feature-icon">🏆</span>
-        <h3>Competitions</h3>
-        <p>Explore tournaments and challenges.</p>
-        <span class="card-link">View Competitions →</span>
-      </button>
+      <a href="games.html" class="btn btn-secondary">
+        🎮 PLAY GAMES
+      </a>
     </div>
+
   </div>
 </section>
 
+<!-- =========================
+     EXPLORE SECTIONS
+========================= -->
 
+<section class="section" id="explore">
 
-
-<!-- GAMES HUB -->
-<section class="app-page" id="page-games">
-  <div class="container section">
-    <span class="section-label">PLAY • EXPLORE • COMPETE</span>
-    <h1>🎮 Games Hub</h1>
-
-    <p>Welcome to the RexWeb Nexora gaming zone.</p>
-
-    <div class="feature-grid">
-      <button class="feature-card" type="button"
-        onclick="window.location.href='games.html'">
-        <span class="feature-icon">🕹️</span>
-        <h3>All Games</h3>
-        <p>Explore available games and start playing.</p>
-        <span class="card-link">Browse Games →</span>
-      </button>
-
-      <button class="feature-card" type="button"
-        onclick="showNotice('Game challenges can be connected when available.')">
-        <span class="feature-icon">⚡</span>
-        <h3>Challenges</h3>
-        <p>Discover gaming challenges.</p>
-        <span class="card-link">Explore Challenges →</span>
-      </button>
-
-      <button class="feature-card" type="button"
-        onclick="showNotice('Leaderboards are not connected yet.')">
-        <span class="feature-icon">🏆</span>
-        <h3>Leaderboards</h3>
-        <p>Leaderboard functionality can be added later.</p>
-        <span class="card-link">View Leaderboards →</span>
-      </button>
-    </div>
-
-    <div class="panel">
-      <h2>Ready to play?</h2>
-      <p>Open the Games Hub to access your games.</p>
-      <div class="action-row">
-        <button class="action-btn primary" type="button"
-          onclick="window.location.href='games.html'">
-          🎮 Open Games Hub
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-
-
-
-
-<!-- CREATOR HUB -->
-
-<section class="app-page" id="page-creator-hub">
-  <div class="container section">
-    <span class="section-label">CREATE</span>
-    <h1>🎨 Creator Hub</h1>
-    <div class="panel">
-      <p>Explore creative resources, design assets, and project ideas.</p>
-    </div>
-  </div>
-</section>
-
-<!-- MARKETPLACE -->
-
-<section class="app-page" id="page-marketplace">
-  <div class="container section">
-    <span class="section-label">TRADE</span>
-    <h1>🛍️ Marketplace</h1>
-    <div class="panel">
-      <p>
-        Discover digital products and downloadable resources.
-        Product listings and payments require backend integration.
+  <div class="section-heading">
+    <div>
+      <div class="section-label">EXPLORE THE PLATFORM</div>
+      <h2>Discover Your Universe</h2>
+      <p class="section-description">
+        Everything you need, organized in one digital destination.
       </p>
     </div>
   </div>
+
+  <div class="category-grid">
+
+    <a href="tools.html" class="category-card">
+      <div class="category-icon">🛠️</div>
+      <h3>Online Tools</h3>
+      <p>
+        Discover useful digital utilities designed to make everyday
+        tasks simpler and faster.
+      </p>
+      <div class="card-link">
+        EXPLORE TOOLS <span>↗</span>
+      </div>
+    </a>
+
+    <a href="themes.html" class="category-card">
+      <div class="category-icon">🎨</div>
+      <h3>Themes & Designs</h3>
+      <p>
+        Explore attractive website themes, creative designs,
+        and customization resources.
+      </p>
+      <div class="card-link">
+        VIEW THEMES <span>↗</span>
+      </div>
+    </a>
+
+    <a href="ebooks.html" class="category-card">
+      <div class="category-icon">📚</div>
+      <h3>Digital Ebooks</h3>
+      <p>
+        Discover digital reading resources, educational materials,
+        and inspiring books.
+      </p>
+      <div class="card-link">
+        EXPLORE EBOOKS <span>↗</span>
+      </div>
+    </a>
+
+    <a href="games.html" class="category-card">
+      <div class="category-icon">🎮</div>
+      <h3>Gaming Zone</h3>
+      <p>
+        Find browser games, explore different genres,
+        and discover your next gaming experience.
+      </p>
+      <div class="card-link">
+        PLAY GAMES <span>↗</span>
+      </div>
+    </a>
+
+    <a href="marketplace.html" class="category-card">
+      <div class="category-icon">🛍️</div>
+      <h3>Marketplace</h3>
+      <p>
+        Explore a growing collection of digital products,
+        resources, and creative discoveries.
+      </p>
+      <div class="card-link">
+        VISIT MARKETPLACE <span>↗</span>
+      </div>
+    </a>
+
+    <a href="themes.html" class="category-card">
+      <div class="category-icon">✨</div>
+      <h3>Creative Studio</h3>
+      <p>
+        Find inspiration for your next digital project
+        and discover new creative possibilities.
+      </p>
+      <div class="card-link">
+        GET INSPIRED <span>↗</span>
+      </div>
+    </a>
+
+  </div>
+
 </section>
 
-<!-- LEARNING -->
+<!-- =========================
+     FEATURE BANNER
+========================= -->
 
-<section class="app-page" id="page-learning">
-  <div class="container section">
-    <span class="section-label">LEARN</span>
-    <h1>📚 Learning Centre</h1>
-    <div class="panel">
-      <p>Explore tutorials, lessons, and educational resources.</p>
+<section class="section">
+
+  <div class="feature-banner">
+
+    <div>
+      <div class="section-label">YOUR NEXT EXPERIENCE STARTS HERE</div>
+
+      <h2>Ready to Explore Nexora?</h2>
+
+      <p>
+        Whether you're looking for useful tools, fresh designs,
+        digital reading, or games to enjoy, your next discovery
+        is just one click away.
+      </p>
+
+      <div class="hero-buttons" style="justify-content:flex-start;margin-top:22px;">
+        <a href="games.html" class="btn btn-primary">
+          ENTER GAMING ZONE ↗
+        </a>
+      </div>
     </div>
+
+    <div class="feature-symbol" aria-hidden="true">🌌</div>
+
   </div>
+
 </section>
 
-<!-- WEB DEVELOPMENT -->
+<!-- =========================
+     MARKETPLACE PREVIEW
+========================= -->
 
-<section class="app-page" id="page-web-dev">
-  <div class="container section">
-    <span class="section-label">BUILD</span>
-    <h1>💻 Web Development</h1>
-    <div class="panel">
-      <p>Explore HTML, CSS, JavaScript, templates, and web development guides.</p>
-      <div class="action-row">
-        <button class="action-btn primary" data-page="coding-studio">Open Coding Studio</button>
-      </div>
+<section class="section" id="marketplace-preview">
+
+  <div class="section-heading">
+    <div>
+      <div class="section-label">DIGITAL DISCOVERIES</div>
+      <h2>Explore the Marketplace</h2>
+      <p class="section-description">
+        Find creative resources and digital experiences.
+      </p>
     </div>
+
+    <a href="marketplace.html" class="view-all">
+      VIEW MARKET ↗
+    </a>
   </div>
-</section>
 
-<!-- COMPETITIONS -->
+  <div class="marketplace-grid">
 
-<section class="app-page" id="page-competitions">
-  <div class="container section">
-    <span class="section-label">COMPETE</span>
-    <h1>🏆 Competitions</h1>
-    <div class="panel">
-      <p>Explore tournaments and challenges. Event registration is not connected yet.</p>
-    </div>
+    <a href="themes.html" class="market-card">
+      <div class="emoji">🖥️</div>
+      <h3>Website Resources</h3>
+      <p>Explore website themes and design resources.</p>
+    </a>
+
+    <a href="ebooks.html" class="market-card">
+      <div class="emoji">📖</div>
+      <h3>Reading Collection</h3>
+      <p>Discover ebooks and digital learning materials.</p>
+    </a>
+
+    <a href="games.html" class="market-card">
+      <div class="emoji">🕹️</div>
+      <h3>Gaming Collection</h3>
+      <p>Explore available games and gaming experiences.</p>
+    </a>
+
   </div>
-</section>
 
-<!-- REWARDS -->
-
-<section class="app-page" id="page-rewards">
-  <div class="container section">
-    <span class="section-label">REWARDS</span>
-    <h1>💰 Rewards Centre</h1>
-    <div class="panel">
-      <p>Explore reward programme information. No earning or withdrawal system is connected yet.</p>
-    </div>
-  </div>
-</section>
-
-<!-- HELP -->
-
-<section class="app-page" id="page-help">
-  <div class="container section">
-    <h1>🛟 Help Centre</h1>
-    <div class="panel">
-      <p>Help resources can be added here.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-
-<section class="app-page" id="page-about">
-  <div class="container section">
-    <h1>⚡ About RexWeb Nexora</h1>
-    <div class="panel">
-      <p>Play. Create. Trade. Grow. A digital destination for gaming, creativity, coding, and learning.</p>
-    </div>
-  </div>
-</section>
-
-<!-- CODING STUDIO -->
-
-<section class="app-page" id="page-coding-studio">
-  <div class="container section">
-
-    <div class="coding-heading">
-      <span class="section-label">REXWEB DEVELOPER TOOLS</span>
-      <h1>🧑‍💻 Coding Studio</h1>
-      <p>Write HTML, CSS and JavaScript. Run your code and expand the preview to fullscreen.</p>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-bar">
-        <strong>👁️ Live Preview</strong>
-        <div class="action-row" style="margin:0">
-          <button class="action-btn primary" id="refreshPreview">▶ Run</button>
-          <button class="action-btn" id="resetEditor">↺ Reset</button>
-        </div>
-      </div>
-
-      <div class="preview-screen" id="previewScreen">
-        <iframe id="codePreview" title="Code preview" sandbox="allow-scripts"></iframe>
-        <button class="preview-fullscreen-btn" id="fullscreenPreview" type="button" aria-label="Open fullscreen preview" title="Fullscreen preview">⛶</button>
-      </div>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-bar">
-        <strong>Code Editor</strong>
-        <span>REXWEB IDE</span>
-      </div>
-
-      <div class="editor-tabs">
-        <button class="editor-tab active" data-editor="html">HTML</button>
-        <button class="editor-tab" data-editor="css">CSS</button>
-        <button class="editor-tab" data-editor="javascript">JavaScript</button>
-      </div>
-
-      <div class="editor-panel active" id="panel-html">
-        <div class="file-label">index.html</div>
-        <textarea class="code-input" id="htmlCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="HTML editor"></textarea>
-      </div>
-
-      <div class="editor-panel" id="panel-css">
-        <div class="file-label">style.css</div>
-        <textarea class="code-input" id="cssCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="CSS editor"></textarea>
-      </div>
-
-      <div class="editor-panel" id="panel-javascript">
-        <div class="file-label">script.js</div>
-        <textarea class="code-input" id="jsCode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="JavaScript editor"></textarea>
-      </div>
-
-      <div class="editor-footer">
-        <span id="editorStatus" aria-live="polite">Ready to code</span>
-        <button class="action-btn primary" id="runCode">▶ Run Code</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SCIENTIFIC CALCULATOR -->
-
-<section class="app-page" id="page-calculator">
-  <div class="container section">
-    <span class="section-label">REXWEB TOOLS</span>
-    <h1>🧮 Scientific Calculator</h1>
-    <p>Use the buttons or type a mathematical expression.</p>
-
-    <div class="calculator">
-      <div class="calc-top">
-        <strong>Scientific Calculator</strong>
-        <label class="calc-mode">
-          Angle
-          <select id="angleMode">
-            <option value="DEG">DEG</option>
-            <option value="RAD">RAD</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="calc-expression" id="calcExpression" aria-live="polite"></div>
-
-      <input class="calc-display" id="calcDisplay" value="0" aria-label="Calculator display" inputmode="decimal">
-
-      <div class="calc-status" id="calcStatus" aria-live="polite"></div>
-
-      <div class="calc-grid" id="calcKeys">
-        <button class="calc-key danger" data-action="clear">AC</button>
-        <button class="calc-key danger" data-action="delete">DEL</button>
-        <button class="calc-key function" data-value="(">(</button>
-        <button class="calc-key function" data-value=")">)</button>
-        <button class="calc-key operator" data-value="/">÷</button>
-
-        <button class="calc-key function" data-value="sin(">sin</button>
-        <button class="calc-key function" data-value="cos(">cos</button>
-        <button class="calc-key function" data-value="tan(">tan</button>
-        <button class="calc-key function" data-value="sqrt(">√</button>
-        <button class="calc-key operator" data-value="^">xʸ</button>
-
-        <button class="calc-key function" data-value="asin(">sin⁻¹</button>
-        <button class="calc-key function" data-value="acos(">cos⁻¹</button>
-        <button class="calc-key function" data-value="atan(">tan⁻¹</button>
-        <button class="calc-key function" data-value="log(">log</button>
-        <button class="calc-key function" data-value="ln(">ln</button>
-
-        <button class="calc-key function" data-value="π">π</button>
-        <button class="calc-key function" data-value="e">e</button>
-        <button class="calc-key function" data-value="!">x!</button>
-        <button class="calc-key function" data-value="%">%</button>
-        <button class="calc-key operator" data-value="*">×</button>
-
-        <button class="calc-key" data-value="7">7</button>
-        <button class="calc-key" data-value="8">8</button>
-        <button class="calc-key" data-value="9">9</button>
-        <button class="calc-key function" data-value="abs(">abs</button>
-        <button class="calc-key operator" data-value="-">−</button>
-
-        <button class="calc-key" data-value="4">4</button>
-        <button class="calc-key" data-value="5">5</button>
-        <button class="calc-key" data-value="6">6</button>
-        <button class="calc-key function" data-value="floor(">floor</button>
-        <button class="calc-key operator" data-value="+">+</button>
-
-        <button class="calc-key" data-value="1">1</button>
-        <button class="calc-key" data-value="2">2</button>
-        <button class="calc-key" data-value="3">3</button>
-        <button class="calc-key function" data-value="ceil(">ceil</button>
-        <button class="calc-key function" data-value="round(">round</button>
-
-        <button class="calc-key" data-value="0">0</button>
-        <button class="calc-key" data-value=".">.</button>
-        <button class="calc-key function" data-value="Ans">Ans</button>
-        <button class="calc-key equal wide" data-action="equals">=</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TEXT COUNTER -->
-
-<section class="app-page" id="page-text-counter">
-  <div class="container section">
-    <span class="section-label">REXWEB WRITING TOOLS</span>
-    <h1>🔢 Text Counter</h1>
-    <p>Type or paste your text. The statistics update automatically.</p>
-
-    <div class="text-counter">
-      <textarea id="counterInput" class="counter-input" placeholder="Type or paste your text here..." aria-label="Text to count"></textarea>
-
-      <div class="action-row">
-        <button class="action-btn primary" id="copyText">Copy Text</button>
-        <button class="action-btn" id="clearText">Clear Text</button>
-      </div>
-
-      <div class="counter-stats" aria-live="polite">
-        <div class="counter-stat"><strong id="countChars">0</strong><span>Characters</span></div>
-        <div class="counter-stat"><strong id="countNoSpaces">0</strong><span>Characters without spaces</span></div>
-        <div class="counter-stat"><strong id="countWords">0</strong><span>Words</span></div>
-        <div class="counter-stat"><strong id="countLines">0</strong><span>Lines</span></div>
-        <div class="counter-stat"><strong id="countDigits">0</strong><span>Digits (0–9)</span></div>
-        <div class="counter-stat"><strong id="countLetters">0</strong><span>Letters</span></div>
-      </div>
-    </div>
-  </div>
 </section>
 
 </main>
 
-<footer>
-  <div class="container">
-    <strong>⚡ REXWEB NEXORA</strong><br>
-    Play. Create. Trade. Grow. · © <span id="year"></span> RexWeb Nexora
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer class="site-footer">
+
+  <div class="footer-inner">
+
+    <a href="index.html" class="footer-brand">
+      REXWEB <span>NEXORA</span> 🌌
+    </a>
+
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="themes.html">Themes</a>
+      <a href="ebooks.html">Ebooks</a>
+      <a href="games.html">Games</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </div>
+
+    <div class="copyright">
+      © <span id="currentYear">2026</span> RexWeb Nexora.
+      Built for your digital universe.
+    </div>
+
   </div>
+
 </footer>
 
-<div class="notice" id="notice" role="status" aria-live="polite"></div>
+<!-- =========================
+     JAVASCRIPT
+========================= -->
 
 <script>
-/* =========================================
-   THEME SWITCH
-========================================= */
+(function () {
+  "use strict";
 
-(function initTheme() {
-  const toggle = document.getElementById("themeToggle");
   const root = document.documentElement;
+  const themeToggle = document.getElementById("themeToggle");
   const themeColor = document.getElementById("themeColor");
+  const menuToggle = document.getElementById("menuToggle");
+  const mainNav = document.getElementById("mainNav");
 
-  function applyTheme(theme, save = true) {
-    if (theme !== "light" && theme !== "dark") theme = "dark";
-
+  // Apply the selected theme.
+  function applyTheme(theme) {
     root.dataset.theme = theme;
-    const isDark = theme === "dark";
 
-    toggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-    toggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-    toggle.setAttribute("aria-pressed", String(!isDark));
+    const isLight = theme === "light";
 
-    themeColor.setAttribute("content", isDark ? "#080b18" : "#f2f5fc");
+    themeToggle.textContent = isLight ? "🌙" : "☀️";
 
-    if (save) {
-      try {
-        localStorage.setItem("nexoraTheme", theme);
-      } catch (_) {}
+    themeToggle.setAttribute(
+      "aria-label",
+      isLight ? "Switch to dark theme" : "Switch to light theme"
+    );
+
+    themeColor.setAttribute(
+      "content",
+      isLight ? "#f4f6ff" : "#080b18"
+    );
+
+    try {
+      localStorage.setItem("rexweb-theme", theme);
+    } catch (error) {
+      // The theme still works if browser storage is unavailable.
     }
   }
 
-  let initialTheme = "dark";
+  // Restore the saved theme.
+  let savedTheme = "dark";
 
   try {
-    const saved = localStorage.getItem("nexoraTheme");
-    if (saved === "light" || saved === "dark") initialTheme = saved;
-  } catch (_) {}
-
-  applyTheme(initialTheme, false);
-
-  toggle.addEventListener("click", () => {
-    applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
-  });
-})();
-
-
-/* =========================================
-   GLOBAL UTILITIES
-========================================= */
-
-document.getElementById("year").textContent = new Date().getFullYear();
-
-const noticeElement = document.getElementById("notice");
-let noticeTimer;
-
-function showNotice(message) {
-  noticeElement.textContent = message;
-  noticeElement.classList.add("show");
-  clearTimeout(noticeTimer);
-
-  noticeTimer = setTimeout(() => {
-    noticeElement.classList.remove("show");
-  }, 2800);
-}
-
-document.querySelectorAll("[data-notice]").forEach(button => {
-  button.addEventListener("click", () => showNotice(button.dataset.notice));
-});
-
-
-/* =========================================
-   PAGE NAVIGATION
-========================================= */
-
-const pageNames = [
-  "home", "games", "creator-hub", "marketplace", "learning",
-  "web-dev", "coding-studio", "calculator", "text-counter",
-  "competitions", "rewards", "help", "about"
-];
-
-const navButtons = document.querySelectorAll("#mainNav [data-page]");
-
-const titles = {
-  home:"Home",
-  games:"Games",
-  "creator-hub":"Creator Hub",
-  marketplace:"Marketplace",
-  learning:"Learning Centre",
-  "web-dev":"Web Development",
-  "coding-studio":"Coding Studio",
-  calculator:"Scientific Calculator",
-  "text-counter":"Text Counter",
-  competitions:"Competitions",
-  rewards:"Rewards Centre",
-  help:"Help Centre",
-  about:"About"
-};
-
-function loadPage(name, updateHistory = true) {
-  if (!pageNames.includes(name)) name = "home";
-
-  const page = document.getElementById("page-" + name);
-  if (!page) return;
-
-  document.querySelectorAll(".app-page").forEach(section => {
-    section.classList.remove("active");
-  });
-
-  page.classList.add("active");
-
-  navButtons.forEach(button => {
-    button.classList.toggle("active", button.dataset.page === name);
-  });
-
-  document.getElementById("moreMenu").classList.remove("open");
-  document.getElementById("moreButton").setAttribute("aria-expanded", "false");
-
-  document.title = (titles[name] || "Home") + " | RexWeb Nexora";
-
-  window.scrollTo({top:0, behavior:"auto"});
-
-  if (updateHistory && location.hash !== "#" + name) {
-    history.pushState({page:name}, "", "#" + name);
-  }
-}
-
-document.querySelectorAll("[data-page]").forEach(button => {
-  button.addEventListener("click", () => loadPage(button.dataset.page));
-});
-
-window.addEventListener("popstate", () => {
-  loadPage(location.hash.slice(1) || "home", false);
-});
-
-const moreButton = document.getElementById("moreButton");
-const moreMenu = document.getElementById("moreMenu");
-
-moreButton.addEventListener("click", () => {
-  const open = moreMenu.classList.toggle("open");
-  moreButton.setAttribute("aria-expanded", String(open));
-});
-
-document.addEventListener("click", event => {
-  if (!moreMenu.contains(event.target) && !moreButton.contains(event.target)) {
-    moreMenu.classList.remove("open");
-    moreButton.setAttribute("aria-expanded", "false");
-  }
-});
-
-loadPage(pageNames.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home", false);
-
-
-/* =========================================
-   CODING STUDIO
-========================================= */
-
-(function initCodingStudio() {
-  const htmlEditor = document.getElementById("htmlCode");
-  const cssEditor = document.getElementById("cssCode");
-  const jsEditor = document.getElementById("jsCode");
-  const preview = document.getElementById("codePreview");
-  const previewScreen = document.getElementById("previewScreen");
-  const fullscreenButton = document.getElementById("fullscreenPreview");
-  const status = document.getElementById("editorStatus");
-
-  const starterHTML = `<main class="welcome">
-  <div class="logo">⚡</div>
-  <h1>My First Website</h1>
-  <p>I built this with RexWeb Nexora.</p>
-  <button id="helloButton">Click Me!</button>
-  <p id="message"></p>
-</main>`;
-
-  const starterCSS = `* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: #0b1020;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
-.welcome {
-  width: min(90%, 500px);
-  padding: 35px 20px;
-  text-align: center;
-  background: #151e38;
-  border: 1px solid #3e4b78;
-  border-radius: 20px;
-}
-
-h1 { color: #8e9cff; }
-
-button {
-  padding: 12px 20px;
-  border: 0;
-  border-radius: 9px;
-  background: #6575ff;
-  color: white;
-  cursor: pointer;
-}`;
-
-  const starterJS = `document.getElementById("helloButton")
-  .addEventListener("click", function () {
-    document.getElementById("message").textContent =
-      "Great! Your JavaScript works!";
-  });`;
-
-  function updatePreview() {
-    const safeCSS = cssEditor.value.replace(/<\/style/gi, "<\\/style");
-    const safeJS = jsEditor.value.replace(/<\/script/gi, "<\\/script");
-
-    const src = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${safeCSS}</style>
-</head>
-<body>
-${htmlEditor.value}
-<script>
-try {
-${safeJS}
-} catch (error) {
-  const box = document.createElement("pre");
-  box.style.cssText = "color:#b91c1c;white-space:pre-wrap;padding:12px";
-  box.textContent = "JavaScript error: " + error.message;
-  document.body.appendChild(box);
-}
-<\/script>
-</body>
-</html>`;
-
-    preview.srcdoc = src;
-    status.textContent = "Preview updated";
+    savedTheme = localStorage.getItem("rexweb-theme") || "dark";
+  } catch (error) {
+    savedTheme = "dark";
   }
 
-  htmlEditor.value = starterHTML;
-  cssEditor.value = starterCSS;
-  jsEditor.value = starterJS;
+  applyTheme(savedTheme === "light" ? "light" : "dark");
 
-  document.querySelectorAll(".editor-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".editor-tab").forEach(item => item.classList.remove("active"));
-      document.querySelectorAll(".editor-panel").forEach(item => item.classList.remove("active"));
+  // Switch between dark and light modes.
+  themeToggle.addEventListener("click", function () {
+    const nextTheme =
+      root.dataset.theme === "dark" ? "light" : "dark";
 
-      tab.classList.add("active");
-      document.getElementById("panel-" + tab.dataset.editor).classList.add("active");
+    applyTheme(nextTheme);
+  });
+
+  // The menu button scrolls the navigation row back to its beginning.
+  // All six navigation links remain in one horizontal row.
+  menuToggle.addEventListener("click", function () {
+    mainNav.scrollTo({
+      left: 0,
+      behavior: "smooth"
     });
+
+    menuToggle.setAttribute("aria-expanded", "true");
+
+    window.setTimeout(function () {
+      menuToggle.setAttribute("aria-expanded", "false");
+    }, 500);
   });
 
-  document.getElementById("runCode").addEventListener("click", updatePreview);
-  document.getElementById("refreshPreview").addEventListener("click", updatePreview);
-
-  document.getElementById("resetEditor").addEventListener("click", () => {
-    if (!confirm("Reset all code to the starter example?")) return;
-
-    htmlEditor.value = starterHTML;
-    cssEditor.value = starterCSS;
-    jsEditor.value = starterJS;
-
-    updatePreview();
-    status.textContent = "Starter code restored";
-  });
-
-  [htmlEditor, cssEditor, jsEditor].forEach(editor => {
-    editor.addEventListener("keydown", event => {
-      if (event.key === "Tab") {
-        event.preventDefault();
-
-        editor.setRangeText(
-          "  ",
-          editor.selectionStart,
-          editor.selectionEnd,
-          "end"
-        );
-      }
-    });
-  });
-
-  async function toggleFullscreen() {
-    try {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-        return;
-      }
-
-      if (previewScreen.requestFullscreen) {
-        await previewScreen.requestFullscreen();
-      } else if (previewScreen.webkitRequestFullscreen) {
-        previewScreen.webkitRequestFullscreen();
-      } else {
-        showNotice("Fullscreen is not supported by this browser.");
-      }
-    } catch (_) {
-      showNotice("Unable to open fullscreen preview.");
-    }
-  }
-
-  fullscreenButton.addEventListener("click", toggleFullscreen);
-
-  function updateFullscreenButton() {
-    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-
-    fullscreenButton.textContent = isFullscreen ? "⤢" : "⛶";
-    fullscreenButton.title = isFullscreen ? "Exit fullscreen" : "Fullscreen preview";
-    fullscreenButton.setAttribute(
-      "aria-label",
-      isFullscreen ? "Exit fullscreen preview" : "Open fullscreen preview"
-    );
-  }
-
-  document.addEventListener("fullscreenchange", updateFullscreenButton);
-  document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
-
-  updatePreview();
-})();
-
-
-/* =========================================
-   SCIENTIFIC CALCULATOR
-   Uses a parser instead of eval().
-========================================= */
-
-(function initCalculator() {
-  const display = document.getElementById("calcDisplay");
-  const expressionLabel = document.getElementById("calcExpression");
-  const status = document.getElementById("calcStatus");
-  const angleMode = document.getElementById("angleMode");
-  const keys = document.getElementById("calcKeys");
-
-  let expression = "";
-  let answer = 0;
-  let justCalculated = false;
-
-  function showExpression() {
-    display.value = expression || "0";
-  }
-
-  function insert(value) {
-    status.textContent = "";
-
-    if (justCalculated && /^[0-9.]$/.test(value)) {
-      expression = "";
-      expressionLabel.textContent = "";
-    }
-
-    justCalculated = false;
-
-    if (expression.length > 300) {
-      status.textContent = "Expression is too long.";
-      return;
-    }
-
-    expression += value;
-    showExpression();
-  }
-
-  function clearAll() {
-    expression = "";
-    expressionLabel.textContent = "";
-    status.textContent = "";
-    justCalculated = false;
-    showExpression();
-  }
-
-  function deleteLast() {
-    expression = expression.slice(0, -1);
-    justCalculated = false;
-    status.textContent = "";
-    showExpression();
-  }
-
-  function factorial(n) {
-    if (!Number.isInteger(n) || n < 0 || n > 170) {
-      throw new Error("Factorial requires a whole number from 0 to 170.");
-    }
-
-    let result = 1;
-
-    for (let i = 2; i <= n; i++) result *= i;
-
-    return result;
-  }
-
-  function calculate(input) {
-    let s = input
-      .replace(/π/g, "pi")
-      .replace(/×/g, "*")
-      .replace(/÷/g, "/")
-      .replace(/−/g, "-")
-      .replace(/\s+/g, "");
-
-    if (!s) throw new Error("Enter a calculation first.");
-    if (s.length > 300) throw new Error("Expression is too long.");
-
-    if (!/^[0-9a-zA-Z.+\-*/^()%!,]*$/.test(s)) {
-      throw new Error("Expression contains an unsupported character.");
-    }
-
-    const tokens = s.match(
-      /(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|[a-zA-Z]+|[()+\-*/^%!]/gi
-    ) || [];
-
-    if (tokens.join("").toLowerCase() !== s.toLowerCase()) {
-      throw new Error("Check the expression syntax.");
-    }
-
-    let pos = 0;
-
-    function peek() {
-      return tokens[pos];
-    }
-
-    function take() {
-      return tokens[pos++];
-    }
-
-    function parseExpression() {
-      let value = parseTerm();
-
-      while (peek() === "+" || peek() === "-") {
-        const op = take();
-        const right = parseTerm();
-        value = op === "+" ? value + right : value - right;
-      }
-
-      return value;
-    }
-
-    function parseTerm() {
-      let value = parseUnary();
-
-      while (peek() === "*" || peek() === "/") {
-        const op = take();
-        const right = parseUnary();
-
-        if (op === "/" && right === 0) {
-          throw new Error("Cannot divide by zero.");
-        }
-
-        value = op === "*" ? value * right : value / right;
-      }
-
-      return value;
-    }
-
-    function parseUnary() {
-      if (peek() === "+") {
-        take();
-        return parseUnary();
-      }
-
-      if (peek() === "-") {
-        take();
-        return -parseUnary();
-      }
-
-      return parsePower();
-    }
-
-    function parsePower() {
-      let value = parsePostfix();
-
-      if (peek() === "^") {
-        take();
-        value = Math.pow(value, parseUnary());
-      }
-
-      return value;
-    }
-
-    function parsePostfix() {
-      let value = parsePrimary();
-
-      while (peek() === "!" || peek() === "%") {
-        const op = take();
-        value = op === "!" ? factorial(value) : value / 100;
-      }
-
-      return value;
-    }
-
-    function parsePrimary() {
-      const token = take();
-
-      if (token === undefined) throw new Error("Incomplete expression.");
-
-      if (token === "(") {
-        const value = parseExpression();
-
-        if (take() !== ")") {
-          throw new Error("Missing closing parenthesis.");
-        }
-
-        return value;
-      }
-
-      if (/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(token)) {
-        return Number(token);
-      }
-
-      const name = token.toLowerCase();
-
-      if (name === "pi") return Math.PI;
-      if (name === "e") return Math.E;
-      if (name === "ans") return answer;
-
-      const functions = {
-        sin: x => Math.sin(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
-        cos: x => Math.cos(angleMode.value === "DEG" ? x * Math.PI / 180 : x),
-
-        tan: x => {
-          const a = angleMode.value === "DEG" ? x * Math.PI / 180 : x;
-
-          if (Math.abs(Math.cos(a)) < 1e-12) {
-            throw new Error("Tangent is undefined at this angle.");
-          }
-
-          return Math.tan(a);
-        },
-
-        asin: x => {
-          if (x < -1 || x > 1) throw new Error("asin accepts values from -1 to 1.");
-          const a = Math.asin(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
-
-        acos: x => {
-          if (x < -1 || x > 1) throw new Error("acos accepts values from -1 to 1.");
-          const a = Math.acos(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
-
-        atan: x => {
-          const a = Math.atan(x);
-          return angleMode.value === "DEG" ? a * 180 / Math.PI : a;
-        },
-
-        sqrt: x => {
-          if (x < 0) throw new Error("Cannot take the real square root of a negative number.");
-          return Math.sqrt(x);
-        },
-
-        log: x => {
-          if (x <= 0) throw new Error("Logarithm requires a positive number.");
-          return Math.log10(x);
-        },
-
-        ln: x => {
-          if (x <= 0) throw new Error("Natural logarithm requires a positive number.");
-          return Math.log(x);
-        },
-
-        abs: x => Math.abs(x),
-        floor: x => Math.floor(x),
-        ceil: x => Math.ceil(x),
-        round: x => Math.round(x)
-      };
-
-      if (functions[name]) {
-        if (take() !== "(") {
-          throw new Error("Function " + name + " needs parentheses.");
-        }
-
-        const argument = parseExpression();
-
-        if (take() !== ")") {
-          throw new Error("Missing closing parenthesis.");
-        }
-
-        return functions[name](argument);
-      }
-
-      throw new Error("Unknown value: " + token);
-    }
-
-    const result = parseExpression();
-
-    if (pos < tokens.length) {
-      throw new Error("Check the expression near " + tokens[pos] + ".");
-    }
-
-    if (!Number.isFinite(result)) {
-      throw new Error("Result is outside the supported range.");
-    }
-
-    return result;
-  }
-
-  function equals() {
-    try {
-      const original = expression;
-      const result = calculate(expression);
-
-      answer = result;
-      expressionLabel.textContent = original + " =";
-      expression = Number(result.toPrecision(12)).toString();
-      display.value = expression;
-      justCalculated = true;
-      status.textContent = "";
-    } catch (error) {
-      status.textContent = error.message || "Invalid calculation.";
-    }
-  }
-
-  keys.addEventListener("click", event => {
-    const button = event.target.closest("button");
-    if (!button) return;
-
-    const action = button.dataset.action;
-    const value = button.dataset.value;
-
-    if (action === "clear") clearAll();
-    else if (action === "delete") deleteLast();
-    else if (action === "equals") equals();
-    else if (value !== undefined) insert(value);
-  });
-
-  display.addEventListener("input", () => {
-    expression = display.value;
-    justCalculated = false;
-    status.textContent = "";
-  });
-
-  display.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === "=") {
-      event.preventDefault();
-      equals();
-    } else if (event.key === "Escape") {
-      clearAll();
+  // Display the current year.
+  document.getElementById("currentYear").textContent =
+    new Date().getFullYear();
+
+  // Highlight the current homepage link.
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+
+  document.querySelectorAll(".nav-btn").forEach(function (link) {
+    if (link.getAttribute("href") === currentPage) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
     }
   });
 
-  angleMode.addEventListener("change", () => {
-    status.textContent = "Angle mode: " + angleMode.value;
-  });
-
-  showExpression();
-})();
-
-
-/* =========================================
-   TEXT COUNTER
-========================================= */
-
-(function initTextCounter() {
-  const input = document.getElementById("counterInput");
-
-  const output = {
-    chars: document.getElementById("countChars"),
-    noSpaces: document.getElementById("countNoSpaces"),
-    words: document.getElementById("countWords"),
-    lines: document.getElementById("countLines"),
-    digits: document.getElementById("countDigits"),
-    letters: document.getElementById("countLetters")
-  };
-
-  function countText() {
-    const text = input.value;
-
-    output.chars.textContent = Array.from(text).length.toLocaleString();
-
-    output.noSpaces.textContent =
-      Array.from(text.replace(/\s/g, "")).length.toLocaleString();
-
-    const trimmed = text.trim();
-
-    output.words.textContent = trimmed
-      ? trimmed.split(/\s+/u).length.toLocaleString()
-      : "0";
-
-    output.lines.textContent = text.length
-      ? text.split(/\r\n|\r|\n/).length.toLocaleString()
-      : "0";
-
-    output.digits.textContent =
-      (text.match(/[0-9]/g) || []).length.toLocaleString();
-
-    output.letters.textContent =
-      (text.match(/\p{L}/gu) || []).length.toLocaleString();
-  }
-
-  input.addEventListener("input", countText);
-
-  document.getElementById("clearText").addEventListener("click", () => {
-    input.value = "";
-    countText();
-    input.focus();
-  });
-
-  document.getElementById("copyText").addEventListener("click", async () => {
-    if (!input.value) {
-      showNotice("There is no text to copy.");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(input.value);
-      showNotice("Text copied.");
-    } catch (_) {
-      input.focus();
-      input.select();
-
-      const copied = document.execCommand("copy");
-
-      showNotice(copied ? "Text copied." : "Select the text and copy it manually.");
-    }
-  });
-
-  countText();
 })();
 </script>
 
