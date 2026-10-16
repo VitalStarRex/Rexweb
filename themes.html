@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Discover, customize and download beautiful website themes with RexWeb Nexora Theme Studio.">
+<title>Theme Studio | RexWeb Nexora</title>
+
+<style>
+:root {
+  --primary: #7657ff;
+  --secondary: #ff5ca8;
+  --accent: #00c9a7;
+  --bg: #f7f7ff;
+  --card: #ffffff;
+  --text: #202039;
+  --muted: #777790;
+  --border: #e9e6f7;
+  --shadow: 0 12px 35px rgba(54, 38, 112, .08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: .25s;
+  min-height: 100vh;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+body.dark {
+  --bg: #11111f;
+  --card: #1c1c30;
+  --text: #f5f3ff;
+  --muted: #aaa8c2;
+  --border: #30304a;
+  --shadow: 0 12px 35px rgba(0,0,0,.2);
+}
+
+header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav {
+  max-width: 1250px;
+  margin: auto;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -.7px;
+}
+
+.logo span {
+  background: linear-gradient(120deg, #7657ff, #ff5ca8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.icon-btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 9px 12px;
+}
+
+.hero {
+  max-width: 1250px;
+  margin: 28px auto;
+  padding: 0 20px;
+}
+
+.hero-box {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 45px 30px;
+  color: white;
+  background: linear-gradient(120deg, #7657ff, #bb58ee 50%, #ff5ca8);
+}
+
+.hero-box:after {
+  content: "✦";
+  position: absolute;
+  right: 7%;
+  top: -55px;
+  font-size: 250px;
+  opacity: .12;
+}
+
+.badge {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.18);
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.1;
+  max-width: 650px;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  max-width: 600px;
+  line-height: 1.8;
+  opacity: .9;
+  font-size: 15px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 23px;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 17px;
+  font-weight: 750;
+  transition: .2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-white {
+  background: white;
+  color: #7657ff;
+}
+
+.btn-glass {
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.3);
+  color: white;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-soft {
+  background: color-mix(in srgb, var(--primary) 11%, var(--card));
+  color: var(--primary);
+}
+
+.btn-danger {
+  background: #fff0f2;
+  color: #d93655;
+}
+
+.container {
+  max-width: 1250px;
+  padding: 0 20px 50px;
+  margin: auto;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 30px 0 18px;
+}
+
+.section-head h2 {
+  font-size: 23px;
+}
+
+.section-head p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.search {
+  flex: 1;
+  min-width: 180px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 13px;
+  outline: none;
+}
+
+.search:focus {
+  border-color: var(--primary);
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 23px;
+}
+
+.filter {
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.filter.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.theme-card {
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: .25s;
+}
+
+.theme-card:hover {
+  transform: translateY(-4px);
+}
+
+.theme-art {
+  height: 175px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-browser {
+  width: 90%;
+  height: 130px;
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,.93);
+  color: #24243a;
+  box-shadow: 0 15px 35px rgba(0,0,0,.13);
+  transform: rotate(-2deg);
+}
+
+.browser-dots {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.browser-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6b86;
+}
+
+.browser-dots i:nth-child(2) {
+  background: #ffca57;
+}
+
+.browser-dots i:nth-child(3) {
+  background: #47d7a2;
+}
+
+.mini-title {
+  width: 65%;
+  height: 9px;
+  background: var(--art-primary);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.mini-line {
+  width: 85%;
+  height: 4px;
+  background: #e8e8f1;
+  border-radius: 5px;
+  margin: 5px 0;
+}
+
+.mini-blocks {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.mini-blocks span {
+  height: 30px;
+  flex: 1;
+  border-radius: 5px;
+  background: var(--art-secondary);
+}
+
+.theme-info {
+  padding: 17px;
+}
+
+.theme-info h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.theme-info p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.tag {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.card-actions button {
+  flex: 1;
+  font-size: 12px;
+  padding: 10px 7px;
+}
+
+.customizer {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.panel h3 {
+  font-size: 17px;
+  margin-bottom: 17px;
+}
+
+.control {
+  margin-bottom: 17px;
+}
+
+.control label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+
+.control small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.control select,
+.control input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 11px;
+  outline: none;
+}
+
+.control input[type="color"] {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.control input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.preview-wrap {
+  min-width: 0;
+}
+
+.preview-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.preview-toolbar strong {
+  font-size: 14px;
+}
+
+.preview-frame {
+  width: 100%;
+  min-height: 520px;
+  height: 600px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+  overflow: hidden;
+}
+
+.preview-frame iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  border: none;
+  background: white;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 13px;
+}
+
+.empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 35px;
+  color: var(--muted);
+}
+
+footer {
+  text-align: center;
+  padding: 30px 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+}
+
+@media (max-width: 850px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customizer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .nav {
+    padding: 12px;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .hero {
+    margin: 18px auto;
+    padding: 0 12px;
+  }
+
+  .hero-box {
+    padding: 32px 20px;
+    border-radius: 21px;
+  }
+
+  .container {
+    padding: 0 12px 35px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-art {
+    height: 190px;
+  }
+
+  .section-head h2 {
+    font-size: 21px;
+  }
+
+  .preview-frame {
+    height: 480px;
+    min-height: 480px;
+  }
+
+  .preview-frame iframe {
+    min-height: 480px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <nav class="nav">
+    <a class="logo" href="index.html">RexWeb <span>Nexora</span></a>
+
+    <div class="nav-right">
+      <a href="index.html" class="icon-btn" aria-label="Home">⌂ Home</a>
+      <button class="icon-btn" id="modeBtn" aria-label="Toggle interface theme">🌙</button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-box">
+    <span class="badge">✦ CREATIVE THEME STUDIO</span>
+    <h1>Your website.<br>Your colors. Your style.</h1>
+    <p>
+      Discover beautiful website designs, experiment with colors and fonts,
+      preview your creation instantly, and download your customized website.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn btn-white" onclick="scrollToThemes()">Explore Themes ↓</button>
+      <button class="btn btn-glass" onclick="scrollToCustomizer()">Open Theme Editor ✨</button>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+
+  <section id="gallery">
+    <div class="section-head">
+      <div>
+        <h2>🎨 Explore Themes</h2>
+        <p>Find a design that matches your next big idea.</p>
+      </div>
+      <span id="themeCount" style="color:var(--muted);font-size:12px"></span>
+    </div>
+
+    <div class="search-row">
+      <input id="search" class="search" type="search"
+        placeholder="Search themes..." aria-label="Search themes">
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="filter active" data-category="All">All Themes</button>
+      <button class="filter" data-category="Business">Business</button>
+      <button class="filter" data-category="Portfolio">Portfolio</button>
+      <button class="filter" data-category="Shop">Shop</button>
+      <button class="filter" data-category="Blog">Blog</button>
+      <button class="filter" data-category="Personal">Personal</button>
+    </div>
+
+    <div class="grid" id="themeGrid"></div>
+  </section>
+
+  <section id="editor">
+    <div class="section-head">
+      <div>
+        <h2>🪄 Theme Customizer</h2>
+        <p>Change the design and watch your preview update instantly.</p>
+      </div>
+    </div>
+
+    <div class="customizer">
+
+      <aside class="panel">
+        <h3>⚙️ Design Settings</h3>
+
+        <div class="control">
+          <label for="siteName">Website name</label>
+          <input id="siteName" type="text" value="My Creative Website"
+            maxlength="70">
+        </div>
+
+        <div class="control">
+          <label for="siteTagline">Website tagline</label>
+          <input id="siteTagline" type="text"
+            value="Ideas become amazing experiences."
+            maxlength="150">
+        </div>
+
+        <div class="control">
+          <label for="primary">Primary color</label>
+          <input id="primary" type="color" value="#7657ff">
+        </div>
+
+        <div class="control">
+          <label for="secondary">Secondary color</label>
+          <input id="secondary" type="color" value="#ff5ca8">
+        </div>
+
+        <div class="control">
+          <label for="background">Background color</label>
+          <input id="background" type="color" value="#ffffff">
+        </div>
+
+        <div class="control">
+          <label for="textColor">Text color</label>
+          <input id="textColor" type="color" value="#202039">
+        </div>
+
+        <div class="control">
+          <label for="font">Font style</label>
+          <select id="font">
+            <option value="system">Modern System</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="monospace">Monospace</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="radius">Corner roundness <span id="radiusValue">16px</span></label>
+          <input id="radius" type="range" min="0" max="35" value="16">
+        </div>
+
+        <div class="control">
+          <label for="layout">Website layout</label>
+          <select id="layout">
+            <option value="center">Centered Hero</option>
+            <option value="left">Left Aligned</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="previewMode">Preview appearance</label>
+          <select id="previewMode">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;margin-bottom:9px"
+          onclick="downloadWebsite()">⬇ Download HTML Website</button>
+
+        <button class="btn btn-soft" style="width:100%;margin-bottom:9px"
+          onclick="saveSettings()">💾 Save Settings</button>
+
+        <button class="btn btn-danger" style="width:100%"
+          onclick="resetSettings()">↻ Reset Design</button>
+
+        <p class="note">
+          Your design settings are stored in this browser when you save them.
+          Downloaded websites contain their own design and work independently.
+        </p>
+      </aside>
+
+      <div class="preview-wrap">
+        <div class="preview-toolbar">
+          <strong>👁️ Live Website Preview</strong>
+          <span style="font-size:11px;color:var(--muted)">Interactive preview</span>
+        </div>
+
+        <div class="preview-frame">
+          <iframe id="preview" title="Live website theme preview"
+            sandbox="allow-scripts"></iframe>
+        </div>
+
+        <p class="note">
+          Preview content is a sample. Customize it, then download the generated
+          HTML file to use as a starting point for your website.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>RexWeb Nexora</strong><br>
+  Create something extraordinary. ✨<br>
+  © <span id="year"></span> RexWeb Nexora. All rights reserved.
+</footer>
+
+<script>
+const themes = [
+  {
+    name: "Creative Business",
+    category: "Business",
+    description: "A polished design for agencies, startups and companies.",
+    primary: "#7657ff",
+    secondary: "#ff5ca8",
+    bg: "#ffffff",
+    text: "#202039",
+    font: "system",
+    radius: 16,
+    layout: "center",
+    art: "linear-gradient(135deg,#7657ff,#c36bff)"
+  },
+  {
+    name: "Ocean Breeze",
+    category: "Portfolio",
+    description: "Fresh blue colors for designers and creative portfolios.",
+    primary: "#087ea4",
+    secondary: "#37c6d0",
+    bg: "#f0fbff",
+    text: "#12334a",
+    font: "Arial, sans-serif",
+    radius: 10,
+    layout: "left",
+    art: "linear-gradient(135deg,#087ea4,#37c6d0)"
+  },
+  {
+    name: "Sunset Shop",
+    category: "Shop",
+    description: "A warm and inviting storefront concept for online shops.",
+    primary: "#e85d36",
+    secondary: "#ffb347",
+    bg: "#fffaf4",
+    text: "#43251c",
+    font: "Georgia, serif",
+    radius: 8,
+    layout: "center",
+    art: "linear-gradient(135deg,#e85d36,#ffb347)"
+  },
+  {
+    name: "Nature Journal",
+    category: "Blog",
+    description: "An earthy, peaceful style for articles and personal blogs.",
+    primary: "#367b51",
+    secondary: "#b7d66b",
+    bg: "#f8fff3",
+    text: "#203d2a",
+    font: "Georgia, serif",
+    radius: 12,
+    layout: "left",
+    art: "linear-gradient(135deg,#367b51,#b7d66b)"
+  },
+  {
+    name: "Midnight Studio",
+    category: "Portfolio",
+    description: "A bold dark design for digital creators and developers.",
+    primary: "#a78bfa",
+    secondary: "#22d3ee",
+    bg: "#171525",
+    text: "#f7f5ff",
+    font: "system",
+    radius: 18,
+    layout: "center",
+    art: "linear-gradient(135deg,#171525,#52408b)"
+  },
+  {
+    name: "Pink Blossom",
+    category: "Personal",
+    description: "A playful, colorful layout for personal websites.",
+    primary: "#db2777",
+    secondary: "#fb7185",
+    bg: "#fff5fa",
+    text: "#501b36",
+    font: "'Trebuchet MS', sans-serif",
+    radius: 25,
+    layout: "center",
+    art: "linear-gradient(135deg,#db2777,#fb7185)"
+  },
+  {
+    name: "Executive",
+    category: "Business",
+    description: "A clean professional look for consultants and services.",
+    primary: "#1d4ed8",
+    secondary: "#60a5fa",
+    bg: "#f8fafc",
+    text: "#172033",
+    font: "Arial, sans-serif",
+    radius: 6,
+    layout: "left",
+    art: "linear-gradient(135deg,#172033,#1d4ed8)"
+  },
+  {
+    name: "Golden Luxury",
+    category: "Shop",
+    description: "An elegant concept for premium products and brands.",
+    primary: "#a77918",
+    secondary: "#e9c46a",
+    bg: "#fffdf5",
+    text: "#332b1b",
+    font: "Georgia, serif",
+    radius: 5,
+    layout: "center",
+    art: "linear-gradient(135deg,#332b1b,#a77918)"
+  },
+  {
+    name: "Fresh Notes",
+    category: "Blog",
+    description: "A minimal reading experience with calm colors.",
+    primary: "#4f46e5",
+    secondary: "#818cf8",
+    bg: "#ffffff",
+    text: "#252542",
+    font: "Verdana, sans-serif",
+    radius: 12,
+    layout: "left",
+    art: "linear-gradient(135deg,#4f46e5,#818cf8)"
+  },
+  {
+    name: "Neon Future",
+    category: "Portfolio",
+    description: "Vibrant futuristic colors for tech and gaming projects.",
+    primary: "#00d9ff",
+    secondary: "#a855f7",
+    bg: "#101323",
+    text: "#f4f7ff",
+    font: "system",
+    radius: 20,
+    layout: "center",
+    art: "linear-gradient(135deg,#101323,#00a8cc)"
+  },
+  {
+    name: "Simple Profile",
+    category: "Personal",
+    description: "An uncomplicated design for introducing yourself online.",
+    primary: "#0f766e",
+    secondary: "#5eead4",
+    bg: "#f0fdfa",
+    text: "#134e4a",
+    font: "Arial, sans-serif",
+    radius: 14,
+    layout: "center",
+    art: "linear-gradient(135deg,#0f766e,#5eead4)"
+  },
+  {
+    name: "Urban Creative",
+    category: "Business",
+    description: "Contemporary styling for creative teams and studios.",
+    primary: "#ea580c",
+    secondary: "#facc15",
+    bg: "#fffaf0",
+    text: "#292524",
+    font: "'Trebuchet MS', sans-serif",
+    radius: 14,
+    layout: "left",
+    art: "linear-gradient(135deg,#ea580c,#facc15)"
+  }
+];
+
+let selectedCategory = "All";
+let selectedTheme = themes[0];
+
+const $ = id => document.getElementById(id);
+
+const fields = [
+  "siteName", "siteTagline", "primary", "secondary",
+  "background", "textColor", "font", "radius", "layout", "previewMode"
+];
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function renderGallery() {
+  const search = $("search").value.toLowerCase().trim();
+
+  const filtered = themes.filter(theme => {
+    const matchesCategory = selectedCategory === "All" ||
+      theme.category === selectedCategory;
+
+    const matchesSearch = (theme.name + " " + theme.category + " " +
+      theme.description).toLowerCase().includes(search);
+
+    return matchesCategory && matchesSearch;
+  });
+
+  $("themeCount").textContent = filtered.length + " themes";
+
+  $("themeGrid").innerHTML = filtered.length
+    ? filtered.map(theme => {
+        const index = themes.indexOf(theme);
+
+        return `
+          <article class="theme-card">
+            <div class="theme-art" style="background:${theme.art}">
+              <div class="mini-browser" style="--art-primary:${theme.primary};--art-secondary:${theme.secondary}">
+                <div class="browser-dots"><i></i><i></i><i></i></div>
+                <div class="mini-title"></div>
+                <div class="mini-line"></div>
+                <div class="mini-line" style="width:55%"></div>
+                <div class="mini-blocks"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+            <div class="theme-info">
+              <h3>${escapeHTML(theme.name)}</h3>
+              <p>${escapeHTML(theme.description)}</p>
+              <div class="tags">
+                <span class="tag">${escapeHTML(theme.category)}</span>
+                <span class="tag">Customizable</span>
+                <span class="tag">HTML Export</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-primary" onclick="useTheme(${index})">Use Theme</button>
+                <button class="btn btn-soft" onclick="previewTheme(${index})">Preview</button>
+              </div>
+            </div>
+          </article>`;
+      }).join("")
+    : '<div class="empty">No themes found. Try another search.</div>';
+}
+
+function getSettings() {
+  return {
+    siteName: $("siteName").value,
+    siteTagline: $("siteTagline").value,
+    primary: $("primary").value,
+    secondary: $("secondary").value,
+    bg: $("background").value,
+    text: $("textColor").value,
+    font: $("font").value,
+    radius: Number($("radius").value),
+    layout: $("layout").value,
+    mode: $("previewMode").value
+  };
+}
+
+function applyTheme(theme) {
+  $("primary").value = theme.primary;
+  $("secondary").value = theme.secondary;
+  $("background").value = theme.bg;
+  $("textColor").value = theme.text;
+  $("font").value = theme.font;
+  $("radius").value = theme.radius;
+  $("layout").value = theme.layout;
+  $("previewMode").value = theme.bg.toLowerCase() === "#171525" ||
+    theme.bg.toLowerCase() === "#101323" ? "dark" : "light";
+
+  selectedTheme = theme;
+  updatePreview();
+}
+
+function useTheme(index) {
+  const theme = themes[index];
+  $("siteName").value = theme.name;
+  $("siteTagline").value = theme.description;
+  applyTheme(theme);
+  scrollToCustomizer();
+}
+
+function previewTheme(index) {
+  useTheme(index);
+}
+
+function makeWebsiteHTML() {
+  const s = getSettings();
+
+  const isDark = s.mode === "dark";
+  const background = isDark ? "#151525" : s.bg;
+  const textColor = isDark ? "#f7f5ff" : s.text;
+  const font = s.font === "system" ? "system-ui, sans-serif" : s.font;
+  const radius = s.radius + "px";
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="${background}">
+<title>${escapeHTML(s.siteName)}</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:${font};background:${background};color:${textColor};line-height:1.7}
+header{padding:20px 7%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;border-bottom:1px solid ${isDark ? "#343449" : "#e8e5ef"}}
+.brand{font-size:21px;font-weight:900}
+nav{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+a{color:inherit;text-decoration:none}
+.hero{padding:90px 8%;text-align:${s.layout === "left" ? "left" : "center"};background:linear-gradient(135deg,${s.primary}18,${s.secondary}18)}
+.hero h1{font-size:clamp(34px,7vw,65px);line-height:1.1;max-width:850px;margin:${s.layout === "left" ? "0" : "0 auto"} 0 20px}
+.hero p{max-width:650px;margin:${s.layout === "left" ? "0" : "0 auto"} 25px;color:${textColor};opacity:.8}
+.btn{display:inline-block;background:${s.primary};color:#fff;padding:13px 23px;border-radius:${radius};font-weight:800}
+.btn.alt{background:${s.secondary}}
+.section{padding:50px 8%}
+.section h2{font-size:28px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-top:25px}
+.card{padding:25px;border:1px solid ${isDark ? "#343449" : "#e8e5ef"};border-radius:${radius};background:${isDark ? "#202035" : "#fff"}}
+.card h3{margin-top:0}
+footer{text-align:center;padding:25px;border-top:1px solid ${isDark ? "#343449" : "#e8e5ef"}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">${escapeHTML(s.siteName)}</div>
+<nav><a href="#home">Home</a><a href="#about">About</a><a href="#services">Services</a><a href="#contact">Contact</a></nav>
+</header>
+<main>
+<section class="hero" id="home">
+<h1>${escapeHTML(s.siteName)}</h1>
+<p>${escapeHTML(s.siteTagline)}</p>
+<a class="btn" href="#services">Explore More →</a>
+<a class="btn alt" href="#contact">Get Started</a>
+</section>
+<section class="section" id="about">
+<h2>Welcome to ${escapeHTML(s.siteName)}</h2>
+<p>${escapeHTML(s.siteTagline)} This website is your space to share ideas, showcase your work and connect with your audience.</p>
+</section>
+<section class="section" id="services">
+<h2>What We Offer</h2>
+<div class="cards">
+<div class="card"><h3>✨ Quality</h3><p>Thoughtfully designed experiences for your visitors.</p></div>
+<div class="card"><h3>🚀 Innovation</h3><p>Fresh ideas that help your website stand out.</p></div>
+<div class="card"><h3>💎 Simplicity</h3><p>A clean, approachable experience on any screen.</p></div>
+</div>
+</section>
+<section class="section" id="contact">
+<h2>Let's Connect</h2>
+<p>Ready to start something great? Add your real contact details here.</p>
+</section>
+</main>
+<footer>© ${new Date().getFullYear()} ${escapeHTML(s.siteName)}. All rights reserved.</footer>
+</body>
+</html>`;
+}
+
+function updatePreview() {
+  $("radiusValue").textContent = $("radius").value + "px";
+
+  const html = makeWebsiteHTML();
+  const iframe = $("preview");
+
+  iframe.srcdoc = html;
+}
+
+function downloadWebsite() {
+  const html = makeWebsiteHTML();
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const filename = ($("siteName").value || "my-website")
+    .trim()
+    .replace(/[^a-z0-9-_]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase() || "my-website";
+
+  link.href = url;
+  link.download = filename + ".html";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem("rexweb-theme-settings", JSON.stringify(getSettings()));
+    alert("Your theme settings have been saved on this device!");
+  } catch (error) {
+    alert("Settings could not be saved in this browser.");
+  }
+}
+
+function resetSettings() {
+  $("siteName").value = "My Creative Website";
+  $("siteTagline").value = "Ideas become amazing experiences.";
+
+  applyTheme({
+    primary: "#7657ff",
+    secondary: "#ff5ca8",
+    bg: "#ffffff",
+    text: "#202039",
+    font: "system",
+    radius: 16,
+    layout: "center"
+  });
+}
+
+function scrollToThemes() {
+  $("gallery").scrollIntoView({ behavior: "smooth" });
+}
+
+function scrollToCustomizer() {
+  $("editor").scrollIntoView({ behavior: "smooth" });
+}
+
+$("filters").addEventListener("click", event => {
+  const button = event.target.closest("[data-category]");
+  if (!button) return;
+
+  selectedCategory = button.dataset.category;
+
+  document.querySelectorAll(".filter").forEach(item => {
+    item.classList.toggle("active", item === button);
+  });
+
+  renderGallery();
+});
+
+$("search").addEventListener("input", renderGallery);
+
+fields.forEach(id => {
+  $(id).addEventListener("input", updatePreview);
+  $(id).addEventListener("change", updatePreview);
+});
+
+$("modeBtn").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  $("modeBtn").textContent =
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
+});
+
+$("year").textContent = new Date().getFullYear();
+
+renderGallery();
+updatePreview();
+</script>
+
+</body>
+</html>
