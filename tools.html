@@ -1,4 +1,3 @@
-Here is the updated full HTML file with the Age Calculator results box formatted to match your exact design:
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -202,10 +201,6 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 <div class="result" id="timerDisplay" style="font-size:20px;text-align:center;font-weight:bold;">00:00</div>
 </div>
 </article>
-
-
-
-
 
 <!-- REXWEB ENHANCED AGE CALCULATOR -->
 <article class="tool-card collapsed" data-name="age calculator date birthday calendar">
@@ -524,316 +519,8 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 
     </div>
 
-    <script>
-    (() => {
-      const yearSelect = document.getElementById('rexBirthYear');
-      const monthSelect = document.getElementById('rexBirthMonth');
-      const daySelect = document.getElementById('rexBirthDay');
-      const calendarDays = document.getElementById('rexCalendarDays');
-      const calendarTitle = document.getElementById('rexCalendarTitle');
-      const selectedDate = document.getElementById('rexSelectedDate');
-      const result = document.getElementById('ageResult');
-
-      if (!yearSelect || yearSelect.dataset.ready) return;
-      yearSelect.dataset.ready = 'true';
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const months = [
-        'January', 'February', 'March', 'April',
-        'May', 'June', 'July', 'August',
-        'September', 'October', 'November', 'December'
-      ];
-
-      const weekdays = [
-        'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-        'Thursday', 'Friday', 'Saturday'
-      ];
-
-      let chosen = null;
-      let viewYear = today.getFullYear();
-      let viewMonth = today.getMonth();
-
-      // Fill the year list. Select a year directly.
-      for (let y = today.getFullYear(); y >= 1900; y--) {
-        const option = document.createElement('option');
-        option.value = y;
-        option.textContent = y;
-        yearSelect.appendChild(option);
-      }
-
-      // Fill the month list.
-      months.forEach((name, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = name;
-        monthSelect.appendChild(option);
-      });
-
-      function daysInMonth(year, month) {
-        return new Date(year, month + 1, 0).getDate();
-      }
-
-      function formatDate(date) {
-        if (!date) return 'No date selected';
-
-        return weekdays[date.getDay()] + ', ' +
-          months[date.getMonth()] + ' ' +
-          date.getDate() + ', ' + date.getFullYear();
-      }
-
-      function syncSelectors() {
-        yearSelect.value = viewYear;
-        monthSelect.value = viewMonth;
-        fillDays();
-      }
-
-      function fillDays() {
-        const oldDay = chosen ? chosen.getDate() : 1;
-        const total = daysInMonth(viewYear, viewMonth);
-
-        daySelect.innerHTML = '<option value="">Day</option>';
-
-        for (let d = 1; d <= total; d++) {
-          const option = document.createElement('option');
-          option.value = d;
-          option.textContent = d;
-          daySelect.appendChild(option);
-        }
-
-        if (oldDay <= total && chosen) {
-          daySelect.value = oldDay;
-        }
-
-        renderCalendar();
-      }
-
-      function renderCalendar() {
-        calendarTitle.textContent =
-          months[viewMonth] + ' ' + viewYear;
-
-        calendarDays.innerHTML = '';
-
-        const firstDay = new Date(
-          viewYear, viewMonth, 1
-        ).getDay();
-
-        const total = daysInMonth(viewYear, viewMonth);
-
-        for (let i = 0; i < firstDay; i++) {
-          calendarDays.appendChild(document.createElement('span'));
-        }
-
-        for (let d = 1; d <= total; d++) {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.textContent = d;
-          button.setAttribute('aria-label', months[viewMonth] + ' ' + d);
-
-          const date = new Date(viewYear, viewMonth, d);
-          date.setHours(0, 0, 0, 0);
-
-          button.disabled = date > today;
-
-          if (chosen &&
-              chosen.getFullYear() === viewYear &&
-              chosen.getMonth() === viewMonth &&
-              chosen.getDate() === d) {
-            button.classList.add('selected');
-            button.setAttribute('aria-pressed', 'true');
-          }
-
-          button.addEventListener('click', () => {
-            chosen = new Date(viewYear, viewMonth, d);
-            chosen.setHours(0, 0, 0, 0);
-
-            syncSelectors();
-            selectedDate.textContent = formatDate(chosen);
-          });
-
-          calendarDays.appendChild(button);
-        }
-      }
-
-      yearSelect.addEventListener('change', () => {
-        if (!yearSelect.value) return;
-
-        viewYear = Number(yearSelect.value);
-
-        if (viewYear === today.getFullYear() &&
-            viewMonth > today.getMonth()) {
-          viewMonth = today.getMonth();
-        }
-
-        if (chosen && chosen.getFullYear() !== viewYear) {
-          chosen = null;
-          selectedDate.textContent = 'No date selected';
-        }
-
-        fillDays();
-      });
-
-      monthSelect.addEventListener('change', () => {
-        if (monthSelect.value === '') return;
-
-        viewMonth = Number(monthSelect.value);
-
-        if (viewYear === today.getFullYear() &&
-            viewMonth > today.getMonth()) {
-          viewMonth = today.getMonth();
-          monthSelect.value = viewMonth;
-        }
-
-        if (chosen &&
-            (chosen.getFullYear() !== viewYear ||
-             chosen.getMonth() !== viewMonth)) {
-          chosen = null;
-          selectedDate.textContent = 'No date selected';
-        }
-
-        fillDays();
-      });
-
-      daySelect.addEventListener('change', () => {
-        if (!daySelect.value) return;
-
-        const date = new Date(
-          viewYear, viewMonth, Number(daySelect.value)
-        );
-
-        if (date > today) return;
-
-        chosen = date;
-        selectedDate.textContent = formatDate(chosen);
-        renderCalendar();
-      });
-
-      document.getElementById('rexPrevMonth')
-        .addEventListener('click', () => {
-          if (viewYear === 1900 && viewMonth === 0) return;
-
-          viewMonth--;
-
-          if (viewMonth < 0) {
-            viewMonth = 11;
-            viewYear--;
-          }
-
-          chosen = null;
-          syncSelectors();
-          selectedDate.textContent = 'No date selected';
-        });
-
-      document.getElementById('rexNextMonth')
-        .addEventListener('click', () => {
-          if (viewYear === today.getFullYear() &&
-              viewMonth >= today.getMonth()) return;
-
-          viewMonth++;
-
-          if (viewMonth > 11) {
-            viewMonth = 0;
-            viewYear++;
-          }
-
-          chosen = null;
-          syncSelectors();
-          selectedDate.textContent = 'No date selected';
-        });
-
-      document.getElementById('rexClearDate')
-        .addEventListener('click', () => {
-          chosen = null;
-          yearSelect.value = '';
-          monthSelect.value = '';
-          daySelect.value = '';
-          selectedDate.textContent = 'No date selected';
-          result.textContent = 'Your age details will appear here.';
-          renderCalendar();
-        });
-
-      document.getElementById('rexApplyDate')
-        .addEventListener('click', () => {
-          if (!chosen) {
-            result.textContent =
-              'Please select your birth year, month, and day first.';
-            return;
-          }
-
-          calculateAge();
-        });
-
-      function calculateAge() {
-        if (!chosen || chosen > today) {
-          result.textContent = 'Please select a valid birthday.';
-          return;
-        }
-
-        let years = today.getFullYear() - chosen.getFullYear();
-        let monthsOld = today.getMonth() - chosen.getMonth();
-        let daysOld = today.getDate() - chosen.getDate();
-
-        if (daysOld < 0) {
-          monthsOld--;
-          const previousMonth = new Date(
-            today.getFullYear(), today.getMonth(), 0
-          );
-          daysOld += previousMonth.getDate();
-        }
-
-        if (monthsOld < 0) {
-          years--;
-          monthsOld += 12;
-        }
-
-        const nextBirthday = new Date(
-          today.getFullYear(),
-          chosen.getMonth(),
-          Math.min(
-            chosen.getDate(),
-            daysInMonth(today.getFullYear(), chosen.getMonth())
-          )
-        );
-
-        if (nextBirthday < today) {
-          nextBirthday.setFullYear(today.getFullYear() + 1);
-        }
-
-        const millisecondsPerDay = 86400000;
-        const daysUntil = Math.round(
-          (nextBirthday - today) / millisecondsPerDay
-        );
-
-        result.innerHTML =
-          '<span class="age-heading">Your Exact Age</span>' +
-          years + ' years, ' +
-          monthsOld + ' months, ' +
-          daysOld + ' days<br>' +
-          '<span class="age-label">Birthday:</span> ' +
-          formatDate(chosen) + '<br>' +
-          '<span class="age-label">Next Birthday:</span> ' +
-          daysUntil + ' day' +
-          (daysUntil === 1 ? '' : 's') + ' to go.';
-      }
-
-      document.getElementById('ageBtn')?.addEventListener(
-        'click', calculateAge
-      );
-
-      syncSelectors();
-    })();
-    </script>
-
   </div>
 </article>
-
-
-
-
-
-
-
 
 <!-- PERCENTAGE CALCULATOR -->
 <article class="tool-card collapsed" data-name="percentage calculator math finance">
@@ -1146,7 +833,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 <p class="desc">Transform your plain text into 50 unique Unicode styles and decorative effects.</p>
 <textarea id="stylishInput" placeholder="Type your text here..."></textarea>
 <div class="row"><button class="btn" id="generateStylish">Generate 50 Styles</button></div>
-<div class="result" id="stylishResult" style="max-height:300px;overflow:auto;">Stylish variants will appear here.</div>
+<div class="result" id="stylishResult" style="max-height:400px;overflow:auto;display:flex;flex-direction:column;gap:10px;">Stylish variants will appear here.</div>
 </div>
 </article>
 
@@ -1666,16 +1353,22 @@ show("timerDisplay","00:00");
       (nextBirthday - today) / millisecondsPerDay
     );
 
+    const birthdayWithoutYear = weekdays[chosen.getDay()] + ', ' +
+      months[chosen.getMonth()] + ' ' +
+      chosen.getDate();
+
     result.innerHTML =
       '<span class="age-heading">Your Exact Age</span>' +
       years + ' years, ' +
       monthsOld + ' months, ' +
       daysOld + ' days<br>' +
       '<span class="age-label">Birthday:</span> ' +
-      formatDate(chosen) + '<br>' +
+      birthdayWithoutYear + '<br>' +
       '<span class="age-label">Next Birthday:</span> ' +
       daysUntil + ' day' +
-      (daysUntil === 1 ? '' : 's') + ' to go.';
+      (daysUntil === 1 ? '' : 's') + ' to go.<br>' +
+      '<span class="age-label">Date(NBD):</span> ' +
+      formatDate(nextBirthday);
   }
 
   syncSelectors();
@@ -1993,7 +1686,7 @@ show("gradPresetResult",`background: ${val};`);
 }
 $("gradPreset").onchange=updatePreset;
 updatePreset();
-$("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"gradPresetResult");
+$("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"copyGradPreset");
 
 /* COLOR PALETTE GENERATOR */
 $("generatePalette").onclick=()=>{
@@ -2028,61 +1721,82 @@ fullWidth:(str)=>str.split('').map(c=>c===' '?' ':String.fromCharCode(c.charCode
 };
 
 $("generateStylish").onclick=()=>{
-const txt=$("stylishInput").value.trim()||"VitalStar";
+const txt=$("stylishInput").value.trim()||"Ameh Christian Chidubem";
 const t=(map)=>typeof map==='function'?map(txt):txt.split('').map(c=>map[c]||c).join('');
-const list=[
-  "1. 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻: " + t(sMaps.script),
-  "2. 𝕍𝕚𝕥𝕒𝕝𝕊𝓽𝕒𝚛: " + t(sMaps.double),
-  "3. 𝐕𝐢𝐭𝐚𝐥𝐒𝐭𝐚𝐫: " + t(sMaps.bold),
-  "4. 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓: " + t(sMaps.italic),
-  "5. 𝙑𝙞𝙩𝙖𝙡𝙎𝙩𝙖𝙧: " + t(sMaps.bold),
-  "6. 𝚅𝚒𝚝𝚊𝚕𝚂𝚝𝚊𝚛: " + t(sMaps.mono),
-  "7. 𝖁𝖎𝖙𝖆𝖑𝕾𝖙𝖆𝖗: " + t(sMaps.gothic),
-  "8. 𝔙𝔦𝔱𝔞𝔩𝔖𝔱𝔞𝔯: " + t(sMaps.gothic),
-  "9. ⓋⓘⓣⓐⓛⓈⓣⓐⓡ: " + t(sMaps.circled),
-  "10. ＶｉｔａｌＳｔａｒ: " + t(sMaps.fullWidth),
-  "11. ꧁༒☬VitalStar☬༒꧂: ꧁༒☬" + txt + "☬༒꧂",
-  "12. ꧁𓊈𒆜VitalStar𒆜𓊉꧂: ꧁𓊈𒆜" + txt + "𒆜𓊉꧂",
-  "13. ★彡[ᴠɪᴛ𝙖ʟsᴛ𝙖ʀ]彡★: ★彡[" + txt + "]彡★",
-  "14. 『ＶＩＴＡＬＳＴＡＲ』: 『" + t(sMaps.fullWidth) + "』",
-  "15. ♛ 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓 ♛: ♛ " + t(sMaps.italic) + " ♛",
-  "16. ✦ 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻 ✦: ✦ " + t(sMaps.script) + " ✦",
-  "17. 𓆩★𓆪 VitalStar 𓆩★𓆪: 𓆩★𓆪 " + txt + " 𓆩★𓆪",
-  "18. ⚡Vɪᴛ𝙖ʟSᴛ𝙖ʀ⚡: ⚡" + txt + "⚡",
-  "19. ☯︎ VITALSTAR ☯︎: ☯︎ " + txt.toUpperCase() + " ☯︎",
-  "20. ♡ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ♡: ♡ " + txt + " ♡",
-  "21. 亗 Vɪᴛ𝙖ʟSᴛ𝙖ʀ 亗: 亗 " + txt + " 亗",
-  "22. ༺☆༻VitalStar༺☆༻: ༺☆༻" + txt + "༺☆༻",
-  "23. ꧁ঔৣ☬VitalStar☬ঔৣ꧂: ꧁ঔৣ☬" + txt + "☬ঔৣ꧂",
-  "24. ✧༺♥༻∞ VitalStar ∞༺♥༻✧: ✧༺♥༻∞ " + txt + " ∞༺♥༻✧",
-  "25. 『★』VitalStar『★』: 『★』" + txt + "『★』",
-  "26. ☠ VITALSTAR ☠: ☠ " + txt.toUpperCase() + " ☠",
-  "27. 么 Vɪᴛ𝙖ʟSᴛ𝙖ʀ 么: 么 " + txt + " 么",
-  "28. ࿐ ࿔:･ﾟVitalStar･ﾟ:࿐: ࿐ ࿔:･ﾟ" + txt + "･ﾟ:࿐",
-  "29. ♜ VITALSTAR ♜: ♜ " + txt.toUpperCase() + " ♜",
-  "30. ⫷ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ⫸: ⫷ " + txt + " ⫸",
-  "31. 乂❤‿❤乂 VitalStar: 乂❤‿❤乂 " + txt,
-  "32. ✨『VitalStar』✨: ✨『" + txt + "』✨",
-  "33. ⚜️ 𝖁𝖎𝖙𝖆𝖑𝕾𝖙𝖆𝖗 ⚜️: ⚜️ " + t(sMaps.gothic) + " ⚜️",
-  "34. ♕ 𝕍𝕚𝕥𝕒𝕝𝕊𝓽𝕒𝚛 ♕: ♕ " + t(sMaps.double) + " ♕",
-  "35. ☾⋆⁺₊✧ VitalStar ✧₊⁺⋆☽: ☾⋆⁺₊✧ " + txt + " ✧₊⁺⋆☽",
-  "36. ᯓ★ Vɪᴛ𝙖ʟSᴛ𝙖ʀ: ᯓ★ " + txt,
-  "37. 𖤐 VITALSTAR 𖤐: 𖤐 " + txt.toUpperCase() + " 𖤐",
-  "38. ༒︎Vɪᴛ𝙖ʟSᴛ𝙖ʀ༒︎: ༒︎" + txt + "༒︎",
-  "39. ✺ 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓 ✺: ✺ " + t(sMaps.italic) + " ✺",
-  "40. ⊹ ࣪ ˖ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ˖ ࣪ ⊹: ⊹ ࣪ ˖ " + txt + " ˖ ࣪ ⊹",
-  "41. ꧁༺VITALSTAR༻꧂: ꧁༺" + txt.toUpperCase() + "༻꧂",
-  "42. ★彡 𝙑𝙞𝙩𝙖𝙡𝙎𝙩𝙖𝙧 彡★: ★彡 " + t(sMaps.bold) + " 彡★",
-  "43. ◥꧁དVitalStarཌ꧂◤: ◥꧁ད" + txt + "ཌ꧂◤",
-  "44. 𓆩⚡𓆪 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻: 𓆩⚡𓆪 " + t(sMaps.script),
-  "45. ♡︎₊˚ VitalStar ˚₊♡︎: ♡︎₊˚ " + txt + " ˚₊♡︎",
-  "46. ✯ VιтαℓSтαя ✯: ✯ " + txt + " ✯",
-  "47. 乂 VITALSTAR 乂: 乂 " + txt.toUpperCase() + " 乂",
-  "48. ⌁༺ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ༻⌁: ⌁༺ " + txt + " ༻⌁",
-  "49. 𖣘『𝑽𝒊𝒕𝙖𝒍𝑺𝒕𝒂𝒓』𖣘: 𖣘『" + t(sMaps.italic) + "』𖣘",
-  "50. 👑 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻 👑: 👑 " + t(sMaps.script) + " 👑"
+const styles=[
+  t(sMaps.script),
+  t(sMaps.double),
+  t(sMaps.bold),
+  t(sMaps.italic),
+  t(sMaps.bold),
+  t(sMaps.mono),
+  t(sMaps.gothic),
+  t(sMaps.gothic),
+  t(sMaps.circled),
+  t(sMaps.fullWidth),
+  "꧁༒☬" + txt + "☬༒꧂",
+  "꧁𓊈𒆜" + txt + "𒆜𓊉꧂",
+  "★彡[" + txt + "]彡★",
+  "『" + t(sMaps.fullWidth) + "』",
+  "♛ " + t(sMaps.italic) + " ♛",
+  "✦ " + t(sMaps.script) + " ✦",
+  "𓆩★𓆪 " + txt + " 𓆩★𓆪",
+  "⚡" + txt + "⚡",
+  "☯︎ " + txt.toUpperCase() + " ☯︎",
+  "♡ " + txt + " ♡",
+  "亗 " + txt + " 亗",
+  "༺☆༻" + txt + "༺☆༻",
+  "꧁ঔৣ☬" + txt + "☬ঔৣ꧂",
+  "✧༺♥༻∞ " + txt + " ∞༺♥༻✧",
+  "『★』" + txt + "『★』",
+  "☠ " + txt.toUpperCase() + " ☠",
+  "么 " + txt + " 么",
+  "࿐ ࿔:･ﾟ" + txt + "･ﾟ:࿐",
+  "♜ " + txt.toUpperCase() + " ♜",
+  "⫷ " + txt + " ⫸",
+  "乂❤‿❤乂 " + txt,
+  "✨『" + txt + "』✨",
+  "⚜️ " + t(sMaps.gothic) + " ⚜️",
+  "♕ " + t(sMaps.double) + " ♕",
+  "☾⋆⁺₊✧ " + txt + " ✧₊⁺⋆☽",
+  "ᯓ★ " + txt,
+  "𖤐 " + txt.toUpperCase() + " 𖤐",
+  "༒︎" + txt + "༒︎",
+  "✺ " + t(sMaps.italic) + " ✺",
+  "⊹ ࣪ ˖ " + txt + " ˖ ࣪ ⊹",
+  "꧁༺" + txt.toUpperCase() + "༻꧂",
+  "★彡 " + t(sMaps.bold) + " 彡★",
+  "◥꧁ད" + txt + "ཌ꧂◤",
+  "𓆩⚡𓆪 " + t(sMaps.script),
+  "♡︎₊˚ " + txt + " ˚₊♡︎",
+  "✯ " + txt + " ✯",
+  "乂 " + txt.toUpperCase() + " 乂",
+  "⌁༺ " + txt + " ༻⌁",
+  "𖣘『" + t(sMaps.italic) + "』𖣘",
+  "👑 " + t(sMaps.script) + " 👑"
 ];
-show("stylishResult", list.join("\n\n"));
+
+const container = $("stylishResult");
+container.innerHTML = "";
+
+styles.forEach((styledText, idx) => {
+  const item = document.createElement("div");
+  item.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);border:1px solid var(--border);padding:8px 12px;border-radius:8px;";
+  
+  const span = document.createElement("span");
+  span.textContent = `${idx + 1}. ${styledText}`;
+  span.style.overflowWrap = "anywhere";
+  
+  const copyBtn = document.createElement("button");
+  copyBtn.textContent = "Copy";
+  copyBtn.className = "btn alt";
+  copyBtn.style.cssText = "padding:6px 10px;font-size:11px;flex-shrink:0;";
+  copyBtn.onclick = () => copyValue(styledText, "stylishResult");
+  
+  item.appendChild(span);
+  item.appendChild(copyBtn);
+  container.appendChild(item);
+});
 };
 
 /* FOOTER */
