@@ -1,3 +1,8 @@
+To restore the dark and light mode toggle while keeping all your recent updates (removing themes, adding the Video Editor 🎬, keeping Web Templates, and styling the active Home button), we need three key pieces:
+ * Light Mode CSS Variables: Define the color palette for light mode using html[data-theme="light"].
+ * Theme Toggle Button: Place the theme switcher button back in the header actions.
+ * Theme Logic Script: JavaScript to switch the theme attribute, update the button icon, and save the preference in localStorage 🌓.
+Here is your complete updated index.html file with dark and light mode fully integrated:
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -6,7 +11,7 @@
 <meta name="theme-color" content="#050b19" id="themeColor">
 
 <title>RexWeb Nexora | Your Digital World</title>
-<meta name="description" content="Explore digital tools, website templates, themes, ebooks, games, and creative resources at RexWeb Nexora.">
+<meta name="description" content="Explore digital tools, website templates, ebooks, games, and creative resources at RexWeb Nexora.">
 
 <style>
 :root {
@@ -133,15 +138,15 @@ header {
 .theme-btn,
 .menu-btn,
 .search-btn {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text);
-  border-radius: 12px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 21px;
+  font-size: 19px;
 }
 
 .theme-btn:hover,
@@ -154,22 +159,28 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 20px;
 }
 
 .header-nav a {
-  padding: 12px 0;
+  padding: 8px 12px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
+  border-radius: 8px;
+  border: 1px solid transparent;
 }
 
-.header-nav a:hover,
+.header-nav a:hover {
+  color: var(--blue);
+}
+
 .header-nav a.active {
   color: var(--blue);
-  border-color: var(--blue);
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: 0 4px 12px rgba(0,200,255,0.1);
 }
 
 /* SECOND NAVIGATION ROW */
@@ -193,26 +204,31 @@ header {
 
 .category-link {
   width: 145px;
-  min-height: 72px;
+  min-height: 65px;
   border: 1px solid var(--border);
   background: var(--card);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 12px;
   font-weight: bold;
   transition: .25s;
 }
 
+.category-link.active-cat {
+  background: var(--surface);
+  border-color: var(--blue);
+}
+
 .category-link .icon {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .category-link:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--blue);
   box-shadow: 0 5px 20px #00c8ff17;
 }
@@ -248,20 +264,20 @@ html[data-theme="light"] .hero {
   display: inline-block;
   border: 1px solid var(--blue);
   border-radius: 30px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   color: var(--blue);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 1.5px;
-  margin-bottom: 17px;
+  margin-bottom: 14px;
 }
 
 .hero h1 {
-  font-size: clamp(36px, 5vw, 57px);
+  font-size: clamp(32px, 5vw, 50px);
   line-height: 1.08;
   font-weight: 900;
   letter-spacing: -2px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .gradient-text {
@@ -273,29 +289,29 @@ html[data-theme="light"] .hero {
 
 .hero p {
   color: var(--muted);
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.7;
   max-width: 470px;
 }
 
 .hero-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-top: 23px;
+  margin-top: 20px;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 13px 21px;
-  border-radius: 13px;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   transition: .25s;
 }
@@ -304,7 +320,7 @@ html[data-theme="light"] .hero {
   color: white;
   border: none;
   background: linear-gradient(110deg, #008dff, #7545ff);
-  box-shadow: 0 8px 24px #4c51ff28;
+  box-shadow: 0 6px 18px #4c51ff28;
 }
 
 .btn:hover {
@@ -353,20 +369,20 @@ html[data-theme="light"] .hero {
 .feature-card {
   min-width: 0;
   border: 1px solid var(--border);
-  border-radius: 15px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--card);
   transition: transform .25s, border-color .25s, box-shadow .25s;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   border-color: var(--accent, var(--blue));
   box-shadow: var(--shadow);
 }
 
 .card-image {
-  height: 155px;
+  height: 140px;
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #102d52, #261052);
@@ -394,41 +410,40 @@ html[data-theme="light"] .hero {
 .card-icon {
   position: absolute;
   z-index: 2;
-  left: 15px;
+  left: 14px;
   bottom: -1px;
-  transform: translateY(0);
-  width: 47px;
-  height: 47px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--accent, var(--blue));
   color: white;
-  border: 3px solid var(--card);
-  font-size: 23px;
+  border: 2px solid var(--card);
+  font-size: 20px;
 }
 
 .card-body {
-  padding: 15px 16px 17px;
+  padding: 13px 14px 15px;
 }
 
 .card-body h3 {
-  font-size: 17px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 
 .card-body p {
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-  min-height: 42px;
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 36px;
 }
 
 .card-link {
   display: inline-block;
-  margin-top: 13px;
+  margin-top: 10px;
   color: var(--accent, var(--blue));
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
 }
 
@@ -436,14 +451,14 @@ html[data-theme="light"] .hero {
 
 .cta-banner {
   margin: 32px 0;
-  padding: 25px;
+  padding: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 12px;
   background:
     radial-gradient(ellipse at 10% 120%, #6240ff26, transparent 45%),
     var(--surface);
@@ -453,34 +468,34 @@ html[data-theme="light"] .hero {
 .cta-main {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .rocket {
-  font-size: 47px;
+  font-size: 40px;
 }
 
 .cta-banner h2 {
-  font-size: 20px;
-  margin-bottom: 7px;
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 
 .cta-banner p {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .stats {
   display: flex;
-  gap: 23px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
 .stat strong {
   display: block;
-  font-size: 21px;
-  margin-bottom: 4px;
+  font-size: 19px;
+  margin-bottom: 2px;
 }
 
 .stat span {
@@ -497,7 +512,7 @@ footer {
 }
 
 .footer-inner {
-  padding: 25px 0;
+  padding: 22px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -514,7 +529,7 @@ footer {
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 17px;
+  gap: 15px;
 }
 
 .footer-links a {
@@ -550,7 +565,7 @@ footer {
   width: min(320px, 85vw);
   height: 100dvh;
   z-index: 2001;
-  padding: 23px;
+  padding: 20px;
   background: var(--surface);
   border-left: 1px solid var(--border);
   transition: right .3s ease;
@@ -565,38 +580,38 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 22px;
 }
 
 .menu-top h2 {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .close-menu {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  width: 39px;
-  height: 39px;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
   color: var(--text);
-  font-size: 23px;
+  font-size: 20px;
 }
 
 .side-menu > p {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
-  margin-bottom: 17px;
+  margin-bottom: 15px;
 }
 
 .side-menu a {
   display: block;
-  padding: 14px 12px;
-  margin-bottom: 7px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: bold;
 }
 
@@ -613,7 +628,7 @@ body.menu-open {
 
 .search-box {
   display: none;
-  padding: 0 0 12px;
+  padding: 0 0 10px;
 }
 
 .search-box.open {
@@ -622,9 +637,9 @@ body.menu-open {
 
 .search-box input {
   width: 100%;
-  padding: 13px 15px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--card);
   color: var(--text);
   outline: none;
@@ -638,205 +653,25 @@ body.menu-open {
 
 @media (max-width: 1000px) {
   .header-nav {
-    gap: 17px;
+    gap: 12px;
   }
 
   .cards-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .card-image {
-    height: 190px;
-  }
 }
 
 @media (max-width: 650px) {
   .topbar {
-    min-height: 65px;
-    gap: 8px;
-  }
-
-  .brand-logo {
-    width: 37px;
-    height: 37px;
-    font-size: 22px;
-  }
-
-  .brand-name {
-    font-size: 19px;
-  }
-
-  .brand small {
-    font-size: 8px;
-  }
-
-  .header-actions {
-    gap: 6px;
-  }
-
-  .theme-btn,
-  .menu-btn,
-  .search-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-    border-radius: 10px;
-  }
-
-  .header-nav {
-    justify-content: flex-start;
-    gap: 22px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .header-nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .header-nav a {
-    font-size: 12px;
-    padding: 12px 0;
-  }
-
-  .category-row {
-    gap: 9px;
-    padding: 10px 0;
-  }
-
-  .category-link {
-    width: 112px;
-    min-height: 65px;
-    font-size: 11px;
-  }
-
-  .category-link .icon {
-    font-size: 21px;
-  }
-
-  .hero {
-    min-height: 380px;
-    background-position: 58% center;
-  }
-
-  .hero-content {
-    padding: 36px 0;
-  }
-
-  .hero h1 {
-    font-size: 39px;
-    letter-spacing: -1.5px;
-  }
-
-  .hero p {
-    font-size: 14px;
-    max-width: 350px;
-  }
-
-  .btn {
-    padding: 12px 15px;
-    font-size: 12px;
-  }
-
-  .section {
-    padding-top: 30px;
+    min-height: 60px;
   }
 
   .cards-grid {
-    gap: 11px;
+    gap: 10px;
   }
 
   .card-image {
-    height: 125px;
-  }
-
-  .card-icon {
-    width: 39px;
-    height: 39px;
-    font-size: 19px;
-    left: 10px;
-  }
-
-  .card-body {
-    padding: 13px 11px 14px;
-  }
-
-  .card-body h3 {
-    font-size: 15px;
-  }
-
-  .card-body p {
-    font-size: 12px;
-    min-height: 58px;
-  }
-
-  .card-link {
-    font-size: 11px;
-    line-height: 1.6;
-  }
-
-  .cta-banner {
-    padding: 18px;
-  }
-
-  .rocket {
-    font-size: 35px;
-  }
-
-  .cta-banner h2 {
-    font-size: 17px;
-  }
-
-  .stats {
-    gap: 17px;
-    width: 100%;
-  }
-
-  .stat strong {
-    font-size: 18px;
-  }
-
-  .footer-inner {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 370px) {
-  .brand-name {
-    font-size: 16px;
-  }
-
-  .brand-logo {
-    width: 33px;
-    height: 33px;
-  }
-
-  .header-actions {
-    gap: 4px;
-  }
-
-  .theme-btn,
-  .menu-btn,
-  .search-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .hero h1 {
-    font-size: 33px;
-  }
-
-  .card-image {
-    height: 105px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    transition: none !important;
-    animation: none !important;
+    height: 120px;
   }
 }
 </style>
@@ -858,7 +693,6 @@ body.menu-open {
     <nav class="header-nav" aria-label="Main navigation">
       <a href="index.html" class="active">Home</a>
       <a href="tools.html">Tools</a>
-      <a href="themes.html">Themes</a>
       <a href="ebooks.html">Ebooks</a>
       <a href="games.html">Games</a>
       <a href="marketplace.html">Marketplace</a>
@@ -884,7 +718,7 @@ body.menu-open {
 
   <div class="category-nav">
     <div class="container category-row">
-      <a class="category-link" href="index.html">
+      <a class="category-link active-cat" href="index.html">
         <span class="icon">⌂</span>Home
       </a>
 
@@ -892,8 +726,8 @@ body.menu-open {
         <span class="icon">🛠️</span>Tools
       </a>
 
-      <a class="category-link" href="themes.html">
-        <span class="icon">🎨</span>Themes
+      <a class="category-link" href="video-editor.html">
+        <span class="icon">🎬</span>Video Editor
       </a>
 
       <a class="category-link" href="ebooks.html">
@@ -957,8 +791,6 @@ body.menu-open {
 
   <div class="cards-grid" id="featureGrid">
 
-    <!-- DIGITAL TOOLS -->
-
     <article class="feature-card" style="--accent:#00c8ff">
       <a href="tools.html">
         <div class="card-image">
@@ -976,8 +808,6 @@ body.menu-open {
         </div>
       </a>
     </article>
-
-    <!-- WEB TEMPLATES -->
 
     <article class="feature-card" style="--accent:#a56aff">
       <a href="templates.html">
@@ -997,27 +827,23 @@ body.menu-open {
       </a>
     </article>
 
-    <!-- THEMES -->
-
-    <article class="feature-card" style="--accent:#ff43c6">
-      <a href="themes.html">
+    <article class="feature-card" style="--accent:#ff5555">
+      <a href="video-editor.html">
         <div class="card-image">
           <img
-            src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80"
-            alt="Colourful digital design and creative technology"
+            src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=700&q=80"
+            alt="Video editing timeline and production suite"
             loading="lazy">
-          <div class="card-icon">🎨</div>
+          <div class="card-icon">🎬</div>
         </div>
 
         <div class="card-body">
-          <h3>Themes &amp; Designs</h3>
-          <p>Beautiful themes, designs, and customization resources.</p>
-          <span class="card-link">View Themes →</span>
+          <h3>Video Editor</h3>
+          <p>Edit, trim, and enhance your videos directly in your browser.</p>
+          <span class="card-link">Explore Video Editor →</span>
         </div>
       </a>
     </article>
-
-    <!-- EBOOKS -->
 
     <article class="feature-card" style="--accent:#00e7b0">
       <a href="ebooks.html">
@@ -1037,8 +863,6 @@ body.menu-open {
       </a>
     </article>
 
-    <!-- GAMES -->
-
     <article class="feature-card" style="--accent:#ff9b43">
       <a href="games.html">
         <div class="card-image">
@@ -1056,8 +880,6 @@ body.menu-open {
         </div>
       </a>
     </article>
-
-    <!-- MARKETPLACE -->
 
     <article class="feature-card" style="--accent:#00c8ff">
       <a href="marketplace.html">
@@ -1077,8 +899,6 @@ body.menu-open {
       </a>
     </article>
 
-    <!-- VITALSTAR -->
-
     <article class="feature-card" style="--accent:#8a5bff">
       <a href="https://vitalstar.web.app/">
         <div class="card-image">
@@ -1096,8 +916,6 @@ body.menu-open {
         </div>
       </a>
     </article>
-
-    <!-- COMMUNITY -->
 
     <article class="feature-card" style="--accent:#ff43c6">
       <a href="https://vitalstar.web.app/">
@@ -1163,7 +981,7 @@ body.menu-open {
         </div>
       </a>
 
-      <p style="margin-top:12px">
+      <p style="margin-top:10px">
         © <span id="year"></span> RexWeb Nexora. All rights reserved.
       </p>
     </div>
@@ -1196,13 +1014,13 @@ body.menu-open {
   <a href="index.html">🏠 Home</a>
   <a href="tools.html">🛠️ Digital Tools</a>
   <a href="templates.html">💻 Web Templates</a>
-  <a href="themes.html">🎨 Themes &amp; Designs</a>
+  <a href="video-editor.html">🎬 Video Editor</a>
   <a href="ebooks.html">📚 Digital Ebooks</a>
   <a href="games.html">🎮 Gaming Zone</a>
   <a href="marketplace.html">🛍️ Marketplace</a>
   <a href="https://vitalstar.web.app/">⭐ Enter VitalStar</a>
 
-  <hr style="border:0;border-top:1px solid var(--border);margin:18px 0">
+  <hr style="border:0;border-top:1px solid var(--border);margin:15px 0">
 
   <a href="about.html">ℹ️ About RexWeb</a>
   <a href="contact.html">✉️ Contact</a>
@@ -1221,13 +1039,11 @@ const themeColor = document.getElementById("themeColor");
 
 function applyTheme(theme) {
   root.setAttribute("data-theme", theme);
-
   themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
   themeToggle.setAttribute(
     "aria-label",
     theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
   );
-
   themeColor.content = theme === "dark" ? "#050b19" : "#f2f6ff";
 
   try {
@@ -1236,7 +1052,6 @@ function applyTheme(theme) {
 }
 
 let savedTheme = "dark";
-
 try {
   savedTheme = localStorage.getItem("rexweb-theme") || "dark";
 } catch (error) {}
@@ -1325,3 +1140,4 @@ document.getElementById("year").textContent =
 
 </body>
 </html>
+
