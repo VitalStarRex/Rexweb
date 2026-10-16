@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -555,7 +556,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 <article class="tool-card collapsed" data-name="responsive website preview mobile tablet desktop iframe">
 <div class="tool-heading"><span class="tool-icon">📱</span><h3>Responsive Website Preview</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Responsive Website Preview">+</button></div>
 <div class="tool-content">
-<p class="desc">Test website URLs or pages across simulated mobile, tablet, and desktop screen sizes. Tap preview to open full screen. Note: Some external websites block framing.</p>
+<p class="desc">Test website URLs or pages across simulated mobile, tablet, and desktop screen sizes. Tap preview to open full screen. Note: Some external websites block framing due to security headers.</p>
 <label>Website URL</label>
 <input type="url" id="respUrlInput" placeholder="https://example.com" value="https://example.com">
 <div class="row">
@@ -569,6 +570,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 <iframe id="respPreviewFrame" class="preview-frame" src="https://example.com" title="Responsive preview"></iframe>
 <div class="preview-hint" id="respPreviewHint">👆 Tap here to open fullscreen preview</div>
 </div>
+<div class="result" id="respMessage" style="font-size:11px; margin-top:8px; color:var(--muted);">💡 <strong>Tip:</strong> If a website shows a blank screen or connection error, it blocks iframe embedding. Use the <strong>"Open in New Tab"</strong> button above to view it properly.</div>
 </div>
 </article>
 
@@ -862,7 +864,7 @@ show("urlResult",decodeURIComponent($("urlInput").value));
 show("urlResult","Invalid encoded text.");
 }
 };
-$("urlCopy").onclick=()=>copyValue($("urlResult水印"||"urlResult"),"urlResult");
+$("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
 
 /* NUMBER BASE CONVERTER */
 $("convertBase").onclick=()=>{
@@ -1231,15 +1233,23 @@ else frame.style.width="100%";
 };
 });
 
-$("respUrlInput").onchange=function(){
-let url=this.value.trim();
-if(url && !url.startsWith("http://") && !url.startsWith("https://")){
-    url="https://"+url;
+function updateResponsiveUrl() {
+    let url = $("respUrlInput").value.trim();
+    if (!url) return;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
+    $("respUrlInput").value = url;
+    $("respPreviewFrame").src = url;
+    $("respExternalLink").href = url;
 }
-const finalUrl=url||"https://example.com";
-$("respPreviewFrame").src=finalUrl;
-$("respExternalLink").href=finalUrl;
-this.value=finalUrl;
+
+$("respUrlInput").onchange = updateResponsiveUrl;
+$("respUrlInput").onkeypress = function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        updateResponsiveUrl();
+    }
 };
 
 /* FOOTER */
@@ -1248,3 +1258,4 @@ $("year").textContent=new Date().getFullYear();
 
 </body>
 </html>
+
