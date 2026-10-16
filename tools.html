@@ -1,4 +1,4 @@
-
+Here is the updated full HTML file with the Age Calculator results box formatted to match your exact design:
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -203,17 +203,637 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- AGE CALCULATOR (ENHANCED CALENDAR INTERFACE) -->
+
+
+
+
+<!-- REXWEB ENHANCED AGE CALCULATOR -->
 <article class="tool-card collapsed" data-name="age calculator date birthday calendar">
-<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Age Calculator">+</button></div>
-<div class="tool-content">
-<p class="desc">Calculate exact age in years, months, and days from your date of birth.</p>
-<label>Date of Birth</label>
-<input type="date" id="birthDate">
-<div class="row"><button class="btn" id="ageBtn">Calculate Age</button></div>
-<div class="result" id="ageResult">Your age details will appear here.</div>
-</div>
+
+  <div class="tool-heading">
+    <span class="tool-icon">📅</span>
+    <h3>Age Calculator</h3>
+    <button class="tool-toggle"
+      aria-expanded="false"
+      aria-label="Expand Age Calculator">+</button>
+  </div>
+
+  <div class="tool-content">
+
+    <p class="desc">
+      Calculate your exact age in years, months, and days.
+    </p>
+
+    <style>
+      .rex-age-box {
+        background: #071329;
+        border: 1px solid #123d70;
+        border-radius: 18px;
+        padding: 16px;
+        color: #f4f7ff;
+        margin-top: 15px;
+      }
+
+      .rex-age-box * {
+        box-sizing: border-box;
+      }
+
+      .rex-age-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+
+      .rex-age-subtitle {
+        color: #9db8ed;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .rex-age-fields {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .rex-age-field label {
+        display: block;
+        font-size: 12px;
+        color: #a8c4f5;
+        margin-bottom: 7px;
+      }
+
+      .rex-age-field select {
+        width: 100%;
+        min-width: 0;
+        padding: 12px 5px;
+        border-radius: 10px;
+        background: #0a1b36;
+        border: 1px solid #00cfff;
+        color: white;
+        font-size: 14px;
+        outline: none;
+      }
+
+      .rex-age-field select:focus {
+        border-color: #a855ff;
+        box-shadow: 0 0 0 2px #a855ff33;
+      }
+
+      .rex-age-calendar {
+        margin-top: 18px;
+        background: #061127;
+        border: 1px solid #16477c;
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .rex-age-calendar-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .rex-age-calendar-head strong {
+        color: #c6b0ff;
+        font-size: 15px;
+      }
+
+      .rex-age-nav {
+        display: flex;
+        gap: 6px;
+      }
+
+      .rex-age-nav button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #174779;
+        background: #0a1b36;
+        color: #fff;
+        border-radius: 9px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .rex-age-weekdays,
+      .rex-age-days {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .rex-age-weekdays span {
+        text-align: center;
+        color: #8caee9;
+        font-size: 12px;
+        padding: 8px 0;
+      }
+
+      .rex-age-days button {
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #eef3ff;
+        border-radius: 9px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .rex-age-days button:not(:disabled):hover {
+        border-color: #00d9ff;
+        background: #0d2a4d;
+      }
+
+      .rex-age-days button.selected {
+        background: linear-gradient(135deg, #a855ff, #6735ff);
+        color: white;
+        font-weight: bold;
+      }
+
+      .rex-age-days button:disabled {
+        color: #34445f;
+        cursor: not-allowed;
+      }
+
+      .rex-age-selected {
+        background: #091b38;
+        border: 1px solid #16477c;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+      }
+
+      .rex-age-selected small {
+        color: #9db8ed;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .rex-age-selected strong {
+        display: block;
+        font-size: 16px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .rex-age-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .rex-age-actions button {
+        padding: 13px 8px;
+        border-radius: 11px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .rex-age-clear {
+        background: transparent;
+        border: 1px solid #00d9ff;
+        color: #00d9ff;
+      }
+
+      .rex-age-apply {
+        background: linear-gradient(135deg, #a855ff, #6735ff);
+        border: 0;
+        color: white;
+      }
+
+      .rex-age-result {
+        margin-top: 16px;
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid #16477c;
+        background: #071329;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+      }
+
+      .rex-age-result .age-heading {
+        color: #65eaff;
+        font-size: 15px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .rex-age-result .age-label {
+        color: #65eaff;
+        font-weight: bold;
+      }
+
+      @media (max-width: 360px) {
+        .rex-age-box {
+          padding: 10px;
+        }
+
+        .rex-age-field select {
+          font-size: 12px;
+        }
+
+        .rex-age-days button {
+          font-size: 12px;
+        }
+      }
+    </style>
+
+    <div class="rex-age-box">
+
+      <div class="rex-age-title">Select Your Birthday</div>
+
+      <div class="rex-age-subtitle">
+        Choose your year, month, and day.
+      </div>
+
+      <div class="rex-age-fields">
+
+        <div class="rex-age-field">
+          <label for="rexBirthYear">YEAR</label>
+          <select id="rexBirthYear">
+            <option value="">Year</option>
+          </select>
+        </div>
+
+        <div class="rex-age-field">
+          <label for="rexBirthMonth">MONTH</label>
+          <select id="rexBirthMonth">
+            <option value="">Month</option>
+          </select>
+        </div>
+
+        <div class="rex-age-field">
+          <label for="rexBirthDay">DAY</label>
+          <select id="rexBirthDay">
+            <option value="">Day</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="rex-age-calendar">
+
+        <div class="rex-age-calendar-head">
+          <strong id="rexCalendarTitle">Choose a date</strong>
+
+          <div class="rex-age-nav">
+            <button type="button" id="rexPrevMonth"
+              aria-label="Previous month">‹</button>
+
+            <button type="button" id="rexNextMonth"
+              aria-label="Next month">›</button>
+          </div>
+        </div>
+
+        <div class="rex-age-weekdays">
+          <span>S</span>
+          <span>M</span>
+          <span>T</span>
+          <span>W</span>
+          <span>T</span>
+          <span>F</span>
+          <span>S</span>
+        </div>
+
+        <div class="rex-age-days" id="rexCalendarDays"></div>
+
+      </div>
+
+      <div class="rex-age-selected">
+        <small>Selected Birthday</small>
+        <strong id="rexSelectedDate">No date selected</strong>
+      </div>
+
+      <div class="rex-age-actions">
+        <button type="button" class="rex-age-clear"
+          id="rexClearDate">Clear</button>
+
+        <button type="button" class="rex-age-apply"
+          id="rexApplyDate">Use Birthday ✓</button>
+      </div>
+
+      <div class="rex-age-result" id="ageResult" aria-live="polite">
+        Your age details will appear here.
+      </div>
+
+    </div>
+
+    <script>
+    (() => {
+      const yearSelect = document.getElementById('rexBirthYear');
+      const monthSelect = document.getElementById('rexBirthMonth');
+      const daySelect = document.getElementById('rexBirthDay');
+      const calendarDays = document.getElementById('rexCalendarDays');
+      const calendarTitle = document.getElementById('rexCalendarTitle');
+      const selectedDate = document.getElementById('rexSelectedDate');
+      const result = document.getElementById('ageResult');
+
+      if (!yearSelect || yearSelect.dataset.ready) return;
+      yearSelect.dataset.ready = 'true';
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const months = [
+        'January', 'February', 'March', 'April',
+        'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December'
+      ];
+
+      const weekdays = [
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+        'Thursday', 'Friday', 'Saturday'
+      ];
+
+      let chosen = null;
+      let viewYear = today.getFullYear();
+      let viewMonth = today.getMonth();
+
+      // Fill the year list. Select a year directly.
+      for (let y = today.getFullYear(); y >= 1900; y--) {
+        const option = document.createElement('option');
+        option.value = y;
+        option.textContent = y;
+        yearSelect.appendChild(option);
+      }
+
+      // Fill the month list.
+      months.forEach((name, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = name;
+        monthSelect.appendChild(option);
+      });
+
+      function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+      }
+
+      function formatDate(date) {
+        if (!date) return 'No date selected';
+
+        return weekdays[date.getDay()] + ', ' +
+          months[date.getMonth()] + ' ' +
+          date.getDate() + ', ' + date.getFullYear();
+      }
+
+      function syncSelectors() {
+        yearSelect.value = viewYear;
+        monthSelect.value = viewMonth;
+        fillDays();
+      }
+
+      function fillDays() {
+        const oldDay = chosen ? chosen.getDate() : 1;
+        const total = daysInMonth(viewYear, viewMonth);
+
+        daySelect.innerHTML = '<option value="">Day</option>';
+
+        for (let d = 1; d <= total; d++) {
+          const option = document.createElement('option');
+          option.value = d;
+          option.textContent = d;
+          daySelect.appendChild(option);
+        }
+
+        if (oldDay <= total && chosen) {
+          daySelect.value = oldDay;
+        }
+
+        renderCalendar();
+      }
+
+      function renderCalendar() {
+        calendarTitle.textContent =
+          months[viewMonth] + ' ' + viewYear;
+
+        calendarDays.innerHTML = '';
+
+        const firstDay = new Date(
+          viewYear, viewMonth, 1
+        ).getDay();
+
+        const total = daysInMonth(viewYear, viewMonth);
+
+        for (let i = 0; i < firstDay; i++) {
+          calendarDays.appendChild(document.createElement('span'));
+        }
+
+        for (let d = 1; d <= total; d++) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = d;
+          button.setAttribute('aria-label', months[viewMonth] + ' ' + d);
+
+          const date = new Date(viewYear, viewMonth, d);
+          date.setHours(0, 0, 0, 0);
+
+          button.disabled = date > today;
+
+          if (chosen &&
+              chosen.getFullYear() === viewYear &&
+              chosen.getMonth() === viewMonth &&
+              chosen.getDate() === d) {
+            button.classList.add('selected');
+            button.setAttribute('aria-pressed', 'true');
+          }
+
+          button.addEventListener('click', () => {
+            chosen = new Date(viewYear, viewMonth, d);
+            chosen.setHours(0, 0, 0, 0);
+
+            syncSelectors();
+            selectedDate.textContent = formatDate(chosen);
+          });
+
+          calendarDays.appendChild(button);
+        }
+      }
+
+      yearSelect.addEventListener('change', () => {
+        if (!yearSelect.value) return;
+
+        viewYear = Number(yearSelect.value);
+
+        if (viewYear === today.getFullYear() &&
+            viewMonth > today.getMonth()) {
+          viewMonth = today.getMonth();
+        }
+
+        if (chosen && chosen.getFullYear() !== viewYear) {
+          chosen = null;
+          selectedDate.textContent = 'No date selected';
+        }
+
+        fillDays();
+      });
+
+      monthSelect.addEventListener('change', () => {
+        if (monthSelect.value === '') return;
+
+        viewMonth = Number(monthSelect.value);
+
+        if (viewYear === today.getFullYear() &&
+            viewMonth > today.getMonth()) {
+          viewMonth = today.getMonth();
+          monthSelect.value = viewMonth;
+        }
+
+        if (chosen &&
+            (chosen.getFullYear() !== viewYear ||
+             chosen.getMonth() !== viewMonth)) {
+          chosen = null;
+          selectedDate.textContent = 'No date selected';
+        }
+
+        fillDays();
+      });
+
+      daySelect.addEventListener('change', () => {
+        if (!daySelect.value) return;
+
+        const date = new Date(
+          viewYear, viewMonth, Number(daySelect.value)
+        );
+
+        if (date > today) return;
+
+        chosen = date;
+        selectedDate.textContent = formatDate(chosen);
+        renderCalendar();
+      });
+
+      document.getElementById('rexPrevMonth')
+        .addEventListener('click', () => {
+          if (viewYear === 1900 && viewMonth === 0) return;
+
+          viewMonth--;
+
+          if (viewMonth < 0) {
+            viewMonth = 11;
+            viewYear--;
+          }
+
+          chosen = null;
+          syncSelectors();
+          selectedDate.textContent = 'No date selected';
+        });
+
+      document.getElementById('rexNextMonth')
+        .addEventListener('click', () => {
+          if (viewYear === today.getFullYear() &&
+              viewMonth >= today.getMonth()) return;
+
+          viewMonth++;
+
+          if (viewMonth > 11) {
+            viewMonth = 0;
+            viewYear++;
+          }
+
+          chosen = null;
+          syncSelectors();
+          selectedDate.textContent = 'No date selected';
+        });
+
+      document.getElementById('rexClearDate')
+        .addEventListener('click', () => {
+          chosen = null;
+          yearSelect.value = '';
+          monthSelect.value = '';
+          daySelect.value = '';
+          selectedDate.textContent = 'No date selected';
+          result.textContent = 'Your age details will appear here.';
+          renderCalendar();
+        });
+
+      document.getElementById('rexApplyDate')
+        .addEventListener('click', () => {
+          if (!chosen) {
+            result.textContent =
+              'Please select your birth year, month, and day first.';
+            return;
+          }
+
+          calculateAge();
+        });
+
+      function calculateAge() {
+        if (!chosen || chosen > today) {
+          result.textContent = 'Please select a valid birthday.';
+          return;
+        }
+
+        let years = today.getFullYear() - chosen.getFullYear();
+        let monthsOld = today.getMonth() - chosen.getMonth();
+        let daysOld = today.getDate() - chosen.getDate();
+
+        if (daysOld < 0) {
+          monthsOld--;
+          const previousMonth = new Date(
+            today.getFullYear(), today.getMonth(), 0
+          );
+          daysOld += previousMonth.getDate();
+        }
+
+        if (monthsOld < 0) {
+          years--;
+          monthsOld += 12;
+        }
+
+        const nextBirthday = new Date(
+          today.getFullYear(),
+          chosen.getMonth(),
+          Math.min(
+            chosen.getDate(),
+            daysInMonth(today.getFullYear(), chosen.getMonth())
+          )
+        );
+
+        if (nextBirthday < today) {
+          nextBirthday.setFullYear(today.getFullYear() + 1);
+        }
+
+        const millisecondsPerDay = 86400000;
+        const daysUntil = Math.round(
+          (nextBirthday - today) / millisecondsPerDay
+        );
+
+        result.innerHTML =
+          '<span class="age-heading">Your Exact Age</span>' +
+          years + ' years, ' +
+          monthsOld + ' months, ' +
+          daysOld + ' days<br>' +
+          '<span class="age-label">Birthday:</span> ' +
+          formatDate(chosen) + '<br>' +
+          '<span class="age-label">Next Birthday:</span> ' +
+          daysUntil + ' day' +
+          (daysUntil === 1 ? '' : 's') + ' to go.';
+      }
+
+      document.getElementById('ageBtn')?.addEventListener(
+        'click', calculateAge
+      );
+
+      syncSelectors();
+    })();
+    </script>
+
+  </div>
 </article>
+
+
+
+
+
+
+
 
 <!-- PERCENTAGE CALCULATOR -->
 <article class="tool-card collapsed" data-name="percentage calculator math finance">
@@ -768,20 +1388,298 @@ show("timerDisplay","00:00");
 };
 
 /* AGE CALCULATOR */
-$("birthDate").max=new Date().toISOString().slice(0,10);
-$("ageBtn").onclick=()=>{
-const value=$("birthDate").value;
-if(!value){show("ageResult","Select your date of birth.");return;}
-const birth=new Date(value+"T00:00:00");
-const now=new Date();
-if(Number.isNaN(birth.getTime())||birth>now){show("ageResult","Choose a valid past date.");return;}
-let y=now.getFullYear()-birth.getFullYear();
-let m=now.getMonth()-birth.getMonth();
-let d=now.getDate()-birth.getDate();
-if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();}
-if(m<0){y--;m+=12;}
-show("ageResult",`Age: ${y} years, ${m} months, ${d} days.`);
-};
+(() => {
+  const yearSelect = document.getElementById('rexBirthYear');
+  const monthSelect = document.getElementById('rexBirthMonth');
+  const daySelect = document.getElementById('rexBirthDay');
+  const calendarDays = document.getElementById('rexCalendarDays');
+  const calendarTitle = document.getElementById('rexCalendarTitle');
+  const selectedDate = document.getElementById('rexSelectedDate');
+  const result = document.getElementById('ageResult');
+
+  if (!yearSelect || yearSelect.dataset.ready) return;
+  yearSelect.dataset.ready = 'true';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const months = [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ];
+
+  const weekdays = [
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+    'Thursday', 'Friday', 'Saturday'
+  ];
+
+  let chosen = null;
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth();
+
+  for (let y = today.getFullYear(); y >= 1900; y--) {
+    const option = document.createElement('option');
+    option.value = y;
+    option.textContent = y;
+    yearSelect.appendChild(option);
+  }
+
+  months.forEach((name, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = name;
+    monthSelect.appendChild(option);
+  });
+
+  function daysInMonth(year, month) {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
+  function formatDate(date) {
+    if (!date) return 'No date selected';
+
+    return weekdays[date.getDay()] + ', ' +
+      months[date.getMonth()] + ' ' +
+      date.getDate() + ', ' + date.getFullYear();
+  }
+
+  function syncSelectors() {
+    yearSelect.value = viewYear;
+    monthSelect.value = viewMonth;
+    fillDays();
+  }
+
+  function fillDays() {
+    const oldDay = chosen ? chosen.getDate() : 1;
+    const total = daysInMonth(viewYear, viewMonth);
+
+    daySelect.innerHTML = '<option value="">Day</option>';
+
+    for (let d = 1; d <= total; d++) {
+      const option = document.createElement('option');
+      option.value = d;
+      option.textContent = d;
+      daySelect.appendChild(option);
+    }
+
+    if (oldDay <= total && chosen) {
+      daySelect.value = oldDay;
+    }
+
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    calendarTitle.textContent =
+      months[viewMonth] + ' ' + viewYear;
+
+    calendarDays.innerHTML = '';
+
+    const firstDay = new Date(
+      viewYear, viewMonth, 1
+    ).getDay();
+
+    const total = daysInMonth(viewYear, viewMonth);
+
+    for (let i = 0; i < firstDay; i++) {
+      calendarDays.appendChild(document.createElement('span'));
+    }
+
+    for (let d = 1; d <= total; d++) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = d;
+      button.setAttribute('aria-label', months[viewMonth] + ' ' + d);
+
+      const date = new Date(viewYear, viewMonth, d);
+      date.setHours(0, 0, 0, 0);
+
+      button.disabled = date > today;
+
+      if (chosen &&
+          chosen.getFullYear() === viewYear &&
+          chosen.getMonth() === viewMonth &&
+          chosen.getDate() === d) {
+        button.classList.add('selected');
+        button.setAttribute('aria-pressed', 'true');
+      }
+
+      button.addEventListener('click', () => {
+        chosen = new Date(viewYear, viewMonth, d);
+        chosen.setHours(0, 0, 0, 0);
+
+        syncSelectors();
+        selectedDate.textContent = formatDate(chosen);
+      });
+
+      calendarDays.appendChild(button);
+    }
+  }
+
+  yearSelect.addEventListener('change', () => {
+    if (!yearSelect.value) return;
+
+    viewYear = Number(yearSelect.value);
+
+    if (viewYear === today.getFullYear() &&
+        viewMonth > today.getMonth()) {
+      viewMonth = today.getMonth();
+    }
+
+    if (chosen && chosen.getFullYear() !== viewYear) {
+      chosen = null;
+      selectedDate.textContent = 'No date selected';
+    }
+
+    fillDays();
+  });
+
+  monthSelect.addEventListener('change', () => {
+    if (monthSelect.value === '') return;
+
+    viewMonth = Number(monthSelect.value);
+
+    if (viewYear === today.getFullYear() &&
+        viewMonth > today.getMonth()) {
+      viewMonth = today.getMonth();
+      monthSelect.value = viewMonth;
+    }
+
+    if (chosen &&
+        (chosen.getFullYear() !== viewYear ||
+         chosen.getMonth() !== viewMonth)) {
+      chosen = null;
+      selectedDate.textContent = 'No date selected';
+    }
+
+    fillDays();
+  });
+
+  daySelect.addEventListener('change', () => {
+    if (!daySelect.value) return;
+
+    const date = new Date(
+      viewYear, viewMonth, Number(daySelect.value)
+    );
+
+    if (date > today) return;
+
+    chosen = date;
+    selectedDate.textContent = formatDate(chosen);
+    renderCalendar();
+  });
+
+  document.getElementById('rexPrevMonth')
+    .addEventListener('click', () => {
+      if (viewYear === 1900 && viewMonth === 0) return;
+
+      viewMonth--;
+
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      }
+
+      chosen = null;
+      syncSelectors();
+      selectedDate.textContent = 'No date selected';
+    });
+
+  document.getElementById('rexNextMonth')
+    .addEventListener('click', () => {
+      if (viewYear === today.getFullYear() &&
+          viewMonth >= today.getMonth()) return;
+
+      viewMonth++;
+
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+
+      chosen = null;
+      syncSelectors();
+      selectedDate.textContent = 'No date selected';
+    });
+
+  document.getElementById('rexClearDate')
+    .addEventListener('click', () => {
+      chosen = null;
+      yearSelect.value = '';
+      monthSelect.value = '';
+      daySelect.value = '';
+      selectedDate.textContent = 'No date selected';
+      result.textContent = 'Your age details will appear here.';
+      renderCalendar();
+    });
+
+  document.getElementById('rexApplyDate')
+    .addEventListener('click', () => {
+      if (!chosen) {
+        result.textContent =
+          'Please select your birth year, month, and day first.';
+        return;
+      }
+
+      calculateAge();
+    });
+
+  function calculateAge() {
+    if (!chosen || chosen > today) {
+      result.textContent = 'Please select a valid birthday.';
+      return;
+    }
+
+    let years = today.getFullYear() - chosen.getFullYear();
+    let monthsOld = today.getMonth() - chosen.getMonth();
+    let daysOld = today.getDate() - chosen.getDate();
+
+    if (daysOld < 0) {
+      monthsOld--;
+      const previousMonth = new Date(
+        today.getFullYear(), today.getMonth(), 0
+      );
+      daysOld += previousMonth.getDate();
+    }
+
+    if (monthsOld < 0) {
+      years--;
+      monthsOld += 12;
+    }
+
+    const nextBirthday = new Date(
+      today.getFullYear(),
+      chosen.getMonth(),
+      Math.min(
+        chosen.getDate(),
+        daysInMonth(today.getFullYear(), chosen.getMonth())
+      )
+    );
+
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+
+    const millisecondsPerDay = 86400000;
+    const daysUntil = Math.round(
+      (nextBirthday - today) / millisecondsPerDay
+    );
+
+    result.innerHTML =
+      '<span class="age-heading">Your Exact Age</span>' +
+      years + ' years, ' +
+      monthsOld + ' months, ' +
+      daysOld + ' days<br>' +
+      '<span class="age-label">Birthday:</span> ' +
+      formatDate(chosen) + '<br>' +
+      '<span class="age-label">Next Birthday:</span> ' +
+      daysUntil + ' day' +
+      (daysUntil === 1 ? '' : 's') + ' to go.';
+  }
+
+  syncSelectors();
+})();
 
 /* PERCENTAGE CALCULATOR */
 $("calcPercent1").onclick=()=>{
@@ -925,7 +1823,6 @@ $("wordInput").addEventListener("input",()=>{
 const t=$("wordInput").value;
 const words=t.trim()?t.trim().split(/\s+/u).length:0;
 const chars=Array.from(t).length;
-const noSpaces=Array.from(t.replace(/\s/g,"")).length;
 const sentences=(t.match(/[.!?]+(?=\s|$)/g)||[]).length;
 const paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
 const reading=Math.ceil(words/200);
@@ -1135,7 +2032,7 @@ const txt=$("stylishInput").value.trim()||"VitalStar";
 const t=(map)=>typeof map==='function'?map(txt):txt.split('').map(c=>map[c]||c).join('');
 const list=[
   "1. 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻: " + t(sMaps.script),
-  "2. 𝕍𝕚𝕥𝕒𝕝𝕊𝕥𝕒𝚛: " + t(sMaps.double),
+  "2. 𝕍𝕚𝕥𝕒𝕝𝕊𝓽𝕒𝚛: " + t(sMaps.double),
   "3. 𝐕𝐢𝐭𝐚𝐥𝐒𝐭𝐚𝐫: " + t(sMaps.bold),
   "4. 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓: " + t(sMaps.italic),
   "5. 𝙑𝙞𝙩𝙖𝙡𝙎𝙩𝙖𝙧: " + t(sMaps.bold),
@@ -1167,7 +2064,7 @@ const list=[
   "31. 乂❤‿❤乂 VitalStar: 乂❤‿❤乂 " + txt,
   "32. ✨『VitalStar』✨: ✨『" + txt + "』✨",
   "33. ⚜️ 𝖁𝖎𝖙𝖆𝖑𝕾𝖙𝖆𝖗 ⚜️: ⚜️ " + t(sMaps.gothic) + " ⚜️",
-  "34. ♕ 𝕍𝕚𝕥𝕒𝕝𝕊𝕥𝕒𝚛 ♕: ♕ " + t(sMaps.double) + " ♕",
+  "34. ♕ 𝕍𝕚𝕥𝕒𝕝𝕊𝓽𝕒𝚛 ♕: ♕ " + t(sMaps.double) + " ♕",
   "35. ☾⋆⁺₊✧ VitalStar ✧₊⁺⋆☽: ☾⋆⁺₊✧ " + txt + " ✧₊⁺⋆☽",
   "36. ᯓ★ Vɪᴛ𝙖ʟSᴛ𝙖ʀ: ᯓ★ " + txt,
   "37. 𖤐 VITALSTAR 𖤐: 𖤐 " + txt.toUpperCase() + " 𖤐",
