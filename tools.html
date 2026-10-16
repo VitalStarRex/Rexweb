@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -79,7 +78,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 .menu.open{display:block}
 .menu a{display:block;padding:12px;border:1px solid var(--border);border-radius:8px;margin:6px 0;font-size:13px}
 
-/* CODE BOARD */
+/* CODE BOARD & PREVIEW WRAPPER */
 .preview-wrapper{position:relative;border:2px solid var(--blue);border-radius:12px;overflow:hidden;background:white}
 .preview-frame{display:block;width:100%;height:260px;background:white;border:0}
 .preview-action{position:absolute;right:8px;top:8px;z-index:2;background:#071327;color:white;border:1px solid var(--blue);padding:9px 12px;border-radius:8px;font-weight:bold}
@@ -556,7 +555,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 <article class="tool-card collapsed" data-name="responsive website preview mobile tablet desktop iframe">
 <div class="tool-heading"><span class="tool-icon">📱</span><h3>Responsive Website Preview</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Responsive Website Preview">+</button></div>
 <div class="tool-content">
-<p class="desc">Test website URLs or pages across simulated mobile, tablet, and desktop screen sizes. Note: Some external websites block framing due to security headers.</p>
+<p class="desc">Test website URLs or pages across simulated mobile, tablet, and desktop screen sizes. Tap preview to open full screen. Note: Some external websites block framing.</p>
 <label>Website URL</label>
 <input type="url" id="respUrlInput" placeholder="https://example.com" value="https://example.com">
 <div class="row">
@@ -565,8 +564,10 @@ The quick brown fox jumps over the lazy dog. 0123456789
 <button class="btn alt" data-device="desktop">💻 Desktop (100% width)</button>
 <a href="https://example.com" id="respExternalLink" target="_blank" class="btn" style="text-align:center;line-height:20px;">↗ Open in New Tab</a>
 </div>
-<div style="margin-top:12px;text-align:center;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:white;">
-<iframe id="respPreviewFrame" src="https://example.com" style="width:100%;height:320px;border:0;transition:width 0.3s;" title="Responsive preview"></iframe>
+<div class="preview-wrapper" style="margin-top:12px;" id="respPreviewWrapper">
+<button class="preview-action" id="fullscreenRespPreview" type="button">⛶ Fullscreen</button>
+<iframe id="respPreviewFrame" class="preview-frame" src="https://example.com" title="Responsive preview"></iframe>
+<div class="preview-hint" id="respPreviewHint">👆 Tap here to open fullscreen preview</div>
 </div>
 </div>
 </article>
@@ -589,7 +590,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 <strong>💻 RexWeb Live Preview</strong>
 <button id="closeFullscreen" class="close-preview">✕ Close</button>
 </div>
-<iframe id="fullscreenFrame" class="fullscreen-frame" title="Fullscreen code preview" sandbox="allow-scripts"></iframe>
+<iframe id="fullscreenFrame" class="fullscreen-frame" title="Fullscreen code preview"></iframe>
 </div>
 </div>
 
@@ -861,7 +862,7 @@ show("urlResult",decodeURIComponent($("urlInput").value));
 show("urlResult","Invalid encoded text.");
 }
 };
-$("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
+$("urlCopy").onclick=()=>copyValue($("urlResult水印"||"urlResult"),"urlResult");
 
 /* NUMBER BASE CONVERTER */
 $("convertBase").onclick=()=>{
@@ -1030,19 +1031,38 @@ if(fullscreenOpen)return;
 previousBodyOverflow=document.body.style.overflow;
 $("previewFullscreen").style.display="block";
 document.body.style.overflow="hidden";
-$("fullscreenFrame").srcdoc=buildPreview();
+const fsFrame=$("fullscreenFrame");
+fsFrame.removeAttribute("srcdoc");
+fsFrame.srcdoc=buildPreview();
 fullscreenOpen=true;
 }
+
+function openRespFullscreen(){
+if(fullscreenOpen)return;
+previousBodyOverflow=document.body.style.overflow;
+$("previewFullscreen").style.display="block";
+document.body.style.overflow="hidden";
+const fsFrame=$("fullscreenFrame");
+fsFrame.removeAttribute("srcdoc");
+fsFrame.src=$("respPreviewFrame").src || "https://example.com";
+fullscreenOpen=true;
+}
+
 function closeFullscreenPreview(){
 if(!fullscreenOpen)return;
 $("previewFullscreen").style.display="none";
 document.body.style.overflow=previousBodyOverflow;
 $("fullscreenFrame").srcdoc="";
+$("fullscreenFrame").src="";
 fullscreenOpen=false;
 }
+
 $("fullscreenPreview").onclick=openFullscreenPreview;
 $("previewHint").onclick=openFullscreenPreview;
+$("fullscreenRespPreview").onclick=openRespFullscreen;
+$("respPreviewHint").onclick=openRespFullscreen;
 $("closeFullscreen").onclick=closeFullscreenPreview;
+
 $("copyCode").onclick=()=>copyValue($("codeInput").value,"codeStatus");
 $("clearCode").onclick=()=>{ $("codeInput").value=""; runCodePreview(); };
 $("clearFiles").onclick=()=>{ uploadedCodeFiles={}; $("codeFiles").value=""; show("uploadedFiles","None."); runCodePreview(); };
@@ -1162,7 +1182,7 @@ const sMaps={
 bold:{a:'𝗮',b:'𝗯',c:'𝗰',d:'𝗱',e:'𝗲',f:'𝗳',g:'𝗴',h:'𝗵',i:'𝗶',j:'𝗷',k:'𝗸',l:'𝗹',m:'𝗺',n:'𝗻',o:'𝗼',p:'𝗽',q:'𝗾',r:'𝗿',s:'𝘀',t:'𝘁',u:'𝘂',v:'𝘃',w:'𝘄',x:'𝘅',y:'𝘆',z:'𝘇',A:'𝗔',B:'𝗕',C:'𝗖',D:'𝗗',E:'𝗘',F:'𝗙',G:'𝗚',H:'𝗛',I:'𝗜',J:'𝗝',K:'𝗞',L:'𝗟',M:'𝗠',N:'𝗡',O:'𝗢',P:'𝗣',Q:'𝗤',R:'𝗥',S:'𝗦',T:'𝗧',U:'𝗨',V:'𝗩',W:'𝗪',X:'𝗫',Y:'𝗬',Z:'𝗭'},
 italic:{a:'𝑎',b:'𝑏',c:'𝑐',d:'𝑑',e:'𝑒',f:'𝑓',g:'𝑔',h:'ℎ',i:'𝑖',j:'𝑗',k:'𝑘',l:'𝑙',m:'𝑚',n:'𝑛',o:'𝑜',p:'𝑝',q:'𝑞',r:'𝑟',s:'𝑠',t:'𝑡',u:'𝑢',v:'𝑣',w:'𝑤',x:'𝑥',y:'𝑦',z:'𝑧',A:'𝐴',B:'𝐵',C:'𝐶',D:'𝐷',E:'𝐸',F:'𝐹',G:'𝐺',H:'𝐻',I:'𝐼',J:'𝐽',K:'𝐾',L:'𝐿',M:'𝑀',N:'𝑁',O:'𝑂',P:'𝑃',Q:'𝑄',R:'𝑅',S:'𝑆',T:'𝑇',U:'𝑈',V:'𝑉',W:'𝑊',X:'𝑋',Y:'𝑌',Z:'𝑍'},
 gothic:{a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷',A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'Ⓜ',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ'},
-script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝒱',w:'𝓌',x:'𝒳',y:'𝓎',z:'𝒵',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'ℱ',G:'𝒢',H:'ℋ',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
+script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝒱',w:'𝓌',x:'𝒳',y:'𝓎',z:'𝒵',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'𝒱',G:'𝒢',H:'ℋ',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
 mono:{a:'𝚊',b:'𝚋',c:'𝚌',d:'𝚍',e:'𝚎',f:'𝚏',g:'𝚐',h:'𝚑',i:'𝚒',j:'𝚓',k:'𝚔',l:'𝚕',m:'𝚖',n:'𝚗',o:'𝚘',p:'𝚙',q:'𝚚',r:'𝚛',s:'𝚜',t:'𝚝',u:'𝚞',v:'𝚟',w:'𝚠',x:'𝚡',y:'𝚢',z:'𝚣',A:'𝙰',B:'𝙱',C:'𝙲',D:'𝙳',E:'𝙴',F:'𝙵',G:'𝙶',H:'𝙷',I:'𝙸',J:'𝙹',K:'𝙺',L:'𝙻',M:'𝙼',N:'𝙽',O:'𝙾',P:'𝙿',Q:'𝚀',R:'𝚁',S:'𝚂',T:'𝚃',U:'𝚄',V:'𝚅',W:'𝚆',X:'𝚇',Y:'𝚈',Z:'𝚉'},
 double:{a:'𝕒',b:'𝕓',c:'𝕔',d:'𝕕',e:'𝕖',f:'𝕗',g:'𝕘',h:'𝕙',i:'𝕚',j:'𝕛',k:'𝕜',l:'𝕝',m:'𝕞',n:'𝕟',o:'𝕠',p:'𝕡',q:'𝕢',r:'𝕣',s:'𝕤',t:'𝕥',u:'𝕦',v:'𝕧',w:'𝕨',x:'𝕩',y:'𝕪',z:'𝕫',A:'𝔸',B: '𝔹',C:'ℂ',D:'𝔻',E:'𝔼',F:'𝔽',G:'𝔾',H:'ℍ',I:'𝕀',J:'𝕁',K:'𝕂',L:'𝕃',M:'𝕄',N:'ℕ',O:'𝕆',P: 'ℙ',Q:'ℚ',R:'ℝ',S:'𝕊',T:'𝕋',U:'𝕌',V:'𝕍',W:'𝕎',X:'𝕏',Y:'𝕐',Z:'ℤ'},
 sansBold:{a:'mathsf{a}',b:'mathsf{b}',c:'mathsf{c}',d:'mathsf{d}',e:'mathsf{e}',f:'mathsf{f}',g:'mathsf{g}',h:'mathsf{h}',i:'mathsf{i}',j:'mathsf{j}',k:'mathsf{k}',l:'mathsf{l}',m:'mathsf{m}',n:'mathsf{n}',o:'mathsf{o}',p:'mathsf{p}',q:'mathsf{q}',r:'mathsf{r}',s:'mathsf{s}',t:'mathsf{t}',u:'mathsf{u}',v:'mathsf{v}',w:'mathsf{w}',x:'mathsf{x}',y:'mathsf{y}',z:'mathsf{z}'},
@@ -1210,10 +1230,16 @@ else if(type==='tablet')frame.style.width="768px";
 else frame.style.width="100%";
 };
 });
-$("respUrlInput").oninput=function(){
-const url=this.value.trim()||"https://example.com";
-$("respPreviewFrame").src=url;
-$("respExternalLink").href=url;
+
+$("respUrlInput").onchange=function(){
+let url=this.value.trim();
+if(url && !url.startsWith("http://") && !url.startsWith("https://")){
+    url="https://"+url;
+}
+const finalUrl=url||"https://example.com";
+$("respPreviewFrame").src=finalUrl;
+$("respExternalLink").href=finalUrl;
+this.value=finalUrl;
 };
 
 /* FOOTER */
@@ -1222,4 +1248,3 @@ $("year").textContent=new Date().getFullYear();
 
 </body>
 </html>
-
