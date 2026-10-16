@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#050b19" id="themeColor">
 <title>Digital Tools | RexWeb Nexora</title>
-<meta name="description" content="Explore advanced digital tools, image editors, calculators, text utilities, a code board, and more at RexWeb Nexora.">
+<meta name="description" content="Explore advanced digital tools, image format converter, calculators, text utilities, a code board, and more at RexWeb Nexora.">
 
 <style>
 :root{
@@ -160,7 +160,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 <div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Scientific Calculator">+</button></div>
 <div class="tool-content">
 <p class="desc">Scientific functions, powers, roots, trigonometry and arithmetic. Trigonometric functions use degrees.</p>
-<input id="calcDisplay" class="calc-display" placeholder="0" aria-label="Calculator display">
+<input id="calcDisplay" class="calc-display" placeholder="0" aria-label="Calculator display" readonly>
 <div class="calc-buttons">
 <button data-calc="sin(">sin</button><button data-calc="cos(">cos</button><button data-calc="tan(">tan</button><button data-calc="sqrt(">√</button>
 <button data-calc="log(">log</button><button data-calc="ln(">ln</button><button data-calc="^">xʸ</button><button data-calc="!">x!</button>
@@ -321,35 +321,9 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 
-<!-- 17 NEW TOOLS -->
+<!-- ADDED TOOLS (Image Format Converter kept, others as requested) -->
 
-<!-- 1. ADVANCED IMAGE EDITOR -->
-<article class="tool-card collapsed" data-name="advanced image editor photo crop filter brightness contrast">
-<div class="tool-heading"><span class="tool-icon">🖼️</span><h3>Advanced Image Editor</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Image Editor">+</button></div>
-<div class="tool-content">
-<p class="desc">Upload an image, adjust brightness, contrast, grayscale, blur, and download your edited photo.</p>
-<label for="imgEditFile">Upload Image</label>
-<input type="file" id="imgEditFile" accept="image/*">
-<div style="margin-top:10px;">
-<label>Brightness: <span id="brightVal">100</span>%</label>
-<input type="range" id="imgBright" min="0" max="200" value="100">
-<label>Contrast: <span id="contrastVal">100</span>%</label>
-<input type="range" id="imgContrast" min="0" max="200" value="100">
-<label>Grayscale: <span id="grayVal">0</span>%</label>
-<input type="range" id="imgGray" min="0" max="100" value="0">
-</div>
-<div style="margin-top:10px;text-align:center;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:var(--bg);padding:5px;">
-<canvas id="imgCanvas" style="max-width:100%;height:auto;display:block;margin:auto;"></canvas>
-</div>
-<div class="row">
-<button class="btn" id="applyImgFilters">Apply Filters</button>
-<button class="btn alt" id="resetImgFilters">Reset</button>
-<a class="btn" id="downloadEditedImg" download="edited-image.png" style="display:inline-block;text-align:center;">Download Image</a>
-</div>
-</div>
-</article>
-
-<!-- 2. STYLISH TEXT GENERATOR -->
+<!-- 1. STYLISH TEXT GENERATOR -->
 <article class="tool-card collapsed" data-name="stylish text generator fonts unicode cool">
 <div class="tool-heading"><span class="tool-icon">✨</span><h3>Stylish Text Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stylish Text Generator">+</button></div>
 <div class="tool-content">
@@ -360,7 +334,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 3. IMAGE FORMAT CONVERTER -->
+<!-- 2. IMAGE FORMAT CONVERTER -->
 <article class="tool-card collapsed" data-name="image format converter png jpeg webp">
 <div class="tool-heading"><span class="tool-icon">🔄</span><h3>Image Format Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Image Format Converter">+</button></div>
 <div class="tool-content">
@@ -380,23 +354,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 4. IMAGE COMPRESSOR -->
-<article class="tool-card collapsed" data-name="image compressor reduce size photo">
-<div class="tool-heading"><span class="tool-icon">📦</span><h3>Image Compressor</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Image Compressor">+</button></div>
-<div class="tool-content">
-<p class="desc">Reduce image file size by adjusting quality percentage.</p>
-<label for="compImageFile">Upload Image</label>
-<input type="file" id="compImageFile" accept="image/*">
-<label>Compression Quality: <span id="compQualityVal">80</span>%</label>
-<input type="range" id="compQuality" min="10" max="95" value="80">
-<div class="row">
-<button class="btn" id="compressImgBtn">Compress & Download</button>
-</div>
-<div class="result" id="compImgResult">Upload an image to compress.</div>
-</div>
-</article>
-
-<!-- 5. CSS GRADIENT GENERATOR -->
+<!-- 3. CSS GRADIENT GENERATOR -->
 <article class="tool-card collapsed" data-name="css gradient generator color background designer">
 <div class="tool-heading"><span class="tool-icon">🌈</span><h3>CSS Gradient Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient Generator">+</button></div>
 <div class="tool-content">
@@ -413,7 +371,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 6. QR CODE GENERATOR -->
+<!-- 4. QR CODE GENERATOR -->
 <article class="tool-card collapsed" data-name="qr code generator link text barcode">
 <div class="tool-heading"><span class="tool-icon">📱</span><h3>QR Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand QR Code Generator">+</button></div>
 <div class="tool-content">
@@ -425,7 +383,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 7. UNIT CONVERTER -->
+<!-- 5. UNIT CONVERTER -->
 <article class="tool-card collapsed" data-name="unit converter length weight temperature data">
 <div class="tool-heading"><span class="tool-icon">⚖️</span><h3>Unit Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Unit Converter">+</button></div>
 <div class="tool-content">
@@ -448,7 +406,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 8. JSON FORMATTER AND VALIDATOR -->
+<!-- 6. JSON FORMATTER AND VALIDATOR -->
 <article class="tool-card collapsed" data-name="json formatter validator parser code">
 <div class="tool-heading"><span class="tool-icon">📋</span><h3>JSON Formatter & Validator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand JSON Formatter & Validator">+</button></div>
 <div class="tool-content">
@@ -463,7 +421,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 9. CSS GRADIENT-TO-CODE GENERATOR -->
+<!-- 7. CSS GRADIENT-TO-CODE GENERATOR -->
 <article class="tool-card collapsed" data-name="css gradient to code generator multi stop">
 <div class="tool-heading"><span class="tool-icon">🎨</span><h3>CSS Gradient-to-Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient-to-Code Generator">+</button></div>
 <div class="tool-content">
@@ -481,7 +439,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 10. MARKDOWN EDITOR WITH LIVE PREVIEW -->
+<!-- 8. MARKDOWN EDITOR WITH LIVE PREVIEW -->
 <article class="tool-card collapsed" data-name="markdown editor live preview writer">
 <div class="tool-heading"><span class="tool-icon">📝</span><h3>Markdown Editor with Live Preview</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Markdown Editor with Live Preview">+</button></div>
 <div class="tool-content">
@@ -500,7 +458,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 11. COLOR PALETTE GENERATOR -->
+<!-- 9. COLOR PALETTE GENERATOR -->
 <article class="tool-card collapsed" data-name="color palette generator harmony design">
 <div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Palette Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Palette Generator">+</button></div>
 <div class="tool-content">
@@ -513,7 +471,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- 12. FONT PREVIEW TOOL -->
+<!-- 10. FONT PREVIEW TOOL -->
 <article class="tool-card collapsed" data-name="font preview tool typography tester">
 <div class="tool-heading"><span class="tool-icon">🔤</span><h3>Font Preview Tool</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Font Preview Tool">+</button></div>
 <div class="tool-content">
@@ -543,7 +501,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 </div>
 </article>
 
-<!-- 13. STOPWATCH AND TIMER -->
+<!-- 11. STOPWATCH AND TIMER -->
 <article class="tool-card collapsed" data-name="stopwatch and timer clock countdown">
 <div class="tool-heading"><span class="tool-icon">⏱️</span><h3>Stopwatch and Timer</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stopwatch and Timer">+</button></div>
 <div class="tool-content">
@@ -568,7 +526,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 </div>
 </article>
 
-<!-- 14. PERCENTAGE CALCULATOR -->
+<!-- 12. PERCENTAGE CALCULATOR -->
 <article class="tool-card collapsed" data-name="percentage calculator math finance">
 <div class="tool-heading"><span class="tool-icon">💯</span><h3>Percentage Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Percentage Calculator">+</button></div>
 <div class="tool-content">
@@ -592,7 +550,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 </div>
 </article>
 
-<!-- 15. HTML ENTITY ENCODER AND DECODER -->
+<!-- 13. HTML ENTITY ENCODER AND DECODER -->
 <article class="tool-card collapsed" data-name="html entity encoder decoder escape">
 <div class="tool-heading"><span class="tool-icon">🔤</span><h3>HTML Entity Encoder and Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Entity Encoder and Decoder">+</button></div>
 <div class="tool-content">
@@ -607,7 +565,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 </div>
 </article>
 
-<!-- 16. RESPONSIVE WEBSITE PREVIEW -->
+<!-- 14. RESPONSIVE WEBSITE PREVIEW -->
 <article class="tool-card collapsed" data-name="responsive website preview mobile tablet desktop iframe">
 <div class="tool-heading"><span class="tool-icon">📱</span><h3>Responsive Website Preview</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Responsive Website Preview">+</button></div>
 <div class="tool-content">
@@ -625,7 +583,7 @@ The quick brown fox jumps over the lazy dog. 0123456789
 </div>
 </article>
 
-<!-- 17. DOWNLOADABLE CODE SNIPPETS -->
+<!-- 15. DOWNLOADABLE CODE SNIPPETS -->
 <article class="tool-card collapsed" data-name="downloadable code snippets templates developer">
 <div class="tool-heading"><span class="tool-icon">📥</span><h3>Downloadable Code Snippets</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Downloadable Code Snippets">+</button></div>
 <div class="tool-content">
@@ -732,13 +690,9 @@ show(id,ok?"Copied successfully!":"Copy manually, please.");
 
 /* SCIENTIFIC CALCULATOR */
 let lastAnswer=0;
-$("calcDisplay").addEventListener("keydown",e=>{
-if(e.key==="Enter")$("calcEquals").click();
-});
 document.querySelectorAll("[data-calc]").forEach(b=>{
 b.onclick=()=>{
 $("calcDisplay").value+=b.dataset.calc;
-$("calcDisplay").focus();
 };
 });
 $("calcClear").onclick=()=>{
@@ -1165,55 +1119,9 @@ show("htmlResult",out.join("\n"));
 $("copyHtml").onclick=()=>copyValue($("htmlResult").textContent,"htmlResult");
 
 
-/* --- LOGIC FOR THE 17 NEW TOOLS --- */
+/* --- LOGIC FOR ADDITIONAL TOOLS --- */
 
-/* 1. Advanced Image Editor */
-let editImg=new Image();
-let editImgLoaded=false;
-$("imgBright").oninput=()=>show("brightVal",$("imgBright").value);
-$("imgContrast").oninput=()=>show("contrastVal",$("imgContrast").value);
-$("imgGray").oninput=()=>show("grayVal",$("imgGray").value);
-
-$("imgEditFile").onchange=function(e){
-const f=e.target.files[0];
-if(!f)return;
-const reader=new FileReader();
-reader.onload=function(event){
-editImg=new Image();
-editImg.onload=function(){
-editImgLoaded=true;
-drawEditedImage();
-};
-editImg.src=event.target.result;
-};
-reader.readAsDataURL(f);
-};
-
-function drawEditedImage(){
-if(!editImgLoaded)return;
-const canvas=$("imgCanvas");
-const ctx=canvas.getContext("2d");
-canvas.width=editImg.width;
-canvas.height=editImg.height;
-ctx.filter=`brightness(${$("imgBright").value}%) contrast(${$("imgContrast").value}%) grayscale(${$("imgGray").value}%)`;
-ctx.drawImage(editImg,0,0);
-$("downloadEditedImg.href")="";
-$("downloadEditedImg").href=canvas.toDataURL("image/png");
-}
-
-$("applyImgFilters").onclick=()=>{
-if(!editImgLoaded){alert("Please upload an image first.");return;}
-drawEditedImage();
-};
-$("resetImgFilters").onclick=()=>{
-if(!editImgLoaded)return;
-$("imgBright").value=100;show("brightVal","100");
-$("imgContrast").value=100;show("contrastVal","100");
-$("imgGray").value=0;show("grayVal","0");
-drawEditedImage();
-};
-
-/* 2. Stylish Text Generator */
+/* 1. Stylish Text Generator */
 const stylishMaps={
 bold: {a:'𝗮',b:'𝗯',c:'𝗰',d:'𝗱',e:'𝗲',f:'𝗳',g:'𝗴',h:'𝗵',i:'𝗶',j:'𝗷',k:'𝗸',l:'𝗹',m:'𝗺',n:'𝗻',o:'𝗼',p:'𝗽',q:'𝗾',r:'𝗿',s:'𝘀',t:'𝘁',u:'𝘂',v:'𝘃',w:'𝘄',x:'𝘅',y:'𝘆',z:'𝘇',A:'𝗔',B:'𝗕',C:'𝗖',D:'𝗗',E:'𝗘',F:'𝗙',G:'𝗚',H:'𝗛',I:'𝗜',J:'𝗝',K:'𝗞',L:'𝗟',M:'𝗠',N:'𝗡',O:'𝗢',P:'𝗣',Q:'𝗤',R:'𝗥',S:'𝗦',T:'𝗧',U:'𝗨',V:'𝗩',W:'𝗪',X:'𝗫',Y:'𝗬',Z:'𝗭'},
 gothic: {a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷',A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'Ⓜ',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ'},
@@ -1231,11 +1139,11 @@ const cText=convertStyle(txt,stylishMaps.cursive);
 show("stylishResult",`[Bold]: ${bText}\n\n[Gothic]: ${gText}\n\n[Cursive]: ${cText}`);
 };
 
-/* 3. Image Format Converter */
+/* 2. Image Format Converter */
 $("convertImgBtn").onclick=()=>{
 const f=$("convImageFile").files[0];
 const target=$("targetFormat").value;
-if(!f){alert("Please upload an image first.");return;}
+if(!f){show("convImgResult","Please upload an image first.");return;}
 const reader=new FileReader();
 reader.onload=function(e){
 const img=new Image();
@@ -1244,49 +1152,30 @@ const canvas=document.createElement("canvas");
 canvas.width=img.width;
 canvas.height=img.height;
 const ctx=canvas.getContext("2d");
+if(target==='image/jpeg'){
+ctx.fillStyle="#FFFFFF";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+}
 ctx.drawImage(img,0,0);
-const dataUrl=canvas.toDataURL(target);
-const ext=target.split('/')[1];
+const dataUrl=canvas.toDataURL(target,0.92);
+const ext=target.split('/')[1]==='jpeg'?'jpg':target.split('/')[1];
 const a=document.createElement("a");
 a.href=dataUrl;
 a.download=`converted-image.${ext}`;
+document.body.appendChild(a);
 a.click();
+a.remove();
 show("convImgResult",`Successfully converted to ${ext.toUpperCase()} and downloaded!`);
 };
-img.src=e.target.result;
-};
-reader.readAsDataURL(f);
-};
-
-/* 4. Image Compressor */
-$("compQuality").oninput=()=>show("compQualityVal",$("compQuality").value);
-$("compressImgBtn").onclick=()=>{
-const f=$("compImageFile").files[0];
-const q=+$("compQuality").value/100;
-if(!f){alert("Please upload an image first.");return;}
-const reader=new FileReader();
-reader.onload=function(e){
-const img=new Image();
-img.onload=function(){
-const canvas=document.createElement("canvas");
-canvas.width=img.width;
-canvas.height=img.height;
-const ctx=canvas.getContext("2d");
-ctx.drawImage(img,0,0);
-const dataUrl=canvas.toDataURL("image/jpeg",q);
-const a=document.createElement("a");
-a.href=dataUrl;
-a.download=`compressed-image.jpg`;
-a.click();
-const approxSize=Math.round((dataUrl.length*3/4)/1024);
-show("compImgResult",`Compressed successfully! Approx file size: ${approxSize} KB.`);
+img.onerror=function(){
+show("convImgResult","Error loading image file.");
 };
 img.src=e.target.result;
 };
 reader.readAsDataURL(f);
 };
 
-/* 5. CSS Gradient Generator */
+/* 3. CSS Gradient Generator */
 function updateGradient(){
 const c1=$("gradColor1").value;
 const c2=$("gradColor2").value;
@@ -1302,13 +1191,12 @@ $("gradAngle").oninput=updateGradient;
 updateGradient();
 $("copyGrad").onclick=()=>copyValue($("gradResult").textContent,"gradResult");
 
-/* 6. QR Code Generator */
+/* 4. QR Code Generator */
 $("generateQr").onclick=()=>{
 const val=$("qrInput").value.trim();
 const container=$("qrContainer");
 container.innerHTML="";
 if(!val){show("qrResult","Enter text or URL to generate QR code.");return;}
-// Using reliable lightweight QR code image API fallback
 const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(val)}`;
 const img=document.createElement("img");
 img.src=qrUrl;
@@ -1318,7 +1206,7 @@ container.appendChild(img);
 show("qrResult","QR Code generated successfully!");
 };
 
-/* 7. Unit Converter */
+/* 5. Unit Converter */
 const unitData={
 length:{Meters:1,Feet:3.28084,Inches:39.3701,Kilometers:0.001},
 weight:{Kilograms:1,Pounds:2.20462,Grams:1000,Ounces:35.274},
@@ -1357,7 +1245,7 @@ show("unitResult",`${val} ${from} = ${res.toPrecision(6)} ${to}`);
 }
 };
 
-/* 8. JSON Formatter and Validator */
+/* 6. JSON Formatter and Validator */
 $("formatJson").onclick=()=>{
 try{
 const obj=JSON.parse($("jsonInput").value);
@@ -1385,7 +1273,7 @@ show("jsonResult","Validation Error: "+e.message);
 }
 };
 
-/* 9. CSS Gradient-to-Code Generator */
+/* 7. CSS Gradient-to-Code Generator */
 const presets={
 sunset:"linear-gradient(135deg, #f857a6 0%, #ff5858 100%)",
 ocean:"linear-gradient(135deg, #2af598 0%, #009efd 100%)",
@@ -1402,10 +1290,9 @@ $("gradPreset").onchange=updatePreset;
 updatePreset();
 $("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"gradPresetResult");
 
-/* 10. Markdown Editor with Live Preview */
+/* 8. Markdown Editor with Live Preview */
 $("markdownInput").addEventListener("input",function(){
 let md=this.value;
-// Simple vanilla markdown parser implementation for robust offline performance
 let html=md
 .replace(/^# (.*$)/gm, '<h1>$1</h1>')
 .replace(/^## (.*$)/gm, '<h2>$1</h2>')
@@ -1419,12 +1306,11 @@ $("markdownPreview").innerHTML=html;
 $("markdownInput").dispatchEvent(new Event("input"));
 $("copyMarkdownHtml").onclick=()=>copyValue($("markdownPreview").innerHTML,"markdownPreview");
 
-/* 11. Color Palette Generator */
+/* 9. Color Palette Generator */
 $("generatePalette").onclick=()=>{
 const base=$("paletteBase").value;
 const boxes=$("paletteBoxes");
 boxes.innerHTML="";
-// Generate shades/variations
 const hex=base.replace("#","");
 const r=parseInt(hex.substring(0,2),16);
 const g=parseInt(hex.substring(2,4),16);
@@ -1453,7 +1339,7 @@ boxes.appendChild(div);
 show("paletteResult","Generated Palette HEX codes: "+colors.join(", "));
 };
 
-/* 12. Font Preview Tool */
+/* 10. Font Preview Tool */
 $("fontSizeRange").oninput=function(){
 show("fontSizeVal",this.value);
 $("fontPreviewBox").style.fontSize=this.value+"px";
@@ -1465,7 +1351,7 @@ $("fontTestInput").oninput=function(){
 $("fontPreviewBox").textContent=this.value||"Type text above...";
 };
 
-/* 13. Stopwatch and Timer */
+/* 11. Stopwatch and Timer */
 let swTimer=null, swSeconds=0, laps=[];
 function formatTime(sec){
 const hrs=Math.floor(sec/3600).toString().padStart(2,'0');
@@ -1513,7 +1399,7 @@ clearInterval(countdownInterval);
 show("timerDisplay","00:00");
 };
 
-/* 14. Percentage Calculator */
+/* 12. Percentage Calculator */
 $("calcPercent1").onclick=()=>{
 const x=parseFloat($("p1").value);
 const y=parseFloat($("p2").value);
@@ -1529,7 +1415,7 @@ const change=((y-x)/x)*100;
 show("percentResult2",`Change: ${change.toFixed(2)}% (${change>=0?'Increase':'Decrease'})`);
 };
 
-/* 15. HTML Entity Encoder and Decoder */
+/* 13. HTML Entity Encoder and Decoder */
 $("encodeEntity").onclick=()=>{
 const t=$("entityInput").value;
 const encoded=t.replace(/[\u00A0-\u9999<>&]/g,i=>'#'+i.charCodeAt(0)+';');
@@ -1542,7 +1428,7 @@ show("entityResult",doc.documentElement.textContent);
 };
 $("copyEntity").onclick=()=>copyValue($("entityResult").textContent,"entityResult");
 
-/* 16. Responsive Website Preview */
+/* 14. Responsive Website Preview */
 document.querySelectorAll("[data-device]").forEach(b=>{
 b.onclick=function(){
 const frame=$("respPreviewFrame");
@@ -1556,7 +1442,7 @@ $("respUrlInput").onchange=function(){
 $("respPreviewFrame").src=this.value;
 };
 
-/* 17. Downloadable Code Snippets */
+/* 15. Downloadable Code Snippets */
 const snippets={
 html5:`<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n</head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>`,
 flexbox:`.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n}`,
