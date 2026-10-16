@@ -1,8 +1,3 @@
-To restore the dark and light mode toggle while keeping all your recent updates (removing themes, adding the Video Editor 🎬, keeping Web Templates, and styling the active Home button), we need three key pieces:
- * Light Mode CSS Variables: Define the color palette for light mode using html[data-theme="light"].
- * Theme Toggle Button: Place the theme switcher button back in the header actions.
- * Theme Logic Script: JavaScript to switch the theme attribute, update the button icon, and save the preference in localStorage 🌓.
-Here is your complete updated index.html file with dark and light mode fully integrated:
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -56,6 +51,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transition: background .3s, color .3s;
   overflow-x: hidden;
+  width: 100%;
 }
 
 a {
@@ -221,6 +217,7 @@ header {
 .category-link.active-cat {
   background: var(--surface);
   border-color: var(--blue);
+  box-shadow: 0 4px 12px rgba(0,200,255,0.1);
 }
 
 .category-link .icon {
