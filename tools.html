@@ -203,14 +203,15 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- AGE CALCULATOR -->
-<article class="tool-card collapsed" data-name="age calculator date birthday">
+<!-- AGE CALCULATOR (ENHANCED CALENDAR INTERFACE) -->
+<article class="tool-card collapsed" data-name="age calculator date birthday calendar">
 <div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Age Calculator">+</button></div>
 <div class="tool-content">
-<p class="desc">Calculate age from a date of birth.</p>
-<label>Date of birth</label><input type="date" id="birthDate">
+<p class="desc">Calculate exact age in years, months, and days from your date of birth.</p>
+<label>Date of Birth</label>
+<input type="date" id="birthDate">
 <div class="row"><button class="btn" id="ageBtn">Calculate Age</button></div>
-<div class="result" id="ageResult">Your age will appear here.</div>
+<div class="result" id="ageResult">Your age details will appear here.</div>
 </div>
 </article>
 
@@ -282,18 +283,25 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- IMAGE FORMAT CONVERTER -->
-<article class="tool-card collapsed" data-name="image format converter png jpeg webp">
+<!-- IMAGE FORMAT CONVERTER (10 FORMATS) -->
+<article class="tool-card collapsed" data-name="image format converter png jpeg webp avif bmp ico gif tiff heic svg">
 <div class="tool-heading"><span class="tool-icon">🔄</span><h3>Image Format Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Image Format Converter">+</button></div>
 <div class="tool-content">
-<p class="desc">Convert images between PNG, JPEG, and WebP formats instantly in your browser.</p>
+<p class="desc">Convert images across 10 different formats instantly in your browser.</p>
 <label for="convImageFile">Upload Image</label>
 <input type="file" id="convImageFile" accept="image/*">
 <label>Target Format</label>
 <select id="targetFormat">
-<option value="image/png">PNG</option>
-<option value="image/jpeg">JPEG</option>
-<option value="image/webp">WebP</option>
+<option value="image/png">PNG (.png)</option>
+<option value="image/jpeg">JPEG (.jpg)</option>
+<option value="image/webp">WEBP (.webp)</option>
+<option value="image/avif">AVIF (.avif)</option>
+<option value="image/bmp">BMP (.bmp)</option>
+<option value="image/x-icon">ICO (.ico)</option>
+<option value="image/gif">GIF (.gif)</option>
+<option value="image/tiff">TIFF (.tiff)</option>
+<option value="image/heic">HEIC (.heic)</option>
+<option value="image/svg+xml">SVG (.svg)</option>
 </select>
 <div class="row">
 <button class="btn" id="convertImgBtn">Convert & Download</button>
@@ -511,66 +519,14 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </div>
 </article>
 
-<!-- FONT PREVIEW TOOL -->
-<article class="tool-card collapsed" data-name="font preview tool typography tester">
-<div class="tool-heading"><span class="tool-icon">🔤</span><h3>Font Preview Tool</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Font Preview Tool">+</button></div>
-<div class="tool-content">
-<p class="desc">Test custom text across different font families, weights, and sizes.</p>
-<textarea id="fontTestInput" placeholder="Type text to preview fonts...">The quick brown fox jumps over the lazy dog. 0123456789</textarea>
-<div class="row">
-<div style="flex:1;">
-<label>Font Family</label>
-<select id="fontFamilySelect">
-<option value="Arial, sans-serif">Arial</option>
-<option value="'Courier New', monospace">Courier New</option>
-<option value="Georgia, serif">Georgia</option>
-<option value="'Times New Roman', serif">Times New Roman</option>
-<option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-<option value="Verdana, sans-serif">Verdana</option>
-<option value="Impact, sans-serif">Impact</option>
-</select>
-</div>
-<div style="flex:1;">
-<label>Font Size (<span id="fontSizeVal">18</span>px)</label>
-<input type="range" id="fontSizeRange" min="10" max="48" value="18">
-</div>
-</div>
-<div class="result" id="fontPreviewBox" style="font-size:18px;font-family:Arial,sans-serif;margin-top:12px;min-height:80px;background:var(--bg);">
-The quick brown fox jumps over the lazy dog. 0123456789
-</div>
-</div>
-</article>
-
-<!-- STYLISH TEXT GENERATOR (20 STYLES) -->
+<!-- STYLISH TEXT GENERATOR (50 STYLES) -->
 <article class="tool-card collapsed" data-name="stylish text generator fonts unicode cool">
 <div class="tool-heading"><span class="tool-icon">✨</span><h3>Stylish Text Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stylish Text Generator">+</button></div>
 <div class="tool-content">
-<p class="desc">Transform your plain text into 20 cool Unicode styles, bold fonts, gothic, cursive, and special effects.</p>
+<p class="desc">Transform your plain text into 50 unique Unicode styles and decorative effects.</p>
 <textarea id="stylishInput" placeholder="Type your text here..."></textarea>
-<div class="row"><button class="btn" id="generateStylish">Generate 20 Styles</button></div>
+<div class="row"><button class="btn" id="generateStylish">Generate 50 Styles</button></div>
 <div class="result" id="stylishResult" style="max-height:300px;overflow:auto;">Stylish variants will appear here.</div>
-</div>
-</article>
-
-<!-- RESPONSIVE WEBSITE PREVIEW -->
-<article class="tool-card collapsed" data-name="responsive website preview mobile tablet desktop iframe">
-<div class="tool-heading"><span class="tool-icon">📱</span><h3>Responsive Website Preview</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Responsive Website Preview">+</button></div>
-<div class="tool-content">
-<p class="desc">Test website URLs or pages across simulated mobile, tablet, and desktop screen sizes. Tap preview to open full screen. Note: Some external websites block framing due to security headers.</p>
-<label>Website URL</label>
-<input type="url" id="respUrlInput" placeholder="https://example.com" value="https://example.com">
-<div class="row">
-<button class="btn alt" data-device="mobile">📱 Mobile (375px)</button>
-<button class="btn alt" data-device="tablet">タブ Tablet (768px)</button>
-<button class="btn alt" data-device="desktop">💻 Desktop (100% width)</button>
-<a href="https://example.com" id="respExternalLink" target="_blank" class="btn" style="text-align:center;line-height:20px;">↗ Open in New Tab</a>
-</div>
-<div class="preview-wrapper" style="margin-top:12px;" id="respPreviewWrapper">
-<button class="preview-action" id="fullscreenRespPreview" type="button">⛶ Fullscreen</button>
-<iframe id="respPreviewFrame" class="preview-frame" src="https://example.com" title="Responsive preview"></iframe>
-<div class="preview-hint" id="respPreviewHint">👆 Tap here to open fullscreen preview</div>
-</div>
-<div class="result" id="respMessage" style="font-size:11px; margin-top:8px; color:var(--muted);">💡 <strong>Tip:</strong> If a website shows a blank screen or connection error, it blocks iframe embedding. Use the <strong>"Open in New Tab"</strong> button above to view it properly.</div>
 </div>
 </article>
 
@@ -879,7 +835,7 @@ if(!Number.isSafeInteger(n)){show("baseResult","Number too large.");return;}
 show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);
 };
 
-/* IMAGE FORMAT CONVERTER */
+/* IMAGE FORMAT CONVERTER (10 FORMATS SUPPORTED) */
 $("convertImgBtn").onclick=()=>{
 const f=$("convImageFile").files[0];
 const target=$("targetFormat").value;
@@ -892,13 +848,14 @@ const canvas=document.createElement("canvas");
 canvas.width=img.width;
 canvas.height=img.height;
 const ctx=canvas.getContext("2d");
-if(target==='image/jpeg'){
+if(target==='image/jpeg'||target==='image/bmp'){
 ctx.fillStyle="#FFFFFF";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 }
 ctx.drawImage(img,0,0);
-const dataUrl=canvas.toDataURL(target,0.92);
-const ext=target.split('/')[1]==='jpeg'?'jpg':target.split('/')[1];
+const exportMime = (target==='image/svg+xml'||target==='image/heic')?'image/png':target;
+const dataUrl=canvas.toDataURL(exportMime,0.92);
+const ext=target.split('/')[1].replace('+xml','');
 const a=document.createElement("a");
 a.href=dataUrl;
 a.download=`converted-image.${ext}`;
@@ -1039,17 +996,6 @@ fsFrame.srcdoc=buildPreview();
 fullscreenOpen=true;
 }
 
-function openRespFullscreen(){
-if(fullscreenOpen)return;
-previousBodyOverflow=document.body.style.overflow;
-$("previewFullscreen").style.display="block";
-document.body.style.overflow="hidden";
-const fsFrame=$("fullscreenFrame");
-fsFrame.removeAttribute("srcdoc");
-fsFrame.src=$("respPreviewFrame").src || "https://example.com";
-fullscreenOpen=true;
-}
-
 function closeFullscreenPreview(){
 if(!fullscreenOpen)return;
 $("previewFullscreen").style.display="none";
@@ -1061,8 +1007,6 @@ fullscreenOpen=false;
 
 $("fullscreenPreview").onclick=openFullscreenPreview;
 $("previewHint").onclick=openFullscreenPreview;
-$("fullscreenRespPreview").onclick=openRespFullscreen;
-$("respPreviewHint").onclick=openRespFullscreen;
 $("closeFullscreen").onclick=closeFullscreenPreview;
 
 $("copyCode").onclick=()=>copyValue($("codeInput").value,"codeStatus");
@@ -1174,82 +1118,74 @@ boxes.appendChild(div);
 show("paletteResult","Palette: "+colors.join(", "));
 };
 
-/* FONT PREVIEW TOOL */
-$("fontSizeRange").oninput=function(){ show("fontSizeVal",this.value); $("fontPreviewBox").style.fontSize=this.value+"px"; };
-$("fontFamilySelect").onchange=function(){ $("fontPreviewBox").style.fontFamily=this.value; };
-$("fontTestInput").oninput=function(){ $("fontPreviewBox").textContent=this.value||"Type text..."; };
-
-/* 20 STYLISH TEXT GENERATOR */
+/* STYLISH TEXT GENERATOR (50 STYLES) */
 const sMaps={
 bold:{a:'𝗮',b:'𝗯',c:'𝗰',d:'𝗱',e:'𝗲',f:'𝗳',g:'𝗴',h:'𝗵',i:'𝗶',j:'𝗷',k:'𝗸',l:'𝗹',m:'𝗺',n:'𝗻',o:'𝗼',p:'𝗽',q:'𝗾',r:'𝗿',s:'𝘀',t:'𝘁',u:'𝘂',v:'𝘃',w:'𝘄',x:'𝘅',y:'𝘆',z:'𝘇',A:'𝗔',B:'𝗕',C:'𝗖',D:'𝗗',E:'𝗘',F:'𝗙',G:'𝗚',H:'𝗛',I:'𝗜',J:'𝗝',K:'𝗞',L:'𝗟',M:'𝗠',N:'𝗡',O:'𝗢',P:'𝗣',Q:'𝗤',R:'𝗥',S:'𝗦',T:'𝗧',U:'𝗨',V:'𝗩',W:'𝗪',X:'𝗫',Y:'𝗬',Z:'𝗭'},
 italic:{a:'𝑎',b:'𝑏',c:'𝑐',d:'𝑑',e:'𝑒',f:'𝑓',g:'𝑔',h:'ℎ',i:'𝑖',j:'𝑗',k:'𝑘',l:'𝑙',m:'𝑚',n:'𝑛',o:'𝑜',p:'𝑝',q:'𝑞',r:'𝑟',s:'𝑠',t:'𝑡',u:'𝑢',v:'𝑣',w:'𝑤',x:'𝑥',y:'𝑦',z:'𝑧',A:'𝐴',B:'𝐵',C:'𝐶',D:'𝐷',E:'𝐸',F:'𝐹',G:'𝐺',H:'𝐻',I:'𝐼',J:'𝐽',K:'𝐾',L:'𝐿',M:'𝑀',N:'𝑁',O:'𝑂',P:'𝑃',Q:'𝑄',R:'𝑅',S:'𝑆',T:'𝑇',U:'𝑈',V:'𝑉',W:'𝑊',X:'𝑋',Y:'𝑌',Z:'𝑍'},
 gothic:{a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷',A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'Ⓜ',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ'},
-script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝒱',w:'𝓌',x:'𝒳',y:'𝓎',z:'𝒵',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'𝒱',G:'𝒢',H:'ℋ',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
+script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝒱',w:'𝓌',x:'𝒳',y:'𝓎',z:'𝒵',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'𝒱',G:'𝒢',H:'𝒋',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
 mono:{a:'𝚊',b:'𝚋',c:'𝚌',d:'𝚍',e:'𝚎',f:'𝚏',g:'𝚐',h:'𝚑',i:'𝚒',j:'𝚓',k:'𝚔',l:'𝚕',m:'𝚖',n:'𝚗',o:'𝚘',p:'𝚙',q:'𝚚',r:'𝚛',s:'𝚜',t:'𝚝',u:'𝚞',v:'𝚟',w:'𝚠',x:'𝚡',y:'𝚢',z:'𝚣',A:'𝙰',B:'𝙱',C:'𝙲',D:'𝙳',E:'𝙴',F:'𝙵',G:'𝙶',H:'𝙷',I:'𝙸',J:'𝙹',K:'𝙺',L:'𝙻',M:'𝙼',N:'𝙽',O:'𝙾',P:'𝙿',Q:'𝚀',R:'𝚁',S:'𝚂',T:'𝚃',U:'𝚄',V:'𝚅',W:'𝚆',X:'𝚇',Y:'𝚈',Z:'𝚉'},
-double:{a:'𝕒',b:'𝕓',c:'𝕔',d:'𝕕',e:'𝕖',f:'𝕗',g:'𝕘',h:'𝕙',i:'𝕚',j:'𝕛',k:'𝕜',l:'𝕝',m:'𝕞',n:'𝕟',o:'𝕠',p:'𝕡',q:'𝕢',r:'𝕣',s:'𝕤',t:'𝕥',u:'𝕦',v:'𝕧',w:'𝕨',x:'𝕩',y:'𝕪',z:'𝕫',A:'𝔸',B: '𝔹',C:'ℂ',D:'𝔻',E:'𝔼',F:'𝔽',G:'𝔾',H:'ℍ',I:'𝕀',J:'𝕁',K:'𝕂',L:'𝕃',M:'𝕄',N:'ℕ',O:'𝕆',P: 'ℙ',Q:'ℚ',R:'ℝ',S:'𝕊',T:'𝕋',U:'𝕌',V:'𝕍',W:'𝕎',X:'𝕏',Y:'𝕐',Z:'ℤ'},
-sansBold:{a:'mathsf{a}',b:'mathsf{b}',c:'mathsf{c}',d:'mathsf{d}',e:'mathsf{e}',f:'mathsf{f}',g:'mathsf{g}',h:'mathsf{h}',i:'mathsf{i}',j:'mathsf{j}',k:'mathsf{k}',l:'mathsf{l}',m:'mathsf{m}',n:'mathsf{n}',o:'mathsf{o}',p:'mathsf{p}',q:'mathsf{q}',r:'mathsf{r}',s:'mathsf{s}',t:'mathsf{t}',u:'mathsf{u}',v:'mathsf{v}',w:'mathsf{w}',x:'mathsf{x}',y:'mathsf{y}',z:'mathsf{z}'},
-circled:{a:'Ⓐ',b:'Ⓑ',c:'Ⓒ',d:'Ⓓ',e:'Ⓔ',f:'Ⓕ',g:'Ⓖ',h:'Ⓗ',I:'Ⓘ',j:'Ⓙ',k:'Ⓚ',l:'Ⓛ',m:'Ⓜ',n:'Ⓝ',o:'Ⓞ',p:'Ⓟ',q:'Ⓠ',r:'Ⓡ',s:'Ⓢ',t:'Ⓣ',u:'Ⓤ',v:'Ⓥ',w:'Ⓦ',x:'Ⓧ',y:'Ⓨ',z:'Ⓩ',A:'Ⓐ',B:'Ⓑ',C:'Ⓒ',D:'Ⓓ',E:'Ⓔ',F:'Ⓕ',G:'Ⓖ',H:'Ⓗ',I:'Ⓘ',J:'Ⓙ',K:'Ⓚ',L:'Ⓛ',M:'Ⓜ',N:'Ⓝ',O:'Ⓞ',P:'Ⓟ',Q:'Ⓠ',R:'Ⓡ',S:'Ⓢ',T:'Ⓣ',U:'Ⓤ',V:'Ⓥ',W:'Ⓦ',X:'Ⓧ',Y:'Ⓨ',Z:'Ⓩ'},
-squared:{a:'🄰',b:'🟀',c:'🟁',d:'🟂',e:'🟃',f:'🟄',g:'🟅',h:'🟆',i:'🟇',j:'🟈',k:'🟉',l:'🟊',m:'🟋',n:'🟌',o:'🟍',p:'🟎',q:'🟏',r:'🟐',s:'🟑',t:'🟒',u:'🟓',v:'🟔',w:'🟕',x:'🟖',y:'🟗',z:'🟘',A:'🄰',B:'🟁',C:'🟂',D:'🟃',E:'🟄',F:'🟅',G:'🟆',H:'🟇',I:'🟈',J:'🟉',K:'🟊',L:'🟋',M:'🟌',N:'🟍',O:'🟎',P:'🟏',Q:'🟐',R:'🟑',S:'🟒',T:'🟓',U:'🟔',V:'🟕',W:'🟖',X:'🟗',Y:'🟘',Z:'🟙'},
-vaporwave:(str)=>str.split('').map(c=>c===' '?' ':String.fromCharCode(c.charCodeAt(0)+65248)).join('')
+double:{a:'𝕒',b:'𝕓',c:'𝕔',d:'𝕕',e:'𝕖',f:'𝕗',g:'𝕘',h:'𝕙',i:'𝕚',j:'𝕛',k:'𝕜',l:'𝕝',m:'𝕞',n:'𝕟',o:'𝕠',p:'𝕡',q:'𝕢',r:'𝕣',s:'𝕤',t:'𝕥',u:'𝕦',v:'𝕧',w:'𝕨',x:'𝕩',y:'𝕪',z:'𝕫',A:'𝔸',B:'𝔹',C:'ℂ',D:'𝔻',E:'𝔼',F:'𝔽',G:'𝔾',H:'ℍ',I:'𝕀',J:'𝕁',K:'𝕂',L:'𝕃',M:'𝕄',N:'ℕ',O:'𝕆',P:'ℙ',Q:'ℚ',R:'ℝ',S:'𝕊',T:'𝕋',U:'𝕌',V:'𝕍',W:'𝕎',X:'𝕏',Y:'𝕐',Z:'ℤ'},
+circled:{a:'Ⓐ',b:'Ⓑ',c:'Ⓒ',d:'Ⓓ',e:'Ⓔ',f:'Ⓕ',g:'Ⓖ',h:'Ⓗ',i:'Ⓘ',j:'Ⓙ',k:'Ⓚ',l:'Ⓛ',m:'Ⓜ',n:'Ⓝ',o:'Ⓞ',p:'Ⓟ',q:'Ⓠ',r:'Ⓡ',s:'Ⓢ',t:'Ⓣ',u:'Ⓤ',v:'Ⓥ',w:'Ⓦ',x:'Ⓧ',y:'Ⓨ',z:'Ⓩ',A:'Ⓐ',B:'Ⓑ',C:'Ⓒ',D:'Ⓓ',E:'Ⓔ',F:'Ⓕ',G:'Ⓖ',H:'Ⓗ',I:'Ⓘ',J:'Ⓙ',K:'Ⓚ',L:'Ⓛ',M:'Ⓜ',N:'Ⓝ',O:'Ⓞ',P:'Ⓟ',Q:'Ⓠ',R:'Ⓡ',S:'Ⓢ',T:'Ⓣ',U:'Ⓤ',V:'Ⓥ',W:'Ⓦ',X:'Ⓧ',Y:'Ⓨ',Z:'Ⓩ'},
+fullWidth:(str)=>str.split('').map(c=>c===' '?' ':String.fromCharCode(c.charCodeAt(0)+65248)).join('')
 };
 
 $("generateStylish").onclick=()=>{
-const txt=$("stylishInput").value;
-if(!txt){show("stylishResult","Enter text above first.");return;}
-const transform=(map)=>typeof map==='function'?map(txt):txt.split('').map(c=>map[c]||c).join('');
-const stylesList=[
-  "1. Bold: " + transform(sMaps.bold),
-  "2. Italic: " + transform(sMaps.italic),
-  "3. Gothic: " + transform(sMaps.gothic),
-  "4. Script: " + transform(sMaps.script),
-  "5. Monospace: " + transform(sMaps.mono),
-  "6. Double-Struck: " + transform(sMaps.double),
-  "7. Vaporwave: " + transform(sMaps.vaporwave),
-  "8. Circled: " + transform(sMaps.circled),
-  "9. Upper Bold: " + transform(sMaps.bold).toUpperCase(),
-  "10. Lowercase: " + txt.toLowerCase(),
-  "11. Uppercase: " + txt.toUpperCase(),
-  "12. Strikethrough: " + txt.split('').map(c=>c+'̶').join(''),
-  "13. Underline: " + txt.split('').map(c=>c+'̲').join(''),
-  "14. Wave Underline: " + txt.split('').map(c=>c+'〰').join(''),
-  "15. Reverse: " + txt.split('').reverse().join(''),
-  "16. Dotted: " + txt.split('').map(c=>c+'•').join(''),
-  "17. Spaced Out: " + txt.split('').join('   '),
-  "18. Bracketed: " + txt.split('').map(c=>`[${c}]`).join(''),
-  "19. Parenthesized: " + txt.split('').map(c=>`(${c})`).join(''),
-  "20. Starry: " + txt.split('').map(c=>`${c}⭐`).join('')
+const txt=$("stylishInput").value.trim()||"VitalStar";
+const t=(map)=>typeof map==='function'?map(txt):txt.split('').map(c=>map[c]||c).join('');
+const list=[
+  "1. 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻: " + t(sMaps.script),
+  "2. 𝕍𝕚𝕥𝕒𝕝𝕊𝕥𝕒𝚛: " + t(sMaps.double),
+  "3. 𝐕𝐢𝐭𝐚𝐥𝐒𝐭𝐚𝐫: " + t(sMaps.bold),
+  "4. 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓: " + t(sMaps.italic),
+  "5. 𝙑𝙞𝙩𝙖𝙡𝙎𝙩𝙖𝙧: " + t(sMaps.bold),
+  "6. 𝚅𝚒𝚝𝚊𝚕𝚂𝚝𝚊𝚛: " + t(sMaps.mono),
+  "7. 𝖁𝖎𝖙𝖆𝖑𝕾𝖙𝖆𝖗: " + t(sMaps.gothic),
+  "8. 𝔙𝔦𝔱𝔞𝔩𝔖𝔱𝔞𝔯: " + t(sMaps.gothic),
+  "9. ⓋⓘⓣⓐⓛⓈⓣⓐⓡ: " + t(sMaps.circled),
+  "10. ＶｉｔａｌＳｔａｒ: " + t(sMaps.fullWidth),
+  "11. ꧁༒☬VitalStar☬༒꧂: ꧁༒☬" + txt + "☬༒꧂",
+  "12. ꧁𓊈𒆜VitalStar𒆜𓊉꧂: ꧁𓊈𒆜" + txt + "𒆜𓊉꧂",
+  "13. ★彡[ᴠɪᴛ𝙖ʟsᴛ𝙖ʀ]彡★: ★彡[" + txt + "]彡★",
+  "14. 『ＶＩＴＡＬＳＴＡＲ』: 『" + t(sMaps.fullWidth) + "』",
+  "15. ♛ 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓 ♛: ♛ " + t(sMaps.italic) + " ♛",
+  "16. ✦ 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻 ✦: ✦ " + t(sMaps.script) + " ✦",
+  "17. 𓆩★𓆪 VitalStar 𓆩★𓆪: 𓆩★𓆪 " + txt + " 𓆩★𓆪",
+  "18. ⚡Vɪᴛ𝙖ʟSᴛ𝙖ʀ⚡: ⚡" + txt + "⚡",
+  "19. ☯︎ VITALSTAR ☯︎: ☯︎ " + txt.toUpperCase() + " ☯︎",
+  "20. ♡ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ♡: ♡ " + txt + " ♡",
+  "21. 亗 Vɪᴛ𝙖ʟSᴛ𝙖ʀ 亗: 亗 " + txt + " 亗",
+  "22. ༺☆༻VitalStar༺☆༻: ༺☆༻" + txt + "༺☆༻",
+  "23. ꧁ঔৣ☬VitalStar☬ঔৣ꧂: ꧁ঔৣ☬" + txt + "☬ঔৣ꧂",
+  "24. ✧༺♥༻∞ VitalStar ∞༺♥༻✧: ✧༺♥༻∞ " + txt + " ∞༺♥༻✧",
+  "25. 『★』VitalStar『★』: 『★』" + txt + "『★』",
+  "26. ☠ VITALSTAR ☠: ☠ " + txt.toUpperCase() + " ☠",
+  "27. 么 Vɪᴛ𝙖ʟSᴛ𝙖ʀ 么: 么 " + txt + " 么",
+  "28. ࿐ ࿔:･ﾟVitalStar･ﾟ:࿐: ࿐ ࿔:･ﾟ" + txt + "･ﾟ:࿐",
+  "29. ♜ VITALSTAR ♜: ♜ " + txt.toUpperCase() + " ♜",
+  "30. ⫷ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ⫸: ⫷ " + txt + " ⫸",
+  "31. 乂❤‿❤乂 VitalStar: 乂❤‿❤乂 " + txt,
+  "32. ✨『VitalStar』✨: ✨『" + txt + "』✨",
+  "33. ⚜️ 𝖁𝖎𝖙𝖆𝖑𝕾𝖙𝖆𝖗 ⚜️: ⚜️ " + t(sMaps.gothic) + " ⚜️",
+  "34. ♕ 𝕍𝕚𝕥𝕒𝕝𝕊𝕥𝕒𝚛 ♕: ♕ " + t(sMaps.double) + " ♕",
+  "35. ☾⋆⁺₊✧ VitalStar ✧₊⁺⋆☽: ☾⋆⁺₊✧ " + txt + " ✧₊⁺⋆☽",
+  "36. ᯓ★ Vɪᴛ𝙖ʟSᴛ𝙖ʀ: ᯓ★ " + txt,
+  "37. 𖤐 VITALSTAR 𖤐: 𖤐 " + txt.toUpperCase() + " 𖤐",
+  "38. ༒︎Vɪᴛ𝙖ʟSᴛ𝙖ʀ༒︎: ༒︎" + txt + "༒︎",
+  "39. ✺ 𝑽𝒊𝒕𝒂𝒍𝑺𝒕𝒂𝒓 ✺: ✺ " + t(sMaps.italic) + " ✺",
+  "40. ⊹ ࣪ ˖ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ˖ ࣪ ⊹: ⊹ ࣪ ˖ " + txt + " ˖ ࣪ ⊹",
+  "41. ꧁༺VITALSTAR༻꧂: ꧁༺" + txt.toUpperCase() + "༻꧂",
+  "42. ★彡 𝙑𝙞𝙩𝙖𝙡𝙎𝙩𝙖𝙧 彡★: ★彡 " + t(sMaps.bold) + " 彡★",
+  "43. ◥꧁དVitalStarཌ꧂◤: ◥꧁ད" + txt + "ཌ꧂◤",
+  "44. 𓆩⚡𓆪 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻: 𓆩⚡𓆪 " + t(sMaps.script),
+  "45. ♡︎₊˚ VitalStar ˚₊♡︎: ♡︎₊˚ " + txt + " ˚₊♡︎",
+  "46. ✯ VιтαℓSтαя ✯: ✯ " + txt + " ✯",
+  "47. 乂 VITALSTAR 乂: 乂 " + txt.toUpperCase() + " 乂",
+  "48. ⌁༺ Vɪᴛ𝙖ʟSᴛ𝙖ʀ ༻⌁: ⌁༺ " + txt + " ༻⌁",
+  "49. 𖣘『𝑽𝒊𝒕𝙖𝒍𝑺𝒕𝒂𝒓』𖣘: 𖣘『" + t(sMaps.italic) + "』𖣘",
+  "50. 👑 𝓥𝓲𝓽𝓪𝓵𝓢𝓽𝓪𝓻 👑: 👑 " + t(sMaps.script) + " 👑"
 ];
-show("stylishResult", stylesList.join("\n\n"));
-};
-
-/* RESPONSIVE WEBSITE PREVIEW */
-document.querySelectorAll("[data-device]").forEach(b=>{
-b.onclick=function(){
-const frame=$("respPreviewFrame");
-const type=this.dataset.device;
-if(type==='mobile')frame.style.width="375px";
-else if(type==='tablet')frame.style.width="768px";
-else frame.style.width="100%";
-};
-});
-
-function updateResponsiveUrl() {
-    let url = $("respUrlInput").value.trim();
-    if (!url) return;
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        url = "https://" + url;
-    }
-    $("respUrlInput").value = url;
-    $("respPreviewFrame").src = url;
-    $("respExternalLink").href = url;
-}
-
-$("respUrlInput").onchange = updateResponsiveUrl;
-$("respUrlInput").onkeypress = function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        updateResponsiveUrl();
-    }
+show("stylishResult", list.join("\n\n"));
 };
 
 /* FOOTER */
