@@ -1,592 +1,135 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#071225">
-<meta name="description" content="Vitalstar VE Pro — Create, edit and transform videos with powerful editing tools.">
-<title>Vitalstar VE Pro | RexWeb Nexora</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d19">
+  <meta name="description" content="VITALSTAR VE PRO — a browser-based video editing workspace.">
+  <title>VITALSTAR VE PRO | RexWeb Nexora</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <main class="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="VITALSTAR VE PRO home">
+        <span class="brand-mark">✦</span><span>VITALSTAR <b>VE PRO</b><small>by RexWeb Nexora</small></span>
+      </a>
+      <div class="top-actions">
+        <button class="btn btn-quiet" id="newProject" type="button">＋ New</button>
+        <button class="btn btn-quiet" id="saveProject" type="button">Save</button>
+        <button class="btn btn-primary" id="exportBtn" type="button">Export Video</button>
+      </div>
+    </header>
 
-<header class="topbar">
-  <div class="brand">
-    <span class="logo" aria-hidden="true">V</span>
-    <div>
-      <b>Vitalstar <em>VE Pro</em></b>
-      <small>Create Beyond Limits.</small>
-    </div>
-  </div>
-
-  <div class="top-actions">
-    <button id="newProject" type="button">＋ New</button>
-    <button id="saveProject" type="button">Save project</button>
-    <button id="exportBtn" class="primary" type="button">Export video</button>
-  </div>
-</header>
-
-<main class="app">
-
-<section class="workspace">
-
-  <!-- MAIN TOOL NAVIGATION -->
-  <aside class="toolrail" aria-label="Editing tools">
-
-    <button class="tool active" type="button" data-panel="media" aria-pressed="true">
-      ▣ <span>Media</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="text" aria-pressed="false">
-      T <span>Text</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="audio" aria-pressed="false">
-      ♫ <span>Audio</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="effects" aria-pressed="false">
-      ✦ <span>Effects</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="adjust" aria-pressed="false">
-      ◐ <span>Adjust</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="speed" aria-pressed="false">
-      ⚡ <span>Speed</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="transitions" aria-pressed="false">
-      ⇄ <span>Transitions</span>
-    </button>
-
-    <button class="tool" type="button" data-panel="export" aria-pressed="false">
-      ⇧ <span>Export</span>
-    </button>
-
-  </aside>
-
-  <!-- TOOL SETTINGS PANEL -->
-  <aside class="assets panel">
-
-    <div class="panel-head">
-      <h2 id="panelTitle">Media</h2>
-      <span class="pill">LOCAL</span>
-    </div>
-
-    <div id="panelContent">
-
-      <p class="muted">
-        Import videos and photos from your device to begin editing.
-      </p>
-
-      <label class="import-btn">
-        ＋ Import media
-        <input
-          id="mediaInput"
-          type="file"
-          accept="video/*,image/*"
-          multiple
-          hidden
-        >
-      </label>
-
-      <div id="mediaList" class="media-list"></div>
-
-    </div>
-  </aside>
-
-  <!-- VIDEO PREVIEW -->
-  <section class="preview-area">
-
-    <div class="preview-head">
-
-      <span id="projectName">Untitled project</span>
-
-      <label class="aspect-control">
-        <span class="sr-only">Video aspect ratio</span>
-        <select id="aspect">
-          <option value="9:16">Portrait 9:16</option>
-          <option value="16:9">Landscape 16:9</option>
-          <option value="1:1">Square 1:1</option>
-          <option value="4:5">Social 4:5</option>
-        </select>
-      </label>
-
-    </div>
-
-    <div class="stage-wrap">
-
-      <div class="stage" id="stage">
-
-        <video
-          id="preview"
-          playsinline
-          preload="metadata"
-          controlslist="nodownload"
-        ></video>
-
-        <img
-          id="photoPreview"
-          alt="Current photo preview"
-          hidden
-        >
-
-        <div class="empty-state" id="emptyState">
-          <div class="play-mark" aria-hidden="true">▶</div>
-          <b>Your preview appears here</b>
-          <small>Import a video or photo to get started</small>
+    <section class="preview-section card">
+      <div class="section-bar preview-header">
+        <div><span class="eyebrow">PREVIEW MONITOR</span><h2 id="projectName">Untitled Project</h2></div>
+        <div class="preview-actions">
+          <label class="compact-control">Ratio
+            <select id="aspect">
+              <option value="16:9">16:9</option><option value="9:16">9:16</option>
+              <option value="1:1">1:1</option><option value="4:5">4:5</option>
+            </select>
+          </label>
+          <button class="icon-btn" id="fullscreenBtn" type="button" title="Fullscreen preview" aria-label="Fullscreen preview">⛶</button>
         </div>
+      </div>
+      <div class="preview-screen" id="stage">
+        <video id="preview" playsinline preload="metadata"></video>
+        <img id="photoPreview" alt="Photo preview">
+        <div id="textOverlay" aria-live="polite"></div>
+        <div class="empty-state" id="emptyState">
+          <span class="empty-icon">▶</span><strong>Your preview appears here</strong>
+          <p>Import a video, photo, or audio file to get started.</p>
+          <button class="btn btn-primary" id="importFromEmpty" type="button">＋ Import media</button>
+        </div>
+      </div>
+      <div class="playback">
+        <div class="playback-left">
+          <button class="icon-btn" id="backFrame" type="button" title="Previous clip">|◀</button>
+          <button class="play-btn" id="playBtn" type="button" aria-label="Play">▶</button>
+          <button class="icon-btn" id="forwardFrame" type="button" title="Next clip">▶|</button>
+        </div>
+        <div class="time-readout"><span id="currentTime">00:00</span><span class="time-divider">/</span><span id="durationTime">00:00</span></div>
+        <div class="playback-right"><span class="status-dot"></span><span id="previewStatus">Ready</span></div>
+      </div>
+    </section>
 
-        <div
-          id="textOverlay"
-          class="text-overlay"
-          role="button"
-          tabindex="0"
-          aria-label="Text overlay. Select to edit."
-          hidden
-        >Tap to edit text</div>
-
+    <section class="tools-area card">
+      <div class="section-bar tools-heading">
+        <div><span class="eyebrow">WORKSPACE</span><h2>Editing tools</h2></div>
+        <button class="text-btn" id="toggleTools" type="button" aria-expanded="true">Collapse −</button>
+      </div>
+      <div id="toolsBody">
+        <div class="tool-row" aria-label="Main editing tools">
+          <button class="tool active" data-panel="media" type="button"><span>▧</span>Media</button>
+          <button class="tool" data-panel="text" type="button"><span>T</span>Text</button>
+          <button class="tool" data-panel="audio" type="button"><span>♫</span>Audio</button>
+          <button class="tool" data-panel="effects" type="button"><span>✧</span>Effects</button>
+          <button class="tool" data-panel="filters" type="button"><span>◐</span>Filters</button>
+          <button class="tool" data-panel="stickers" type="button"><span>☆</span>Stickers</button>
+          <button class="tool" data-panel="captions" type="button"><span>▤</span>Captions</button>
+          <button class="tool" data-panel="transitions" type="button"><span>⇄</span>Transitions</button>
+          <button class="tool" data-panel="settings" type="button"><span>⚙</span>Settings</button>
+        </div>
+        <div class="tool-row secondary-tools" aria-label="Clip editing tools">
+          <button class="mini-tool" id="splitBtn" type="button">✂ Split</button>
+          <button class="mini-tool" id="speedTool" type="button">⏩ Speed</button>
+          <button class="mini-tool" id="cropTool" type="button">▣ Crop</button>
+          <button class="mini-tool" id="rotateTool" type="button">↻ Rotate</button>
+          <button class="mini-tool" id="adjustTool" type="button">☼ Adjust</button>
+          <button class="mini-tool" id="duplicateBtn" type="button">▣ Duplicate</button>
+          <button class="mini-tool danger-text" id="deleteBtn" type="button">⌫ Delete</button>
+          <button class="mini-tool" id="trimTool" type="button">↔ Trim</button>
+        </div>
       </div>
 
-    </div>
-
-    <!-- PLAYBACK CONTROLS -->
-    <div class="transport">
-
-      <button id="backFrame" type="button" title="Back 5 seconds">
-        ↶ 5s
-      </button>
-
-      <button
-        id="playBtn"
-        class="play-button"
-        type="button"
-        aria-label="Play or pause preview"
-      >▶</button>
-
-      <button id="forwardFrame" type="button" title="Forward 5 seconds">
-        5s ↷
-      </button>
-
-      <span id="timeReadout" aria-live="off">00:00 / 00:00</span>
-
-      <button id="undoBtn" type="button" title="Undo" aria-label="Undo">
-        ↶
-      </button>
-
-      <button id="redoBtn" type="button" title="Redo" aria-label="Redo">
-        ↷
-      </button>
-
-    </div>
-
-    <!-- PREVIEW STATUS -->
-    <div class="preview-status">
-      <span>Preview</span>
-      <span id="previewStatus" role="status">Ready</span>
-      <span id="speedReadout">1.0×</span>
-    </div>
-
-  </section>
-
-</section>
-
-<!-- SELECTED CLIP PROPERTIES -->
-<section class="properties-section panel" aria-labelledby="propertiesTitle">
-
-  <div class="panel-head">
-    <h2 id="propertiesTitle">Clip properties</h2>
-    <span class="pill" id="selectedClipType">NO CLIP SELECTED</span>
-  </div>
-
-  <div class="properties-grid">
-
-    <div class="property-group">
-      <label for="clipName">Clip name</label>
-      <input
-        id="clipName"
-        type="text"
-        placeholder="Select a timeline clip"
-        autocomplete="off"
-      >
-    </div>
-
-    <div class="property-group">
-      <label for="clipSpeed">Playback speed</label>
-      <select id="clipSpeed">
-        <option value="0.25">0.25×</option>
-        <option value="0.5">0.5×</option>
-        <option value="0.75">0.75×</option>
-        <option value="1" selected>1× Normal</option>
-        <option value="1.25">1.25×</option>
-        <option value="1.5">1.5×</option>
-        <option value="2">2×</option>
-      </select>
-    </div>
-
-    <div class="property-group">
-      <label for="clipVolume">Clip volume</label>
-      <input
-        id="clipVolume"
-        type="range"
-        min="0"
-        max="100"
-        value="100"
-      >
-      <output id="clipVolumeValue">100%</output>
-    </div>
-
-    <div class="property-group">
-      <label for="clipStart">Start time (seconds)</label>
-      <input
-        id="clipStart"
-        type="number"
-        min="0"
-        step="0.1"
-        value="0"
-      >
-    </div>
-
-    <div class="property-group">
-      <label for="clipEnd">End time (seconds)</label>
-      <input
-        id="clipEnd"
-        type="number"
-        min="0"
-        step="0.1"
-        value="0"
-      >
-    </div>
-
-  </div>
-
-  <p class="muted properties-hint" id="propertiesHint">
-    Select a clip on the timeline to edit its properties.
-  </p>
-
-</section>
-
-<!-- TIMELINE -->
-<section class="timeline-section panel">
-
-  <div class="timeline-top">
-
-    <div>
-      <b>Timeline</b>
-      <span class="muted" id="clipCount">0 clips</span>
-    </div>
-
-    <div class="timeline-tools">
-
-      <button id="splitBtn" type="button">✂ Split</button>
-
-      <button id="deleteBtn" type="button">Delete</button>
-
-      <button id="zoomOut" type="button" aria-label="Zoom out">
-        −
-      </button>
-
-      <input
-        id="zoomRange"
-        type="range"
-        min="50"
-        max="160"
-        value="100"
-        aria-label="Timeline zoom"
-      >
-
-      <button id="zoomIn" type="button" aria-label="Zoom in">
-        ＋
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="timeline-scroll" id="timelineScroll">
-
-    <div class="ruler" id="ruler">
-      <span>00:00</span>
-      <span>00:05</span>
-      <span>00:10</span>
-      <span>00:15</span>
-      <span>00:20</span>
-    </div>
-
-    <!-- VIDEO TRACK -->
-    <div class="track-row">
-
-      <div class="track-label">VIDEO</div>
-
-      <div
-        class="track"
-        id="videoTrack"
-        aria-label="Video timeline"
-      >
-        <span class="track-placeholder">
-          Import media, then add it to the timeline
-        </span>
+      <div class="settings" id="settingsPanel">
+        <div class="settings-heading">
+          <div><span class="eyebrow">CONTROL PANEL</span><h3 id="panelTitle">Media Library</h3></div>
+          <button class="icon-btn" id="collapsePanel" type="button" aria-label="Collapse settings panel">⌃</button>
+        </div>
+        <div class="settings-content" id="panelContent">
+          <div class="media-toolbar">
+            <p class="muted">Import files from your device. Media stays in this browser session unless you save the project file.</p>
+            <label class="btn btn-primary file-button">＋ Import media<input id="mediaInput" type="file" accept="video/*,image/*,audio/*" multiple></label>
+          </div>
+          <div id="mediaList" class="media-list"><div class="empty-library">No media imported yet.</div></div>
+        </div>
       </div>
+    </section>
 
-    </div>
-
-    <!-- TEXT TRACK -->
-    <div class="track-row">
-
-      <div class="track-label">TEXT</div>
-
-      <div
-        class="track text-track"
-        id="textTrack"
-        aria-label="Text timeline"
-      >
-        <span class="track-placeholder">Text overlays</span>
+    <section class="timeline-section card">
+      <div class="section-bar timeline-heading">
+        <div><span class="eyebrow">MULTI-TRACK EDITOR</span><h2>Timeline <span class="pill" id="clipCount">0 clips</span></h2></div>
+        <div class="timeline-actions">
+          <button class="icon-btn" id="undoBtn" type="button" title="Undo" aria-label="Undo">↶</button>
+          <button class="icon-btn" id="redoBtn" type="button" title="Redo" aria-label="Redo">↷</button>
+          <button class="icon-btn" id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+          <input id="zoomRange" type="range" min="40" max="180" value="80" aria-label="Timeline zoom">
+          <button class="icon-btn" id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in">＋</button>
+        </div>
       </div>
-
-    </div>
-
-    <!-- AUDIO TRACK -->
-    <div class="track-row">
-
-      <div class="track-label">AUDIO</div>
-
-      <div
-        class="track audio-track"
-        id="audioTrack"
-        aria-label="Audio timeline"
-      >
-        <span class="track-placeholder">Music and sound</span>
+      <div class="timeline-scroll" id="timelineScroll">
+        <div class="timeline-inner" id="timelineInner">
+          <div class="ruler-row"><div class="track-label ruler-label">TIME</div><div class="ruler" id="ruler"></div></div>
+          <div class="track-row"><div class="track-label"><span>▣</span> VIDEO</div><div class="track-lane" id="videoTrack"><span class="lane-placeholder">Import video or photos</span></div></div>
+          <div class="track-row"><div class="track-label"><span>T</span> OVERLAY</div><div class="track-lane" id="textTrack"><span class="lane-placeholder">Text overlays appear here</span></div></div>
+          <div class="track-row"><div class="track-label"><span>♫</span> AUDIO</div><div class="track-lane" id="audioTrack"><span class="lane-placeholder">Add audio from the Audio tool</span></div></div>
+          <div class="track-row"><div class="track-label"><span>✧</span> EFFECTS</div><div class="track-lane" id="effectsTrack"><span class="lane-placeholder">Choose an effect to apply</span></div></div>
+          <div class="playhead-line" id="playhead"><span></span></div>
+        </div>
       </div>
+      <div class="timeline-footer"><span id="timelineStatus">Select a clip to edit it.</span><span>Tap a clip to select it</span></div>
+    </section>
 
-    </div>
-
-    <div
-      class="playhead"
-      id="playhead"
-      aria-hidden="true"
-    ></div>
-
-  </div>
-
-  <div class="timeline-footer">
-
-    <span id="currentTime">00:00.00</span>
-
-    <span id="timelineStatus" role="status">
-      Drafts are stored in this browser
-    </span>
-
-  </div>
-
-</section>
-
-<!-- TEXT EDITING -->
-<section class="editor-section panel" id="textEditorSection">
-
-  <div class="panel-head">
-    <h2>Text editor</h2>
-    <span class="pill">OVERLAYS</span>
-  </div>
-
-  <div class="properties-grid">
-
-    <div class="property-group">
-      <label for="textInput">Text content</label>
-      <input
-        id="textInput"
-        type="text"
-        placeholder="Enter your video text"
-        maxlength="250"
-      >
-    </div>
-
-    <div class="property-group">
-      <label for="textColor">Text colour</label>
-      <input
-        id="textColor"
-        type="color"
-        value="#ffffff"
-      >
-    </div>
-
-    <div class="property-group">
-      <label for="textSize">Text size</label>
-      <input
-        id="textSize"
-        type="range"
-        min="12"
-        max="96"
-        value="32"
-      >
-      <output id="textSizeValue">32 px</output>
-    </div>
-
-    <div class="property-group">
-      <label for="textPosition">Text position</label>
-      <select id="textPosition">
-        <option value="top">Top</option>
-        <option value="center" selected>Centre</option>
-        <option value="bottom">Bottom</option>
-      </select>
-    </div>
-
-    <div class="property-group">
-      <label for="textAnimation">Text animation</label>
-      <select id="textAnimation">
-        <option value="none">None</option>
-        <option value="fade">Fade</option>
-        <option value="slide">Slide</option>
-        <option value="zoom">Zoom</option>
-        <option value="bounce">Bounce</option>
-      </select>
-    </div>
-
-    <div class="property-group">
-      <label for="textDuration">Duration (seconds)</label>
-      <input
-        id="textDuration"
-        type="number"
-        min="0.1"
-        step="0.1"
-        value="5"
-      >
-    </div>
-
-  </div>
-
-  <div class="section-actions">
-    <button id="addTextBtn" type="button" class="primary">
-      ＋ Add text to timeline
-    </button>
-
-    <button id="updateTextBtn" type="button">
-      Apply text changes
-    </button>
-  </div>
-
-</section>
-
-<!-- VIDEO ADJUSTMENTS -->
-<section class="editor-section panel" id="adjustEditorSection">
-
-  <div class="panel-head">
-    <h2>Video adjustments</h2>
-    <span class="pill">PREVIEW</span>
-  </div>
-
-  <div class="properties-grid">
-
-    <div class="property-group">
-      <label for="brightness">Brightness</label>
-      <input
-        id="brightness"
-        type="range"
-        min="0"
-        max="200"
-        value="100"
-      >
-      <output id="brightnessValue">100%</output>
-    </div>
-
-    <div class="property-group">
-      <label for="contrast">Contrast</label>
-      <input
-        id="contrast"
-        type="range"
-        min="0"
-        max="200"
-        value="100"
-      >
-      <output id="contrastValue">100%</output>
-    </div>
-
-    <div class="property-group">
-      <label for="grayscale">Grayscale</label>
-      <select id="grayscale">
-        <option value="0">Off</option>
-        <option value="1">On</option>
-      </select>
-    </div>
-
-  </div>
-
-  <div class="section-actions">
-    <button id="resetAdjustmentsBtn" type="button">
-      Reset adjustments
-    </button>
-  </div>
-
-</section>
-
-<!-- EXPORT SETTINGS -->
-<section class="editor-section panel" id="exportEditorSection">
-
-  <div class="panel-head">
-    <h2>Export settings</h2>
-    <span class="pill">OUTPUT</span>
-  </div>
-
-  <div class="properties-grid">
-
-    <div class="property-group">
-      <label for="exportResolution">Resolution</label>
-      <select id="exportResolution">
-        <option value="720">720p HD</option>
-        <option value="1080" selected>1080p Full HD</option>
-        <option value="2160">2160p 4K</option>
-      </select>
-    </div>
-
-    <div class="property-group">
-      <label for="exportFps">Frame rate</label>
-      <select id="exportFps">
-        <option value="24">24 FPS</option>
-        <option value="30" selected>30 FPS</option>
-        <option value="60">60 FPS</option>
-      </select>
-    </div>
-
-    <div class="property-group">
-      <label for="exportFormat">Format</label>
-      <select id="exportFormat">
-        <option value="mp4" selected>MP4 video</option>
-      </select>
-    </div>
-
-  </div>
-
-  <p class="muted">
-    Export availability depends on the rendering engine and your device.
-    The editor must confirm a successful render before presenting a
-    finished video.
-  </p>
-
-  <div class="section-actions">
-    <button id="startExportBtn" type="button" class="primary">
-      Export video
-    </button>
-  </div>
-
-  <div id="exportProgressContainer" hidden>
-    <progress id="exportProgress" max="100" value="0"></progress>
-    <span id="exportStatus" role="status">Preparing export…</span>
-  </div>
-
-</section>
-
-</main>
-
-<!-- NOTIFICATIONS -->
-<div
-  id="toast"
-  role="status"
-  aria-live="polite"
-></div>
-
-<script src="app.js"></script>
-
+    <footer class="bottom-actions">
+      <div class="footer-brand"><span class="brand-mark">✦</span><span>VITALSTAR VE PRO<small>Creativity Meets Technology</small></span></div>
+      <div class="bottom-buttons"><button class="btn btn-quiet" id="saveProjectBottom" type="button">Save Project</button><button class="btn btn-primary" id="exportBottom" type="button">Export Video ↗</button></div>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <input id="projectOpenInput" type="file" accept=".json,application/json" hidden>
+  <script src="app.js"></script>
 </body>
 </html>
