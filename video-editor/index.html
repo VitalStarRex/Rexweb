@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071225">
+<title>Vitalstar VE Pro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">V</span>
+    <div>
+      <b>Vitalstar <em>VE Pro</em></b>
+      <small>Create Beyond Limits.</small>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="newProject">New</button>
+    <button id="saveProject">Save project</button>
+    <button class="primary" id="exportBtn">Export</button>
+  </div>
+</header>
+
+<main class="app">
+<section class="workspace">
+
+<aside class="toolrail">
+  <button class="tool active" data-panel="media">▣<span>Media</span></button>
+  <button class="tool" data-panel="text">T<span>Text</span></button>
+  <button class="tool" data-panel="audio">♫<span>Audio</span></button>
+  <button class="tool" data-panel="effects">✦<span>Effects</span></button>
+  <button class="tool" data-panel="adjust">◐<span>Adjust</span></button>
+</aside>
+
+<aside class="assets panel">
+  <div class="panel-head">
+    <h2 id="panelTitle">Media</h2>
+    <span class="pill">LOCAL</span>
+  </div>
+  <div id="panelContent">
+    <p class="muted">Import videos and photos from your device to begin editing.</p>
+    <label class="import-btn">
+      ＋ Import media
+      <input id="mediaInput" type="file" accept="video/*,image/*" multiple hidden>
+    </label>
+    <div id="mediaList" class="media-list"></div>
+  </div>
+</aside>
+
+<section class="preview-area">
+  <div class="preview-head">
+    <span id="projectName">Untitled project</span>
+    <select id="aspect">
+      <option value="9:16">Portrait 9:16</option>
+      <option value="16:9">Landscape 16:9</option>
+      <option value="1:1">Square 1:1</option>
+      <option value="4:5">Social 4:5</option>
+    </select>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+      <video id="preview" playsinline></video>
+      <img id="photoPreview" alt="" hidden>
+      <div class="empty-state" id="emptyState">
+        <div class="play-mark">▶</div>
+        <b>Your preview appears here</b>
+        <small>Import a video or photo to get started</small>
+      </div>
+      <div id="textOverlay" class="text-overlay" hidden>Tap to edit text</div>
+    </div>
+  </div>
+
+  <div class="transport">
+    <button id="backFrame" title="Back 5 seconds">↶ 5s</button>
+    <button id="playBtn" class="play-button">▶</button>
+    <button id="forwardFrame" title="Forward 5 seconds">5s ↷</button>
+    <span id="timeReadout">00:00 / 00:00</span>
+    <button id="undoBtn" title="Undo">↶</button>
+    <button id="redoBtn" title="Redo">↷</button>
+  </div>
+</section>
+
+</section>
+
+<section class="timeline-section">
+  <div class="timeline-top">
+    <div>
+      <b>Timeline</b>
+      <span class="muted" id="clipCount">0 clips</span>
+    </div>
+    <div class="timeline-tools">
+      <button id="splitBtn">✂ Split</button>
+      <button id="deleteBtn">Delete</button>
+      <button id="zoomOut">−</button>
+      <input id="zoomRange" type="range" min="50" max="160" value="100" aria-label="Timeline zoom">
+      <button id="zoomIn">＋</button>
+    </div>
+  </div>
+
+  <div class="timeline-scroll">
+    <div class="ruler" id="ruler">
+      <span>00:00</span>
+      <span>00:05</span>
+      <span>00:10</span>
+      <span>00:15</span>
+      <span>00:20</span>
+    </div>
+
+    <div class="track-row">
+      <div class="track-label">VIDEO</div>
+      <div class="track" id="videoTrack">
+        <span class="track-placeholder">Import media, then add it to the timeline</span>
+      </div>
+    </div>
+
+    <div class="track-row">
+      <div class="track-label">TEXT</div>
+      <div class="track text-track" id="textTrack">
+        <span class="track-placeholder">Text overlays</span>
+      </div>
+    </div>
+
+    <div class="track-row">
+      <div class="track-label">AUDIO</div>
+      <div class="track audio-track" id="audioTrack">
+        <span class="track-placeholder">Music and sound</span>
+      </div>
+    </div>
+
+    <div class="playhead" id="playhead"></div>
+  </div>
+
+  <div class="timeline-footer">
+    <span id="currentTime">00:00.00</span>
+    <span>Drafts are stored in this browser</span>
+  </div>
+</section>
+</main>
+
+<div id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
