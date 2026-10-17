@@ -1,135 +1,1214 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#080d19">
-  <meta name="description" content="VITALSTAR VE PRO — a browser-based video editing workspace.">
-  <title>VITALSTAR VE PRO | RexWeb Nexora</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080d19">
+<meta name="description" content="VITALSTAR VE PRO — a modern browser-based video editing studio.">
+<title>VITALSTAR VE PRO | RexWeb Nexora</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg:#080d19;
+  --surface:#101827;
+  --surface2:#151f31;
+  --line:#25334a;
+  --text:#f4f7ff;
+  --muted:#94a3ba;
+  --purple:#9865ff;
+  --cyan:#36e5f5;
+  --green:#45e0ad;
+  --danger:#ff6b81;
+  --radius:17px;
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body {
+  min-height:100vh;
+  background:radial-gradient(ellipse at 50% -25%,#1a2450 0,transparent 52%),var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:14px;
+}
+
+button,input,select,textarea {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline:2px solid var(--cyan);
+  outline-offset:2px;
+}
+
+.app {
+  width:min(1220px,100%);
+  margin:auto;
+  padding:18px 22px 30px;
+}
+
+.topbar,
+.brand,
+.top-actions,
+.section-bar,
+.preview-actions,
+.playback,
+.playback-left,
+.playback-right,
+.timeline-actions,
+.bottom-actions,
+.bottom-buttons,
+.footer-brand,
+.media-toolbar {
+  display:flex;
+  align-items:center;
+}
+
+.topbar {
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.brand {
+  gap:10px;
+  color:var(--text);
+  text-decoration:none;
+  font:700 16px 'Space Grotesk',sans-serif;
+}
+
+.brand b {
+  color:var(--cyan);
+}
+
+.brand small,
+.footer-brand small {
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font:400 10px 'DM Sans',sans-serif;
+  letter-spacing:1px;
+}
+
+.brand-mark {
+  display:grid;
+  place-items:center;
+  width:39px;
+  height:39px;
+  border-radius:13px;
+  color:#090d18;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  font-size:25px;
+}
+
+.top-actions {
+  gap:8px;
+}
+
+.btn {
+  padding:10px 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:var(--text);
+  background:var(--surface2);
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.btn-primary {
+  border:0;
+  color:#07101a;
+  background:linear-gradient(105deg,var(--cyan),#a3f5ff);
+}
+
+.btn-quiet {
+  background:var(--surface);
+}
+
+.card {
+  margin-bottom:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(145deg,#121b2bfa,#0e1625fa);
+  box-shadow:0 10px 28px #00000013;
+}
+
+.section-bar {
+  justify-content:space-between;
+  gap:12px;
+  padding:17px 19px;
+}
+
+.eyebrow {
+  display:block;
+  margin-bottom:4px;
+  color:var(--cyan);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1.7px;
+}
+
+.section-bar h2,
+.settings-heading h3 {
+  margin:0;
+  font:600 17px 'Space Grotesk',sans-serif;
+}
+
+.preview-actions {
+  gap:10px;
+}
+
+.compact-control {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.compact-control select,
+.field select,
+.field input,
+.field textarea {
+  max-width:100%;
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  color:var(--text);
+  background:#0a1220;
+}
+
+.icon-btn {
+  display:grid;
+  place-items:center;
+  width:35px;
+  height:35px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:var(--text);
+  background:#111c2d;
+  font-size:16px;
+}
+
+.preview-screen {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  aspect-ratio:16/9;
+  max-height:510px;
+  overflow:hidden;
+  background:repeating-linear-gradient(135deg,#0b1321,#0b1321 18px,#0d1728 18px,#0d1728 36px);
+}
+
+.preview-screen video,
+.preview-screen img {
+  display:none;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#05070b;
+}
+
+.preview-screen #textOverlay {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:5%;
+  pointer-events:none;
+  white-space:pre-wrap;
+  text-align:center;
+  font-weight:700;
+  text-shadow:0 2px 8px #000;
+}
+
+.empty-state {
+  max-width:330px;
+  padding:25px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.empty-state strong {
+  display:block;
+  margin-top:12px;
+  color:var(--text);
+  font-size:16px;
+}
+
+.empty-state p {
+  margin:10px 0;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.empty-icon {
+  display:grid;
+  place-items:center;
+  width:55px;
+  height:55px;
+  margin:auto;
+  border:1px solid #43516b;
+  border-radius:50%;
+  color:var(--cyan);
+  background:#121d30;
+  font-size:20px;
+}
+
+.playback {
+  gap:16px;
+  min-height:61px;
+  padding:12px 18px;
+  border-top:1px solid var(--line);
+}
+
+.playback-left {
+  gap:8px;
+}
+
+.play-btn {
+  width:37px;
+  height:37px;
+  border:0;
+  border-radius:50%;
+  color:white;
+  background:var(--purple);
+  font-size:14px;
+}
+
+.time-readout {
+  font-size:12px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+
+.time-divider {
+  padding:0 5px;
+  color:#56657e;
+}
+
+.playback-right {
+  gap:7px;
+  margin-left:auto;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.status-dot {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+}
+
+.tool-row {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:0 18px 13px;
+  scrollbar-width:thin;
+}
+
+.tool {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:78px;
+  padding:11px 10px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:#aebbd0;
+  background:#0c1524;
+  font-size:11px;
+  font-weight:600;
+}
+
+.tool span {
+  color:var(--cyan);
+  font-size:20px;
+  font-weight:700;
+}
+
+.tool.active {
+  border-color:#6850a7;
+  color:white;
+  background:#201d3b;
+}
+
+.secondary-tools {
+  padding-top:12px;
+  padding-bottom:16px;
+  border-top:1px solid #202d40;
+}
+
+.mini-tool {
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  color:#d4deed;
+  background:#111b2b;
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.danger-text {
+  color:#ff8798;
+}
+
+.settings {
+  border-top:1px solid var(--line);
+  background:#0c1422;
+}
+
+.settings-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px 18px 12px;
+}
+
+.settings-heading h3 {
+  font-size:15px;
+}
+
+.settings-content {
+  padding:0 18px 18px;
+}
+
+.muted {
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.media-toolbar {
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.media-toolbar p {
+  max-width:590px;
+}
+
+.file-button {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  overflow:hidden;
+}
+
+.file-button input {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:pointer;
+}
+
+.media-list {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:9px;
+  margin-top:15px;
+}
+
+.media-item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#111c2c;
+}
+
+.media-thumb {
+  display:grid;
+  flex:0 0 37px;
+  place-items:center;
+  width:37px;
+  height:37px;
+  border-radius:8px;
+  color:var(--cyan);
+  background:#202b42;
+  font-size:17px;
+}
+
+.media-info {
+  flex:1;
+  min-width:0;
+}
+
+.media-info strong {
+  display:block;
+  overflow:hidden;
+  font-size:11px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.media-info small {
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.media-add {
+  padding:5px;
+  border:0;
+  color:var(--cyan);
+  background:transparent;
+  font-size:17px;
+}
+
+.empty-library {
+  grid-column:1/-1;
+  padding:17px;
+  border:1px dashed #34435c;
+  border-radius:10px;
+  color:var(--muted);
+  text-align:center;
+  font-size:12px;
+}
+
+.panel-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width:100%;
+  font-size:12px;
+}
+
+.field textarea {
+  min-height:75px;
+  resize:vertical;
+}
+
+.field input[type=range] {
+  padding:0;
+  accent-color:var(--purple);
+}
+
+.field input[type=color] {
+  height:38px;
+  padding:4px;
+}
+
+.panel-actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:13px;
+}
+
+.field-note {
+  margin:9px 0 0;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.45;
+}
+
+.timeline-heading {
+  padding-bottom:13px;
+}
+
+.timeline-heading h2 {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.pill {
+  padding:4px 8px;
+  border:1px solid #24515e;
+  border-radius:99px;
+  color:var(--cyan);
+  background:#102934;
+  font:600 10px 'DM Sans',sans-serif;
+}
+
+.timeline-actions {
+  gap:6px;
+}
+
+.timeline-actions input {
+  width:78px;
+  accent-color:var(--cyan);
+}
+
+.timeline-scroll {
+  position:relative;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:thin;
+}
+
+.timeline-inner {
+  position:relative;
+  min-width:100%;
+  padding-bottom:6px;
+}
+
+.ruler-row,
+.track-row {
+  display:flex;
+  min-height:55px;
+  border-top:1px solid #202b3e;
+}
+
+.ruler-row {
+  min-height:30px;
+}
+
+.track-label {
+  display:flex;
+  flex:0 0 100px;
+  align-items:center;
+  gap:7px;
+  width:100px;
+  padding:0 12px;
+  border-right:1px solid var(--line);
+  color:#8d9bb1;
+  background:#0d1625;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.track-label span {
+  color:var(--cyan);
+  font-size:14px;
+}
+
+.ruler-label {
+  font-size:8px;
+}
+
+.ruler,
+.track-lane {
+  position:relative;
+  flex:1;
+  min-width:0;
+  background-color:#0b1320;
+  background-image:linear-gradient(to right,#26344a 1px,transparent 1px);
+  background-size:80px 100%;
+}
+
+.ruler {
+  height:30px;
+  color:#75839b;
+  font-size:9px;
+}
+
+.ruler-tick {
+  position:absolute;
+  top:7px;
+  transform:translateX(4px);
+}
+
+.track-lane {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-height:55px;
+  padding:5px;
+}
+
+.lane-placeholder {
+  color:#46546b;
+  font-size:10px;
+  pointer-events:none;
+}
+
+.timeline-clip {
+  position:relative;
+  display:flex;
+  flex:0 0 auto;
+  align-items:center;
+  gap:7px;
+  height:40px;
+  min-width:35px;
+  max-width:100%;
+  overflow:hidden;
+  padding:0 10px;
+  border:1px solid #2d8295;
+  border-radius:7px;
+  color:#e5fbff;
+  background:linear-gradient(100deg,#164052,#18364a);
+  font-size:10px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.timeline-clip.photo {
+  border-color:#7960bb;
+  background:linear-gradient(100deg,#47316f,#2a3157);
+}
+
+.timeline-clip.audio {
+  border-color:#328d79;
+  background:linear-gradient(100deg,#174a42,#153c37);
+}
+
+.timeline-clip.text-clip {
+  border-color:#b18345;
+  background:linear-gradient(100deg,#533c27,#382b23);
+}
+
+.timeline-clip.selected {
+  outline:2px solid var(--cyan);
+  outline-offset:1px;
+}
+
+.clip-duration {
+  opacity:.7;
+  font-size:9px;
+}
+
+.playhead-line {
+  position:absolute;
+  top:30px;
+  bottom:6px;
+  left:100px;
+  z-index:5;
+  width:2px;
+  background:var(--cyan);
+  pointer-events:none;
+  box-shadow:0 0 9px #36e5f588;
+}
+
+.playhead-line span {
+  position:absolute;
+  top:-5px;
+  left:-4px;
+  width:10px;
+  height:10px;
+  border-radius:2px;
+  background:var(--cyan);
+  transform:rotate(45deg);
+}
+
+.timeline-footer {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 17px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:10px;
+}
+
+.bottom-actions {
+  justify-content:space-between;
+  gap:15px;
+  padding:5px 2px 12px;
+}
+
+.footer-brand {
+  gap:9px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.footer-brand .brand-mark {
+  width:30px;
+  height:30px;
+  border-radius:10px;
+  font-size:19px;
+}
+
+.bottom-buttons {
+  gap:8px;
+}
+
+.toast {
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  z-index:100;
+  max-width:calc(100vw - 28px);
+  padding:12px 16px;
+  border-radius:11px;
+  color:#08131c;
+  background:#e8faff;
+  font-size:12px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,20px);
+  transition:.2s;
+}
+
+.toast.show {
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.hidden {
+  display:none!important;
+}
+
+.effect-chip {
+  padding:5px 8px;
+  border:1px solid #574b83;
+  border-radius:7px;
+  color:#c3b0ff;
+  background:#241e3b;
+  font-size:10px;
+}
+
+.export-progress {
+  height:7px;
+  margin-top:10px;
+  overflow:hidden;
+  border-radius:9px;
+  background:#1d2a3d;
+}
+
+.export-progress>span {
+  display:block;
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,var(--purple),var(--cyan));
+  transition:width .15s;
+}
+
+@media(min-width:900px) {
+  .preview-screen {
+    width:min(100%,960px);
+    margin:0 auto;
+  }
+}
+
+@media(max-width:650px) {
+  .app {
+    padding:11px 10px 20px;
+  }
+
+  .topbar {
+    align-items:flex-start;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+
+  .brand {
+    font-size:14px;
+  }
+
+  .brand-mark {
+    width:34px;
+    height:34px;
+  }
+
+  .top-actions {
+    display:grid;
+    grid-template-columns:1fr 1fr 1.35fr;
+    width:100%;
+  }
+
+  .btn {
+    padding:10px 8px;
+    font-size:11px;
+  }
+
+  .section-bar {
+    padding:14px 12px;
+  }
+
+  .section-bar h2 {
+    font-size:15px;
+  }
+
+  .preview-actions {
+    gap:6px;
+  }
+
+  .compact-control {
+    font-size:10px;
+  }
+
+  .compact-control select {
+    padding:7px;
+  }
+
+  .playback {
+    gap:10px;
+    padding:10px 12px;
+  }
+
+  .playback-right {
+    font-size:0;
+  }
+
+  .playback-right .status-dot {
+    width:8px;
+    height:8px;
+  }
+
+  .play-btn {
+    width:34px;
+    height:34px;
+  }
+
+  .icon-btn {
+    width:32px;
+    height:32px;
+  }
+
+  .tool-row {
+    padding-right:12px;
+    padding-left:12px;
+  }
+
+  .tool {
+    min-width:68px;
+    padding:9px 8px;
+  }
+
+  .settings-heading {
+    padding:13px 12px;
+  }
+
+  .settings-content {
+    padding:0 12px 14px;
+  }
+
+  .media-toolbar {
+    align-items:flex-start;
+  }
+
+  .media-toolbar p {
+    flex:1 1 100%;
+  }
+
+  .media-list {
+    grid-template-columns:repeat(auto-fill,minmax(125px,1fr));
+  }
+
+  .timeline-actions {
+    gap:4px;
+  }
+
+  .timeline-actions .icon-btn {
+    width:29px;
+    height:29px;
+  }
+
+  .timeline-actions input {
+    width:55px;
+  }
+
+  .track-label {
+    flex-basis:76px;
+    width:76px;
+    padding:0 8px;
+    font-size:8px;
+  }
+
+  .playhead-line {
+    left:76px;
+  }
+
+  .timeline-footer {
+    padding:10px 12px;
+  }
+
+  .bottom-actions {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .bottom-buttons {
+    width:100%;
+  }
+
+  .bottom-buttons .btn {
+    flex:1;
+  }
+
+  .panel-grid {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .timeline-heading {
+    align-items:flex-start;
+  }
+
+  .timeline-heading .eyebrow {
+    font-size:8px;
+  }
+}
+
+@media(max-width:380px) {
+  .preview-header {
+    align-items:flex-start;
+  }
+
+  .preview-actions {
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+
+  .panel-grid {
+    grid-template-columns:1fr;
+  }
+
+  .time-readout {
+    font-size:11px;
+  }
+
+  .timeline-heading {
+    flex-direction:column;
+  }
+
+  .timeline-actions {
+    width:100%;
+  }
+}
+</style>
 </head>
+
 <body>
-  <main class="app">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="VITALSTAR VE PRO home">
-        <span class="brand-mark">✦</span><span>VITALSTAR <b>VE PRO</b><small>by RexWeb Nexora</small></span>
-      </a>
-      <div class="top-actions">
-        <button class="btn btn-quiet" id="newProject" type="button">＋ New</button>
-        <button class="btn btn-quiet" id="saveProject" type="button">Save</button>
-        <button class="btn btn-primary" id="exportBtn" type="button">Export Video</button>
-      </div>
-    </header>
+<main class="app">
 
-    <section class="preview-section card">
-      <div class="section-bar preview-header">
-        <div><span class="eyebrow">PREVIEW MONITOR</span><h2 id="projectName">Untitled Project</h2></div>
-        <div class="preview-actions">
-          <label class="compact-control">Ratio
-            <select id="aspect">
-              <option value="16:9">16:9</option><option value="9:16">9:16</option>
-              <option value="1:1">1:1</option><option value="4:5">4:5</option>
-            </select>
-          </label>
-          <button class="icon-btn" id="fullscreenBtn" type="button" title="Fullscreen preview" aria-label="Fullscreen preview">⛶</button>
-        </div>
-      </div>
-      <div class="preview-screen" id="stage">
-        <video id="preview" playsinline preload="metadata"></video>
-        <img id="photoPreview" alt="Photo preview">
-        <div id="textOverlay" aria-live="polite"></div>
-        <div class="empty-state" id="emptyState">
-          <span class="empty-icon">▶</span><strong>Your preview appears here</strong>
-          <p>Import a video, photo, or audio file to get started.</p>
-          <button class="btn btn-primary" id="importFromEmpty" type="button">＋ Import media</button>
-        </div>
-      </div>
-      <div class="playback">
-        <div class="playback-left">
-          <button class="icon-btn" id="backFrame" type="button" title="Previous clip">|◀</button>
-          <button class="play-btn" id="playBtn" type="button" aria-label="Play">▶</button>
-          <button class="icon-btn" id="forwardFrame" type="button" title="Next clip">▶|</button>
-        </div>
-        <div class="time-readout"><span id="currentTime">00:00</span><span class="time-divider">/</span><span id="durationTime">00:00</span></div>
-        <div class="playback-right"><span class="status-dot"></span><span id="previewStatus">Ready</span></div>
-      </div>
-    </section>
+<header class="topbar">
+  <a class="brand" href="#" aria-label="VITALSTAR VE PRO home">
+    <span class="brand-mark">✦</span>
+    <span>VITALSTAR <b>VE PRO</b><small>by RexWeb Nexora</small></span>
+  </a>
 
-    <section class="tools-area card">
-      <div class="section-bar tools-heading">
-        <div><span class="eyebrow">WORKSPACE</span><h2>Editing tools</h2></div>
-        <button class="text-btn" id="toggleTools" type="button" aria-expanded="true">Collapse −</button>
+  <div class="top-actions">
+    <button class="btn btn-quiet" id="newProject" type="button">＋ New</button>
+    <button class="btn btn-quiet" id="saveProject" type="button">Save</button>
+    <button class="btn btn-primary" id="exportBtn" type="button">Export Video</button>
+  </div>
+</header>
+
+<section class="preview-section card">
+  <div class="section-bar preview-header">
+    <div>
+      <span class="eyebrow">PREVIEW MONITOR</span>
+      <h2 id="projectName">Untitled Project</h2>
+    </div>
+
+    <div class="preview-actions">
+      <label class="compact-control">Ratio
+        <select id="aspect">
+          <option value="16:9">16:9</option>
+          <option value="9:16">9:16</option>
+          <option value="1:1">1:1</option>
+          <option value="4:5">4:5</option>
+        </select>
+      </label>
+
+      <button class="icon-btn" id="fullscreenBtn" type="button" title="Fullscreen preview" aria-label="Fullscreen preview">⛶</button>
+    </div>
+  </div>
+
+  <div class="preview-screen" id="stage">
+    <video id="preview" playsinline preload="metadata"></video>
+    <img id="photoPreview" alt="Photo preview">
+    <div id="textOverlay" aria-live="polite"></div>
+
+    <div class="empty-state" id="emptyState">
+      <span class="empty-icon">▶</span>
+      <strong>Your preview appears here</strong>
+      <p>Import a video, photo, or audio file to get started.</p>
+      <button class="btn btn-primary" id="importFromEmpty" type="button">＋ Import media</button>
+    </div>
+  </div>
+
+  <div class="playback">
+    <div class="playback-left">
+      <button class="icon-btn" id="backFrame" type="button" title="Previous second">|◀</button>
+      <button class="play-btn" id="playBtn" type="button" aria-label="Play">▶</button>
+      <button class="icon-btn" id="forwardFrame" type="button" title="Next second">▶|</button>
+    </div>
+
+    <div class="time-readout">
+      <span id="currentTime">00:00</span>
+      <span class="time-divider">/</span>
+      <span id="durationTime">00:00</span>
+    </div>
+
+    <div class="playback-right">
+      <span class="status-dot"></span>
+      <span id="previewStatus">Ready</span>
+    </div>
+  </div>
+</section>
+
+<section class="tools-area card">
+  <div class="section-bar tools-heading">
+    <div>
+      <span class="eyebrow">WORKSPACE</span>
+      <h2>Editing tools</h2>
+    </div>
+    <button class="text-btn" id="toggleTools" type="button" aria-expanded="true">Collapse −</button>
+  </div>
+
+  <div id="toolsBody">
+    <div class="tool-row" aria-label="Main editing tools">
+      <button class="tool active" data-panel="media" type="button"><span>▧</span>Media</button>
+      <button class="tool" data-panel="text" type="button"><span>T</span>Text</button>
+      <button class="tool" data-panel="audio" type="button"><span>♫</span>Audio</button>
+      <button class="tool" data-panel="effects" type="button"><span>✧</span>Effects</button>
+      <button class="tool" data-panel="filters" type="button"><span>◐</span>Filters</button>
+      <button class="tool" data-panel="stickers" type="button"><span>☆</span>Stickers</button>
+      <button class="tool" data-panel="captions" type="button"><span>▤</span>Captions</button>
+      <button class="tool" data-panel="transitions" type="button"><span>⇄</span>Transitions</button>
+      <button class="tool" data-panel="settings" type="button"><span>⚙</span>Settings</button>
+    </div>
+
+    <div class="tool-row secondary-tools" aria-label="Clip editing tools">
+      <button class="mini-tool" id="splitBtn" type="button">✂ Split</button>
+      <button class="mini-tool" id="speedTool" type="button">⏩ Speed</button>
+      <button class="mini-tool" id="cropTool" type="button">▣ Crop</button>
+      <button class="mini-tool" id="rotateTool" type="button">↻ Rotate</button>
+      <button class="mini-tool" id="adjustTool" type="button">☼ Adjust</button>
+      <button class="mini-tool" id="duplicateBtn" type="button">▣ Duplicate</button>
+      <button class="mini-tool danger-text" id="deleteBtn" type="button">⌫ Delete</button>
+      <button class="mini-tool" id="trimTool" type="button">↔ Trim</button>
+    </div>
+  </div>
+
+  <div class="settings" id="settingsPanel">
+    <div class="settings-heading">
+      <div>
+        <span class="eyebrow">CONTROL PANEL</span>
+        <h3 id="panelTitle">Media Library</h3>
       </div>
-      <div id="toolsBody">
-        <div class="tool-row" aria-label="Main editing tools">
-          <button class="tool active" data-panel="media" type="button"><span>▧</span>Media</button>
-          <button class="tool" data-panel="text" type="button"><span>T</span>Text</button>
-          <button class="tool" data-panel="audio" type="button"><span>♫</span>Audio</button>
-          <button class="tool" data-panel="effects" type="button"><span>✧</span>Effects</button>
-          <button class="tool" data-panel="filters" type="button"><span>◐</span>Filters</button>
-          <button class="tool" data-panel="stickers" type="button"><span>☆</span>Stickers</button>
-          <button class="tool" data-panel="captions" type="button"><span>▤</span>Captions</button>
-          <button class="tool" data-panel="transitions" type="button"><span>⇄</span>Transitions</button>
-          <button class="tool" data-panel="settings" type="button"><span>⚙</span>Settings</button>
-        </div>
-        <div class="tool-row secondary-tools" aria-label="Clip editing tools">
-          <button class="mini-tool" id="splitBtn" type="button">✂ Split</button>
-          <button class="mini-tool" id="speedTool" type="button">⏩ Speed</button>
-          <button class="mini-tool" id="cropTool" type="button">▣ Crop</button>
-          <button class="mini-tool" id="rotateTool" type="button">↻ Rotate</button>
-          <button class="mini-tool" id="adjustTool" type="button">☼ Adjust</button>
-          <button class="mini-tool" id="duplicateBtn" type="button">▣ Duplicate</button>
-          <button class="mini-tool danger-text" id="deleteBtn" type="button">⌫ Delete</button>
-          <button class="mini-tool" id="trimTool" type="button">↔ Trim</button>
-        </div>
+      <button class="icon-btn" id="collapsePanel" type="button" aria-label="Collapse settings panel">⌃</button>
+    </div>
+
+    <div class="settings-content" id="panelContent">
+      <div class="media-toolbar">
+        <p class="muted">Import media from your device to start editing.</p>
+        <label class="btn btn-primary file-button">
+          ＋ Import media
+          <input id="mediaInput" type="file" accept="video/*,image/*,audio/*" multiple>
+        </label>
+      </div>
+      <div id="mediaList" class="media-list">
+        <div class="empty-library">No media imported yet.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="timeline-section card">
+  <div class="section-bar timeline-heading">
+    <div>
+      <span class="eyebrow">MULTI-TRACK EDITOR</span>
+      <h2>Timeline <span class="pill" id="clipCount">0 clips</span></h2>
+    </div>
+
+    <div class="timeline-actions">
+      <button class="icon-btn" id="undoBtn" type="button" title="Undo" aria-label="Undo">↶</button>
+      <button class="icon-btn" id="redoBtn" type="button" title="Redo" aria-label="Redo">↷</button>
+      <button class="icon-btn" id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+      <input id="zoomRange" type="range" min="40" max="180" value="80" aria-label="Timeline zoom">
+      <button class="icon-btn" id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in">＋</button>
+    </div>
+  </div>
+
+  <div class="timeline-scroll" id="timelineScroll">
+    <div class="timeline-inner" id="timelineInner">
+      <div class="ruler-row">
+        <div class="track-label ruler-label">TIME</div>
+        <div class="ruler" id="ruler"></div>
       </div>
 
-      <div class="settings" id="settingsPanel">
-        <div class="settings-heading">
-          <div><span class="eyebrow">CONTROL PANEL</span><h3 id="panelTitle">Media Library</h3></div>
-          <button class="icon-btn" id="collapsePanel" type="button" aria-label="Collapse settings panel">⌃</button>
-        </div>
-        <div class="settings-content" id="panelContent">
-          <div class="media-toolbar">
-            <p class="muted">Import files from your device. Media stays in this browser session unless you save the project file.</p>
-            <label class="btn btn-primary file-button">＋ Import media<input id="mediaInput" type="file" accept="video/*,image/*,audio/*" multiple></label>
-          </div>
-          <div id="mediaList" class="media-list"><div class="empty-library">No media imported yet.</div></div>
-        </div>
+      <div class="track-row">
+        <div class="track-label"><span>▣</span> VIDEO</div>
+        <div class="track-lane" id="videoTrack"><span class="lane-placeholder">Import video or photos</span></div>
       </div>
-    </section>
 
-    <section class="timeline-section card">
-      <div class="section-bar timeline-heading">
-        <div><span class="eyebrow">MULTI-TRACK EDITOR</span><h2>Timeline <span class="pill" id="clipCount">0 clips</span></h2></div>
-        <div class="timeline-actions">
-          <button class="icon-btn" id="undoBtn" type="button" title="Undo" aria-label="Undo">↶</button>
-          <button class="icon-btn" id="redoBtn" type="button" title="Redo" aria-label="Redo">↷</button>
-          <button class="icon-btn" id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>
-          <input id="zoomRange" type="range" min="40" max="180" value="80" aria-label="Timeline zoom">
-          <button class="icon-btn" id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in">＋</button>
-        </div>
+      <div class="track-row">
+        <div class="track-label"><span>T</span> OVERLAY</div>
+        <div class="track-lane" id="textTrack"><span class="lane-placeholder">Text overlays appear here</span></div>
       </div>
-      <div class="timeline-scroll" id="timelineScroll">
-        <div class="timeline-inner" id="timelineInner">
-          <div class="ruler-row"><div class="track-label ruler-label">TIME</div><div class="ruler" id="ruler"></div></div>
-          <div class="track-row"><div class="track-label"><span>▣</span> VIDEO</div><div class="track-lane" id="videoTrack"><span class="lane-placeholder">Import video or photos</span></div></div>
-          <div class="track-row"><div class="track-label"><span>T</span> OVERLAY</div><div class="track-lane" id="textTrack"><span class="lane-placeholder">Text overlays appear here</span></div></div>
-          <div class="track-row"><div class="track-label"><span>♫</span> AUDIO</div><div class="track-lane" id="audioTrack"><span class="lane-placeholder">Add audio from the Audio tool</span></div></div>
-          <div class="track-row"><div class="track-label"><span>✧</span> EFFECTS</div><div class="track-lane" id="effectsTrack"><span class="lane-placeholder">Choose an effect to apply</span></div></div>
-          <div class="playhead-line" id="playhead"><span></span></div>
-        </div>
-      </div>
-      <div class="timeline-footer"><span id="timelineStatus">Select a clip to edit it.</span><span>Tap a clip to select it</span></div>
-    </section>
 
-    <footer class="bottom-actions">
-      <div class="footer-brand"><span class="brand-mark">✦</span><span>VITALSTAR VE PRO<small>Creativity Meets Technology</small></span></div>
-      <div class="bottom-buttons"><button class="btn btn-quiet" id="saveProjectBottom" type="button">Save Project</button><button class="btn btn-primary" id="exportBottom" type="button">Export Video ↗</button></div>
-    </footer>
-  </main>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <input id="projectOpenInput" type="file" accept=".json,application/json" hidden>
-  <script src="app.js"></script>
+      <div class="track-row">
+        <div class="track-label"><span>♫</span> AUDIO</div>
+        <div class="track-lane" id="audioTrack"><span class="lane-placeholder">Add audio from the Audio tool</span></div>
+      </div>
+
+      <div class="track-row">
+        <div class="track-label"><span>✧</span> EFFECTS</div>
+        <div class="track-lane" id="effectsTrack"><span class="lane-placeholder">Choose an effect to apply</span></div>
+      </div>
+
+      <div class="playhead-line" id="playhead"><span></span></div>
+    </div>
+  </div>
+
+  <div class="timeline-footer">
+    <span id="timelineStatus">Select a clip to edit it.</span>
+    <span>Tap a clip to select it</span>
+  </div>
+</section>
+
+<footer class="bottom-actions">
+  <div class="footer-brand">
+    <span class="brand-mark">✦</span>
+    <span>VITALSTAR VE PRO<small>Creativity Meets Technology</small></span>
+  </div>
+
+  <div class="bottom-buttons">
+    <button class="btn btn-quiet" id="saveProjectBottom" type="button">Save Project</button>
+    <button class="btn btn-primary" id="exportBottom" type="button">Export Video ↗</button>
+  </div>
+</footer>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input id="projectOpenInput" type="file" accept=".json,application/json" hidden>
+
+<script src="app.js"></script>
 </body>
 </html>
