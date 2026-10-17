@@ -1,2079 +1,280 @@
-/* ==========================================================
-   VITALSTAR VE PRO — VIDEO EDITOR ENGINE
-   RexWeb Nexora
-   Features:
-   - Video, image and audio import
-   - Timeline clip selection and playback
-   - Split, delete, undo and redo
-   - Playback speed control
-   - Text overlays and animations
-   - Brightness, contrast and grayscale
-   - Rotation controls
-   - Project save and restore
-   - Responsive timeline and preview
-   - Honest export status
-   ========================================================== */
-
 (() => {
-  "use strict";
-
-  const $ = (selector) => document.querySelector(selector);
-  const $$ = (selector) => [...document.querySelectorAll(selector)];
-
-  const STORAGE_KEY = "vitalstar_ve_pro_project_v2";
-
+  'use strict';
+  const $ = (id) => document.getElementById(id);
   const state = {
-    media: [],
-    clips: [],
-    selectedClipId: null,
-    currentPanel: "media",
-    nextId: 1,
-    zoom: 1,
-    playing: false,
-    history: [],
-    historyIndex: -1,
-    projectName: "My Video Project",
-    playhead: 0,
-    speed: 1,
-    adjustments: {
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      rotation: 0
-    },
-    animationFrame: null,
-    lastTick: 0,
-    toastTimer: null,
-    objectUrls: new Set()
+    media: [], clips: [], textItems: [], effects: [], selectedId: null,
+    zoom: 80, playhead: 0, playing: false, currentPanel: 'media',
+    speed: 1, rotation: 0, brightness: 100, contrast: 100, grayscale: 0,
+    history: [], future: [], objectUrls: [], exportCancelled: false
   };
+  const preview = $('preview'), photo = $('photoPreview'), overlay = $('textOverlay');
+  let toastTimer, playbackTimer = null, activeMediaId = null, lastPreviewTime = 0;
 
-  const el = {
-    newProject: $("#newProject"),
-    saveProject: $("#saveProject"),
-    exportBtn: $("#exportBtn"),
-    projectName: $("#projectName"),
-    aspect: $("#aspect"),
-
-    mediaInput: $("#mediaInput"),
-    mediaList: $("#mediaList"),
-    panelTitle: $("#panelTitle"),
-    panelContent: $("#panelContent"),
-
-    stage: $("#stage"),
-    preview: $("#preview"),
-    photoPreview: $("#photoPreview"),
-    emptyState: $("#emptyState"),
-    textOverlay: $("#textOverlay"),
-
-    backFrame: $("#backFrame"),
-    playBtn: $("#playBtn"),
-    forwardFrame: $("#forwardFrame"),
-    timeReadout: $("#timeReadout"),
-    undoBtn: $("#undoBtn"),
-    redoBtn: $("#redoBtn"),
-
-    splitBtn: $("#splitBtn"),
-    deleteBtn: $("#deleteBtn"),
-    zoomOut: $("#zoomOut"),
-    zoomIn: $("#zoomIn"),
-    zoomRange: $("#zoomRange"),
-
-    videoTrack: $("#videoTrack"),
-    textTrack: $("#textTrack"),
-    audioTrack: $("#audioTrack"),
-    ruler: $("#ruler"),
-    playhead: $("#playhead"),
-    clipCount: $("#clipCount"),
-    currentTime: $("#currentTime"),
-
-    toast: $("#toast")
-  };
-
-  const missing = Object.entries(el)
-    .filter(([, element]) => !element)
-    .map(([name]) => name);
-
-  if (missing.length) {
-    console.warn(
-      "Vitalstar VE Pro: Some HTML elements were not found:",
-      missing.join(", ")
-    );
+  function toast(message) {
+    const node = $('toast'); node.textContent = message; node.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove('show'), 2800);
   }
-
-  function notify(message, duration = 2600) {
-    if (!el.toast) {
-      console.log("[Vitalstar VE Pro]", message);
-      return;
-    }
-
-    el.toast.textContent = message;
-    el.toast.classList.add("show");
-
-    clearTimeout(state.toastTimer);
-
-    state.toastTimer = setTimeout(() => {
-      el.toast.classList.remove("show");
-    }, duration);
+  function fmt(seconds) {
+    seconds = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+    const mins = Math.floor(seconds / 60), secs = Math.floor(seconds % 60);
+    return String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
   }
-
-  function makeId() {
-    return state.nextId++;
+  function makeId() { return 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function durationOf(media) { return media && media.duration && Number.isFinite(media.duration) ? media.duration : 5; }
+  function mediaById(id) { return state.media.find(m => m.id === id); }
+  function selectedClip() { return state.clips.find(c => c.id === state.selectedId) || null; }
+  function totalDuration() {
+    return state.clips.reduce((sum,c) => sum + Math.max(.1, Number(c.duration)||0), 0) || 0;
   }
-
-  function formatTime(seconds) {
-    seconds = Math.max(0, Number(seconds) || 0);
-
-    const minutes = Math.floor(seconds / 60);
-    const remaining = Math.floor(seconds % 60);
-    const frames = Math.floor((seconds % 1) * 30);
-
-    return (
-      String(minutes).padStart(2, "0") +
-      ":" +
-      String(remaining).padStart(2, "0") +
-      "." +
-      String(frames).padStart(2, "0")
-    );
+  function clipStartAt(id) {
+    let t = 0;
+    for (const c of state.clips) { if (c.id === id) return t; t += c.duration; }
+    return 0;
   }
-
-  function getSelectedClip() {
-    return state.clips.find(
-      (clip) => clip.id === state.selectedClipId
-    ) || null;
+  function snapshot() {
+    state.history.push(JSON.stringify({clips:state.clips,textItems:state.textItems,effects:state.effects,selectedId:state.selectedId}));
+    if (state.history.length > 30) state.history.shift();
+    state.future = [];
+    updateUndoRedo();
   }
-
-  function getMedia(mediaId) {
-    return state.media.find((item) => item.id === mediaId) || null;
-  }
-
-  function getClipDuration(clip) {
-    return Math.max(0.1, (clip.end || 0) - (clip.start || 0));
-  }
-
-  function getTimelineDuration() {
-    if (!state.clips.length) return 0;
-
-    return Math.max(
-      0,
-      ...state.clips.map((clip) => Number(clip.end) || 0)
-    );
-  }
-
-  function createObjectUrl(file) {
-    const url = URL.createObjectURL(file);
-    state.objectUrls.add(url);
-    return url;
-  }
-
-  function revokeObjectUrl(url) {
-    if (!url || !state.objectUrls.has(url)) return;
-
-    URL.revokeObjectURL(url);
-    state.objectUrls.delete(url);
-  }
-
-  function captureSnapshot() {
-    return JSON.stringify({
-      clips: state.clips,
-      selectedClipId: state.selectedClipId,
-      nextId: state.nextId,
-      projectName: state.projectName,
-      adjustments: state.adjustments,
-      speed: state.speed
-    });
-  }
-
-  function saveHistory() {
-    const snapshot = captureSnapshot();
-
-    if (
-      state.history[state.historyIndex] === snapshot
-    ) {
-      return;
-    }
-
-    state.history = state.history.slice(
-      0,
-      state.historyIndex + 1
-    );
-
-    state.history.push(snapshot);
-
-    if (state.history.length > 60) {
-      state.history.shift();
-    }
-
-    state.historyIndex = state.history.length - 1;
-
-    updateUndoRedoButtons();
-  }
-
-  function restoreSnapshot(snapshot) {
+  function restoreSnapshot(raw) {
     try {
-      const data = JSON.parse(snapshot);
-
-      state.clips = Array.isArray(data.clips)
-        ? data.clips
-        : [];
-
-      state.selectedClipId = data.selectedClipId ?? null;
-      state.nextId = Math.max(
-        Number(data.nextId) || 1,
-        state.nextId
-      );
-
-      state.projectName =
-        data.projectName || "My Video Project";
-
-      state.adjustments = {
-        brightness: 100,
-        contrast: 100,
-        grayscale: 0,
-        rotation: 0,
-        ...(data.adjustments || {})
-      };
-
-      state.speed = Number(data.speed) || 1;
-
-      if (el.projectName) {
-        el.projectName.textContent = state.projectName;
-      }
-
-      renderTimeline();
-      updatePreview();
-      applyAdjustments();
-      updateUndoRedoButtons();
-    } catch (error) {
-      console.error("Could not restore edit history:", error);
-    }
+      const d = JSON.parse(raw); state.clips=d.clips||[]; state.textItems=d.textItems||[]; state.effects=d.effects||[]; state.selectedId=d.selectedId||null;
+      renderTimeline(); updateOverlay(); updateUndoRedo(); syncSelectedProperties();
+    } catch(e) { toast('Could not restore that edit.'); }
   }
-
-  function updateUndoRedoButtons() {
-    if (el.undoBtn) {
-      el.undoBtn.disabled = state.historyIndex <= 0;
+  function updateUndoRedo() { $('undoBtn').disabled = !state.history.length; $('redoBtn').disabled = !state.future.length; }
+  function addMedia(file) {
+    const url = URL.createObjectURL(file); state.objectUrls.push(url);
+    const item = {id:makeId(),name:file.name,type:file.type.startsWith('video/')?'video':file.type.startsWith('image/')?'image':file.type.startsWith('audio/')?'audio':'other',url,size:file.size,duration:0,mime:file.type};
+    state.media.push(item);
+    if (item.type === 'video' || item.type === 'audio') {
+      const probe = document.createElement(item.type); probe.preload='metadata'; probe.src=url;
+      probe.onloadedmetadata = () => { item.duration = Number.isFinite(probe.duration) ? probe.duration : 0; renderMedia(); };
+      probe.onerror = () => renderMedia();
     }
-
-    if (el.redoBtn) {
-      el.redoBtn.disabled =
-        state.historyIndex >= state.history.length - 1;
-    }
+    renderMedia();
+    if (item.type === 'video' || item.type === 'image') addClip(item.id);
+    else if (item.type === 'audio') { snapshot(); state.clips.push({id:makeId(),mediaId:item.id,type:'audio',name:item.name,duration:durationOf(item),speed:1,volume:1,start:0,end:durationOf(item)}); renderTimeline(); }
   }
-
-  function undo() {
-    if (state.historyIndex <= 0) {
-      notify("Nothing to undo.");
-      return;
-    }
-
-    state.historyIndex--;
-    restoreSnapshot(state.history[state.historyIndex]);
-    notify("Undo successful.");
+  function importFiles(files) {
+    const valid = Array.from(files || []).filter(f => /^(video|image|audio)\//.test(f.type));
+    if (!valid.length) { toast('Choose a video, photo, or audio file.'); return; }
+    valid.forEach(addMedia);
+    $('mediaInput').value = '';
+    toast(valid.length + ' file' + (valid.length===1?'':'s') + ' imported.');
   }
-
-  function redo() {
-    if (state.historyIndex >= state.history.length - 1) {
-      notify("Nothing to redo.");
-      return;
-    }
-
-    state.historyIndex++;
-    restoreSnapshot(state.history[state.historyIndex]);
-    notify("Redo successful.");
+  function addClip(mediaId) {
+    const m = mediaById(mediaId); if (!m || !['video','image'].includes(m.type)) return;
+    snapshot();
+    const duration = m.type === 'image' ? 5 : durationOf(m);
+    const clip = {id:makeId(),mediaId:m.id,type:m.type,name:m.name,duration,speed:1,volume:1,start:0,end:duration,rotation:0};
+    state.clips.push(clip); state.selectedId=clip.id; renderTimeline(); selectClip(clip.id); setPlayhead(clipStartAt(clip.id), true);
   }
-
-  /* ----------------------------------------------------------
-     MEDIA IMPORT
-     ---------------------------------------------------------- */
-
-  function detectMediaType(file) {
-    if (file.type.startsWith("video/")) return "video";
-    if (file.type.startsWith("image/")) return "image";
-    if (file.type.startsWith("audio/")) return "audio";
-
-    return null;
-  }
-
-  function importFiles(fileList) {
-    const files = [...fileList];
-
-    if (!files.length) return;
-
-    let imported = 0;
-
-    for (const file of files) {
-      const type = detectMediaType(file);
-
-      if (!type) {
-        continue;
-      }
-
-      const item = {
-        id: makeId(),
-        name: file.name,
-        type,
-        file,
-        url: createObjectUrl(file),
-        duration: type === "image" ? 5 : 0,
-        size: file.size,
-        mime: file.type
-      };
-
-      state.media.push(item);
-      imported++;
-
-      if (type === "video" || type === "audio") {
-        readMediaDuration(item);
-      }
-    }
-
-    renderMediaList();
-
-    if (el.mediaInput) {
-      el.mediaInput.value = "";
-    }
-
-    if (imported) {
-      notify(
-        `${imported} media file${imported === 1 ? "" : "s"} imported.`
-      );
-
-      switchPanel("media");
-    } else {
-      notify("Choose a supported video, image or audio file.");
-    }
-  }
-
-  function readMediaDuration(item) {
-    const probe = document.createElement(
-      item.type === "audio" ? "audio" : "video"
-    );
-
-    probe.preload = "metadata";
-    probe.src = item.url;
-
-    probe.addEventListener(
-      "loadedmetadata",
-      () => {
-        if (
-          Number.isFinite(probe.duration) &&
-          probe.duration > 0
-        ) {
-          item.duration = probe.duration;
-          renderMediaList();
-        }
-
-        probe.removeAttribute("src");
-        probe.load();
-      },
-      { once: true }
-    );
-
-    probe.addEventListener(
-      "error",
-      () => {
-        console.warn("Could not read media metadata:", item.name);
-      },
-      { once: true }
-    );
-  }
-
-  function renderMediaList() {
-    if (!el.mediaList) return;
-
-    el.mediaList.innerHTML = "";
-
-    if (!state.media.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-media";
-      empty.textContent = "Import videos, photos or audio to begin.";
-      el.mediaList.appendChild(empty);
-      return;
-    }
-
-    state.media.forEach((item) => {
-      const card = document.createElement("div");
-      card.className = "media-item";
-      card.dataset.mediaId = item.id;
-
-      const icon = document.createElement("span");
-      icon.className = "media-icon";
-      icon.textContent =
-        item.type === "video"
-          ? "🎬"
-          : item.type === "image"
-            ? "🖼️"
-            : "🎵";
-
-      const info = document.createElement("div");
-      info.className = "media-info";
-
-      const name = document.createElement("div");
-      name.className = "media-name";
-      name.textContent = item.name;
-      name.title = item.name;
-
-      const meta = document.createElement("small");
-      meta.textContent =
-        item.type.toUpperCase() +
-        (item.duration ? ` • ${formatTime(item.duration)}` : "");
-
-      info.append(name, meta);
-
-      const addButton = document.createElement("button");
-      addButton.type = "button";
-      addButton.className = "media-add";
-      addButton.textContent = "+";
-      addButton.title = "Add to timeline";
-
-      addButton.addEventListener("click", () => {
-        addMediaToTimeline(item.id);
-      });
-
-      card.append(icon, info, addButton);
-
-      card.addEventListener("dblclick", () => {
-        addMediaToTimeline(item.id);
-      });
-
-      el.mediaList.appendChild(card);
+  function renderMedia() {
+    const list=$('mediaList'); list.innerHTML='';
+    if (!state.media.length) { list.innerHTML='<div class="empty-library">No media imported yet.</div>'; return; }
+    state.media.forEach(m => {
+      const item=document.createElement('div'); item.className='media-item';
+      const icon=m.type==='video'?'▶':m.type==='image'?'▧':'♫';
+      const info=document.createElement('div'); info.className='media-info';
+      const name=document.createElement('strong'); name.textContent=m.name;
+      const meta=document.createElement('small'); meta.textContent=m.type.toUpperCase()+' · '+(m.size/1024/1024).toFixed(1)+' MB';
+      info.append(name,meta);
+      const thumb=document.createElement('div'); thumb.className='media-thumb'; thumb.textContent=icon;
+      const add=document.createElement('button'); add.className='media-add'; add.type='button'; add.textContent='＋'; add.title='Add to timeline';
+      add.onclick=()=>{ if(m.type==='video'||m.type==='image') addClip(m.id); else { snapshot(); state.clips.push({id:makeId(),mediaId:m.id,type:'audio',name:m.name,duration:durationOf(m),speed:1,volume:1,start:0,end:durationOf(m)}); renderTimeline(); toast('Audio added to the audio track.'); } };
+      item.append(thumb,info,add); list.append(item);
     });
   }
-
-  /* ----------------------------------------------------------
-     TIMELINE
-     ---------------------------------------------------------- */
-
-  function addMediaToTimeline(mediaId) {
-    const item = getMedia(mediaId);
-
-    if (!item) {
-      notify("Media file not found.");
-      return;
-    }
-
-    const duration =
-      item.type === "image"
-        ? 5
-        : Math.max(0.1, Number(item.duration) || 5);
-
-    const start = getTimelineDuration();
-
-    const clip = {
-      id: makeId(),
-      mediaId: item.id,
-      name: item.name,
-      type: item.type,
-      start,
-      end: start + duration,
-      duration,
-      text: "",
-      textColor: "#ffffff",
-      textSize: 32,
-      textAnimation: "none",
-      volume: 1,
-      muted: false,
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      rotation: 0
-    };
-
-    state.clips.push(clip);
-    state.selectedClipId = clip.id;
-    state.playhead = clip.start;
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-
-    notify("Clip added to timeline.");
-  }
-
-  function selectClip(clipId) {
-    const clip = state.clips.find(
-      (item) => item.id === Number(clipId)
-    );
-
-    if (!clip) return;
-
-    state.selectedClipId = clip.id;
-    state.playhead = clip.start;
-
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-  }
-
-  function deleteSelectedClip() {
-    const clip = getSelectedClip();
-
-    if (!clip) {
-      notify("Select a timeline clip first.");
-      return;
-    }
-
-    stopPlayback();
-
-    state.clips = state.clips.filter(
-      (item) => item.id !== clip.id
-    );
-
-    state.selectedClipId = null;
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-
-    notify("Clip deleted.");
-  }
-
-  function splitSelectedClip() {
-    const clip = getSelectedClip();
-
-    if (!clip) {
-      notify("Select a clip to split.");
-      return;
-    }
-
-    const splitAt = state.playhead;
-
-    if (
-      splitAt <= clip.start + 0.05 ||
-      splitAt >= clip.end - 0.05
-    ) {
-      notify("Move the playhead inside the selected clip first.");
-      return;
-    }
-
-    const originalEnd = clip.end;
-
-    const second = {
-      ...clip,
-      id: makeId(),
-      name: clip.name,
-      start: splitAt,
-      end: originalEnd
-    };
-
-    clip.end = splitAt;
-
-    state.clips.push(second);
-    state.selectedClipId = second.id;
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-
-    notify("Clip split successfully.");
-  }
-
   function renderTimeline() {
-    renderTrack(el.videoTrack, ["video", "image"]);
-    renderTrack(el.textTrack, ["text"]);
-    renderTrack(el.audioTrack, ["audio"]);
-
-    renderRuler();
-    updatePlayheadUI();
-
-    if (el.clipCount) {
-      el.clipCount.textContent =
-        `${state.clips.length} clip${state.clips.length === 1 ? "" : "s"}`;
-    }
-  }
-
-  function renderTrack(track, types) {
-    if (!track) return;
-
-    track.innerHTML = "";
-
-    const clips = state.clips.filter((clip) => {
-      if (types.includes("text")) {
-        return clip.type !== "audio" && Boolean(clip.text);
-      }
-
-      return types.includes(clip.type);
+    const zoom=state.zoom, total=Math.max(12,totalDuration()), pxPerSec=zoom/5;
+    const innerWidth=Math.max(520,total*pxPerSec+80);
+    $('timelineInner').style.width=(100+innerWidth)+'px';
+    ['videoTrack','audioTrack','textTrack','effectsTrack'].forEach(id=>{ const n=$(id); n.innerHTML=''; });
+    const video=$('videoTrack'), audio=$('audioTrack'), text=$('textTrack'), effects=$('effectsTrack');
+    let cursor=0;
+    state.clips.forEach(c=>{
+      const lane=c.type==='audio'?audio:video;
+      const el=document.createElement('button'); el.type='button'; el.className='timeline-clip '+(c.type==='image'?'photo':'')+(c.type==='audio'?' audio':'')+(c.id===state.selectedId?' selected':'');
+      el.style.width=Math.max(40,c.duration*pxPerSec)+'px'; el.title=c.name+' · '+fmt(c.duration);
+      const label=document.createElement('span'); label.textContent=(c.type==='audio'?'♫ ':c.type==='image'?'▧ ':'▶ ')+c.name;
+      const dur=document.createElement('span'); dur.className='clip-duration'; dur.textContent=fmt(c.duration);
+      el.append(label,dur); el.onclick=()=>{selectClip(c.id);setPlayhead(clipStartAt(c.id),true);};
+      lane.append(el); cursor+=c.duration;
     });
-
-    if (!clips.length) {
-      const empty = document.createElement("div");
-      empty.className = "track-empty";
-      empty.textContent =
-        types.includes("audio")
-          ? "Add audio here"
-          : types.includes("text")
-            ? "Text overlays appear here"
-            : "Add video or images here";
-
-      track.appendChild(empty);
-      return;
-    }
-
-    clips.forEach((clip) => {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "timeline-clip";
-      item.dataset.clipId = clip.id;
-
-      if (clip.id === state.selectedClipId) {
-        item.classList.add("selected");
-      }
-
-      const left = Math.max(0, clip.start * state.zoom * 30);
-      const width = Math.max(
-        48,
-        getClipDuration(clip) * state.zoom * 30
-      );
-
-      item.style.position = "absolute";
-      item.style.left = `${left}px`;
-      item.style.width = `${width}px`;
-      item.style.overflow = "hidden";
-
-      const label = document.createElement("span");
-      label.className = "clip-label";
-
-      if (clip.type === "text") {
-        label.textContent = `T: ${clip.text}`;
-      } else {
-        label.textContent = clip.name;
-      }
-
-      item.appendChild(label);
-
-      item.addEventListener("click", (event) => {
-        event.stopPropagation();
-        selectClip(clip.id);
-      });
-
-      item.addEventListener("dblclick", (event) => {
-        event.stopPropagation();
-        selectClip(clip.id);
-        renderSelectedClipProperties();
-      });
-
-      track.appendChild(item);
+    state.textItems.forEach(t=>{
+      const el=document.createElement('button'); el.type='button'; el.className='timeline-clip text-clip'+(t.id===state.selectedId?' selected':'');
+      el.style.width=Math.max(50,(t.duration||3)*pxPerSec)+'px'; el.textContent='T · '+(t.text||'Text overlay').slice(0,25); el.onclick=()=>{state.selectedId=t.id;renderTimeline();showPanel('text');populateTextPanel(t);}; text.append(el);
     });
-
-    track.style.position = "relative";
-    track.style.minWidth =
-      `${Math.max(600, getTimelineDuration() * state.zoom * 30 + 100)}px`;
+    state.effects.forEach(e=>{const el=document.createElement('span');el.className='effect-chip';el.textContent=e.name;effects.append(el);});
+    if(!video.children.length) video.innerHTML='<span class="lane-placeholder">Import video or photos</span>';
+    if(!audio.children.length) audio.innerHTML='<span class="lane-placeholder">Add audio from the Audio tool</span>';
+    if(!text.children.length) text.innerHTML='<span class="lane-placeholder">Text overlays appear here</span>';
+    if(!effects.children.length) effects.innerHTML='<span class="lane-placeholder">Choose an effect to apply</span>';
+    const maxWidth=100+innerWidth;
+    $('ruler').innerHTML='';
+    const seconds=Math.ceil(total+3);
+    for(let s=0;s<=seconds;s+=Math.max(1,Math.round(80/pxPerSec))){
+      const tick=document.createElement('span');tick.className='ruler-tick';tick.style.left=(s*pxPerSec)+'px';tick.textContent=fmt(s);$('ruler').append(tick);
+    }
+    $('playhead').style.left=(100+state.playhead*pxPerSec)+'px';
+    $('clipCount').textContent=state.clips.length+' clip'+(state.clips.length===1?'':'s');
+    $('durationTime').textContent=fmt(total);
+    $('currentTime').textContent=fmt(state.playhead);
+    $('timelineStatus').textContent=selectedClip()?('Selected: '+selectedClip().name):'Select a clip to edit it.';
+    updateUndoRedo();
   }
-
-  function renderRuler() {
-    if (!el.ruler) return;
-
-    el.ruler.innerHTML = "";
-
-    const duration = Math.max(10, getTimelineDuration());
-    const interval = duration > 120 ? 10 : duration > 60 ? 5 : 1;
-
-    for (let seconds = 0; seconds <= duration; seconds += interval) {
-      const tick = document.createElement("span");
-      tick.className = "ruler-tick";
-      tick.style.position = "absolute";
-      tick.style.left = `${seconds * state.zoom * 30}px`;
-      tick.textContent = `${seconds}s`;
-
-      el.ruler.appendChild(tick);
-    }
-
-    el.ruler.style.position = "relative";
-    el.ruler.style.minWidth =
-      `${Math.max(600, duration * state.zoom * 30 + 100)}px`;
+  function selectClip(id) {
+    state.selectedId=id; renderTimeline(); syncSelectedProperties();
+    const c=state.clips.find(x=>x.id===id);
+    if(c){ if(c.type==='audio') showPanel('audio'); else showPanel('media'); }
   }
-
-  function updatePlayheadUI() {
-    const position = state.playhead * state.zoom * 30;
-
-    if (el.playhead) {
-      el.playhead.style.left = `${position}px`;
-    }
-
-    if (el.currentTime) {
-      el.currentTime.textContent = formatTime(state.playhead);
-    }
-
-    if (el.timeReadout) {
-      el.timeReadout.textContent =
-        `${formatTime(state.playhead)} / ${formatTime(getTimelineDuration())}`;
-    }
+  function syncSelectedProperties() {
+    const c=selectedClip();
+    $('timelineStatus').textContent=c?'Selected: '+c.name:'Select a clip to edit it.';
+    if(c && c.type!=='audio') loadPreview(c);
   }
-
-  function setZoom(value) {
-    state.zoom = Math.min(4, Math.max(0.25, Number(value) || 1));
-
-    if (el.zoomRange) {
-      el.zoomRange.value = String(state.zoom);
+  function loadPreview(c) {
+    const m=mediaById(c.mediaId); if(!m)return;
+    activeMediaId=m.id; $('emptyState').classList.add('hidden'); preview.style.display='none';photo.style.display='none';
+    if(m.type==='video'){
+      if(preview.src!==m.url){preview.pause();preview.src=m.url;preview.load();}
+      preview.style.display='block';preview.playbackRate=c.speed||1;preview.volume=Number(c.volume??1);
+      try{preview.currentTime=Math.min(c.start||0,Math.max(0,(m.duration||1)-.05));}catch(e){}
+    } else if(m.type==='image'){
+      photo.src=m.url;photo.style.display='block';
     }
-
-    renderTimeline();
+    applyPreviewStyle();
+    updateOverlay();
+    $('previewStatus').textContent=m.type==='image'?'Photo selected':'Video selected';
   }
-
-  /* ----------------------------------------------------------
-     PREVIEW
-     ---------------------------------------------------------- */
-
-  function findClipAtTime(time) {
-    return state.clips.find(
-      (clip) => time >= clip.start && time < clip.end
-    ) || null;
+  function applyPreviewStyle() {
+    const filter=`brightness(${state.brightness}%) contrast(${state.contrast}%) grayscale(${state.grayscale}%)`;
+    preview.style.filter=filter;photo.style.filter=filter;
+    preview.style.transform=`rotate(${state.rotation}deg)`;photo.style.transform=`rotate(${state.rotation}deg)`;
   }
-
-  function updatePreview() {
-    const clip = findClipAtTime(state.playhead);
-
-    if (!clip) {
-      if (el.preview) {
-        el.preview.pause();
-        el.preview.hidden = true;
-      }
-
-      if (el.photoPreview) {
-        el.photoPreview.hidden = true;
-      }
-
-      if (el.emptyState) {
-        el.emptyState.hidden = false;
-      }
-
-      if (el.textOverlay) {
-        el.textOverlay.textContent = "";
-        el.textOverlay.hidden = true;
-      }
-
-      updatePlayheadUI();
-      return;
+  function setPlayhead(time, updateMedia=false) {
+    state.playhead=Math.max(0,Math.min(totalDuration(),Number(time)||0));
+    if(updateMedia){
+      let start=0, chosen=null;
+      for(const c of state.clips){if(c.type!=='audio'&&state.playhead>=start&&state.playhead<=start+c.duration){chosen=c;break;}start+=c.duration;}
+      if(chosen){if(chosen.id!==state.selectedId){state.selectedId=chosen.id;renderTimeline();syncSelectedProperties();}const m=mediaById(chosen.mediaId);if(m&&m.type==='video'&&preview.src===m.url){const local=Math.max(0,state.playhead-clipStartAt(chosen.id));try{preview.currentTime=Math.min((chosen.start||0)+local,Math.max(0,(m.duration||1)-.05));}catch(e){}}}
     }
-
-    const item = getMedia(clip.mediaId);
-
-    if (!item) {
-      if (el.emptyState) {
-        el.emptyState.hidden = false;
-        el.emptyState.textContent =
-          "This clip's original media is unavailable. Re-import the file.";
-      }
-
-      return;
-    }
-
-    if (el.emptyState) {
-      el.emptyState.hidden = true;
-    }
-
-    if (clip.type === "video") {
-      showVideo(item, clip);
-    } else if (clip.type === "image") {
-      showImage(item);
-    } else if (clip.type === "audio") {
-      if (el.emptyState) {
-        el.emptyState.hidden = false;
-        el.emptyState.textContent =
-          "Audio clip selected. Audio playback is available while playing the timeline.";
-      }
-    }
-
-    updateTextOverlay(clip);
-    applyAdjustments(clip);
-    updatePlayheadUI();
+    $('currentTime').textContent=fmt(state.playhead);$('playhead').style.left=(100+state.playhead*(state.zoom/5))+'px';
   }
-
-  function showVideo(item, clip) {
-    if (!el.preview) return;
-
-    if (el.photoPreview) {
-      el.photoPreview.hidden = true;
-    }
-
-    el.preview.hidden = false;
-
-    if (el.preview.dataset.mediaId !== String(item.id)) {
-      el.preview.pause();
-      el.preview.src = item.url;
-      el.preview.dataset.mediaId = String(item.id);
-      el.preview.load();
-    }
-
-    const localTime = Math.max(
-      0,
-      state.playhead - clip.start
-    );
-
-    try {
-      if (
-        Math.abs(el.preview.currentTime - localTime) > 0.4
-      ) {
-        el.preview.currentTime = Math.min(
-          localTime,
-          Number.isFinite(el.preview.duration)
-            ? Math.max(0, el.preview.duration - 0.05)
-            : localTime
-        );
-      }
-    } catch (_) {
-      // Metadata may not have loaded yet.
-    }
-
-    el.preview.playbackRate = state.speed;
+  function updateOverlay() {
+    const t=state.textItems.find(item=>state.playhead>=item.start && state.playhead<=item.start+item.duration) || state.textItems[state.textItems.length-1];
+    overlay.textContent=t?t.text:'';overlay.style.color=t?t.color:'#ffffff';overlay.style.fontSize=(t?t.size:32)+'px';
+    overlay.style.alignItems=t&&t.position==='top'?'flex-start':t&&t.position==='bottom'?'flex-end':'center';
+    overlay.style.paddingTop=t&&t.position==='top'?'8%':'5%';overlay.style.paddingBottom=t&&t.position==='bottom'?'8%':'5%';
   }
-
-  function showImage(item) {
-    if (el.preview) {
-      el.preview.pause();
-      el.preview.hidden = true;
-    }
-
-    if (el.photoPreview) {
-      el.photoPreview.src = item.url;
-      el.photoPreview.hidden = false;
-    }
+  function showPanel(name) {
+    state.currentPanel=name;
+    document.querySelectorAll('.tool[data-panel]').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));
+    const titles={media:'Media Library',text:'Text & Captions',audio:'Audio Tools',effects:'Effects',filters:'Filters',stickers:'Stickers',captions:'Captions',transitions:'Transitions',settings:'Project Settings'};
+    $('panelTitle').textContent=titles[name]||'Settings';
+    renderPanel(name);
   }
-
-  function updateTextOverlay(clip) {
-    if (!el.textOverlay) return;
-
-    const text = clip.text || "";
-
-    el.textOverlay.textContent = text;
-    el.textOverlay.hidden = !text;
-
-    el.textOverlay.style.color =
-      clip.textColor || "#ffffff";
-
-    el.textOverlay.style.fontSize =
-      `${Math.max(10, Number(clip.textSize) || 32)}px`;
-
-    el.textOverlay.style.animation = "none";
-    el.textOverlay.classList.remove(
-      "text-fade-in",
-      "text-slide-in",
-      "text-zoom-in",
-      "text-bounce"
-    );
-
-    const animationClasses = {
-      fade: "text-fade-in",
-      slide: "text-slide-in",
-      zoom: "text-zoom-in",
-      bounce: "text-bounce"
-    };
-
-    const animationClass =
-      animationClasses[clip.textAnimation];
-
-    if (animationClass && text) {
-      void el.textOverlay.offsetWidth;
-      el.textOverlay.classList.add(animationClass);
-    }
+  function panelField(label,control){return `<label class="field"><span>${label}</span>${control}</label>`;}
+  function renderPanel(name) {
+    const box=$('panelContent');
+    if(name==='media'){box.innerHTML='<div class="media-toolbar"><p class="muted">Import files from your device. Media stays in this browser session unless you save the project file.</p><label class="btn btn-primary file-button">＋ Import media<input id="mediaInput" type="file" accept="video/*,image/*,audio/*" multiple></label></div><div id="mediaList" class="media-list"></div>'; $('mediaInput').addEventListener('change',e=>importFiles(e.target.files));renderMedia();return;}
+    if(name==='text'||name==='captions'){box.innerHTML=`<div class="panel-grid">${panelField('Text',`<textarea id="textInput" placeholder="Type your title or caption..."></textarea>`)}${panelField('Text colour','<input id="textColor" type="color" value="#ffffff">')}${panelField('Font size','<input id="textSize" type="range" min="14" max="72" value="32">')}${panelField('Position','<select id="textPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option></select>')}${panelField('Duration (seconds)','<input id="textDuration" type="number" min="1" max="120" value="3">')}</div><div class="panel-actions"><button class="btn btn-primary" id="addTextBtn" type="button">＋ Add text</button><button class="btn btn-quiet" id="updateTextBtn" type="button">Update selected text</button></div><p class="field-note">Text overlays are composited in the preview and included in browser-based export where supported.</p>`;
+      $('addTextBtn').onclick=addText; $('updateTextBtn').onclick=updateText; return;}
+    if(name==='audio'){box.innerHTML=`<p class="muted">Import an audio file using the media picker, then tap ＋ beside it to add it to the audio track.</p><div class="panel-grid">${panelField('Selected clip volume','<input id="audioVolume" type="range" min="0" max="1" step=".05" value="1">')}${panelField('Playback speed','<select id="audioSpeed"><option value=".5">0.5×</option><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>')}</div><div class="panel-actions"><label class="btn btn-primary file-button">＋ Import audio<input id="audioInput" type="file" accept="audio/*" multiple></label></div><p class="field-note">Audio clips can be added to the timeline. Full multi-track audio mixing may depend on browser capabilities.</p>`;
+      $('audioInput').addEventListener('change',e=>importFiles(e.target.files));$('audioVolume').oninput=e=>{const c=selectedClip();if(c){c.volume=+e.target.value;if(c.type==='video')preview.volume=c.volume;}};$('audioSpeed').onchange=e=>{const c=selectedClip();if(c){c.speed=+e.target.value;if(c.type==='video')preview.playbackRate=c.speed;}};return;}
+    if(name==='effects'||name==='filters'){box.innerHTML=`<div class="panel-grid">${panelField('Effect / filter','<select id="effectChoice"><option value="none">None</option><option value="cinema">Cinematic</option><option value="vivid">Vivid</option><option value="mono">Monochrome</option><option value="warm">Warm tone</option><option value="cool">Cool tone</option><option value="blur">Soft blur</option></select>')}${panelField('Intensity','<input id="effectIntensity" type="range" min="0" max="100" value="50">')}</div><div class="panel-actions"><button class="btn btn-primary" id="applyEffectBtn" type="button">Apply effect</button><button class="btn btn-quiet" id="resetEffectBtn" type="button">Reset preview</button></div><p class="field-note">Effects currently adjust the preview and record the chosen effect in the timeline. Export applies brightness, contrast, and grayscale; advanced effects may vary by browser.</p>`;
+      $('applyEffectBtn').onclick=applyEffect;$('resetEffectBtn').onclick=()=>{state.brightness=100;state.contrast=100;state.grayscale=0;state.effects=[];applyPreviewStyle();renderTimeline();toast('Preview adjustments reset.');};return;}
+    if(name==='stickers'){box.innerHTML='<p class="muted">Choose a simple sticker to add as a text overlay.</p><div class="panel-actions">'+['⭐','❤️','✨','🔥','🎉','😊','⚡','🌈'].map(s=>`<button class="mini-tool sticker-choice" type="button">${s}</button>`).join('')+'</div>';box.querySelectorAll('.sticker-choice').forEach(b=>b.onclick=()=>{snapshot();state.textItems.push({id:makeId(),text:b.textContent,color:'#ffffff',size:42,position:'center',start:state.playhead,duration:3});state.selectedId=state.textItems[state.textItems.length-1].id;renderTimeline();updateOverlay();toast('Sticker added to overlay track.');});return;}
+    if(name==='transitions'){box.innerHTML='<p class="muted">Transitions between clips are not rendered yet. You can arrange clips in sequence and preview each clip using the timeline.</p><div class="panel-actions"><button class="btn btn-quiet" id="transitionInfo" type="button">How it works</button></div>'; $('transitionInfo').onclick=()=>toast('Transition rendering is not available in this build.');return;}
+    box.innerHTML=`<div class="panel-grid">${panelField('Project name','<input id="projectTitleInput" type="text" value="'+$('projectName').textContent.replace(/"/g,'&quot;')+'">')}${panelField('Preview aspect ratio','<select id="panelAspect"><option>16:9</option><option>9:16</option><option>1:1</option><option>4:5</option></select>')}</div><div class="panel-actions"><button class="btn btn-primary" id="applyProjectSettings" type="button">Apply settings</button><button class="btn btn-quiet" id="openProjectBtn" type="button">Open saved project JSON</button></div><p class="field-note">Project JSON saves the edit structure and settings. Browser security means original media files must remain available locally; project JSON does not embed large video files.</p>`;
+    $('panelAspect').value=$('aspect').value;$('applyProjectSettings').onclick=()=>{$('projectName').textContent=$('projectTitleInput').value.trim()||'Untitled Project';$('aspect').value=$('panelAspect').value;setAspect();toast('Project settings applied.');};$('openProjectBtn').onclick=()=>$('projectOpenInput').click();
   }
-
-  function applyAdjustments(clip = getSelectedClip()) {
-    if (!el.stage) return;
-
-    const brightness = clip
-      ? Number(clip.brightness ?? state.adjustments.brightness)
-      : state.adjustments.brightness;
-
-    const contrast = clip
-      ? Number(clip.contrast ?? state.adjustments.contrast)
-      : state.adjustments.contrast;
-
-    const grayscale = clip
-      ? Number(clip.grayscale ?? state.adjustments.grayscale)
-      : state.adjustments.grayscale;
-
-    const rotation = clip
-      ? Number(clip.rotation ?? state.adjustments.rotation)
-      : state.adjustments.rotation;
-
-    el.stage.style.filter =
-      `brightness(${brightness}%) ` +
-      `contrast(${contrast}%) ` +
-      `grayscale(${grayscale}%)`;
-
-    const media = el.preview && !el.preview.hidden
-      ? el.preview
-      : el.photoPreview;
-
-    if (media) {
-      media.style.transform = `rotate(${rotation}deg)`;
-    }
-  }
-
-  /* ----------------------------------------------------------
-     PLAYBACK
-     ---------------------------------------------------------- */
-
-  function setSpeed(speed) {
-    state.speed = Math.max(
-      0.25,
-      Math.min(2, Number(speed) || 1)
-    );
-
-    if (el.preview) {
-      el.preview.playbackRate = state.speed;
-    }
-
-    if (el.panelContent) {
-      const control = $("#speedControl");
-      if (control) control.value = String(state.speed);
-    }
-
-    saveHistory();
-    notify(`Playback speed: ${state.speed}×`);
-  }
-
-  function togglePlayback() {
-    if (state.playing) {
-      stopPlayback();
-    } else {
-      startPlayback();
-    }
-  }
-
-  function startPlayback() {
-    if (!state.clips.length) {
-      notify("Add a video or image to the timeline first.");
-      return;
-    }
-
-    if (state.playhead >= getTimelineDuration()) {
-      state.playhead = 0;
-    }
-
-    state.playing = true;
-    state.lastTick = performance.now();
-
-    if (el.playBtn) {
-      el.playBtn.textContent = "❚❚";
-      el.playBtn.setAttribute("aria-label", "Pause playback");
-    }
-
-    if (el.preview && !el.preview.hidden) {
-      el.preview.playbackRate = state.speed;
-      el.preview.play().catch(() => {
-        // The timeline clock still operates if autoplay is blocked.
-      });
-    }
-
-    state.animationFrame = requestAnimationFrame(playbackTick);
-  }
-
-  function stopPlayback() {
-    state.playing = false;
-
-    if (state.animationFrame) {
-      cancelAnimationFrame(state.animationFrame);
-      state.animationFrame = null;
-    }
-
-    if (el.preview) {
-      el.preview.pause();
-    }
-
-    if (el.playBtn) {
-      el.playBtn.textContent = "▶";
-      el.playBtn.setAttribute("aria-label", "Play");
-    }
-  }
-
-  function playbackTick(now) {
-    if (!state.playing) return;
-
-    const delta = Math.min(
-      0.1,
-      Math.max(0, (now - state.lastTick) / 1000)
-    );
-
-    state.lastTick = now;
-
-    state.playhead += delta * state.speed;
-
-    if (state.playhead >= getTimelineDuration()) {
-      state.playhead = getTimelineDuration();
-      updatePreview();
-      stopPlayback();
-      return;
-    }
-
-    const activeClip = findClipAtTime(state.playhead);
-    const currentMedia = activeClip
-      ? getMedia(activeClip.mediaId)
-      : null;
-
-    if (
-      activeClip &&
-      activeClip.type === "video" &&
-      currentMedia &&
-      el.preview &&
-      el.preview.dataset.mediaId !== String(currentMedia.id)
-    ) {
-      updatePreview();
-
-      if (state.playing) {
-        el.preview.play().catch(() => {});
-      }
-    } else {
-      updatePreview();
-    }
-
-    state.animationFrame = requestAnimationFrame(playbackTick);
-  }
-
-  function seek(seconds) {
-    stopPlayback();
-
-    const duration = getTimelineDuration();
-
-    state.playhead = Math.max(
-      0,
-      Math.min(duration, state.playhead + seconds)
-    );
-
-    const clip = findClipAtTime(state.playhead);
-
-    if (clip) {
-      state.selectedClipId = clip.id;
-    }
-
-    updatePreview();
-    renderTimeline();
-    renderSelectedClipProperties();
-  }
-
-  /* ----------------------------------------------------------
-     TEXT EDITING
-     ---------------------------------------------------------- */
-
-  function addText() {
-    const text = prompt("Enter your text overlay:");
-
-    if (text === null || !text.trim()) return;
-
-    const clip = getSelectedClip();
-
-    if (clip && clip.type !== "audio") {
-      clip.text = text.trim();
-      clip.textColor = clip.textColor || "#ffffff";
-      clip.textSize = clip.textSize || 32;
-      clip.textAnimation = clip.textAnimation || "none";
-
-      saveHistory();
-      renderTimeline();
-      updatePreview();
-
-      notify("Text overlay updated.");
-      return;
-    }
-
-    const duration = 5;
-    const start = state.playhead;
-
-    const textClip = {
-      id: makeId(),
-      mediaId: null,
-      name: "Text Overlay",
-      type: "text",
-      start,
-      end: start + duration,
-      duration,
-      text: text.trim(),
-      textColor: "#ffffff",
-      textSize: 32,
-      textAnimation: "none"
-    };
-
-    state.clips.push(textClip);
-    state.selectedClipId = textClip.id;
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-
-    notify("Text overlay added.");
-  }
-
-  function updateSelectedText(value) {
-    const clip = getSelectedClip();
-
-    if (!clip || clip.type === "audio") {
-      notify("Select a video, image or text clip first.");
-      return;
-    }
-
-    clip.text = value;
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-  }
-
-  /* ----------------------------------------------------------
-     EFFECTS AND ADJUSTMENTS
-     ---------------------------------------------------------- */
-
-  function setAdjustment(name, value) {
-    const clip = getSelectedClip();
-    const numericValue = Number(value);
-
-    if (clip && clip.type !== "audio") {
-      clip[name] = numericValue;
-    } else {
-      state.adjustments[name] = numericValue;
-    }
-
-    saveHistory();
-    applyAdjustments(clip);
-  }
-
-  function resetAdjustments() {
-    state.adjustments = {
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      rotation: 0
-    };
-
-    const clip = getSelectedClip();
-
-    if (clip && clip.type !== "audio") {
-      clip.brightness = 100;
-      clip.contrast = 100;
-      clip.grayscale = 0;
-      clip.rotation = 0;
-    }
-
-    saveHistory();
-    applyAdjustments(clip);
-    switchPanel("adjust");
-
-    notify("Adjustments reset.");
-  }
-
-  function rotatePreview(degrees = 90) {
-    const clip = getSelectedClip();
-
-    if (clip && clip.type !== "audio") {
-      clip.rotation = (
-        (Number(clip.rotation) || 0) + degrees + 360
-      ) % 360;
-    } else {
-      state.adjustments.rotation = (
-        state.adjustments.rotation + degrees + 360
-      ) % 360;
-    }
-
-    saveHistory();
-    applyAdjustments(clip);
-    notify("Preview rotation updated.");
-  }
-
-  function toggleGrayscale() {
-    const clip = getSelectedClip();
-
-    const current = clip
-      ? Number(clip.grayscale) || 0
-      : state.adjustments.grayscale;
-
-    setAdjustment("grayscale", current === 100 ? 0 : 100);
-  }
-
-  /* ----------------------------------------------------------
-     CLIP PROPERTIES
-     ---------------------------------------------------------- */
-
-  function renderSelectedClipProperties() {
-    const host = $("#clipProperties");
-    if (!host) return;
-
-    host.innerHTML = "";
-
-    const clip = getSelectedClip();
-
-    if (!clip) {
-      host.textContent = "Select a timeline clip to edit its properties.";
-      return;
-    }
-
-    const heading = document.createElement("h3");
-    heading.textContent = "Selected Clip";
-    host.appendChild(heading);
-
-    const name = document.createElement("p");
-    name.textContent = clip.name;
-    name.className = "selected-clip-name";
-    host.appendChild(name);
-
-    const makeLabel = (text, control) => {
-      const label = document.createElement("label");
-      label.className = "editor-field";
-      label.append(document.createTextNode(text), control);
-      host.appendChild(label);
-    };
-
-    if (clip.type !== "audio") {
-      const textInput = document.createElement("textarea");
-      textInput.value = clip.text || "";
-      textInput.placeholder = "Type overlay text...";
-      textInput.rows = 2;
-      textInput.addEventListener("change", () => {
-        clip.text = textInput.value;
-        saveHistory();
-        renderTimeline();
-        updatePreview();
-      });
-
-      makeLabel("Text overlay", textInput);
-
-      const colorInput = document.createElement("input");
-      colorInput.type = "color";
-      colorInput.value = clip.textColor || "#ffffff";
-
-      colorInput.addEventListener("input", () => {
-        clip.textColor = colorInput.value;
-        updatePreview();
-      });
-
-      colorInput.addEventListener("change", saveHistory);
-      makeLabel("Text color", colorInput);
-
-      const sizeInput = document.createElement("input");
-      sizeInput.type = "range";
-      sizeInput.min = "12";
-      sizeInput.max = "96";
-      sizeInput.value = String(clip.textSize || 32);
-
-      sizeInput.addEventListener("input", () => {
-        clip.textSize = Number(sizeInput.value);
-        updatePreview();
-      });
-
-      sizeInput.addEventListener("change", saveHistory);
-      makeLabel("Text size", sizeInput);
-
-      const animation = document.createElement("select");
-
-      [
-        ["none", "None"],
-        ["fade", "Fade In"],
-        ["slide", "Slide In"],
-        ["zoom", "Zoom In"],
-        ["bounce", "Bounce"]
-      ].forEach(([value, label]) => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = label;
-        animation.appendChild(option);
-      });
-
-      animation.value = clip.textAnimation || "none";
-
-      animation.addEventListener("change", () => {
-        clip.textAnimation = animation.value;
-        saveHistory();
-        updatePreview();
-      });
-
-      makeLabel("Text animation", animation);
-
-      const brightnessInput = document.createElement("input");
-      brightnessInput.type = "range";
-      brightnessInput.min = "25";
-      brightnessInput.max = "200";
-      brightnessInput.value = String(clip.brightness ?? 100);
-
-      brightnessInput.addEventListener("input", () => {
-        clip.brightness = Number(brightnessInput.value);
-        applyAdjustments(clip);
-      });
-
-      brightnessInput.addEventListener("change", saveHistory);
-      makeLabel("Brightness", brightnessInput);
-
-      const contrastInput = document.createElement("input");
-      contrastInput.type = "range";
-      contrastInput.min = "25";
-      contrastInput.max = "200";
-      contrastInput.value = String(clip.contrast ?? 100);
-
-      contrastInput.addEventListener("input", () => {
-        clip.contrast = Number(contrastInput.value);
-        applyAdjustments(clip);
-      });
-
-      contrastInput.addEventListener("change", saveHistory);
-      makeLabel("Contrast", contrastInput);
-
-      const grayscaleInput = document.createElement("input");
-      grayscaleInput.type = "range";
-      grayscaleInput.min = "0";
-      grayscaleInput.max = "100";
-      grayscaleInput.value = String(clip.grayscale ?? 0);
-
-      grayscaleInput.addEventListener("input", () => {
-        clip.grayscale = Number(grayscaleInput.value);
-        applyAdjustments(clip);
-      });
-
-      grayscaleInput.addEventListener("change", saveHistory);
-      makeLabel("Grayscale", grayscaleInput);
-    }
-
-    if (clip.type === "audio" || clip.type === "video") {
-      const volumeInput = document.createElement("input");
-      volumeInput.type = "range";
-      volumeInput.min = "0";
-      volumeInput.max = "1";
-      volumeInput.step = "0.05";
-      volumeInput.value = String(clip.volume ?? 1);
-
-      volumeInput.addEventListener("input", () => {
-        clip.volume = Number(volumeInput.value);
-
-        if (el.preview) {
-          el.preview.volume = clip.volume;
+  function populateTextPanel(t){showPanel('text');$('textInput').value=t.text;$('textColor').value=t.color;$('textSize').value=t.size;$('textPosition').value=t.position;$('textDuration').value=t.duration;}
+  function addText(){const text=$('textInput').value.trim();if(!text){toast('Type some text first.');return;}snapshot();const t={id:makeId(),text,color:$('textColor').value,size:+$('textSize').value,position:$('textPosition').value,start:state.playhead,duration:Math.max(1,+$('textDuration').value||3)};state.textItems.push(t);state.selectedId=t.id;renderTimeline();updateOverlay();toast('Text overlay added.');}
+  function updateText(){const t=state.textItems.find(x=>x.id===state.selectedId);if(!t){toast('Select a text overlay on the timeline first.');return;}const text=$('textInput').value.trim();if(!text){toast('Type some text first.');return;}snapshot();Object.assign(t,{text,color:$('textColor').value,size:+$('textSize').value,position:$('textPosition').value,duration:Math.max(1,+$('textDuration').value||3)});renderTimeline();updateOverlay();toast('Text overlay updated.');}
+  function applyEffect(){const choice=$('effectChoice').value,intensity=+$('effectIntensity').value/100;if(choice==='none'){state.brightness=100;state.contrast=100;state.grayscale=0;}if(choice==='cinema'){state.contrast=100+intensity*35;state.brightness=100-intensity*8;state.grayscale=0;}if(choice==='vivid'){state.contrast=100+intensity*25;state.brightness=100+intensity*8;state.grayscale=0;}if(choice==='mono'){state.grayscale=100*intensity;}if(choice==='warm'){state.brightness=100+intensity*7;state.grayscale=0;}if(choice==='cool'){state.contrast=100+intensity*10;state.grayscale=0;}if(choice==='blur'){preview.style.filter+=` blur(${intensity*2}px)`;photo.style.filter+=` blur(${intensity*2}px)`;}applyPreviewStyle();if(choice!=='none'){state.effects.push({id:makeId(),name:choice[0].toUpperCase()+choice.slice(1)});renderTimeline();}toast('Effect applied to preview.');}
+  function setAspect(){const v=$('aspect').value;const ratio={'16:9':'16 / 9','9:16':'9 / 16','1:1':'1 / 1','4:5':'4 / 5'}[v]||'16 / 9';$('stage').style.aspectRatio=ratio;}
+  function pausePlayback(){state.playing=false;preview.pause();clearInterval(playbackTimer);playbackTimer=null;$('playBtn').textContent='▶';$('playBtn').setAttribute('aria-label','Play');}
+  function playPlayback(){if(!state.clips.length){toast('Import media before playing.');return;}state.playing=true;$('playBtn').textContent='Ⅱ';$('playBtn').setAttribute('aria-label','Pause');let last=performance.now();playbackTimer=setInterval(()=>{if(!state.playing)return;const now=performance.now();state.playhead+=(now-last)/1000;last=now;if(state.playhead>=totalDuration()){state.playhead=0;}setPlayhead(state.playhead,true);updateOverlay();const c=selectedClip(),m=c&&mediaById(c.mediaId);if(m&&m.type==='video'&&preview.paused){preview.play().catch(()=>{});}if(m&&m.type==='image'){preview.pause();} },100); }
+  function togglePlayback(){if(state.playing)pausePlayback();else playPlayback();}
+  function splitSelected(){const c=selectedClip();if(!c){toast('Select a timeline clip to split.');return;}const start=clipStartAt(c.id),local=state.playhead-start;if(local<.25||c.duration-local<.25){toast('Move the playhead inside the selected clip to split it.');return;}snapshot();const second={...c,id:makeId(),name:c.name+' (split)',duration:c.duration-local,start:(c.start||0)+local,end:c.end};c.duration=local;c.end=(c.start||0)+local;state.clips.splice(state.clips.indexOf(c)+1,0,second);renderTimeline();toast('Clip split into two timeline sections.');}
+  function deleteSelected(){const id=state.selectedId;if(!id){toast('Select a clip or text overlay first.');return;}snapshot();const ci=state.clips.findIndex(c=>c.id===id);if(ci>=0)state.clips.splice(ci,1);else state.textItems=state.textItems.filter(t=>t.id!==id);state.selectedId=null;renderTimeline();updateOverlay();$('previewStatus').textContent='Ready';toast('Selected timeline item deleted.');}
+  function duplicateSelected(){const c=selectedClip();if(c){snapshot();const copy={...c,id:makeId(),name:c.name+' copy'};state.clips.splice(state.clips.indexOf(c)+1,0,copy);state.selectedId=copy.id;renderTimeline();toast('Clip duplicated.');return;}const t=state.textItems.find(x=>x.id===state.selectedId);if(t){snapshot();const copy={...t,id:makeId(),start:t.start+t.duration};state.textItems.push(copy);state.selectedId=copy.id;renderTimeline();toast('Text overlay duplicated.');return;}toast('Select a clip or text overlay first.');}
+  function changeSpeed(){const c=selectedClip();if(!c){toast('Select a clip first.');return;}const speeds=[.5,.75,1,1.25,1.5,2],next=speeds[(speeds.indexOf(c.speed||1)+1)%speeds.length];snapshot();c.speed=next;if(c.type==='video')preview.playbackRate=next;toast('Playback speed set to '+next+'×.');}
+  function rotateSelected(){state.rotation=(state.rotation+90)%360;applyPreviewStyle();toast('Preview rotated '+state.rotation+'°.');}
+  function adjustSelected(){showPanel('effects');}
+  function trimSelected(){const c=selectedClip();if(!c){toast('Select a clip first.');return;}const newDur=prompt('Set clip duration in seconds (current '+c.duration.toFixed(1)+'):',String(Math.max(1,Math.round(c.duration))));if(newDur===null)return;const val=Number(newDur);if(!Number.isFinite(val)||val<=0){toast('Enter a duration greater than zero.');return;}snapshot();c.duration=Math.min(val,3600);c.end=(c.start||0)+c.duration;renderTimeline();toast('Clip duration updated.');}
+  function cropSelected(){toast('Crop controls are not included in this browser build yet. Use the aspect-ratio selector for the output frame.');}
+  function saveProject(){const project={app:'VITALSTAR VE PRO',version:1,projectName:$('projectName').textContent,aspect:$('aspect').value,brightness:state.brightness,contrast:state.contrast,grayscale:state.grayscale,rotation:state.rotation,clips:state.clips,textItems:state.textItems,effects:state.effects,media:state.media.map(m=>({id:m.id,name:m.name,type:m.type,size:m.size,mime:m.mime,duration:m.duration})),savedAt:new Date().toISOString()};const blob=new Blob([JSON.stringify(project,null,2)],{type:'application/json'});downloadBlob(blob,(project.projectName||'vitalstar-project').replace(/[^a-z0-9-_]+/gi,'-')+'.json');toast('Project structure saved as JSON. Media files are not embedded.');}
+  function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+  function openProject(file){const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!d||!Array.isArray(d.clips))throw new Error('Invalid project');state.clips=d.clips;state.textItems=d.textItems||[];state.effects=d.effects||[];state.brightness=d.brightness||100;state.contrast=d.contrast||100;state.grayscale=d.grayscale||0;state.rotation=d.rotation||0;$('projectName').textContent=d.projectName||'Imported Project';$('aspect').value=d.aspect||'16:9';setAspect();state.selectedId=null;renderTimeline();applyPreviewStyle();toast('Project structure loaded. Re-import its original media to preview clips.');}catch(e){toast('That file is not a valid VITALSTAR project JSON.');}};reader.readAsText(file);}
+  async function exportVideo(){
+    if(!state.clips.some(c=>c.type==='video'||c.type==='image')){toast('Add a video or photo clip before exporting.');return;}
+    if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast('Video export is not supported in this browser. Try the latest Chrome browser.');return;}
+    const supported=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+    if(!supported){toast('This browser does not offer a supported WebM export format.');return;}
+    const w=720,h=405,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext('2d');const stream=canvas.captureStream(24);
+    const recorder=new MediaRecorder(stream,{mimeType:supported});const chunks=[];
+    recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+    const finished=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve();recorder.onerror=()=>reject(new Error('Recorder error'));});
+    const exportBtn=$('exportBtn');exportBtn.disabled=true;state.exportCancelled=false;
+    const total=state.clips.filter(c=>c.type!=='audio').reduce((s,c)=>s+c.duration,0);
+    if(total<=0){exportBtn.disabled=false;toast('No visual clips found.');return;}
+    let elapsed=0;
+    const drawBackground=()=>{ctx.fillStyle='#05070b';ctx.fillRect(0,0,w,h);};
+    const drawOverlay=(time)=>{const t=state.textItems.find(x=>time>=x.start&&time<=x.start+x.duration);if(t){ctx.fillStyle=t.color||'#fff';ctx.font=`bold ${Math.min(64,t.size||32)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline=t.position==='top'?'top':t.position==='bottom'?'bottom':'middle';ctx.shadowColor='#000';ctx.shadowBlur=6;ctx.fillText(t.text.slice(0,120),w/2,t.position==='top'?35:t.position==='bottom'?h-35:h/2,w*.9);ctx.shadowBlur=0;}};
+    try{
+      recorder.start(250);$('previewStatus').textContent='Exporting WebM…';
+      for(const c of state.clips){
+        if(c.type==='audio')continue;
+        if(state.exportCancelled)break;
+        const m=mediaById(c.mediaId);if(!m)continue;
+        drawBackground();
+        if(m.type==='image'){
+          const img=new Image();img.src=m.url;await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});
+          const scale=Math.min(w/img.width,h/img.height),dw=img.width*scale,dh=img.height*scale;ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
+          const start=performance.now();
+          while((performance.now()-start)/1000<c.duration&&!state.exportCancelled){drawBackground();ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);drawOverlay(elapsed+(performance.now()-start)/1000);await new Promise(r=>setTimeout(r,40));}
+        }else{
+          const v=document.createElement('video');v.src=m.url;v.muted=true;v.playsInline=true;v.preload='auto';
+          await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(new Error('Could not load '+m.name));});
+          try{v.currentTime=Math.max(0,c.start||0);}catch(e){}
+          await new Promise(res=>{if(v.readyState>=2)res();else v.oncanplay=res;});
+          const start=performance.now();v.playbackRate=c.speed||1;await v.play().catch(()=>{});
+          while((performance.now()-start)/1000<c.duration&&!v.ended&&!state.exportCancelled){
+            drawBackground();const scale=Math.min(w/v.videoWidth,h/v.videoHeight),dw=v.videoWidth*scale,dh=v.videoHeight*scale;
+            ctx.save();ctx.translate(w/2,h/2);ctx.rotate((c.rotation||0)*Math.PI/180);ctx.filter=`brightness(${state.brightness}%) contrast(${state.contrast}%) grayscale(${state.grayscale}%)`;ctx.drawImage(v,-dw/2,-dh/2,dw,dh);ctx.restore();drawOverlay(elapsed+(performance.now()-start)/1000);
+            await new Promise(r=>setTimeout(r,40));
+          }v.pause();v.remove();
         }
-      });
-
-      volumeInput.addEventListener("change", saveHistory);
-      makeLabel("Volume", volumeInput);
-    }
-
-    const startInput = document.createElement("input");
-    startInput.type = "number";
-    startInput.min = "0";
-    startInput.step = "0.1";
-    startInput.value = String(clip.start);
-
-    startInput.addEventListener("change", () => {
-      const newStart = Math.max(0, Number(startInput.value) || 0);
-      const duration = getClipDuration(clip);
-
-      clip.start = newStart;
-      clip.end = newStart + duration;
-
-      state.playhead = clip.start;
-
-      saveHistory();
-      renderTimeline();
-      updatePreview();
-      renderSelectedClipProperties();
-    });
-
-    makeLabel("Start (seconds)", startInput);
-
-    const endInput = document.createElement("input");
-    endInput.type = "number";
-    endInput.min = String(clip.start + 0.1);
-    endInput.step = "0.1";
-    endInput.value = String(clip.end);
-
-    endInput.addEventListener("change", () => {
-      const newEnd = Math.max(
-        clip.start + 0.1,
-        Number(endInput.value) || clip.end
-      );
-
-      clip.end = newEnd;
-
-      saveHistory();
-      renderTimeline();
-      updatePreview();
-      renderSelectedClipProperties();
-    });
-
-    makeLabel("End (seconds)", endInput);
-  }
-
-  /* ----------------------------------------------------------
-     PANELS
-     ---------------------------------------------------------- */
-
-  function switchPanel(panel) {
-    state.currentPanel = panel;
-
-    $$(".tool-btn[data-panel]").forEach((button) => {
-      button.classList.toggle(
-        "active",
-        button.dataset.panel === panel
-      );
-    });
-
-    if (el.panelTitle) {
-      const titles = {
-        media: "Media",
-        text: "Text",
-        audio: "Audio",
-        effects: "Effects",
-        adjust: "Adjust"
-      };
-
-      el.panelTitle.textContent = titles[panel] || "Tools";
-    }
-
-    if (!el.panelContent) return;
-
-    el.panelContent.innerHTML = "";
-
-    if (panel === "media") {
-      const description = document.createElement("p");
-      description.textContent =
-        "Import videos, photos and audio, then add them to your timeline.";
-
-      el.panelContent.appendChild(description);
-
-      const importButton = document.createElement("button");
-      importButton.type = "button";
-      importButton.className = "primary-btn";
-      importButton.textContent = "＋ Import Media";
-
-      importButton.addEventListener("click", () => {
-        el.mediaInput?.click();
-      });
-
-      el.panelContent.appendChild(importButton);
-
-      if (el.mediaList) {
-        el.panelContent.appendChild(el.mediaList);
+        elapsed+=c.duration;
       }
-    }
-
-    if (panel === "text") {
-      const addButton = document.createElement("button");
-      addButton.type = "button";
-      addButton.className = "primary-btn";
-      addButton.textContent = "＋ Add Text";
-      addButton.addEventListener("click", addText);
-
-      el.panelContent.appendChild(addButton);
-
-      const note = document.createElement("p");
-      note.textContent =
-        "Select a video, photo or text clip to change its text, color, size and animation.";
-
-      el.panelContent.appendChild(note);
-    }
-
-    if (panel === "audio") {
-      const importButton = document.createElement("button");
-      importButton.type = "button";
-      importButton.className = "primary-btn";
-      importButton.textContent = "＋ Import Audio";
-
-      importButton.addEventListener("click", () => {
-        if (el.mediaInput) {
-          el.mediaInput.accept = "audio/*";
-          el.mediaInput.click();
-
-          setTimeout(() => {
-            el.mediaInput.accept = "video/*,image/*,audio/*";
-          }, 1000);
-        }
-      });
-
-      el.panelContent.appendChild(importButton);
-
-      const note = document.createElement("p");
-      note.textContent =
-        "Import audio, then tap + beside the file to add it to the timeline.";
-
-      el.panelContent.appendChild(note);
-
-      const audioItems = state.media.filter(
-        (item) => item.type === "audio"
-      );
-
-      audioItems.forEach((item) => {
-        const row = document.createElement("div");
-        row.className = "audio-item";
-
-        const label = document.createElement("span");
-        label.textContent = item.name;
-
-        const addButton = document.createElement("button");
-        addButton.type = "button";
-        addButton.textContent = "+ Add";
-        addButton.addEventListener("click", () => {
-          addMediaToTimeline(item.id);
-        });
-
-        row.append(label, addButton);
-        el.panelContent.appendChild(row);
-      });
-    }
-
-    if (panel === "effects") {
-      addPanelButton(
-        el.panelContent,
-        "Rotate 90°",
-        () => rotatePreview(90)
-      );
-
-      addPanelButton(
-        el.panelContent,
-        "Rotate 180°",
-        () => rotatePreview(180)
-      );
-
-      addPanelButton(
-        el.panelContent,
-        "Toggle Grayscale",
-        toggleGrayscale
-      );
-
-      addPanelButton(
-        el.panelContent,
-        "Reset Adjustments",
-        resetAdjustments
-      );
-
-      const note = document.createElement("p");
-      note.textContent =
-        "Effects in this version affect the editor preview. They are not yet rendered into an exported video file.";
-
-      el.panelContent.appendChild(note);
-    }
-
-    if (panel === "adjust") {
-      const clip = getSelectedClip();
-
-      addRangeControl(
-        el.panelContent,
-        "Brightness",
-        25,
-        200,
-        clip?.brightness ?? state.adjustments.brightness,
-        (value) => setAdjustment("brightness", value)
-      );
-
-      addRangeControl(
-        el.panelContent,
-        "Contrast",
-        25,
-        200,
-        clip?.contrast ?? state.adjustments.contrast,
-        (value) => setAdjustment("contrast", value)
-      );
-
-      addRangeControl(
-        el.panelContent,
-        "Grayscale",
-        0,
-        100,
-        clip?.grayscale ?? state.adjustments.grayscale,
-        (value) => setAdjustment("grayscale", value)
-      );
-
-      addPanelButton(
-        el.panelContent,
-        "Reset Adjustments",
-        resetAdjustments
-      );
-    }
-
-    const properties = document.createElement("div");
-    properties.id = "clipProperties";
-    properties.className = "clip-properties";
-
-    el.panelContent.appendChild(properties);
-
-    renderSelectedClipProperties();
+      recorder.stop();await finished;
+      if(chunks.length){const blob=new Blob(chunks,{type:supported});downloadBlob(blob,($('projectName').textContent||'vitalstar-video').replace(/[^a-z0-9-_]+/gi,'-')+'.webm');toast(state.exportCancelled?'Export cancelled; partial WebM downloaded.':'Export finished as WebM.');}
+      else toast('Export produced no video data.');
+    }catch(err){try{if(recorder.state!=='inactive')recorder.stop();}catch(e){}toast('Export failed: '+(err.message||'browser error'));}finally{stream.getTracks().forEach(t=>t.stop());exportBtn.disabled=false;$('previewStatus').textContent='Ready';}
   }
-
-  function addPanelButton(parent, text, callback) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "tool-action";
-    button.textContent = text;
-    button.addEventListener("click", callback);
-
-    parent.appendChild(button);
+  function bind(){
+    $('mediaInput').addEventListener('change',e=>importFiles(e.target.files));
+    $('importFromEmpty').onclick=()=>{$('mediaInput').click();};
+    document.querySelectorAll('.tool[data-panel]').forEach(b=>b.onclick=()=>showPanel(b.dataset.panel));
+    $('toggleTools').onclick=()=>{const body=$('toolsBody'),hide=!body.classList.contains('hidden');body.classList.toggle('hidden',hide);$('toggleTools').textContent=hide?'Expand +':'Collapse −';$('toggleTools').setAttribute('aria-expanded',String(!hide));};
+    $('collapsePanel').onclick=()=>{$('panelContent').classList.toggle('hidden');$('collapsePanel').textContent=$('panelContent').classList.contains('hidden')?'⌄':'⌃';};
+    $('playBtn').onclick=togglePlayback;$('backFrame').onclick=()=>{pausePlayback();setPlayhead(Math.max(0,state.playhead-1),true);updateOverlay();};$('forwardFrame').onclick=()=>{pausePlayback();setPlayhead(Math.min(totalDuration(),state.playhead+1),true);updateOverlay();};
+    $('aspect').onchange=setAspect;$('fullscreenBtn').onclick=()=>{const el=$('stage');if(!document.fullscreenElement&&el.requestFullscreen)el.requestFullscreen().catch(()=>toast('Fullscreen is not available here.'));else if(document.exitFullscreen)document.exitFullscreen();};
+    $('splitBtn').onclick=splitSelected;$('deleteBtn').onclick=deleteSelected;$('duplicateBtn').onclick=duplicateSelected;$('speedTool').onclick=changeSpeed;$('rotateTool').onclick=rotateSelected;$('adjustTool').onclick=adjustSelected;$('cropTool').onclick=cropSelected;$('trimTool').onclick=trimSelected;
+    $('zoomRange').oninput=e=>{state.zoom=+e.target.value;renderTimeline();};$('zoomIn').onclick=()=>{$('zoomRange').value=Math.min(180,+$('zoomRange').value+10);state.zoom=+$('zoomRange').value;renderTimeline();};$('zoomOut').onclick=()=>{$('zoomRange').value=Math.max(40,+$('zoomRange').value-10);state.zoom=+$('zoomRange').value;renderTimeline();};
+    $('undoBtn').onclick=()=>{if(!state.history.length)return;state.future.push(JSON.stringify({clips:state.clips,textItems:state.textItems,effects:state.effects,selectedId:state.selectedId}));restoreSnapshot(state.history.pop());};
+    $('redoBtn').onclick=()=>{if(!state.future.length)return;state.history.push(JSON.stringify({clips:state.clips,textItems:state.textItems,effects:state.effects,selectedId:state.selectedId}));restoreSnapshot(state.future.pop());};
+    $('saveProject').onclick=$('saveProjectBottom').onclick=saveProject;$('exportBtn').onclick=$('exportBottom').onclick=exportVideo;
+    $('newProject').onclick=()=>{if((state.clips.length||state.textItems.length)&&!confirm('Start a new project? Unsaved edits will be cleared.'))return;pausePlayback();state.clips=[];state.textItems=[];state.effects=[];state.selectedId=null;state.playhead=0;state.history=[];state.future=[];$('projectName').textContent='Untitled Project';preview.removeAttribute('src');preview.load();preview.style.display='none';photo.removeAttribute('src');photo.style.display='none';overlay.textContent='';$('emptyState').classList.remove('hidden');renderTimeline();toast('New project created.');};
+    $('projectOpenInput').onchange=e=>{if(e.target.files[0])openProject(e.target.files[0]);e.target.value='';};
+    preview.addEventListener('timeupdate',()=>{if(!state.playing&&preview.duration){$('previewStatus').textContent='Previewing';}});
+    document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.code==='Space'){e.preventDefault();togglePlayback();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveProject();}});
+    $('stage').addEventListener('click',()=>{if(state.clips.length&&!state.playing)togglePlayback();});
   }
-
-  function addRangeControl(
-    parent,
-    labelText,
-    min,
-    max,
-    initial,
-    callback
-  ) {
-    const label = document.createElement("label");
-    label.className = "editor-field";
-
-    const text = document.createElement("span");
-    text.textContent = `${labelText}: ${initial}%`;
-
-    const input = document.createElement("input");
-    input.type = "range";
-    input.min = String(min);
-    input.max = String(max);
-    input.value = String(initial);
-
-    input.addEventListener("input", () => {
-      text.textContent = `${labelText}: ${input.value}%`;
-      callback(input.value);
-    });
-
-    label.append(text, input);
-    parent.appendChild(label);
-  }
-
-  /* ----------------------------------------------------------
-     SAVE AND RESTORE
-     ---------------------------------------------------------- */
-
-  function saveProject() {
-    const project = {
-      version: 2,
-      projectName: state.projectName,
-      aspect: el.aspect?.value || "9:16",
-      clips: state.clips,
-      selectedClipId: state.selectedClipId,
-      nextId: state.nextId,
-      adjustments: state.adjustments,
-      speed: state.speed,
-      savedAt: new Date().toISOString()
-    };
-
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(project)
-      );
-
-      notify(
-        "Project settings saved. Original media files must be re-imported after a page reload."
-      );
-    } catch (error) {
-      console.error("Project save failed:", error);
-
-      notify(
-        "Could not save project. Browser storage may be full."
-      );
-    }
-  }
-
-  function restoreProject() {
-    let raw;
-
-    try {
-      raw = localStorage.getItem(STORAGE_KEY);
-    } catch (error) {
-      console.error("Project storage unavailable:", error);
-      return;
-    }
-
-    if (!raw) return;
-
-    try {
-      const project = JSON.parse(raw);
-
-      state.projectName =
-        project.projectName || "My Video Project";
-
-      state.clips = Array.isArray(project.clips)
-        ? project.clips
-        : [];
-
-      state.selectedClipId =
-        project.selectedClipId ?? null;
-
-      state.nextId = Math.max(
-        Number(project.nextId) || 1,
-        ...state.clips.map((clip) => clip.id + 1),
-        1
-      );
-
-      state.adjustments = {
-        brightness: 100,
-        contrast: 100,
-        grayscale: 0,
-        rotation: 0,
-        ...(project.adjustments || {})
-      };
-
-      state.speed = Number(project.speed) || 1;
-
-      if (el.projectName) {
-        el.projectName.textContent = state.projectName;
-      }
-
-      if (el.aspect && project.aspect) {
-        el.aspect.value = project.aspect;
-        applyAspectRatio(project.aspect);
-      }
-
-      renderTimeline();
-      updatePreview();
-      applyAdjustments();
-
-      notify(
-        "Project settings restored. Re-import missing media to continue editing."
-      );
-    } catch (error) {
-      console.error("Project restore failed:", error);
-      notify("Saved project could not be restored.");
-    }
-  }
-
-  function createNewProject() {
-    const proceed = confirm(
-      "Start a new project? Save your current project first if you need it later."
-    );
-
-    if (!proceed) return;
-
-    stopPlayback();
-
-    state.clips = [];
-    state.selectedClipId = null;
-    state.playhead = 0;
-    state.projectName = "My Video Project";
-
-    state.adjustments = {
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      rotation: 0
-    };
-
-    if (el.projectName) {
-      el.projectName.textContent = state.projectName;
-    }
-
-    saveHistory();
-    renderTimeline();
-    updatePreview();
-    renderSelectedClipProperties();
-
-    notify("New project created.");
-  }
-
-  /* ----------------------------------------------------------
-     ASPECT RATIO
-     ---------------------------------------------------------- */
-
-  function applyAspectRatio(ratio) {
-    if (!el.stage) return;
-
-    const ratios = {
-      "9:16": "9 / 16",
-      "16:9": "16 / 9",
-      "1:1": "1 / 1",
-      "4:5": "4 / 5"
-    };
-
-    el.stage.style.aspectRatio =
-      ratios[ratio] || "9 / 16";
-  }
-
-  /* ----------------------------------------------------------
-     EXPORT
-     ---------------------------------------------------------- */
-
-  function exportProject() {
-    if (!state.clips.length) {
-      notify("Add clips to the timeline before exporting.");
-      return;
-    }
-
-    notify(
-      "MP4 rendering is not implemented in this browser-only version. Your edits are not being exported as a finished video yet.",
-      5000
-    );
-  }
-
-  /* ----------------------------------------------------------
-     EVENTS
-     ---------------------------------------------------------- */
-
-  function bindEvents() {
-    el.mediaInput?.addEventListener("change", (event) => {
-      importFiles(event.target.files || []);
-    });
-
-    el.newProject?.addEventListener(
-      "click",
-      createNewProject
-    );
-
-    el.saveProject?.addEventListener(
-      "click",
-      saveProject
-    );
-
-    el.exportBtn?.addEventListener(
-      "click",
-      exportProject
-    );
-
-    el.playBtn?.addEventListener(
-      "click",
-      togglePlayback
-    );
-
-    el.backFrame?.addEventListener("click", () => {
-      seek(-1 / 30);
-    });
-
-    el.forwardFrame?.addEventListener("click", () => {
-      seek(1 / 30);
-    });
-
-    el.undoBtn?.addEventListener("click", undo);
-    el.redoBtn?.addEventListener("click", redo);
-
-    el.splitBtn?.addEventListener(
-      "click",
-      splitSelectedClip
-    );
-
-    el.deleteBtn?.addEventListener(
-      "click",
-      deleteSelectedClip
-    );
-
-    el.zoomOut?.addEventListener("click", () => {
-      setZoom(state.zoom / 1.25);
-    });
-
-    el.zoomIn?.addEventListener("click", () => {
-      setZoom(state.zoom * 1.25);
-    });
-
-    el.zoomRange?.addEventListener("input", (event) => {
-      setZoom(event.target.value);
-    });
-
-    el.aspect?.addEventListener("change", (event) => {
-      applyAspectRatio(event.target.value);
-    });
-
-    el.projectName?.addEventListener("click", () => {
-      const name = prompt(
-        "Enter project name:",
-        state.projectName
-      );
-
-      if (name === null || !name.trim()) return;
-
-      state.projectName = name.trim();
-      el.projectName.textContent = state.projectName;
-
-      saveHistory();
-    });
-
-    $$(".tool-btn[data-panel]").forEach((button) => {
-      button.addEventListener("click", () => {
-        switchPanel(button.dataset.panel);
-      });
-    });
-
-    /*
-      Clicking the timeline ruler or track background moves
-      the playhead to the corresponding time.
-    */
-
-    [el.ruler, el.videoTrack, el.textTrack, el.audioTrack]
-      .filter(Boolean)
-      .forEach((track) => {
-        track.addEventListener("click", (event) => {
-          if (event.target.closest(".timeline-clip")) return;
-
-          const rect = track.getBoundingClientRect();
-
-          const x =
-            event.clientX -
-            rect.left +
-            (track.scrollLeft || 0);
-
-          state.playhead = Math.max(
-            0,
-            x / (state.zoom * 30)
-          );
-
-          state.playhead = Math.min(
-            state.playhead,
-            getTimelineDuration()
-          );
-
-          const clip = findClipAtTime(state.playhead);
-
-          if (clip) {
-            state.selectedClipId = clip.id;
-          }
-
-          updatePreview();
-          renderTimeline();
-          renderSelectedClipProperties();
-        });
-      });
-
-    /*
-      Keep preview video playback synchronized with the
-      timeline when the user manually seeks the video.
-    */
-
-    el.preview?.addEventListener("timeupdate", () => {
-      if (!state.playing) return;
-
-      const clip = findClipAtTime(state.playhead);
-
-      if (!clip || clip.type !== "video") return;
-
-      const localTime = el.preview.currentTime;
-
-      state.playhead = clip.start + localTime;
-      updatePlayheadUI();
-    });
-
-    el.preview?.addEventListener("ended", () => {
-      if (!state.playing) return;
-
-      const clip = findClipAtTime(state.playhead);
-      if (!clip) return;
-
-      state.playhead = Math.min(
-        clip.end,
-        state.playhead + 0.03
-      );
-    });
-
-    document.addEventListener("keydown", (event) => {
-      const target = event.target;
-
-      if (
-        target &&
-        (
-          target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable
-        )
-      ) {
-        return;
-      }
-
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === "z"
-      ) {
-        event.preventDefault();
-
-        if (event.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
-      }
-
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === "y"
-      ) {
-        event.preventDefault();
-        redo();
-      }
-
-      if (event.code === "Space") {
-        event.preventDefault();
-        togglePlayback();
-      }
-
-      if (event.key === "Delete" || event.key === "Backspace") {
-        deleteSelectedClip();
-      }
-    });
-
-    /*
-      Prevent accidentally leaving the page while editing.
-      This warning cannot recover media files after a reload.
-    */
-
-    window.addEventListener("beforeunload", (event) => {
-      if (state.clips.length && state.media.length) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
-    });
-  }
-
-  /* ----------------------------------------------------------
-     INITIALIZATION
-     ---------------------------------------------------------- */
-
-  function initialize() {
-    bindEvents();
-
-    if (el.mediaInput) {
-      el.mediaInput.accept = "video/*,image/*,audio/*";
-      el.mediaInput.multiple = true;
-    }
-
-    if (el.zoomRange) {
-      el.zoomRange.value = String(state.zoom);
-    }
-
-    applyAspectRatio(el.aspect?.value || "9:16");
-
-    renderMediaList();
-    renderTimeline();
-
-    state.history = [];
-    state.historyIndex = -1;
-    saveHistory();
-
-    restoreProject();
-
-    switchPanel("media");
-
-    /*
-      Add a playback speed selector to the transport bar
-      if the HTML doesn't already contain one.
-    */
-
-    createSpeedControl();
-
-    console.log("Vitalstar VE Pro initialized.");
-  }
-
-  function createSpeedControl() {
-    if (!el.playBtn || $("#speedControl")) return;
-
-    const select = document.createElement("select");
-    select.id = "speedControl";
-    select.className = "speed-control";
-    select.title = "Playback speed";
-    select.setAttribute("aria-label", "Playback speed");
-
-    [
-      ["0.25", "0.25×"],
-      ["0.5", "0.5×"],
-      ["0.75", "0.75×"],
-      ["1", "1×"],
-      ["1.25", "1.25×"],
-      ["1.5", "1.5×"],
-      ["1.75", "1.75×"],
-      ["2", "2×"]
-    ].forEach(([value, label]) => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      select.appendChild(option);
-    });
-
-    select.value = String(state.speed);
-
-    select.addEventListener("change", () => {
-      setSpeed(select.value);
-    });
-
-    el.playBtn.insertAdjacentElement("afterend", select);
-  }
-
-  initialize();
+  bind();renderMedia();renderTimeline();showPanel('media');setAspect();
 })();
