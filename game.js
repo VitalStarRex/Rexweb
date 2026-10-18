@@ -10,9 +10,6 @@
     return;
   }
 
-  const $ = (selector, parent = root) => parent.querySelector(selector);
-  const $$ = (selector, parent = root) => [...parent.querySelectorAll(selector)];
-
   const games = [
     { id: 'snake', name: 'Snake', icon: '🐍', description: 'Eat, grow, and avoid your tail.' },
     { id: 'ttt', name: 'Tic-Tac-Toe', icon: '⭕', description: 'Challenge the computer.' },
@@ -26,18 +23,27 @@
     { id: 'flappy', name: 'Flappy Flyer', icon: '🐦', description: 'Fly between the pipes.' }
   ];
 
-  let currentGame = null;
-  let cleanup = [];
-  let gameToken = 0;
-  let scores = loadScores();
+  let scores = {};
+  try {
+    scores = JSON.parse(localStorage.getItem(SCORE_KEY) || '{}') || {};
+  } catch (_) {}
 
-  function loadScores() {
-    try {
-      return JSON.parse(localStorage.getItem(SCORE_KEY) || '{}');
-    } catch (_) {
-      return {};
-    }
-  }
+  let cleanupCurrent = () => {};
+  let generation = 0;
+  let activeGame = null;
+
+  const $ = (selector, scope = root) => scope.querySelector(selector);
+  const $$ = (selector, scope = root) => [...scope.querySelectorAll(selector)];
+
+  const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+
+  const best = id => Number(scores[id] || 0);
 
   function saveScores() {
     try {
@@ -45,21 +51,7 @@
     } catch (_) {}
   }
 
-  function bestScore(id) {
-    return Number(scores[id]) || 0;
-  }
-
-  function escapeHTML(value) {
-    return String(value).replace(/[&<>"']/g, char => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[char]);
-  }
-
-  function installStyles() {
+  function addStyles() {
     if (document.getElementById('nexora-arcade-styles')) return;
 
     const style = document.createElement('style');
@@ -67,160 +59,171 @@
 
     style.textContent = `
       #nexora-games {
-        --nx-bg:#040a16;
-        --nx-panel:#0a1527;
-        --nx-panel2:#10213a;
-        --nx-line:#203956;
-        --nx-text:#f2f7ff;
-        --nx-muted:#91a7c5;
-        --nx-cyan:#35e8ff;
-        --nx-purple:#9b6cff;
-        --nx-green:#43f5a5;
-        background:var(--nx-bg);
-        color:var(--nx-text);
+        --bg:#050914;
+        --panel:#0b1425;
+        --panel2:#101d32;
+        --line:#223651;
+        --text:#f2f7ff;
+        --muted:#91a4bf;
+        --cyan:#35e8ff;
+        --purple:#9b6cff;
+        --green:#43f5a5;
+        color:var(--text);
+        background:var(--bg);
         font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-        min-height:100%;
+        min-height:70vh;
         padding:16px;
-        box-sizing:border-box;
         overflow:hidden;
       }
 
       #nexora-games * { box-sizing:border-box; }
-      #nexora-games button { font:inherit; -webkit-tap-highlight-color:transparent; }
+
+      #nexora-games button {
+        font:inherit;
+        -webkit-tap-highlight-color:transparent;
+      }
 
       #nexora-games .nx-shell {
         width:min(100%,1000px);
-        margin:auto;
+        margin:0 auto;
       }
 
       #nexora-games .nx-header {
         display:flex;
         align-items:center;
         justify-content:space-between;
-        flex-wrap:wrap;
         gap:12px;
+        flex-wrap:wrap;
         margin-bottom:18px;
       }
 
       #nexora-games .nx-brand {
         display:flex;
         align-items:center;
-        gap:12px;
+        gap:11px;
       }
 
       #nexora-games .nx-logo {
-        width:58px;
-        height:58px;
-        flex-shrink:0;
+        width:46px;
+        height:46px;
         display:grid;
         place-items:center;
-        border:2px solid #126b91;
-        border-radius:17px;
-        color:var(--nx-cyan);
-        font-size:30px;
+        border:1px solid #27637c;
+        border-radius:14px;
+        color:var(--cyan);
+        font-size:24px;
         font-weight:900;
-        background:linear-gradient(135deg,#102d48,#191334);
-        box-shadow:0 0 20px #00dfff22;
+        background:linear-gradient(135deg,#102b42,#161332);
+        box-shadow:0 0 22px #35e8ff19;
       }
 
       #nexora-games .nx-brand h1 {
-        font-size:clamp(17px,4vw,26px);
+        font-size:clamp(17px,4vw,24px);
+        line-height:1.15;
         margin:0;
-        line-height:1.2;
+        letter-spacing:.6px;
       }
 
       #nexora-games .nx-brand p {
         margin:5px 0 0;
-        color:var(--nx-muted);
+        color:var(--muted);
         font-size:12px;
       }
 
       #nexora-games .nx-btn {
-        border:1px solid var(--nx-line);
-        color:var(--nx-text);
-        background:var(--nx-panel2);
-        border-radius:13px;
-        padding:11px 15px;
-        min-height:43px;
+        border:1px solid var(--line);
+        color:var(--text);
+        background:var(--panel2);
+        border-radius:11px;
+        padding:10px 14px;
+        min-height:42px;
         cursor:pointer;
+        transition:transform .12s,border-color .12s;
       }
 
-      #nexora-games .nx-btn:active { transform:scale(.98); }
+      #nexora-games .nx-btn:active { transform:scale(.97); }
+
+      #nexora-games .nx-btn:focus-visible,
+      #nexora-games button:focus-visible {
+        outline:2px solid var(--cyan);
+        outline-offset:3px;
+      }
 
       #nexora-games .nx-btn-primary {
         color:#001019;
-        background:var(--nx-cyan);
-        border-color:var(--nx-cyan);
         font-weight:900;
+        background:var(--cyan);
+        border-color:var(--cyan);
       }
 
       #nexora-games .nx-title {
-        font-size:18px;
-        margin:22px 0 13px;
+        font-size:17px;
+        margin:20px 0 12px;
       }
 
-      #nexora-games .nx-game-grid {
+      #nexora-games .nx-grid {
         display:grid;
         grid-template-columns:repeat(2,minmax(0,1fr));
         gap:12px;
       }
 
-      #nexora-games .nx-game-card {
+      #nexora-games .nx-card {
         text-align:left;
         padding:16px;
+        border:1px solid var(--line);
+        border-radius:16px;
+        background:linear-gradient(145deg,var(--panel),#080f1e);
+        color:var(--text);
         min-width:0;
-        border:1px solid var(--nx-line);
-        border-radius:17px;
-        background:linear-gradient(145deg,var(--nx-panel),#070e1c);
-        color:var(--nx-text);
         cursor:pointer;
       }
 
-      #nexora-games .nx-game-card:hover {
-        border-color:var(--nx-cyan);
+      #nexora-games .nx-card:hover {
+        border-color:#2684a5;
       }
 
       #nexora-games .nx-card-icon {
-        display:block;
         font-size:29px;
-        margin-bottom:10px;
+        display:block;
+        margin-bottom:11px;
       }
 
       #nexora-games .nx-card-title {
+        font-size:15px;
+        font-weight:800;
         display:block;
-        font-weight:850;
       }
 
       #nexora-games .nx-card-description {
-        display:block;
-        color:var(--nx-muted);
+        color:var(--muted);
         font-size:12px;
+        display:block;
         margin-top:6px;
         line-height:1.5;
       }
 
       #nexora-games .nx-card-best {
         display:block;
-        margin-top:12px;
-        color:var(--nx-cyan);
+        color:var(--cyan);
         font-size:11px;
+        margin-top:12px;
       }
 
       #nexora-games .nx-panel {
-        border:1px solid var(--nx-line);
-        border-radius:23px;
+        border:1px solid var(--line);
+        background:var(--panel);
+        border-radius:20px;
         overflow:hidden;
-        background:var(--nx-panel);
       }
 
       #nexora-games .nx-game-top {
-        padding:18px;
+        padding:16px;
+        border-bottom:1px solid var(--line);
         display:flex;
-        align-items:center;
         justify-content:space-between;
+        align-items:center;
         flex-wrap:wrap;
-        gap:14px;
-        border-bottom:1px solid var(--nx-line);
+        gap:12px;
       }
 
       #nexora-games .nx-game-heading {
@@ -230,59 +233,61 @@
       }
 
       #nexora-games .nx-game-heading h2 {
+        font-size:clamp(19px,4vw,26px);
         margin:0;
-        font-size:clamp(18px,4vw,26px);
       }
 
       #nexora-games .nx-game-heading p {
-        margin:5px 0 0;
-        color:var(--nx-muted);
         font-size:13px;
+        color:var(--muted);
+        margin:4px 0 0;
       }
 
       #nexora-games .nx-stats {
         display:flex;
-        gap:9px;
+        gap:8px;
         flex-wrap:wrap;
       }
 
       #nexora-games .nx-stat {
-        background:#050c18;
-        border:1px solid var(--nx-line);
+        padding:9px 12px;
+        border:1px solid var(--line);
         border-radius:12px;
-        padding:10px 13px;
+        background:#060d19;
         font-size:13px;
+        white-space:nowrap;
       }
 
-      #nexora-games .nx-stat strong { color:var(--nx-cyan); }
+      #nexora-games .nx-stat strong {
+        color:var(--cyan);
+      }
 
       #nexora-games .nx-game-area {
-        position:relative;
         padding:14px;
-        min-height:180px;
+        min-height:220px;
       }
 
       #nexora-games .nx-canvas-wrap {
-        position:relative;
         width:100%;
-        margin:auto;
+        max-width:520px;
+        margin:0 auto;
       }
 
       #nexora-games canvas {
         display:block;
         width:100%;
         height:auto;
-        border:1px solid #153b5c;
-        border-radius:17px;
+        border-radius:14px;
         background:#030914;
+        border:1px solid #1b3854;
         touch-action:none;
       }
 
       #nexora-games .nx-message {
         text-align:center;
-        min-height:23px;
-        padding:6px 10px 12px;
-        color:var(--nx-cyan);
+        min-height:25px;
+        padding:7px 12px 14px;
+        color:var(--cyan);
         font-size:13px;
       }
 
@@ -294,144 +299,169 @@
         padding:12px;
       }
 
-      /* UNIVERSAL LAPTOP-STYLE TOUCHPAD */
+      /* UNIVERSAL VIRTUAL TOUCHPAD */
 
-      #nexora-games .nx-gamepad {
-        border-top:1px solid var(--nx-line);
-        padding:20px 12px;
-        background:linear-gradient(180deg,#081426,#040b16);
+      #nexora-games .nx-controller {
+        padding:18px 12px;
+        border-top:1px solid #18334d;
+        background:linear-gradient(180deg,#071326,#040a16);
       }
 
-      #nexora-games .nx-pad-label {
-        color:var(--nx-muted);
-        text-align:center;
+      #nexora-games .nx-controller-title {
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:12px;
+        color:#a7c8ed;
         font-size:12px;
         font-weight:900;
-        letter-spacing:3px;
-        margin-bottom:15px;
+        letter-spacing:2px;
+        margin-bottom:16px;
+        text-align:center;
       }
 
-      #nexora-games .nx-touch-layout {
-        width:min(100%,650px);
-        margin:auto;
+      #nexora-games .nx-controller-title:before,
+      #nexora-games .nx-controller-title:after {
+        content:"";
+        height:2px;
+        flex:1;
+        max-width:120px;
+        background:linear-gradient(90deg,transparent,var(--cyan));
+      }
+
+      #nexora-games .nx-controller-title:after {
+        background:linear-gradient(90deg,var(--cyan),transparent);
+      }
+
+      #nexora-games .nx-controller-layout {
         display:grid;
-        grid-template-columns:minmax(0,1fr);
-        gap:13px;
+        grid-template-columns:minmax(70px,.7fr) minmax(150px,1.5fr) minmax(70px,.7fr);
         align-items:center;
+        gap:12px;
+        max-width:850px;
+        margin:auto;
       }
 
-      #nexora-games .nx-touch-instructions {
-        display:flex;
-        justify-content:space-between;
-        gap:10px;
-        align-items:center;
-        flex-wrap:wrap;
-        color:#a6c5e7;
+      #nexora-games .nx-instructions,
+      #nexora-games .nx-pad-status {
+        min-width:0;
+        padding:12px;
+        border:1px solid #17466b;
+        border-radius:15px;
+        background:#07182c;
+        color:#a9c9ed;
         font-size:12px;
         line-height:1.7;
       }
 
-      #nexora-games .nx-touch-status {
-        color:var(--nx-green);
+      #nexora-games .nx-instructions .nx-hand {
+        display:block;
+        font-size:28px;
+        margin-bottom:5px;
+      }
+
+      #nexora-games .nx-pad-status strong {
+        display:block;
+        color:#9bc9ff;
+        margin-bottom:7px;
+        font-size:12px;
+      }
+
+      #nexora-games .nx-ready {
+        color:var(--green);
         font-weight:800;
       }
 
-      #nexora-games .nx-touchpad {
+      #nexora-games .nx-pad {
         position:relative;
+        height:170px;
         width:100%;
-        height:160px;
-        overflow:hidden;
-        border:3px solid #00dfff;
-        border-radius:24px;
+        border:3px solid #087ca5;
+        border-radius:23px;
         background:
-          linear-gradient(90deg,transparent 49.7%,#20b8df30 50%,transparent 50.3%),
-          linear-gradient(transparent 49.7%,#20b8df30 50%,transparent 50.3%),
-          radial-gradient(ellipse at center,#123e5d,#08192c 75%);
-        box-shadow:0 0 17px #00dfff32,inset 0 0 22px #00dfff13;
+          linear-gradient(90deg,transparent 49.6%,#1681a744 50%,transparent 50.5%),
+          linear-gradient(transparent 49.6%,#1681a744 50%,transparent 50.5%),
+          radial-gradient(ellipse at center,#123c5c,#071a30 75%);
+        box-shadow:0 0 0 4px #00d9ff12,0 0 20px #00cfff22,inset 0 0 22px #00cfff14;
+        overflow:hidden;
         touch-action:none;
         user-select:none;
         -webkit-user-select:none;
+        cursor:crosshair;
       }
 
-      #nexora-games .nx-touchpad::before {
+      #nexora-games .nx-pad:before {
         content:"";
         position:absolute;
         inset:10px;
-        border:1px solid #35e8ff38;
-        border-radius:15px;
+        border:1px solid #42caff22;
+        border-radius:13px;
         pointer-events:none;
       }
 
-      #nexora-games .nx-touchpad::after {
-        content:"";
+      #nexora-games .nx-pad.nx-pad-active {
+        border-color:var(--cyan);
+        box-shadow:0 0 0 4px #00d9ff20,0 0 25px #00cfff55,inset 0 0 28px #00cfff24;
+      }
+
+      #nexora-games .nx-pad-knob {
         position:absolute;
         left:50%;
         top:50%;
-        width:100px;
-        height:100px;
-        border:1px solid #35e8ff20;
+        width:48px;
+        height:48px;
+        border:3px solid #25e7ff;
         border-radius:50%;
+        background:radial-gradient(circle,#35e8ff 0 22%,#087fa7 27%,#063554 70%);
+        box-shadow:0 0 0 10px #00d9ff19,0 0 0 20px #00d9ff0d,0 0 20px #00d9ff88;
         transform:translate(-50%,-50%);
         pointer-events:none;
       }
 
-      #nexora-games .nx-touch-knob {
-        position:absolute;
-        left:50%;
-        top:50%;
-        width:32px;
-        height:32px;
-        transform:translate(-50%,-50%);
-        border:3px solid #8bf8ff;
-        border-radius:50%;
-        background:#00dfff;
-        box-shadow:0 0 15px #00dfff,0 0 35px #00dfff70;
-        pointer-events:none;
-        z-index:2;
-      }
-
-      #nexora-games .nx-touchpad.nx-touch-active {
-        border-color:#71f7ff;
-        box-shadow:0 0 25px #00dfff50,inset 0 0 28px #00dfff22;
-      }
-
-      #nexora-games .nx-touch-buttons {
+      #nexora-games .nx-pad-actions {
         display:flex;
         justify-content:center;
+        align-items:center;
         flex-wrap:wrap;
         gap:10px;
+        margin-top:15px;
       }
 
-      #nexora-games .nx-pad-btn {
-        min-width:65px;
-        min-height:55px;
-        padding:10px 16px;
-        border:1px solid #28536e;
-        border-radius:14px;
-        color:var(--nx-cyan);
-        background:linear-gradient(145deg,#142a42,#091426);
+      #nexora-games .nx-pad-action {
+        min-width:100px;
+        min-height:45px;
+        padding:10px 18px;
+        border-radius:12px;
+        border:1px solid #087da3;
+        background:#09243b;
+        color:var(--cyan);
         font-weight:900;
-        font-size:18px;
         cursor:pointer;
         touch-action:manipulation;
       }
 
-      #nexora-games .nx-pad-action {
-        min-width:115px;
-        color:#001a12;
-        background:linear-gradient(145deg,#5affc2,#17c98b);
-        border-color:var(--nx-green);
+      #nexora-games .nx-pad-action.fire {
+        color:#00120e;
+        background:linear-gradient(135deg,#5bffc1,#18c88c);
+        border-color:var(--green);
+      }
+
+      #nexora-games .nx-pad-action.jump {
+        color:#fff;
+        background:linear-gradient(135deg,#8053d8,#43278b);
+        border-color:var(--purple);
       }
 
       #nexora-games .nx-board {
         display:grid;
         gap:8px;
-        max-width:340px;
-        margin:15px auto;
+        max-width:360px;
+        margin:12px auto;
       }
 
       #nexora-games .nx-ttt-board {
         grid-template-columns:repeat(3,minmax(0,1fr));
+        width:min(100%,330px);
       }
 
       #nexora-games .nx-cell {
@@ -439,27 +469,29 @@
         border:1px solid #2a415e;
         border-radius:13px;
         background:#0c192a;
-        color:var(--nx-cyan);
-        font-size:clamp(30px,8vw,48px);
+        color:var(--cyan);
+        font-size:clamp(28px,8vw,48px);
         font-weight:900;
         cursor:pointer;
       }
 
-      #nexora-games .nx-cell.nx-o { color:var(--nx-purple); }
+      #nexora-games .nx-cell.nx-o {
+        color:var(--purple);
+      }
 
       #nexora-games .nx-result {
-        text-align:center;
-        color:var(--nx-muted);
         font-size:14px;
-        line-height:1.6;
+        color:var(--muted);
+        text-align:center;
+        min-height:24px;
       }
 
       #nexora-games .nx-question {
+        font-size:clamp(28px,8vw,43px);
+        font-weight:900;
         text-align:center;
         margin:20px 0;
-        color:var(--nx-cyan);
-        font-size:clamp(27px,7vw,42px);
-        font-weight:900;
+        color:var(--cyan);
       }
 
       #nexora-games .nx-answer-grid {
@@ -467,15 +499,15 @@
         grid-template-columns:repeat(2,minmax(0,1fr));
         gap:10px;
         max-width:480px;
-        margin:15px auto;
+        margin:16px auto;
       }
 
       #nexora-games .nx-answer {
-        padding:15px 8px;
-        border:1px solid var(--nx-line);
+        padding:15px 10px;
+        border:1px solid var(--line);
         border-radius:12px;
+        color:var(--text);
         background:#0c192a;
-        color:var(--nx-text);
         font-weight:800;
         cursor:pointer;
       }
@@ -484,16 +516,16 @@
         display:flex;
         justify-content:center;
         flex-wrap:wrap;
-        gap:9px;
+        gap:10px;
         margin:18px auto;
       }
 
       #nexora-games .nx-word {
         text-align:center;
-        margin:20px 0;
         font-size:clamp(22px,6vw,34px);
+        letter-spacing:7px;
+        margin:18px 0;
         font-weight:900;
-        letter-spacing:6px;
         overflow-wrap:anywhere;
       }
 
@@ -507,493 +539,96 @@
 
       #nexora-games .nx-letter {
         min-height:39px;
-        border:1px solid var(--nx-line);
+        border:1px solid var(--line);
         border-radius:8px;
         background:#0d192b;
-        color:var(--nx-text);
+        color:var(--text);
         cursor:pointer;
+        font-weight:800;
       }
 
-      #nexora-games .nx-letter:disabled,
-      #nexora-games .nx-answer:disabled {
-        opacity:.45;
+      #nexora-games .nx-letter:disabled {
+        opacity:.3;
         cursor:default;
       }
 
-      #nexora-games .nx-hidden { display:none !important; }
-
       #nexora-games .nx-footer {
-        padding:18px 0 4px;
-        color:#7188a6;
         text-align:center;
-        font-size:12px;
+        color:#60758f;
+        font-size:11px;
+        padding:18px 0 4px;
       }
 
       @media(min-width:650px) {
         #nexora-games { padding:24px; }
-        #nexora-games .nx-game-grid {
-          grid-template-columns:repeat(3,minmax(0,1fr));
-        }
+        #nexora-games .nx-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
         #nexora-games .nx-game-area { padding:20px; }
-        #nexora-games .nx-touch-layout {
-          grid-template-columns:minmax(0,1fr);
+        #nexora-games .nx-pad { height:200px; }
+      }
+
+      @media(max-width:480px) {
+        #nexora-games .nx-controller-layout {
+          grid-template-columns:1fr;
+          gap:10px;
+        }
+
+        #nexora-games .nx-instructions {
+          text-align:center;
+          padding:7px 10px;
+        }
+
+        #nexora-games .nx-instructions .nx-hand {
+          display:inline;
+          margin-right:8px;
+        }
+
+        #nexora-games .nx-pad-status {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:7px 12px;
+        }
+
+        #nexora-games .nx-pad-status strong {
+          margin:0;
+        }
+
+        #nexora-games .nx-pad {
+          height:165px;
         }
       }
 
-      @media(max-width:380px) {
+      @media(max-width:360px) {
         #nexora-games { padding:10px; }
-        #nexora-games .nx-game-grid { gap:8px; }
-        #nexora-games .nx-game-card { padding:12px; }
-        #nexora-games .nx-touchpad { height:135px; }
+        #nexora-games .nx-grid { gap:8px; }
+        #nexora-games .nx-card { padding:12px; }
         #nexora-games .nx-letter-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
       }
 
       @media(prefers-reduced-motion:reduce) {
-        #nexora-games * { transition:none !important; }
+        #nexora-games * { transition:none!important; }
       }
     `;
 
     document.head.appendChild(style);
   }
 
-  function dispose() {
-    gameToken++;
+  function stopCurrent() {
+    generation++;
 
-    cleanup.forEach(fn => {
-      try { fn(); } catch (error) {
-        console.warn('Nexora cleanup:', error);
-      }
-    });
+    try {
+      cleanupCurrent();
+    } catch (error) {
+      console.warn('Arcade cleanup:', error);
+    }
 
-    cleanup = [];
-    currentGame = null;
+    cleanupCurrent = () => {};
+    activeGame = null;
   }
 
-  function register(fn) {
-    if (typeof fn === 'function') cleanup.push(fn);
-  }
-
-  function setMessage(message) {
-    const el = $('[data-message]');
-    if (el) el.textContent = message || '';
-  }
-
-  function setScore(value) {
-    if (!currentGame) return;
-
-    currentGame.score = Math.max(0, Math.floor(Number(value) || 0));
-
-    const score = $('[data-score]');
-    const best = $('[data-best]');
-
-    if (score) score.textContent = currentGame.score;
-
-    if (currentGame.score > bestScore(currentGame.id)) {
-      scores[currentGame.id] = currentGame.score;
-      saveScores();
-    }
-
-    if (best) best.textContent = bestScore(currentGame.id);
-  }
-
-  function addScore(points = 1) {
-    if (currentGame) setScore(currentGame.score + points);
-  }
-
-  function canvas(width, height, maxWidth = width) {
-    const wrap = document.createElement('div');
-    wrap.className = 'nx-canvas-wrap';
-    wrap.style.maxWidth = maxWidth + 'px';
-
-    const el = document.createElement('canvas');
-    el.width = width;
-    el.height = height;
-    el.setAttribute('aria-label', 'Game play area');
-
-    wrap.appendChild(el);
-    $('[data-game-area]').appendChild(wrap);
-
-    const ctx = el.getContext('2d');
-
-    if (!ctx) throw new Error('Canvas is not supported.');
-
-    return { canvas: el, ctx };
-  }
-
-  function loop(callback) {
-    let raf = 0;
-    let previous = 0;
-    let alive = true;
-    const token = gameToken;
-
-    function frame(now) {
-      if (!alive || token !== gameToken) return;
-
-      const dt = previous ? Math.min((now - previous) / 1000, 0.035) : 0;
-      previous = now;
-
-      callback(dt, now);
-      raf = requestAnimationFrame(frame);
-    }
-
-    raf = requestAnimationFrame(frame);
-
-    return () => {
-      alive = false;
-      cancelAnimationFrame(raf);
-    };
-  }
-
-  function keyboard(callback) {
-    const down = event => {
-      if (event.target instanceof HTMLInputElement ||
-          event.target instanceof HTMLTextAreaElement) return;
-
-      callback(event, true);
-    };
-
-    const up = event => callback(event, false);
-
-    window.addEventListener('keydown', down);
-    window.addEventListener('keyup', up);
-
-    return () => {
-      window.removeEventListener('keydown', down);
-      window.removeEventListener('keyup', up);
-    };
-  }
-
-  /*
-   * UNIVERSAL TOUCHPAD:
-   * Swipe directions work across the arcade.
-   * Buttons provide accessible directional controls.
-   * Game-specific actions are mapped separately.
-   */
-
-  function touchpad(gameId, container) {
-    const padRoot = document.createElement('div');
-    padRoot.className = 'nx-gamepad';
-
-    padRoot.innerHTML = `
-      <div class="nx-pad-label">UNIVERSAL TOUCHPAD</div>
-
-      <div class="nx-touch-layout">
-        <div class="nx-touch-instructions">
-          <span>Swipe to move · Tap to act</span>
-          <span class="nx-touch-status" data-pad-status>● Ready</span>
-        </div>
-
-        <div class="nx-touchpad"
-             data-touchpad
-             role="application"
-             aria-label="Touchpad controller">
-          <div class="nx-touch-knob" data-touch-knob></div>
-        </div>
-
-        <div class="nx-touch-buttons">
-          <button type="button" class="nx-pad-btn" data-direction="left" aria-label="Move left">←</button>
-          <button type="button" class="nx-pad-btn" data-direction="up" aria-label="Move up">↑</button>
-          <button type="button" class="nx-pad-btn" data-direction="down" aria-label="Move down">↓</button>
-          <button type="button" class="nx-pad-btn" data-direction="right" aria-label="Move right">→</button>
-          <button type="button" class="nx-pad-btn nx-pad-action" data-pad-action>ACT</button>
-        </div>
-      </div>
-    `;
-
-    container.replaceChildren(padRoot);
-
-    const pad = $('[data-touchpad]', padRoot);
-    const knob = $('[data-touch-knob]', padRoot);
-    const status = $('[data-pad-status]', padRoot);
-    const actionButton = $('[data-pad-action]', padRoot);
-
-    const keyMap = {
-      left: 'ArrowLeft',
-      right: 'ArrowRight',
-      up: 'ArrowUp',
-      down: 'ArrowDown'
-    };
-
-    const activeKeys = new Set();
-    let pointerId = null;
-    let startX = 0;
-    let startY = 0;
-    let moved = false;
-    let lastDirection = '';
-    let destroyed = false;
-
-    function emitKey(key, pressed) {
-      if (!key || destroyed) return;
-
-      if (pressed) {
-        if (activeKeys.has(key)) return;
-        activeKeys.add(key);
-
-        window.dispatchEvent(new KeyboardEvent('keydown', {
-          key,
-          bubbles: true,
-          cancelable: true
-        }));
-      } else {
-        if (!activeKeys.has(key)) return;
-        activeKeys.delete(key);
-
-        window.dispatchEvent(new KeyboardEvent('keyup', {
-          key,
-          bubbles: true,
-          cancelable: true
-        }));
-      }
-    }
-
-    function releaseKeys() {
-      [...activeKeys].forEach(key => emitKey(key, false));
-    }
-
-    function directionFor(dx, dy) {
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 16) return '';
-
-      if (Math.abs(dx) >= Math.abs(dy)) {
-        return dx < 0 ? 'left' : 'right';
-      }
-
-      return dy < 0 ? 'up' : 'down';
-    }
-
-    function showStatus(message) {
-      if (!destroyed) status.textContent = message;
-    }
-
-    function move(direction, pressed) {
-      if (destroyed) return;
-
-      if (gameId === 'ttt' ||
-          gameId === 'math' ||
-          gameId === 'rps' ||
-          gameId === 'hangman') {
-        showStatus('Tap your answer on the game.');
-        return;
-      }
-
-      if (gameId === 'runner' && direction === 'up' && pressed) {
-        act();
-        return;
-      }
-
-      if (gameId === 'flappy' && pressed) {
-        act();
-        return;
-      }
-
-      if (gameId === 'pong' &&
-          direction !== 'up' && direction !== 'down') return;
-
-      if (gameId === 'breakout' &&
-          direction !== 'left' && direction !== 'right') return;
-
-      if (gameId === 'shooter' &&
-          direction !== 'left' && direction !== 'right') return;
-
-      emitKey(keyMap[direction], pressed);
-
-      if (pressed) {
-        lastDirection = direction;
-        showStatus('● Moving ' + direction);
-      } else {
-        showStatus('● Ready');
-      }
-    }
-
-    function act() {
-      if (destroyed) return;
-
-      switch (gameId) {
-        case 'snake':
-          showStatus('Swipe to steer your snake.');
-          break;
-
-        case 'runner':
-        case 'flappy':
-        case 'shooter':
-        case 'breakout':
-          emitKey(' ', true);
-          setTimeout(() => emitKey(' ', false), 60);
-          showStatus('● Action');
-          break;
-
-        case 'pong':
-          showStatus('Move up or down to control your paddle.');
-          break;
-
-        case 'ttt':
-        case 'math':
-        case 'rps':
-        case 'hangman':
-          showStatus('Tap your choice in the game.');
-          break;
-
-        default:
-          showStatus('● Ready');
-      }
-    }
-
-    function onPointerDown(event) {
-      if (destroyed || pointerId !== null) return;
-
-      event.preventDefault();
-
-      pointerId = event.pointerId;
-      const rect = pad.getBoundingClientRect();
-
-      startX = event.clientX - rect.left;
-      startY = event.clientY - rect.top;
-      moved = false;
-      lastDirection = '';
-
-      pad.classList.add('nx-touch-active');
-
-      try {
-        pad.setPointerCapture(pointerId);
-      } catch (_) {}
-
-      knob.style.left = startX + 'px';
-      knob.style.top = startY + 'px';
-
-      showStatus('● Touch active');
-    }
-
-    function onPointerMove(event) {
-      if (destroyed || event.pointerId !== pointerId) return;
-
-      event.preventDefault();
-
-      const rect = pad.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      const dx = x - startX;
-      const dy = y - startY;
-
-      const maxX = rect.width * 0.38;
-      const maxY = rect.height * 0.32;
-
-      knob.style.left = Math.max(12, Math.min(rect.width - 12, x)) + 'px';
-      knob.style.top = Math.max(12, Math.min(rect.height - 12, y)) + 'px';
-
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 16) {
-        moved = true;
-
-        const direction = directionFor(dx, dy);
-
-        if (direction && direction !== lastDirection) {
-          releaseKeys();
-          move(direction, true);
-        }
-      }
-    }
-
-    function onPointerUp(event) {
-      if (pointerId === null ||
-          (event && event.pointerId !== undefined &&
-           event.pointerId !== pointerId)) return;
-
-      if (event && event.cancelable) event.preventDefault();
-
-      const wasMoved = moved;
-
-      pointerId = null;
-      pad.classList.remove('nx-touch-active');
-
-      releaseKeys();
-
-      knob.style.left = '50%';
-      knob.style.top = '50%';
-
-      if (!wasMoved) act();
-      else showStatus('● Ready');
-    }
-
-    function onPointerCancel() {
-      pointerId = null;
-      pad.classList.remove('nx-touch-active');
-      releaseKeys();
-      knob.style.left = '50%';
-      knob.style.top = '50%';
-      showStatus('● Ready');
-    }
-
-    pad.addEventListener('pointerdown', onPointerDown);
-    pad.addEventListener('pointermove', onPointerMove);
-    pad.addEventListener('pointerup', onPointerUp);
-    pad.addEventListener('pointercancel', onPointerCancel);
-    pad.addEventListener('lostpointercapture', onPointerCancel);
-
-    const directionButtons = $$('[data-direction]', padRoot);
-
-    directionButtons.forEach(button => {
-      const direction = button.dataset.direction;
-
-      const down = event => {
-        event.preventDefault();
-        move(direction, true);
-      };
-
-      const up = event => {
-        if (event) event.preventDefault();
-        move(direction, false);
-      };
-
-      button.addEventListener('pointerdown', down);
-      button.addEventListener('pointerup', up);
-      button.addEventListener('pointercancel', up);
-      button.addEventListener('lostpointercapture', up);
-
-      register(() => {
-        button.removeEventListener('pointerdown', down);
-        button.removeEventListener('pointerup', up);
-        button.removeEventListener('pointercancel', up);
-        button.removeEventListener('lostpointercapture', up);
-      });
-    });
-
-    const onAction = event => {
-      event.preventDefault();
-      act();
-    };
-
-    actionButton.addEventListener('click', onAction);
-
-    const labels = {
-      snake: 'TURN',
-      ttt: 'SELECT',
-      pong: 'PLAY',
-      breakout: 'LAUNCH',
-      runner: 'JUMP',
-      shooter: 'FIRE',
-      math: 'ANSWER',
-      rps: 'CHOOSE',
-      hangman: 'GUESS',
-      flappy: 'FLAP'
-    };
-
-    actionButton.textContent = labels[gameId] || 'ACT';
-
-    register(() => {
-      destroyed = true;
-      releaseKeys();
-
-      pad.removeEventListener('pointerdown', onPointerDown);
-      pad.removeEventListener('pointermove', onPointerMove);
-      pad.removeEventListener('pointerup', onPointerUp);
-      pad.removeEventListener('pointercancel', onPointerCancel);
-      pad.removeEventListener('lostpointercapture', onPointerCancel);
-      actionButton.removeEventListener('click', onAction);
-    });
-  }
-
-  function renderHome() {
-    dispose();
-    installStyles();
+  function showHome() {
+    stopCurrent();
 
     root.innerHTML = `
       <div class="nx-shell">
@@ -1005,46 +640,42 @@
               <p>ARCADE UNIVERSE · PLAY WITHOUT LIMITS</p>
             </div>
           </div>
-
-          <button class="nx-btn" data-refresh>↻ Refresh Scores</button>
+          <button class="nx-btn" data-action="refresh">↻ Refresh Scores</button>
         </header>
 
         <h2 class="nx-title">Choose Your Game</h2>
 
-        <div class="nx-game-grid">
+        <div class="nx-grid">
           ${games.map(game => `
-            <button class="nx-game-card" data-open="${game.id}">
+            <button class="nx-card" data-open="${game.id}">
               <span class="nx-card-icon">${game.icon}</span>
               <span class="nx-card-title">${escapeHTML(game.name)}</span>
               <span class="nx-card-description">${escapeHTML(game.description)}</span>
-              <span class="nx-card-best">BEST SCORE: ${bestScore(game.id)}</span>
+              <span class="nx-card-best">BEST SCORE: ${best(game.id)}</span>
             </button>
           `).join('')}
         </div>
 
-        <footer class="nx-footer">
-          REXWEB NEXORA · YOUR DIGITAL WORLD, WITHOUT LIMITS
-        </footer>
+        <footer class="nx-footer">REXWEB NEXORA · YOUR DIGITAL WORLD, WITHOUT LIMITS</footer>
       </div>
     `;
 
     $$('[data-open]').forEach(button => {
-      button.addEventListener('click', () => startGame(button.dataset.open));
+      button.addEventListener('click', () => openGame(button.dataset.open));
     });
 
-    $('[data-refresh]').addEventListener('click', renderHome);
+    $('[data-action="refresh"]').addEventListener('click', showHome);
   }
 
-  function startGame(id) {
+  function openGame(id) {
     const game = games.find(item => item.id === id);
     if (!game) return;
 
-    dispose();
-    installStyles();
+    stopCurrent();
+    activeGame = id;
 
-    currentGame = { id, score: 0 };
-
-    const token = gameToken;
+    const thisGeneration = generation;
+    let score = 0;
 
     root.innerHTML = `
       <div class="nx-shell">
@@ -1056,13 +687,13 @@
               <p>ARCADE UNIVERSE · TOUCH TO PLAY</p>
             </div>
           </div>
-          <button class="nx-btn" data-home>← All Games</button>
+          <button class="nx-btn" data-action="home">← All Games</button>
         </header>
 
         <section class="nx-panel">
           <div class="nx-game-top">
             <div class="nx-game-heading">
-              <span style="font-size:34px">${game.icon}</span>
+              <span style="font-size:32px">${game.icon}</span>
               <div>
                 <h2>${escapeHTML(game.name)}</h2>
                 <p>${escapeHTML(game.description)}</p>
@@ -1071,1427 +702,1753 @@
 
             <div class="nx-stats">
               <div class="nx-stat">SCORE: <strong data-score>0</strong></div>
-              <div class="nx-stat">BEST: <strong data-best>${bestScore(id)}</strong></div>
+              <div class="nx-stat">BEST: <strong data-best>${best(id)}</strong></div>
             </div>
           </div>
 
           <div class="nx-game-area" data-game-area></div>
           <div class="nx-message" data-message aria-live="polite"></div>
 
-          <div data-gamepad></div>
+          <section class="nx-controller">
+            <div class="nx-controller-title">TOUCH CONTROLLER</div>
+
+            <div class="nx-controller-layout">
+              <div class="nx-instructions">
+                <span class="nx-hand">☝️</span>
+                <span data-instructions>Drag to move</span>
+              </div>
+
+              <div class="nx-pad" data-pad aria-label="Virtual touchpad. Drag to move and tap to act.">
+                <div class="nx-pad-knob" data-knob></div>
+              </div>
+
+              <div class="nx-pad-status">
+                <div>
+                  <strong>PAD STATUS</strong>
+                  <span class="nx-ready" data-pad-state>● Ready</span>
+                </div>
+                <div>
+                  X: <span data-pad-x>0.50</span><br>
+                  Y: <span data-pad-y>0.50</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="nx-pad-actions" data-actions></div>
+          </section>
 
           <div class="nx-controls">
-            <button class="nx-btn nx-btn-primary" data-restart>↻ Restart</button>
-            <button class="nx-btn" data-home>▦ All Games</button>
+            <button class="nx-btn nx-btn-primary" data-action="restart">↻ Restart</button>
+            <button class="nx-btn" data-action="home">▦ All Games</button>
           </div>
         </section>
 
-        <footer class="nx-footer">
-          Use the touchpad or keyboard to play.
-        </footer>
+        <footer class="nx-footer">Use the touchpad or your keyboard to play.</footer>
       </div>
     `;
 
-    $$('[data-home]').forEach(button => {
-      button.addEventListener('click', renderHome);
+    const area = $('[data-game-area]');
+    const message = $('[data-message]');
+    const scoreLabel = $('[data-score]');
+    const bestLabel = $('[data-best]');
+    const pad = $('[data-pad]');
+    const knob = $('[data-knob]');
+    const padState = $('[data-pad-state]');
+    const padX = $('[data-pad-x]');
+    const padY = $('[data-pad-y]');
+    const instructions = $('[data-instructions]');
+    const actions = $('[data-actions]');
+
+    $('[data-action="home"]').addEventListener('click', showHome);
+    $('[data-action="restart"]').addEventListener('click', () => {
+      if (activeGame === id) openGame(id);
     });
 
-    $('[data-restart]').addEventListener('click', () => startGame(id));
-
-    try {
-      switch (id) {
-        case 'snake': gameSnake(); break;
-        case 'ttt': gameTTT(); break;
-        case 'pong': gamePong(); break;
-        case 'breakout': gameBreakout(); break;
-        case 'runner': gameRunner(); break;
-        case 'shooter': gameShooter(); break;
-        case 'math': gameMath(); break;
-        case 'rps': gameRPS(); break;
-        case 'hangman': gameHangman(); break;
-        case 'flappy': gameFlappy(); break;
-      }
-
-      if (token === gameToken && currentGame) {
-        touchpad(id, $('[data-gamepad]'));
-      }
-    } catch (error) {
-      console.error('Nexora game error:', error);
-      setMessage('The game encountered an error. Tap Restart to try again.');
+    function setMessage(text) {
+      if (message && message.isConnected) message.textContent = text || '';
     }
-  }
 
-  /* 1. SNAKE */
+    function setScore(value) {
+      score = Math.max(0, Math.floor(Number(value) || 0));
+      scoreLabel.textContent = score;
 
-  function gameSnake() {
-    const { canvas: el, ctx } = canvas(360, 360);
-    const size = 18;
-    const cells = 20;
+      if (score > best(id)) {
+        scores[id] = score;
+        saveScores();
+      }
 
-    let body, direction, nextDirection, food, alive, accumulator;
+      bestLabel.textContent = best(id);
+    }
 
-    function reset() {
-      body = [
+    function addScore(amount = 1) {
+      setScore(score + amount);
+    }
+
+    function makeCanvas(width, height) {
+      const wrap = document.createElement('div');
+      wrap.className = 'nx-canvas-wrap';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.setAttribute('aria-label', `${game.name} game area`);
+
+      wrap.appendChild(canvas);
+      area.appendChild(wrap);
+
+      return { canvas, ctx: canvas.getContext('2d') };
+    }
+
+    const controller = {
+      x: 0,
+      y: 0,
+      active: false,
+      fire: false,
+      jump: false,
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      tap: false,
+      keys: new Set()
+    };
+
+    const localCleanups = [];
+    let animationFrame = 0;
+    let intervalIds = [];
+    let timeoutIds = [];
+    let lastTime = 0;
+
+    function listen(target, event, handler, options) {
+      target.addEventListener(event, handler, options);
+      localCleanups.push(() => target.removeEventListener(event, handler, options));
+    }
+
+    function timeout(callback, ms) {
+      const timer = setTimeout(() => {
+        timeoutIds = timeoutIds.filter(id => id !== timer);
+        if (thisGeneration === generation && activeGame === id) callback();
+      }, ms);
+
+      timeoutIds.push(timer);
+      return timer;
+    }
+
+    function interval(callback, ms) {
+      const timer = setInterval(() => {
+        if (thisGeneration === generation && activeGame === id) callback();
+      }, ms);
+
+      intervalIds.push(timer);
+      return timer;
+    }
+
+    function frame(callback) {
+      let alive = true;
+
+      const tick = time => {
+        if (!alive || thisGeneration !== generation || activeGame !== id) return;
+
+        const dt = lastTime ? Math.min((time - lastTime) / 1000, 0.04) : 0;
+        lastTime = time;
+
+        callback(dt, time);
+        animationFrame = requestAnimationFrame(tick);
+      };
+
+      animationFrame = requestAnimationFrame(tick);
+
+      return () => {
+        alive = false;
+        cancelAnimationFrame(animationFrame);
+      };
+    }
+
+    function addAction(label, className, callback) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `nx-pad-action ${className || ''}`;
+      button.textContent = label;
+
+      const handler = event => {
+        event.preventDefault();
+        controller.tap = true;
+        if (callback) callback();
+      };
+
+      listen(button, 'pointerdown', handler);
+      actions.appendChild(button);
+      return button;
+    }
+
+    function setInstructions(text) {
+      instructions.textContent = text;
+    }
+
+    function updatePadDisplay() {
+      const rect = pad.getBoundingClientRect();
+      const maxX = Math.max(1, rect.width / 2 - 28);
+      const maxY = Math.max(1, rect.height / 2 - 28);
+
+      knob.style.left = `${50 + controller.x * 43}%`;
+      knob.style.top = `${50 + controller.y * 43}%`;
+
+      padX.textContent = (0.5 + controller.x / 2).toFixed(2);
+      padY.textContent = (0.5 + controller.y / 2).toFixed(2);
+
+      padState.textContent = controller.active ? '● Active' : '● Ready';
+      padState.style.color = controller.active ? '#35e8ff' : '#43f5a5';
+
+      pad.classList.toggle('nx-pad-active', controller.active);
+    }
+
+    function resetPad() {
+      controller.x = 0;
+      controller.y = 0;
+      controller.active = false;
+      controller.left = false;
+      controller.right = false;
+      controller.up = false;
+      controller.down = false;
+      updatePadDisplay();
+    }
+
+    function updateFromPointer(event) {
+      const rect = pad.getBoundingClientRect();
+
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = (event.clientY - rect.top) / rect.height;
+
+      controller.x = Math.max(-1, Math.min(1, (nx - 0.5) * 2));
+      controller.y = Math.max(-1, Math.min(1, (ny - 0.5) * 2));
+
+      controller.left = controller.x < -0.18;
+      controller.right = controller.x > 0.18;
+      controller.up = controller.y < -0.18;
+      controller.down = controller.y > 0.18;
+      controller.active = true;
+
+      updatePadDisplay();
+    }
+
+    let pointerId = null;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let pointerMoved = false;
+
+    listen(pad, 'pointerdown', event => {
+      event.preventDefault();
+
+      pointerId = event.pointerId;
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+      pointerMoved = false;
+
+      try {
+        pad.setPointerCapture(event.pointerId);
+      } catch (_) {}
+
+      updateFromPointer(event);
+
+      if (id === 'shooter') {
+        controller.fire = true;
+      } else if (id === 'flappy') {
+        controller.jump = true;
+      } else if (id === 'runner') {
+        controller.jump = true;
+      } else if (id === 'snake') {
+        steerSnakeFromVector(controller.x, controller.y);
+      } else if (id === 'ttt') {
+        handleBoardTap(event);
+      } else if (id === 'math') {
+        handleMathTap(event);
+      } else if (id === 'rps') {
+        handleRpsTap(event);
+      } else if (id === 'hangman') {
+        handleHangmanTap(event);
+      } else {
+        controller.tap = true;
+      }
+    });
+
+    listen(pad, 'pointermove', event => {
+      if (event.pointerId !== pointerId) return;
+      event.preventDefault();
+
+      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 8) {
+        pointerMoved = true;
+      }
+
+      updateFromPointer(event);
+
+      if (id === 'snake') {
+        steerSnakeFromVector(controller.x, controller.y);
+      }
+
+      if (id === 'shooter') {
+        controller.fire = true;
+      }
+    });
+
+    function endPointer(event) {
+      if (pointerId !== null && event.pointerId !== pointerId) return;
+
+      pointerId = null;
+      resetPad();
+
+      controller.fire = false;
+      controller.jump = false;
+    }
+
+    listen(pad, 'pointerup', endPointer);
+    listen(pad, 'pointercancel', endPointer);
+    listen(pad, 'lostpointercapture', endPointer);
+    listen(pad, 'contextmenu', event => event.preventDefault());
+
+    listen(window, 'keydown', event => {
+      if (thisGeneration !== generation) return;
+
+      const key = event.key.toLowerCase();
+      controller.keys.add(key);
+
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) {
+        event.preventDefault();
+      }
+
+      controller.left = controller.keys.has('arrowleft') || controller.keys.has('a');
+      controller.right = controller.keys.has('arrowright') || controller.keys.has('d');
+      controller.up = controller.keys.has('arrowup') || controller.keys.has('w');
+      controller.down = controller.keys.has('arrowdown') || controller.keys.has('s');
+
+      if (key === ' ' || key === 'arrowup' || key === 'w') {
+        if (id === 'runner') controller.jump = true;
+        if (id === 'flappy') controller.jump = true;
+        if (id === 'shooter') controller.fire = true;
+      }
+
+      if (id === 'snake') {
+        if (controller.up) steerSnakeFromVector(0, -1);
+        else if (controller.down) steerSnakeFromVector(0, 1);
+        else if (controller.left) steerSnakeFromVector(-1, 0);
+        else if (controller.right) steerSnakeFromVector(1, 0);
+      }
+
+      if (id === 'math' && /^[1-4]$/.test(key)) {
+        chooseMathAnswer(Number(key) - 1);
+      }
+
+      if (id === 'hangman' && /^[a-z]$/.test(key)) {
+        guessLetter(key.toUpperCase());
+      }
+
+      if (id === 'rps') {
+        if (key === 'r') playRps('rock');
+        if (key === 'p') playRps('paper');
+        if (key === 's') playRps('scissors');
+      }
+    });
+
+    listen(window, 'keyup', event => {
+      controller.keys.delete(event.key.toLowerCase());
+
+      controller.left = controller.keys.has('arrowleft') || controller.keys.has('a');
+      controller.right = controller.keys.has('arrowright') || controller.keys.has('d');
+      controller.up = controller.keys.has('arrowup') || controller.keys.has('w');
+      controller.down = controller.keys.has('arrowdown') || controller.keys.has('s');
+
+      if (event.key === ' ' || event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') {
+        controller.jump = false;
+        controller.fire = false;
+      }
+    });
+
+    // Game-specific touchpad actions.
+    let snakeDirection = { x: 1, y: 0 };
+    let snakeNextDirection = { x: 1, y: 0 };
+
+    function steerSnakeFromVector(x, y) {
+      if (Math.abs(x) > Math.abs(y)) {
+        if (x > 0.18) snakeNextDirection = { x: 1, y: 0 };
+        if (x < -0.18) snakeNextDirection = { x: -1, y: 0 };
+      } else {
+        if (y > 0.18) snakeNextDirection = { x: 0, y: 1 };
+        if (y < -0.18) snakeNextDirection = { x: 0, y: -1 };
+      }
+    }
+
+    let boardTapHandler = null;
+    let mathTapHandler = null;
+    let rpsTapHandler = null;
+    let hangmanTapHandler = null;
+
+    function handleBoardTap(event) {
+      if (boardTapHandler) boardTapHandler(event);
+    }
+
+    function handleMathTap(event) {
+      if (mathTapHandler) mathTapHandler(event);
+    }
+
+    function handleRpsTap(event) {
+      if (rpsTapHandler) rpsTapHandler(event);
+    }
+
+    function handleHangmanTap(event) {
+      if (hangmanTapHandler) hangmanTapHandler(event);
+    }
+
+    function makeGame() {
+      switch (id) {
+        case 'snake': return gameSnake();
+        case 'ttt': return gameTicTacToe();
+        case 'pong': return gamePong();
+        case 'breakout': return gameBreakout();
+        case 'runner': return gameRunner();
+        case 'shooter': return gameShooter();
+        case 'math': return gameMath();
+        case 'rps': return gameRPS();
+        case 'hangman': return gameHangman();
+        case 'flappy': return gameFlappy();
+        default:
+          area.textContent = 'Game unavailable.';
+          return () => {};
+      }
+    }
+
+    function gameSnake() {
+      setInstructions('Drag in a direction to steer');
+      addAction('↑ UP', '', () => steerSnakeFromVector(0, -1));
+      addAction('↓ DOWN', '', () => steerSnakeFromVector(0, 1));
+      addAction('← LEFT', '', () => steerSnakeFromVector(-1, 0));
+      addAction('RIGHT →', '', () => steerSnakeFromVector(1, 0));
+
+      const { canvas, ctx } = makeCanvas(360, 360);
+      const size = 18;
+      const grid = 20;
+
+      let snake = [
         { x: 9, y: 10 },
         { x: 8, y: 10 },
         { x: 7, y: 10 }
       ];
-      direction = { x: 1, y: 0 };
-      nextDirection = { ...direction };
-      food = randomFood();
-      alive = true;
-      accumulator = 0;
-      setScore(0);
-      setMessage('Eat the food. Avoid walls and your tail.');
-      draw();
-    }
 
-    function randomFood() {
-      let point;
+      let food = { x: 14, y: 10 };
+      let alive = true;
+      let elapsed = 0;
 
-      do {
-        point = {
-          x: Math.floor(Math.random() * cells),
-          y: Math.floor(Math.random() * cells)
+      function placeFood() {
+        for (let i = 0; i < 500; i++) {
+          const candidate = {
+            x: Math.floor(Math.random() * grid),
+            y: Math.floor(Math.random() * grid)
+          };
+
+          if (!snake.some(part => part.x === candidate.x && part.y === candidate.y)) {
+            food = candidate;
+            return;
+          }
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#102035';
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= grid; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * size, 0);
+          ctx.lineTo(i * size, canvas.height);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(0, i * size);
+          ctx.lineTo(canvas.width, i * size);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = '#ff5e89';
+        ctx.shadowColor = '#ff5e89';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(food.x * size + size / 2, food.y * size + size / 2, size * 0.34, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        snake.forEach((part, index) => {
+          ctx.fillStyle = index === 0 ? '#66ffd0' : '#1bc995';
+          ctx.fillRect(part.x * size + 2, part.y * size + 2, size - 4, size - 4);
+        });
+      }
+
+      function step() {
+        if (!alive) return;
+
+        const next = snakeNextDirection;
+
+        if (!(next.x === -snakeDirection.x && next.y === -snakeDirection.y)) {
+          snakeDirection = { ...next };
+        }
+
+        const head = {
+          x: snake[0].x + snakeDirection.x,
+          y: snake[0].y + snakeDirection.y
         };
-      } while (body && body.some(part =>
-        part.x === point.x && part.y === point.y
-      ));
 
-      return point;
-    }
-
-    function draw() {
-      ctx.fillStyle = '#030914';
-      ctx.fillRect(0, 0, el.width, el.height);
-
-      ctx.strokeStyle = '#102035';
-
-      for (let i = 0; i <= cells; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * size, 0);
-        ctx.lineTo(i * size, el.height);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, i * size);
-        ctx.lineTo(el.width, i * size);
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = '#ff5e89';
-      ctx.beginPath();
-      ctx.arc(
-        food.x * size + size / 2,
-        food.y * size + size / 2,
-        size * 0.34,
-        0, Math.PI * 2
-      );
-      ctx.fill();
-
-      body.forEach((part, i) => {
-        ctx.fillStyle = i === 0 ? '#66ffd0' : '#1bc995';
-        ctx.fillRect(
-          part.x * size + 2,
-          part.y * size + 2,
-          size - 4,
-          size - 4
-        );
-      });
-    }
-
-    function steer(dir) {
-      const map = {
-        up: { x: 0, y: -1 },
-        down: { x: 0, y: 1 },
-        left: { x: -1, y: 0 },
-        right: { x: 1, y: 0 }
-      };
-
-      const next = map[dir];
-      if (!next) return;
-
-      if (next.x === -direction.x && next.y === -direction.y) return;
-
-      nextDirection = next;
-    }
-
-    function update() {
-      if (!alive) return;
-
-      direction = { ...nextDirection };
-
-      const head = {
-        x: body[0].x + direction.x,
-        y: body[0].y + direction.y
-      };
-
-      const eating = head.x === food.x && head.y === food.y;
-
-      if (
-        head.x < 0 || head.y < 0 ||
-        head.x >= cells || head.y >= cells ||
-        body.slice(0, eating ? undefined : -1).some(part =>
-          part.x === head.x && part.y === head.y
-        )
-      ) {
-        alive = false;
-        setMessage('Game over! Your score: ' + currentGame.score);
-        return;
-      }
-
-      body.unshift(head);
-
-      if (eating) {
-        addScore(10);
-        food = randomFood();
-
-        if (body.length >= cells * cells) {
+        if (
+          head.x < 0 || head.y < 0 ||
+          head.x >= grid || head.y >= grid ||
+          snake.some((part, index) => index > 0 && part.x === head.x && part.y === head.y)
+        ) {
           alive = false;
-          setMessage('Amazing! You filled the entire board!');
+          setMessage('Game over! Tap Restart to play again.');
+          return;
         }
-      } else {
-        body.pop();
-      }
 
-      draw();
-    }
+        snake.unshift(head);
 
-    register(keyboard((event, pressed) => {
-      if (!pressed) return;
-
-      const key = event.key.toLowerCase();
-
-      if (key === 'arrowup' || key === 'w') steer('up');
-      if (key === 'arrowdown' || key === 's') steer('down');
-      if (key === 'arrowleft' || key === 'a') steer('left');
-      if (key === 'arrowright' || key === 'd') steer('right');
-    }));
-
-    register(loop(dt => {
-      if (!alive) return;
-
-      accumulator += dt;
-
-      if (accumulator >= 0.12) {
-        accumulator = 0;
-        update();
-      }
-    }));
-
-    reset();
-
-    const oldReset = reset;
-    register(() => { alive = false; });
-    return oldReset;
-  }
-
-  /* 2. TIC-TAC-TOE */
-
-  function gameTTT() {
-    const area = $('[data-game-area]');
-
-    area.innerHTML = `
-      <div class="nx-result" data-ttt-status>Your turn — you are X.</div>
-      <div class="nx-board nx-ttt-board" data-ttt-board>
-        ${Array.from({ length: 9 }, (_, i) =>
-          `<button class="nx-cell" data-cell="${i}" aria-label="Square ${i + 1}"></button>`
-        ).join('')}
-      </div>
-    `;
-
-    const board = $('[data-ttt-board]');
-    const status = $('[data-ttt-status]');
-
-    const cells = Array(9).fill('');
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6]
-    ];
-
-    let finished = false;
-    let timer = null;
-
-    function winner() {
-      for (const line of lines) {
-        const [a, b, c] = line;
-
-        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-          return cells[a];
+        if (head.x === food.x && head.y === food.y) {
+          addScore(10);
+          placeFood();
+        } else {
+          snake.pop();
         }
+
+        draw();
       }
 
-      return cells.every(Boolean) ? 'draw' : null;
-    }
+      const stop = frame(dt => {
+        elapsed += dt;
 
-    function draw() {
-      $$('[data-cell]', board).forEach(button => {
-        const value = cells[Number(button.dataset.cell)];
-        button.textContent = value;
-        button.disabled = finished || Boolean(value);
-        button.classList.toggle('nx-o', value === 'O');
+        if (elapsed >= 0.12) {
+          elapsed = 0;
+          step();
+        }
       });
-    }
 
-    function finish() {
-      const result = winner();
-      if (!result) return false;
-
-      finished = true;
       draw();
 
-      if (result === 'X') {
-        addScore(1);
-        status.textContent = 'You win! +1 point.';
-      } else if (result === 'O') {
-        status.textContent = 'Computer wins. Try again!';
-      } else {
-        status.textContent = 'Draw game!';
-      }
-
-      return true;
+      return () => stop();
     }
 
-    function findWinningMove(player) {
-      for (let i = 0; i < 9; i++) {
-        if (cells[i]) continue;
+    function gameTicTacToe() {
+      setInstructions('Tap the board or use the touchpad');
+      const status = document.createElement('div');
+      status.className = 'nx-result';
+      status.textContent = 'Your turn — you are X.';
 
-        cells[i] = player;
-        const wins = winner() === player;
-        cells[i] = '';
+      const board = document.createElement('div');
+      board.className = 'nx-board nx-ttt-board';
 
-        if (wins) return i;
-      }
+      board.innerHTML = Array.from({ length: 9 }, (_, index) =>
+        `<button class="nx-cell" data-cell="${index}" aria-label="Square ${index + 1}"></button>`
+      ).join('');
 
-      return -1;
-    }
+      area.append(status, board);
 
-    function computerMove() {
-      if (finished) return;
+      const cells = $$('.nx-cell', board);
+      const state = Array(9).fill('');
+      const wins = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
 
-      let index = findWinningMove('O');
+      let ended = false;
+      let computerTimer = null;
 
-      if (index < 0) index = findWinningMove('X');
-      if (index < 0 && !cells[4]) index = 4;
+      function winner() {
+        for (const line of wins) {
+          const [a, b, c] = line;
 
-      if (index < 0) {
-        const corners = [0, 2, 6, 8].filter(i => !cells[i]);
-
-        if (corners.length) {
-          index = corners[Math.floor(Math.random() * corners.length)];
+          if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+            return state[a];
+          }
         }
+
+        return state.every(Boolean) ? 'draw' : null;
       }
 
-      if (index < 0) {
-        const remaining = cells
-          .map((value, i) => value ? -1 : i)
-          .filter(i => i >= 0);
+      function render() {
+        cells.forEach((cell, index) => {
+          cell.textContent = state[index];
+          cell.disabled = ended || Boolean(state[index]);
+          cell.classList.toggle('nx-o', state[index] === 'O');
+        });
+      }
 
-        if (remaining.length) {
-          index = remaining[Math.floor(Math.random() * remaining.length)];
+      function finish() {
+        const result = winner();
+        if (!result) return false;
+
+        ended = true;
+        render();
+
+        if (result === 'X') {
+          addScore(1);
+          status.textContent = 'You win! +1 point.';
+        } else if (result === 'O') {
+          status.textContent = 'Computer wins. Try again!';
+        } else {
+          status.textContent = 'It is a draw.';
         }
+
+        return true;
       }
 
-      if (index >= 0) cells[index] = 'O';
+      function findWinningMove(mark) {
+        for (let i = 0; i < 9; i++) {
+          if (state[i]) continue;
 
-      draw();
+          state[i] = mark;
+          const winsNow = winner() === mark;
+          state[i] = '';
 
-      if (!finish()) status.textContent = 'Your turn — you are X.';
-    }
+          if (winsNow) return i;
+        }
 
-    function click(event) {
-      const button = event.target.closest('[data-cell]');
+        return -1;
+      }
 
-      if (!button || finished) return;
+      function computerMove() {
+        if (ended) return;
 
-      const index = Number(button.dataset.cell);
+        let move = findWinningMove('O');
 
-      if (cells[index]) return;
+        if (move < 0) move = findWinningMove('X');
+        if (move < 0 && !state[4]) move = 4;
 
-      cells[index] = 'X';
-      draw();
+        if (move < 0) {
+          const corners = [0, 2, 6, 8].filter(index => !state[index]);
+          if (corners.length) {
+            move = corners[Math.floor(Math.random() * corners.length)];
+          }
+        }
 
-      if (finish()) return;
+        if (move < 0) {
+          const empty = state.map((value, index) => value ? -1 : index).filter(index => index >= 0);
+          if (empty.length) move = empty[Math.floor(Math.random() * empty.length)];
+        }
 
-      status.textContent = 'Computer is thinking…';
-      timer = setTimeout(computerMove, 300);
-    }
+        if (move >= 0) state[move] = 'O';
 
-    board.addEventListener('click', click);
-    draw();
+        render();
 
-    register(() => {
-      clearTimeout(timer);
-      board.removeEventListener('click', click);
-    });
-  }
+        if (!finish()) status.textContent = 'Your turn — you are X.';
+      }
 
-  /* 3. PONG */
+      function play(index) {
+        if (ended || state[index]) return;
 
-  function gamePong() {
-    const { canvas: el, ctx } = canvas(520, 320, 700);
+        state[index] = 'X';
+        render();
 
-    let playerY = 125;
-    let opponentY = 125;
-    const paddleW = 10;
-    const paddleH = 70;
+        if (finish()) return;
 
-    let up = false;
-    let down = false;
-    let leftScore = 0;
-    let rightScore = 0;
-    let ball;
-    let accumulator = 0;
+        status.textContent = 'Computer is thinking…';
+        computerTimer = timeout(computerMove, 300);
+      }
 
-    function resetBall(direction) {
-      ball = {
-        x: el.width / 2,
-        y: el.height / 2,
-        vx: 210 * direction,
-        vy: (Math.random() - 0.5) * 160,
-        r: 7
+      function onBoardClick(event) {
+        const cell = event.target.closest('[data-cell]');
+        if (cell) play(Number(cell.dataset.cell));
+      }
+
+      listen(board, 'click', onBoardClick);
+
+      boardTapHandler = event => {
+        if (ended) return;
+
+        const rect = pad.getBoundingClientRect();
+        const index = Math.min(8, Math.max(0,
+          Math.floor(((event.clientY - rect.top) / rect.height) * 3) * 3 +
+          Math.floor(((event.clientX - rect.left) / rect.width) * 3)
+        ));
+
+        play(index);
+      };
+
+      render();
+
+      return () => {
+        if (computerTimer) clearTimeout(computerTimer);
+        boardTapHandler = null;
       };
     }
 
-    function draw() {
-      ctx.fillStyle = '#030914';
-      ctx.fillRect(0, 0, el.width, el.height);
+    function gamePong() {
+      setInstructions('Move the touchpad up and down');
+      addAction('↑ UP', '', () => { controller.y = -1; updatePadDisplay(); });
+      addAction('↓ DOWN', '', () => { controller.y = 1; updatePadDisplay(); });
 
-      ctx.strokeStyle = '#1d3550';
-      ctx.setLineDash([7, 9]);
-      ctx.beginPath();
-      ctx.moveTo(el.width / 2, 0);
-      ctx.lineTo(el.width / 2, el.height);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      const { canvas, ctx } = makeCanvas(520, 320);
 
-      ctx.fillStyle = '#35e8ff';
-      ctx.fillRect(18, playerY, paddleW, paddleH);
+      let playerY = 125;
+      let enemyY = 125;
+      const paddleWidth = 10;
+      const paddleHeight = 70;
 
-      ctx.fillStyle = '#9b6cff';
-      ctx.fillRect(el.width - 28, opponentY, paddleW, paddleH);
-
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#d9e8ff';
-      ctx.font = 'bold 30px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText(leftScore, el.width / 2 - 55, 42);
-      ctx.fillText(rightScore, el.width / 2 + 55, 42);
-    }
-
-    function update(dt) {
-      if (up) playerY -= 280 * dt;
-      if (down) playerY += 280 * dt;
-
-      playerY = Math.max(0, Math.min(el.height - paddleH, playerY));
-
-      const target = ball.y - paddleH / 2;
-      opponentY += Math.sign(target - opponentY) *
-        Math.min(Math.abs(target - opponentY), 180 * dt);
-
-      opponentY = Math.max(0, Math.min(el.height - paddleH, opponentY));
-
-      ball.x += ball.vx * dt;
-      ball.y += ball.vy * dt;
-
-      if (ball.y < ball.r || ball.y > el.height - ball.r) {
-        ball.vy *= -1;
-      }
-
-      if (
-        ball.vx < 0 &&
-        ball.x - ball.r < 28 &&
-        ball.y > playerY &&
-        ball.y < playerY + paddleH
-      ) {
-        ball.vx = Math.abs(ball.vx) * 1.04;
-        ball.vy += ((ball.y - (playerY + paddleH / 2)) / (paddleH / 2)) * 65;
-        ball.x = 29;
-      }
-
-      if (
-        ball.vx > 0 &&
-        ball.x + ball.r > el.width - 28 &&
-        ball.y > opponentY &&
-        ball.y < opponentY + paddleH
-      ) {
-        ball.vx = -Math.abs(ball.vx) * 1.03;
-        ball.vy += ((ball.y - (opponentY + paddleH / 2)) / (paddleH / 2)) * 55;
-        ball.x = el.width - 29;
-      }
-
-      if (ball.x < -10) {
-        rightScore++;
-        resetBall(1);
-      } else if (ball.x > el.width + 10) {
-        leftScore++;
-        addScore(1);
-        resetBall(-1);
-      }
-    }
-
-    register(keyboard((event, pressed) => {
-      const key = event.key.toLowerCase();
-
-      if (key === 'arrowup' || key === 'w') up = pressed;
-      if (key === 'arrowdown' || key === 's') down = pressed;
-    }));
-
-    resetBall(Math.random() > 0.5 ? 1 : -1);
-
-    register(loop(dt => {
-      update(dt);
-      draw();
-    }));
-
-    register(() => { up = down = false; });
-  }
-
-  /* 4. BRICK BREAKER */
-
-  function gameBreakout() {
-    const { canvas: el, ctx } = canvas(480, 420, 620);
-
-    const columns = 8;
-    const rows = 5;
-    const brickW = 50;
-    const brickH = 17;
-    const gap = 5;
-    const startX = 22;
-    const startY = 38;
-
-    let paddleX = 200;
-    const paddleW = 86;
-    const paddleH = 11;
-
-    let ball;
-    let bricks;
-    let alive = true;
-    let left = false;
-    let right = false;
-
-    function reset() {
-      paddleX = (el.width - paddleW) / 2;
-
-      ball = {
-        x: el.width / 2,
-        y: el.height - 65,
-        vx: 155,
-        vy: -190,
+      let ball = {
+        x: 260, y: 160, vx: 205,
+        vy: Math.random() * 140 - 70,
         r: 7
       };
 
-      bricks = [];
+      let playerUp = false;
+      let playerDown = false;
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < columns; col++) {
-          bricks.push({
-            x: startX + col * (brickW + gap),
-            y: startY + row * (brickH + gap),
-            w: brickW,
-            h: brickH,
-            alive: true,
-            color: ['#35e8ff', '#9b6cff', '#43f5a5', '#ffbe55', '#ff6d9a'][row]
+      function resetBall(direction) {
+        ball = {
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: 205 * direction,
+          vy: Math.random() * 140 - 70,
+          r: 7
+        };
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#1d3550';
+        ctx.setLineDash([7, 9]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#35e8ff';
+        ctx.fillRect(18, playerY, paddleWidth, paddleHeight);
+
+        ctx.fillStyle = '#9b6cff';
+        ctx.fillRect(canvas.width - 28, enemyY, paddleWidth, paddleHeight);
+
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#d9e8ff';
+        ctx.font = 'bold 30px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText(score, canvas.width / 2 - 55, 42);
+      }
+
+      const stop = frame(dt => {
+        const movement = controller.y * 290;
+
+        playerY += movement * dt;
+
+        if (playerUp || controller.up) playerY -= 280 * dt;
+        if (playerDown || controller.down) playerY += 280 * dt;
+
+        playerY = Math.max(0, Math.min(canvas.height - paddleHeight, playerY));
+
+        const enemyTarget = ball.y - paddleHeight / 2;
+        enemyY += Math.sign(enemyTarget - enemyY) *
+          Math.min(Math.abs(enemyTarget - enemyY), 195 * dt);
+
+        enemyY = Math.max(0, Math.min(canvas.height - paddleHeight, enemyY));
+
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+
+        if (ball.y < ball.r || ball.y > canvas.height - ball.r) {
+          ball.vy *= -1;
+        }
+
+        if (
+          ball.vx < 0 &&
+          ball.x - ball.r < 28 &&
+          ball.y >= playerY &&
+          ball.y <= playerY + paddleHeight
+        ) {
+          ball.vx = Math.abs(ball.vx) * 1.035;
+          ball.vy += (ball.y - (playerY + paddleHeight / 2)) / (paddleHeight / 2) * 65;
+          ball.x = 29;
+        }
+
+        if (
+          ball.vx > 0 &&
+          ball.x + ball.r > canvas.width - 28 &&
+          ball.y >= enemyY &&
+          ball.y <= enemyY + paddleHeight
+        ) {
+          ball.vx = -Math.abs(ball.vx) * 1.02;
+          ball.vy += (ball.y - (enemyY + paddleHeight / 2)) / (paddleHeight / 2) * 45;
+          ball.x = canvas.width - 29;
+        }
+
+        if (ball.x < -10) {
+          resetBall(1);
+        } else if (ball.x > canvas.width + 10) {
+          addScore(1);
+          resetBall(-1);
+        }
+
+        draw();
+      });
+
+      return () => stop();
+    }
+
+    function gameBreakout() {
+      setInstructions('Drag left or right to move the paddle');
+
+      const { canvas, ctx } = makeCanvas(480, 420);
+
+      const cols = 8;
+      const rows = 5;
+      const brickW = 50;
+      const brickH = 17;
+      const gap = 5;
+      const startX = 22;
+      const startY = 38;
+
+      let paddleX = 200;
+      const paddleW = 86;
+      const paddleH = 11;
+
+      let ball = {
+        x: 240, y: 320, vx: 160, vy: -190, r: 7
+      };
+
+      let alive = true;
+      let won = false;
+
+      let bricks = [];
+
+      function resetBricks() {
+        bricks = [];
+
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            bricks.push({
+              x: startX + col * (brickW + gap),
+              y: startY + row * (brickH + gap),
+              w: brickW,
+              h: brickH,
+              alive: true,
+              color: ['#35e8ff', '#9b6cff', '#43f5a5', '#ffbe55', '#ff6d9a'][row]
+            });
+          }
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        bricks.forEach(brick => {
+          if (!brick.alive) return;
+
+          ctx.fillStyle = brick.color;
+          ctx.shadowColor = brick.color;
+          ctx.shadowBlur = 8;
+          ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
+        });
+
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = '#35e8ff';
+        ctx.fillStyle = '#35e8ff';
+        ctx.fillRect(paddleX, canvas.height - 32, paddleW, paddleH);
+
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+      }
+
+      resetBricks();
+
+      const stop = frame(dt => {
+        if (!alive) {
+          draw();
+          return;
+        }
+
+        paddleX += controller.x * 330 * dt;
+
+        if (controller.left) paddleX -= 260 * dt;
+        if (controller.right) paddleX += 260 * dt;
+
+        paddleX = Math.max(0, Math.min(canvas.width - paddleW, paddleX));
+
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+
+        if (ball.x < ball.r || ball.x > canvas.width - ball.r) {
+          ball.vx *= -1;
+        }
+
+        if (ball.y < ball.r) {
+          ball.vy = Math.abs(ball.vy);
+        }
+
+        const paddleY = canvas.height - 32;
+
+        if (
+          ball.vy > 0 &&
+          ball.y + ball.r >= paddleY &&
+          ball.y <= paddleY + paddleH &&
+          ball.x >= paddleX &&
+          ball.x <= paddleX + paddleW
+        ) {
+          ball.vy = -Math.abs(ball.vy);
+          ball.vx += (ball.x - (paddleX + paddleW / 2)) / (paddleW / 2) * 95;
+          ball.y = paddleY - ball.r;
+        }
+
+        for (const brick of bricks) {
+          if (
+            brick.alive &&
+            ball.x + ball.r > brick.x &&
+            ball.x - ball.r < brick.x + brick.w &&
+            ball.y + ball.r > brick.y &&
+            ball.y - ball.r < brick.y + brick.h
+          ) {
+            brick.alive = false;
+            ball.vy *= -1;
+            addScore(10);
+            break;
+          }
+        }
+
+        if (bricks.every(brick => !brick.alive)) {
+          alive = false;
+          won = true;
+          setMessage('You cleared every brick! Restart to play again.');
+        } else if (ball.y > canvas.height + 15) {
+          alive = false;
+          setMessage('Ball lost! Tap Restart to try again.');
+        }
+
+        draw();
+      });
+
+      return () => {
+        alive = false;
+        stop();
+      };
+    }
+
+    function gameRunner() {
+      setInstructions('Swipe to move. Tap or press jump to leap.');
+      addAction('JUMP', 'jump', () => jump());
+
+      const { canvas, ctx } = makeCanvas(520, 280);
+      const ground = 225;
+
+      const player = {
+        x: 70, y: ground - 35, w: 27, h: 35, vy: 0, jumping: false
+      };
+
+      let obstacles = [];
+      let alive = true;
+      let elapsed = 0;
+      let spawnTimer = 0;
+      let speed = 205;
+      let distance = 0;
+
+      function jump() {
+        if (!alive) return;
+
+        if (!player.jumping) {
+          player.vy = -390;
+          player.jumping = true;
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#152b43';
+
+        for (let i = 0; i < 12; i++) {
+          const x = (i * 53 - elapsed * speed * 0.4) % canvas.width;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, ground);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#35e8ff';
+        ctx.beginPath();
+        ctx.moveTo(0, ground);
+        ctx.lineTo(canvas.width, ground);
+        ctx.stroke();
+
+        ctx.fillStyle = '#43f5a5';
+        ctx.shadowColor = '#43f5a5';
+        ctx.shadowBlur = 12;
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+
+        ctx.fillStyle = '#ff6d9a';
+        ctx.shadowColor = '#ff6d9a';
+
+        obstacles.forEach(obstacle => {
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
+        });
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#d9e8ff';
+        ctx.font = '13px system-ui';
+        ctx.fillText(`DISTANCE ${Math.floor(distance)}`, 12, 22);
+      }
+
+      const stop = frame(dt => {
+        if (!alive) {
+          draw();
+          return;
+        }
+
+        elapsed += dt;
+        distance += dt * 10;
+        speed = Math.min(340, 205 + elapsed * 2.2);
+        setScore(Math.floor(distance));
+
+        if (controller.jump) {
+          jump();
+          controller.jump = false;
+        }
+
+        if (player.jumping) {
+          player.vy += 1000 * dt;
+          player.y += player.vy * dt;
+
+          if (player.y >= ground - player.h) {
+            player.y = ground - player.h;
+            player.vy = 0;
+            player.jumping = false;
+          }
+        }
+
+        spawnTimer -= dt;
+
+        if (spawnTimer <= 0) {
+          const height = 22 + Math.random() * 24;
+
+          obstacles.push({
+            x: canvas.width + 10,
+            y: ground - height,
+            w: 18 + Math.random() * 12,
+            h: height
+          });
+
+          spawnTimer = 0.85 + Math.random() * 0.85;
+        }
+
+        obstacles.forEach(obstacle => {
+          obstacle.x -= speed * dt;
+        });
+
+        obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -5);
+
+        for (const obstacle of obstacles) {
+          if (
+            player.x + player.w - 4 > obstacle.x &&
+            player.x + 4 < obstacle.x + obstacle.w &&
+            player.y + player.h - 3 > obstacle.y
+          ) {
+            alive = false;
+            setMessage(`Game over! Distance: ${Math.floor(distance)}. Tap Restart to try again.`);
+            break;
+          }
+        }
+
+        draw();
+      });
+
+      return () => {
+        alive = false;
+        stop();
+      };
+    }
+
+    function gameShooter() {
+      setInstructions('Swipe to move. Hold FIRE or tap the touchpad to shoot.');
+      addAction('FIRE', 'fire', () => fire());
+
+      const { canvas, ctx } = makeCanvas(480, 400);
+
+      const ship = { x: 240, y: 345 };
+      let bullets = [];
+      let enemies = [];
+      let particles = [];
+      let spawnTimer = 0;
+      let fireTimer = 0;
+      let elapsed = 0;
+      let hull = 3;
+      let alive = true;
+
+      function fire() {
+        if (!alive || fireTimer > 0) return;
+
+        bullets.push({
+          x: ship.x,
+          y: ship.y - 14,
+          vx: 0,
+          vy: -390
+        });
+
+        fireTimer = 0.16;
+      }
+
+      function explode(x, y, color) {
+        for (let i = 0; i < 7; i++) {
+          particles.push({
+            x, y,
+            vx: 150 * (Math.random() - 0.5),
+            vy: 150 * (Math.random() - 0.5),
+            life: 0.4 + Math.random() * 0.35,
+            color
           });
         }
       }
 
-      alive = true;
-      setScore(0);
-      setMessage('Break all the bricks without losing your ball.');
-    }
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function draw() {
-      ctx.fillStyle = '#030914';
-      ctx.fillRect(0, 0, el.width, el.height);
+        for (let i = 0; i < 65; i++) {
+          const x = (79 * i) % canvas.width;
+          const y = (113 * i + elapsed * 22) % canvas.height;
 
-      bricks.forEach(brick => {
-        if (!brick.alive) return;
-
-        ctx.fillStyle = brick.color;
-        ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
-      });
-
-      ctx.fillStyle = '#35e8ff';
-      ctx.fillRect(paddleX, el.height - 32, paddleW, paddleH);
-
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function update(dt) {
-      if (!alive) return;
-
-      if (left) paddleX -= 330 * dt;
-      if (right) paddleX += 330 * dt;
-
-      paddleX = Math.max(0, Math.min(el.width - paddleW, paddleX));
-
-      ball.x += ball.vx * dt;
-      ball.y += ball.vy * dt;
-
-      if (ball.x < ball.r || ball.x > el.width - ball.r) ball.vx *= -1;
-      if (ball.y < ball.r) ball.vy = Math.abs(ball.vy);
-
-      const paddleY = el.height - 32;
-
-      if (
-        ball.vy > 0 &&
-        ball.y + ball.r >= paddleY &&
-        ball.y < paddleY + paddleH &&
-        ball.x >= paddleX &&
-        ball.x <= paddleX + paddleW
-      ) {
-        ball.vy = -Math.abs(ball.vy);
-        ball.vx += ((ball.x - (paddleX + paddleW / 2)) / (paddleW / 2)) * 95;
-        ball.y = paddleY - ball.r;
-      }
-
-      for (const brick of bricks) {
-        if (!brick.alive) continue;
-
-        if (
-          ball.x + ball.r > brick.x &&
-          ball.x - ball.r < brick.x + brick.w &&
-          ball.y + ball.r > brick.y &&
-          ball.y - ball.r < brick.y + brick.h
-        ) {
-          brick.alive = false;
-          ball.vy *= -1;
-          addScore(10);
-          break;
+          ctx.fillStyle = i % 4 === 0 ? '#35e8ff' : '#546a8c';
+          ctx.fillRect(x, y, 2, 2);
         }
-      }
 
-      if (bricks.every(brick => !brick.alive)) {
-        alive = false;
-        setMessage('You cleared every brick! Restart to play again.');
-      } else if (ball.y > el.height + 15) {
-        alive = false;
-        setMessage('Ball lost! Restart to try again.');
-      }
-    }
-
-    register(keyboard((event, pressed) => {
-      const key = event.key.toLowerCase();
-
-      if (key === 'arrowleft' || key === 'a') left = pressed;
-      if (key === 'arrowright' || key === 'd') right = pressed;
-    }));
-
-    register(loop(dt => {
-      update(dt);
-      draw();
-    }));
-
-    reset();
-
-    register(() => { left = right = false; });
-  }
-
-  /* 5. ENDLESS RUNNER */
-
-  function gameRunner() {
-    const { canvas: el, ctx } = canvas(520, 280, 700);
-
-    const ground = 225;
-
-    const player = {
-      x: 70,
-      y: ground - 35,
-      w: 27,
-      h: 35,
-      vy: 0,
-      jumping: false
-    };
-
-    let obstacles = [];
-    let elapsed = 0;
-    let spawn = 0;
-    let distance = 0;
-    let speed = 205;
-    let alive = true;
-    let jumpQueued = false;
-    let scoreAccumulator = 0;
-
-    function jump() {
-      if (!alive) return;
-      if (!player.jumping) {
-        player.vy = -390;
-        player.jumping = true;
-      }
-    }
-
-    function draw() {
-      ctx.fillStyle = '#030914';
-      ctx.fillRect(0, 0, el.width, el.height);
-
-      ctx.strokeStyle = '#152b43';
-
-      for (let i = 0; i < 12; i++) {
-        const x = i * 53 - (elapsed * speed * 0.4) % 53;
+        ctx.fillStyle = '#35e8ff';
+        ctx.shadowColor = '#35e8ff';
+        ctx.shadowBlur = 14;
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, ground);
-        ctx.stroke();
-      }
-
-      ctx.strokeStyle = '#35e8ff';
-      ctx.beginPath();
-      ctx.moveTo(0, ground);
-      ctx.lineTo(el.width, ground);
-      ctx.stroke();
-
-      ctx.fillStyle = '#43f5a5';
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-
-      ctx.fillStyle = '#ff6d9a';
-
-      obstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
-      });
-
-      ctx.fillStyle = '#d9e8ff';
-      ctx.font = '13px system-ui';
-      ctx.fillText('DISTANCE ' + distance, 12, 22);
-    }
-
-    function update(dt) {
-      if (!alive) return;
-
-      elapsed += dt;
-      speed = Math.min(340, 205 + 2.2 * elapsed);
-
-      scoreAccumulator += dt;
-
-      if (scoreAccumulator >= 0.1) {
-        const gained = Math.floor(scoreAccumulator * 10);
-        distance += gained;
-        scoreAccumulator -= gained / 10;
-        setScore(distance);
-      }
-
-      if (jumpQueued) {
-        jumpQueued = false;
-        jump();
-      }
-
-      if (player.jumping) {
-        player.vy += 1000 * dt;
-        player.y += player.vy * dt;
-
-        if (player.y >= ground - player.h) {
-          player.y = ground - player.h;
-          player.vy = 0;
-          player.jumping = false;
-        }
-      }
-
-      spawn -= dt;
-
-      if (spawn <= 0) {
-        const height = 22 + Math.random() * 24;
-
-        obstacles.push({
-          x: el.width + 10,
-          y: ground - height,
-          w: 18 + Math.random() * 12,
-          h: height
-        });
-
-        spawn = 0.85 + Math.random() * 0.85;
-      }
-
-      obstacles.forEach(obstacle => {
-        obstacle.x -= speed * dt;
-      });
-
-      obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -5);
-
-      for (const obstacle of obstacles) {
-        if (
-          player.x + player.w - 4 > obstacle.x &&
-          player.x + 4 < obstacle.x + obstacle.w &&
-          player.y + player.h - 3 > obstacle.y
-        ) {
-          alive = false;
-          setMessage('Game over! Distance: ' + distance + '. Restart to try again.');
-          break;
-        }
-      }
-    }
-
-    register(keyboard((event, pressed) => {
-      if (!pressed) return;
-
-      const key = event.key.toLowerCase();
-
-      if (key === ' ' || key === 'arrowup' || key === 'w') {
-        jumpQueued = true;
-      }
-    }));
-
-    register(loop(dt => {
-      update(dt);
-      draw();
-    }));
-
-    register(() => { alive = false; });
-  }
-
-  /* 6. SPACE SHOOTER */
-
-  function gameShooter() {
-    const { canvas: el, ctx } = canvas(480, 400, 700);
-
-    const player = { x: 240, y: 345, w: 28, h: 24 };
-
-    let enemies = [];
-    let bullets = [];
-    let particles = [];
-    let left = false;
-    let right = false;
-    let firing = false;
-    let fireCooldown = 0;
-    let spawnCooldown = 0;
-    let elapsed = 0;
-    let alive = true;
-    let hull = 3;
-
-    function shoot() {
-      if (!alive || fireCooldown > 0) return;
-
-      bullets.push({
-        x: player.x,
-        y: player.y - 15,
-        vx: 0,
-        vy: -390
-      });
-
-      fireCooldown = 0.16;
-    }
-
-    function burst(x, y, color) {
-      for (let i = 0; i < 7; i++) {
-        particles.push({
-          x, y,
-          vx: (Math.random() - 0.5) * 180,
-          vy: (Math.random() - 0.5) * 180,
-          life: 0.4 + Math.random() * 0.35,
-          color
-        });
-      }
-    }
-
-    function draw() {
-      ctx.fillStyle = '#030914';
-      ctx.fillRect(0, 0, el.width, el.height);
-
-      for (let i = 0; i < 65; i++) {
-        const x = (79 * i) % el.width;
-        const y = (113 * i + 30 * elapsed * 12) % el.height;
-
-        ctx.fillStyle = i % 4 === 0 ? '#35e8ff' : '#546a8c';
-        ctx.fillRect(x, y, 2, 2);
-      }
-
-      ctx.fillStyle = '#35e8ff';
-      ctx.shadowColor = '#35e8ff';
-      ctx.shadowBlur = 14;
-
-      ctx.beginPath();
-      ctx.moveTo(player.x, player.y - 16);
-      ctx.lineTo(player.x - 15, player.y + 12);
-      ctx.lineTo(player.x + 15, player.y + 12);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = '#ff6d9a';
-      ctx.shadowColor = '#ff6d9a';
-
-      enemies.forEach(enemy => {
-        ctx.beginPath();
-        ctx.moveTo(enemy.x, enemy.y + 12);
-        ctx.lineTo(enemy.x - 13, enemy.y - 10);
-        ctx.lineTo(enemy.x + 13, enemy.y - 10);
+        ctx.moveTo(ship.x, ship.y - 16);
+        ctx.lineTo(ship.x - 15, ship.y + 12);
+        ctx.lineTo(ship.x + 15, ship.y + 12);
         ctx.closePath();
         ctx.fill();
-      });
 
-      ctx.fillStyle = '#f6fdff';
-      ctx.shadowColor = '#35e8ff';
-
-      bullets.forEach(bullet => {
-        ctx.fillRect(bullet.x - 2, bullet.y - 7, 4, 12);
-      });
-
-      particles.forEach(particle => {
-        ctx.globalAlpha = Math.max(0, particle.life / 0.75);
-        ctx.fillStyle = particle.color;
-        ctx.fillRect(particle.x, particle.y, 3, 3);
-      });
-
-      ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = '#e6efff';
-      ctx.font = 'bold 13px system-ui';
-      ctx.fillText('HULL ' + '♥'.repeat(hull), 12, 22);
-    }
-
-    function update(dt) {
-      if (!alive) return;
-
-      elapsed += dt;
-
-      if (left) player.x -= 270 * dt;
-      if (right) player.x += 270 * dt;
-
-      player.x = Math.max(18, Math.min(el.width - 18, player.x));
-
-      fireCooldown -= dt;
-      if (firing) shoot();
-
-      spawnCooldown -= dt;
-
-      if (spawnCooldown <= 0) {
-        enemies.push({
-          x: 22 + Math.random() * (el.width - 44),
-          y: -18,
-          vy: 65 + Math.random() * 60 + elapsed * 0.5,
-          dead: false
+        ctx.fillStyle = '#f6fdff';
+        bullets.forEach(bullet => {
+          ctx.fillRect(bullet.x - 2, bullet.y - 8, 4, 12);
         });
 
-        spawnCooldown = Math.max(0.35, 0.85 - elapsed * 0.008) +
-          Math.random() * 0.3;
+        ctx.fillStyle = '#ff4f8b';
+        ctx.shadowColor = '#ff4f8b';
+
+        enemies.forEach(enemy => {
+          ctx.beginPath();
+          ctx.moveTo(enemy.x, enemy.y + 12);
+          ctx.lineTo(enemy.x - 13, enemy.y - 10);
+          ctx.lineTo(enemy.x + 13, enemy.y - 10);
+          ctx.closePath();
+          ctx.fill();
+        });
+
+        particles.forEach(particle => {
+          ctx.fillStyle = particle.color;
+          ctx.fillRect(particle.x, particle.y, 3, 3);
+        });
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#e6efff';
+        ctx.font = 'bold 13px system-ui';
+        ctx.fillText(`HULL ${'♥'.repeat(hull)}`, 12, 22);
       }
 
-      bullets.forEach(bullet => {
-        bullet.x += bullet.vx * dt;
-        bullet.y += bullet.vy * dt;
-      });
+      const stop = frame(dt => {
+        elapsed += dt;
 
-      bullets = bullets.filter(bullet => bullet.y > -20);
+        if (!alive) {
+          draw();
+          return;
+        }
 
-      enemies.forEach(enemy => {
-        enemy.y += enemy.vy * dt;
+        if (controller.left) ship.x -= 270 * dt;
+        if (controller.right) ship.x += 270 * dt;
 
-        if (
-          Math.abs(enemy.x - player.x) < 22 &&
-          Math.abs(enemy.y - player.y) < 25
-        ) {
-          enemy.dead = true;
-          hull--;
-          burst(enemy.x, enemy.y, '#ff6d9a');
+        ship.x += controller.x * 270 * dt;
+        ship.x = Math.max(18, Math.min(canvas.width - 18, ship.x));
 
-          if (hull <= 0) {
-            alive = false;
-            setMessage('Ship destroyed! Score: ' + currentGame.score);
-          }
+        fireTimer -= dt;
+
+        if (controller.fire || controller.tap || controller.keys.has(' ')) {
+          fire();
+          controller.tap = false;
+        }
+
+        spawnTimer -= dt;
+
+        if (spawnTimer <= 0) {
+          enemies.push({
+            x: 22 + (canvas.width - 44) * Math.random(),
+            y: -18,
+            vy: 65 + 60 * Math.random() + elapsed * 0.6,
+            dead: false
+          });
+
+          spawnTimer = Math.max(0.35, 0.85 - elapsed * 0.008) + Math.random() * 0.3;
         }
 
         bullets.forEach(bullet => {
+          bullet.x += bullet.vx * dt;
+          bullet.y += bullet.vy * dt;
+        });
+
+        bullets = bullets.filter(bullet => bullet.y > -20);
+
+        enemies.forEach(enemy => {
+          enemy.y += enemy.vy * dt;
+
           if (
-            !enemy.dead &&
-            !bullet.dead &&
-            Math.abs(bullet.x - enemy.x) < 16 &&
-            Math.abs(bullet.y - enemy.y) < 16
+            Math.abs(enemy.x - ship.x) < 22 &&
+            Math.abs(enemy.y - ship.y) < 25
           ) {
-            bullet.dead = true;
             enemy.dead = true;
-            addScore(10);
-            burst(enemy.x, enemy.y, '#35e8ff');
+            hull--;
+            explode(enemy.x, enemy.y, '#ff6d9a');
+
+            if (hull <= 0) {
+              alive = false;
+              setMessage(`Ship destroyed! Score: ${score}. Tap Restart to try again.`);
+            }
+          }
+
+          bullets.forEach(bullet => {
+            if (
+              !bullet.dead &&
+              !enemy.dead &&
+              Math.abs(bullet.x - enemy.x) < 16 &&
+              Math.abs(bullet.y - enemy.y) < 16
+            ) {
+              bullet.dead = true;
+              enemy.dead = true;
+              addScore(10);
+              explode(enemy.x, enemy.y, '#35e8ff');
+            }
+          });
+
+          if (enemy.y > canvas.height + 15 && !enemy.dead) {
+            enemy.dead = true;
+            hull--;
+
+            if (hull <= 0) {
+              alive = false;
+              setMessage(`Invaders broke through! Score: ${score}.`);
+            }
           }
         });
 
-        if (enemy.y > el.height + 15 && !enemy.dead) {
-          enemy.dead = true;
-          hull--;
+        bullets = bullets.filter(bullet => !bullet.dead);
+        enemies = enemies.filter(enemy => !enemy.dead);
 
-          if (hull <= 0) {
-            alive = false;
-            setMessage('Invaders broke through! Score: ' + currentGame.score);
-          }
-        }
+        particles.forEach(particle => {
+          particle.x += particle.vx * dt;
+          particle.y += particle.vy * dt;
+          particle.life -= dt;
+        });
+
+        particles = particles.filter(particle => particle.life > 0);
+
+        draw();
       });
 
-      bullets = bullets.filter(bullet => !bullet.dead);
-      enemies = enemies.filter(enemy => !enemy.dead);
-
-      particles.forEach(particle => {
-        particle.x += particle.vx * dt;
-        particle.y += particle.vy * dt;
-        particle.life -= dt;
-      });
-
-      particles = particles.filter(particle => particle.life > 0);
+      return () => {
+        alive = false;
+        stop();
+      };
     }
 
-    register(keyboard((event, pressed) => {
-      const key = event.key.toLowerCase();
+    function gameMath() {
+      setInstructions('Tap an answer or move the pad to choose');
 
-      if (key === 'arrowleft' || key === 'a') left = pressed;
-      if (key === 'arrowright' || key === 'd') right = pressed;
+      const status = document.createElement('div');
+      status.className = 'nx-result';
+      status.textContent = 'Answer correctly to earn points.';
 
-      if (key === ' ' || key === 'enter') {
-        firing = pressed;
-        if (pressed) shoot();
-      }
-    }));
+      const question = document.createElement('div');
+      question.className = 'nx-question';
 
-    register(loop(dt => {
-      update(dt);
-      draw();
-    }));
+      const answers = document.createElement('div');
+      answers.className = 'nx-answer-grid';
 
-    register(() => {
-      alive = false;
-      left = right = firing = false;
-    });
-  }
+      const streak = document.createElement('div');
+      streak.className = 'nx-result';
+      streak.textContent = 'Correct answers: 0';
 
-  /* 7. MATH CHALLENGE */
+      area.append(status, question, answers, streak);
 
-  function gameMath() {
-    const area = $('[data-game-area]');
+      let answer = 0;
+      let correctStreak = 0;
+      let locked = false;
+      let choices = [];
 
-    area.innerHTML = `
-      <div class="nx-result" data-math-info>Answer correctly to earn points.</div>
-      <div class="nx-question" data-question></div>
-      <div class="nx-answer-grid" data-answers></div>
-      <div class="nx-result" data-streak>Correct answers: 0</div>
-    `;
+      function newQuestion() {
+        locked = false;
+        status.textContent = 'Choose the correct answer.';
 
-    const question = $('[data-question]');
-    const answers = $('[data-answers]');
-    const info = $('[data-math-info]');
-    const streak = $('[data-streak]');
+        const operation = Math.floor(Math.random() * 4);
+        let a = 1 + Math.floor(Math.random() * 20);
+        let b = 1 + Math.floor(Math.random() * 20);
+        let symbol = '+';
 
-    let answer = 0;
-    let count = 0;
-    let locked = false;
-    let timer = null;
+        if (operation === 0) {
+          answer = a + b;
+          symbol = '+';
+        } else if (operation === 1) {
+          if (b > a) [a, b] = [b, a];
+          answer = a - b;
+          symbol = '−';
+        } else if (operation === 2) {
+          a = 1 + Math.floor(Math.random() * 12);
+          b = 1 + Math.floor(Math.random() * 12);
+          answer = a * b;
+          symbol = '×';
+        } else {
+          b = 1 + Math.floor(Math.random() * 10);
+          answer = 1 + Math.floor(Math.random() * 12);
+          a = b * answer;
+          symbol = '÷';
+        }
 
-    function nextQuestion() {
-      locked = false;
-      info.textContent = 'Choose the correct answer.';
+        question.textContent = `${a} ${symbol} ${b} = ?`;
 
-      const type = Math.floor(Math.random() * 4);
-      let a = 1 + Math.floor(Math.random() * 20);
-      let b = 1 + Math.floor(Math.random() * 20);
-      let symbol = '+';
+        const options = new Set([answer]);
 
-      if (type === 0) {
-        answer = a + b;
-      } else if (type === 1) {
-        if (b > a) [a, b] = [b, a];
-        answer = a - b;
-        symbol = '−';
-      } else if (type === 2) {
-        a = 1 + Math.floor(Math.random() * 12);
-        b = 1 + Math.floor(Math.random() * 12);
-        answer = a * b;
-        symbol = '×';
-      } else {
-        b = 1 + Math.floor(Math.random() * 10);
-        answer = 1 + Math.floor(Math.random() * 12);
-        a = b * answer;
-        symbol = '÷';
-      }
+        while (options.size < 4) {
+          const offset = Math.floor(Math.random() * 13) - 6;
+          options.add(Math.max(0, answer + (offset || 1)));
+        }
 
-      question.textContent = `${a} ${symbol} ${b} = ?`;
+        choices = [...options].sort(() => Math.random() - 0.5);
 
-      const options = new Set([answer]);
-
-      while (options.size < 4) {
-        const offset = Math.floor(Math.random() * 13) - 6;
-        options.add(Math.max(0, answer + (offset || 1)));
-      }
-
-      answers.innerHTML = [...options]
-        .sort(() => Math.random() - 0.5)
-        .map((value, index) =>
+        answers.innerHTML = choices.map((value, index) =>
           `<button class="nx-answer" data-answer="${value}">${index + 1}. ${value}</button>`
         ).join('');
-    }
-
-    function choose(value) {
-      if (locked) return;
-      locked = true;
-
-      if (Number(value) === answer) {
-        count++;
-        addScore(10);
-        info.textContent = 'Correct! +10 points.';
-      } else {
-        count = 0;
-        info.textContent = 'Incorrect. The answer was ' + answer + '.';
       }
 
-      streak.textContent = 'Correct answers: ' + count;
+      function chooseMathAnswer(index) {
+        if (locked || index < 0 || index >= choices.length) return;
+        locked = true;
 
-      $$('[data-answer]', answers).forEach(button => {
-        button.disabled = true;
+        if (Number(choices[index]) === answer) {
+          correctStreak++;
+          addScore(10);
+          status.textContent = 'Correct! +10 points.';
+        } else {
+          correctStreak = 0;
+          status.textContent = `Not quite. The answer was ${answer}.`;
+        }
+
+        streak.textContent = `Correct answers: ${correctStreak}`;
+
+        $$('[data-answer]', answers).forEach(button => {
+          button.disabled = true;
+        });
+
+        timeout(newQuestion, 700);
+      }
+
+      listen(answers, 'click', event => {
+        const button = event.target.closest('[data-answer]');
+        if (!button) return;
+
+        chooseMathAnswer(choices.indexOf(Number(button.dataset.answer)));
       });
 
-      timer = setTimeout(nextQuestion, 650);
+      mathTapHandler = event => {
+        if (locked) return;
+
+        const rect = pad.getBoundingClientRect();
+        const index = Math.min(3, Math.max(0,
+          Math.floor((event.clientY - rect.top) / rect.height * 2) * 2 +
+          Math.floor((event.clientX - rect.left) / rect.width * 2)
+        ));
+
+        chooseMathAnswer(index);
+      };
+
+      newQuestion();
+
+      return () => {
+        mathTapHandler = null;
+      };
     }
 
-    const click = event => {
-      const button = event.target.closest('[data-answer]');
-      if (button) choose(button.dataset.answer);
-    };
+    function gameRPS() {
+      setInstructions('Tap the touchpad to choose a move');
+      const status = document.createElement('div');
+      status.className = 'nx-result';
+      status.textContent = 'Choose Rock, Paper, or Scissors.';
 
-    answers.addEventListener('click', click);
+      const buttons = document.createElement('div');
+      buttons.className = 'nx-rps-buttons';
 
-    register(keyboard((event, pressed) => {
-      if (!pressed || !/^[1-4]$/.test(event.key)) return;
-
-      const button = $$('[data-answer]', answers)[Number(event.key) - 1];
-
-      if (button && !button.disabled) choose(button.dataset.answer);
-    }));
-
-    register(() => {
-      clearTimeout(timer);
-      answers.removeEventListener('click', click);
-    });
-
-    nextQuestion();
-  }
-
-  /* 8. ROCK PAPER SCISSORS */
-
-  function gameRPS() {
-    const area = $('[data-game-area]');
-
-    area.innerHTML = `
-      <div class="nx-result">Choose your move.</div>
-
-      <div class="nx-rps-buttons" data-rps-buttons>
+      buttons.innerHTML = `
         <button class="nx-btn" data-rps="rock">✊ Rock</button>
         <button class="nx-btn" data-rps="paper">✋ Paper</button>
         <button class="nx-btn" data-rps="scissors">✌️ Scissors</button>
-      </div>
+      `;
 
-      <div class="nx-question" data-rps-result>Ready?</div>
-      <div class="nx-result" data-rps-score>Wins: 0 · Draws: 0 · Losses: 0</div>
-    `;
+      const result = document.createElement('div');
+      result.className = 'nx-question';
+      result.textContent = 'Ready?';
 
-    const result = $('[data-rps-result]');
-    const score = $('[data-rps-score]');
-    const buttons = $('[data-rps-buttons]');
+      const tally = document.createElement('div');
+      tally.className = 'nx-result';
+      tally.textContent = 'Wins: 0 · Draws: 0 · Losses: 0';
 
-    const choices = ['rock', 'paper', 'scissors'];
-    const icons = { rock: '✊', paper: '✋', scissors: '✌️' };
+      area.append(status, buttons, result, tally);
 
-    let wins = 0;
-    let draws = 0;
-    let losses = 0;
+      const moves = ['rock', 'paper', 'scissors'];
+      const icons = { rock: '✊', paper: '✋', scissors: '✌️' };
 
-    function play(choice) {
-      const computer = choices[Math.floor(Math.random() * 3)];
+      let wins = 0;
+      let draws = 0;
+      let losses = 0;
 
-      let message;
+      function playRps(move) {
+        const computer = moves[Math.floor(Math.random() * moves.length)];
+        let messageText;
 
-      if (choice === computer) {
-        draws++;
-        message = 'Draw!';
-      } else if (
-        (choice === 'rock' && computer === 'scissors') ||
-        (choice === 'paper' && computer === 'rock') ||
-        (choice === 'scissors' && computer === 'paper')
-      ) {
-        wins++;
-        addScore(1);
-        message = 'You win!';
-      } else {
-        losses++;
-        message = 'Computer wins!';
+        if (move === computer) {
+          draws++;
+          messageText = 'Draw!';
+        } else if (
+          (move === 'rock' && computer === 'scissors') ||
+          (move === 'paper' && computer === 'rock') ||
+          (move === 'scissors' && computer === 'paper')
+        ) {
+          wins++;
+          addScore(1);
+          messageText = 'You win!';
+        } else {
+          losses++;
+          messageText = 'Computer wins!';
+        }
+
+        result.textContent = `${icons[move]} vs ${icons[computer]}`;
+        status.textContent = messageText;
+        tally.textContent = `Wins: ${wins} · Draws: ${draws} · Losses: ${losses}`;
       }
 
-      result.textContent = `${icons[choice]} vs ${icons[computer]} — ${message}`;
-      score.textContent = `Wins: ${wins} · Draws: ${draws} · Losses: ${losses}`;
-    }
+      listen(buttons, 'click', event => {
+        const button = event.target.closest('[data-rps]');
+        if (button) playRps(button.dataset.rps);
+      });
 
-    const click = event => {
-      const button = event.target.closest('[data-rps]');
-      if (button) play(button.dataset.rps);
-    };
+      rpsTapHandler = event => {
+        const rect = pad.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
 
-    buttons.addEventListener('click', click);
-
-    register(keyboard((event, pressed) => {
-      if (!pressed) return;
-
-      const keyMap = {
-        r: 'rock',
-        p: 'paper',
-        s: 'scissors'
+        playRps(x < 1 / 3 ? 'rock' : x < 2 / 3 ? 'paper' : 'scissors');
       };
 
-      if (keyMap[event.key.toLowerCase()]) {
-        play(keyMap[event.key.toLowerCase()]);
-      }
-    }));
-
-    register(() => buttons.removeEventListener('click', click));
-  }
-
-  /* 9. HANGMAN */
-
-  function gameHangman() {
-    const words = [
-      'GALAXY', 'PLANET', 'ROCKET', 'JUNGLE', 'PUZZLE',
-      'ARCADE', 'NEXORA', 'GAMING', 'NEBULA', 'PYTHON',
-      'COMPUTER', 'RAINBOW', 'DIAMOND', 'OCEAN', 'FUTURE'
-    ];
-
-    const word = words[Math.floor(Math.random() * words.length)];
-    const guessed = new Set();
-
-    let mistakes = 0;
-    const maxMistakes = 6;
-    let finished = false;
-
-    const area = $('[data-game-area]');
-
-    area.innerHTML = `
-      <div class="nx-result" data-hangman-status>Guess the hidden word.</div>
-      <div class="nx-question" data-hangman-drawing>○</div>
-      <div class="nx-word" data-hangman-word></div>
-      <div class="nx-letter-grid" data-hangman-letters>
-        ${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter =>
-          `<button class="nx-letter" data-letter="${letter}">${letter}</button>`
-        ).join('')}
-      </div>
-    `;
-
-    const wordEl = $('[data-hangman-word]');
-    const drawing = $('[data-hangman-drawing]');
-    const status = $('[data-hangman-status]');
-    const letters = $('[data-hangman-letters]');
-
-    const stages = ['○', '◔', '◑', '◕', '◉', '☠', '✖'];
-
-    function render() {
-      wordEl.textContent = word.split('').map(letter =>
-        guessed.has(letter) ? letter : '_'
-      ).join(' ');
-
-      drawing.textContent = stages[Math.min(mistakes, maxMistakes)];
-
-      $$('[data-letter]', letters).forEach(button => {
-        button.disabled = finished || guessed.has(button.dataset.letter);
-      });
+      return () => {
+        rpsTapHandler = null;
+      };
     }
 
-    function guess(letter) {
-      if (finished || guessed.has(letter)) return;
+    function gameHangman() {
+      setInstructions('Tap the pad to guess a letter');
+      addAction('NEW WORD', '', () => resetHangman());
 
-      guessed.add(letter);
+      const wordList = [
+        'GALAXY', 'PLANET', 'ROCKET', 'JUNGLE', 'PUZZLE',
+        'ARCADE', 'NEXORA', 'GAMING', 'NEBULA', 'PYTHON',
+        'COMPUTER', 'RAINBOW', 'DIAMOND', 'OCEAN', 'FUTURE'
+      ];
 
-      if (!word.includes(letter)) mistakes++;
+      let word = '';
+      let guessed = new Set();
+      let mistakes = 0;
+      const maxMistakes = 6;
+      let ended = false;
 
-      if (word.split('').every(char => guessed.has(char))) {
-        finished = true;
-        addScore(10);
-        status.textContent = `You solved it! The word was ${word}. +10 points.`;
-      } else if (mistakes >= maxMistakes) {
-        finished = true;
-        status.textContent = `Game over! The word was ${word}.`;
-      } else {
-        status.textContent = `Mistakes: ${mistakes}/${maxMistakes}`;
+      const status = document.createElement('div');
+      status.className = 'nx-result';
+
+      const drawing = document.createElement('div');
+      drawing.className = 'nx-question';
+
+      const display = document.createElement('div');
+      display.className = 'nx-word';
+
+      const letters = document.createElement('div');
+      letters.className = 'nx-letter-grid';
+
+      letters.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter =>
+        `<button class="nx-letter" data-letter="${letter}">${letter}</button>`
+      ).join('');
+
+      area.append(status, drawing, display, letters);
+
+      function resetHangman() {
+        word = wordList[Math.floor(Math.random() * wordList.length)];
+        guessed = new Set();
+        mistakes = 0;
+        ended = false;
+        status.textContent = 'Guess the hidden word.';
+        render();
       }
 
-      render();
-    }
+      function render() {
+        display.textContent = word.split('').map(letter =>
+          guessed.has(letter) ? letter : '_'
+        ).join(' ');
 
-    const click = event => {
-      const button = event.target.closest('[data-letter]');
-      if (button) guess(button.dataset.letter);
-    };
+        drawing.textContent = ['○', '◔', '◑', '◕', '◉', '☠', '✖'][mistakes];
 
-    letters.addEventListener('click', click);
-
-    register(keyboard((event, pressed) => {
-      if (pressed && /^[a-z]$/i.test(event.key)) {
-        guess(event.key.toUpperCase());
-      }
-    }));
-
-    register(() => letters.removeEventListener('click', click));
-
-    render();
-  }
-
-  /* 10. FLAPPY FLYER */
-
-  function gameFlappy() {
-    const { canvas: el, ctx } = canvas(360, 480, 500);
-
-    const bird = { x: 82, y: 210, vy: 0, r: 12 };
-
-    let pipes = [];
-    let alive = true;
-    let started = false;
-    let flapQueued = false;
-    let spawnTimer = 0;
-    let score = 0;
-
-    const gravity = 900;
-    const flapVelocity = -300;
-    const pipeWidth = 54;
-    const gap = 145;
-
-    function flap() {
-      if (!alive) return;
-
-      started = true;
-      bird.vy = flapVelocity;
-    }
-
-    function draw() {
-      ctx.fillStyle = '#071226';
-      ctx.fillRect(0, 0, el.width, el.height);
-
-      for (let i = 0; i < 28; i++) {
-        const x = (37 * i) % el.width;
-        const y = (71 * i) % el.height;
-
-        ctx.fillStyle = '#213957';
-        ctx.fillRect(x, y, 2, 2);
+        $$('[data-letter]', letters).forEach(button => {
+          button.disabled = ended || guessed.has(button.dataset.letter);
+        });
       }
 
-      pipes.forEach(pipe => {
-        ctx.fillStyle = '#43f5a5';
+      function guessLetter(letter) {
+        if (ended || guessed.has(letter) || !/^[A-Z]$/.test(letter)) return;
 
-        ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
-        ctx.fillRect(
-          pipe.x,
-          pipe.top + gap,
-          pipeWidth,
-          el.height - pipe.top - gap
-        );
+        guessed.add(letter);
 
-        ctx.fillStyle = '#1bbf88';
-        ctx.fillRect(pipe.x - 4, pipe.top - 10, pipeWidth + 8, 10);
-        ctx.fillRect(pipe.x - 4, pipe.top + gap, pipeWidth + 8, 10);
+        if (!word.includes(letter)) mistakes++;
+
+        if (word.split('').every(char => guessed.has(char))) {
+          ended = true;
+          addScore(10);
+          status.textContent = `You solved it! The word was ${word}. +10 points.`;
+        } else if (mistakes >= maxMistakes) {
+          ended = true;
+          status.textContent = `Game over! The word was ${word}.`;
+        } else {
+          status.textContent = `Mistakes: ${mistakes}/${maxMistakes}`;
+        }
+
+        render();
+      }
+
+      listen(letters, 'click', event => {
+        const button = event.target.closest('[data-letter]');
+        if (button) guessLetter(button.dataset.letter);
       });
 
-      ctx.fillStyle = '#ffdc68';
-      ctx.beginPath();
-      ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
-      ctx.fill();
+      hangmanTapHandler = event => {
+        const rect = pad.getBoundingClientRect();
+        const lettersArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const col = Math.min(6, Math.max(0,
+          Math.floor((event.clientX - rect.left) / rect.width * 7)
+        ));
+        const row = Math.min(3, Math.max(0,
+          Math.floor((event.clientY - rect.top) / rect.height * 4)
+        ));
 
-      ctx.fillStyle = '#091120';
-      ctx.beginPath();
-      ctx.arc(bird.x + 4, bird.y - 3, 2.5, 0, Math.PI * 2);
-      ctx.fill();
+        const index = row * 7 + col;
+        if (index < lettersArray.length) guessLetter(lettersArray[index]);
+      };
 
-      ctx.fillStyle = '#eaf3ff';
-      ctx.font = 'bold 17px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('SCORE ' + score, el.width / 2, 30);
+      resetHangman();
 
-      if (!started && alive) {
-        ctx.fillStyle = '#fff';
-        ctx.fillText('TAP FLAP TO START', el.width / 2, el.height / 2 + 65);
-      }
+      return () => {
+        hangmanTapHandler = null;
+      };
     }
 
-    function update(dt) {
-      if (!alive) return;
+    function gameFlappy() {
+      setInstructions('Tap the touchpad or FLAP to fly');
+      addAction('FLAP', 'fire', () => flap());
 
-      if (flapQueued) {
-        flapQueued = false;
-        flap();
+      const { canvas, ctx } = makeCanvas(360, 480);
+
+      const bird = { x: 82, y: 210, vy: 0, r: 12 };
+
+      let pipes = [];
+      let elapsed = 0;
+      let spawnTimer = 0;
+      let alive = true;
+      let started = false;
+      let passed = 0;
+      const gravity = 900;
+      const flapVelocity = -300;
+      const pipeW = 54;
+      const gap = 145;
+
+      function flap() {
+        if (!alive) return;
+
+        started = true;
+        bird.vy = flapVelocity;
       }
 
-      if (!started) return;
+      function draw() {
+        ctx.fillStyle = '#071226';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      bird.vy += gravity * dt;
-      bird.y += bird.vy * dt;
+        for (let i = 0; i < 28; i++) {
+          const x = (37 * i) % canvas.width;
+          const y = (71 * i) % canvas.height;
 
-      spawnTimer -= dt;
+          ctx.fillStyle = '#213957';
+          ctx.fillRect(x, y, 2, 2);
+        }
 
-      if (spawnTimer <= 0) {
-        const maxTop = el.height - gap - 55;
-        const top = 35 + Math.random() * Math.max(10, maxTop - 35);
+        pipes.forEach(pipe => {
+          ctx.fillStyle = '#43f5a5';
+          ctx.shadowColor = '#43f5a5';
+          ctx.shadowBlur = 8;
 
-        pipes.push({
-          x: el.width + 5,
-          top,
-          scored: false
+          ctx.fillRect(pipe.x, 0, pipeW, pipe.top);
+          ctx.fillRect(pipe.x, pipe.top + gap, pipeW, canvas.height - pipe.top - gap);
+
+          ctx.fillStyle = '#1bbf88';
+          ctx.fillRect(pipe.x - 4, pipe.top - 10, pipeW + 8, 10);
+          ctx.fillRect(pipe.x - 4, pipe.top + gap, pipeW + 8, 10);
         });
 
-        spawnTimer = 1.35;
+        ctx.shadowColor = '#ffdc68';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#ffdc68';
+
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#091120';
+
+        ctx.beginPath();
+        ctx.arc(bird.x + 4, bird.y - 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#eaf3ff';
+        ctx.font = 'bold 17px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText(`SCORE ${passed}`, canvas.width / 2, 30);
+
+        if (!started && alive) {
+          ctx.fillStyle = '#fff';
+          ctx.fillText('TAP FLAP TO START', canvas.width / 2, canvas.height / 2 + 65);
+        }
       }
 
-      pipes.forEach(pipe => {
-        pipe.x -= 145 * dt;
+      const stop = frame(dt => {
+        elapsed += dt;
 
-        if (!pipe.scored && pipe.x + pipeWidth < bird.x) {
-          pipe.scored = true;
-          score++;
-          setScore(score);
+        if (!alive) {
+          draw();
+          return;
         }
 
-        const horizontal =
-          bird.x + bird.r > pipe.x &&
-          bird.x - bird.r < pipe.x + pipeWidth;
-
-        const vertical =
-          bird.y - bird.r < pipe.top ||
-          bird.y + bird.r > pipe.top + gap;
-
-        if (horizontal && vertical) {
-          alive = false;
-          setMessage('You hit a pipe! Score: ' + score + '. Restart to try again.');
+        if (controller.jump || controller.tap) {
+          flap();
+          controller.jump = false;
+          controller.tap = false;
         }
+
+        if (started) {
+          bird.vy += gravity * dt;
+          bird.y += bird.vy * dt;
+
+          spawnTimer -= dt;
+
+          if (spawnTimer <= 0) {
+            const minTop = 55;
+            const maxTop = canvas.height - gap - 55;
+
+            pipes.push({
+              x: canvas.width + 5,
+              top: minTop + Math.random() * (maxTop - minTop),
+              scored: false
+            });
+
+            spawnTimer = 1.35;
+          }
+
+          pipes.forEach(pipe => {
+            pipe.x -= 145 * dt;
+
+            if (!pipe.scored && pipe.x + pipeW < bird.x) {
+              pipe.scored = true;
+              passed++;
+              setScore(passed);
+            }
+
+            const overlapsX =
+              bird.x + bird.r > pipe.x &&
+              bird.x - bird.r < pipe.x + pipeW;
+
+            const outsideGap =
+              bird.y - bird.r < pipe.top ||
+              bird.y + bird.r > pipe.top + gap;
+
+            if (overlapsX && outsideGap) {
+              alive = false;
+              setMessage(`You hit a pipe! Score: ${passed}. Tap Restart to try again.`);
+            }
+          });
+
+          pipes = pipes.filter(pipe => pipe.x + pipeW > -5);
+
+          if (bird.y - bird.r < 0 || bird.y + bird.r > canvas.height) {
+            alive = false;
+            setMessage(`Flight ended! Score: ${passed}. Tap Restart to try again.`);
+          }
+        }
+
+        draw();
       });
 
-      pipes = pipes.filter(pipe => pipe.x + pipeWidth > -5);
-
-      if (bird.y - bird.r < 0 || bird.y + bird.r > el.height) {
+      return () => {
         alive = false;
-        setMessage('Flight ended! Score: ' + score + '. Restart to try again.');
-      }
+        stop();
+      };
     }
 
-    register(keyboard((event, pressed) => {
-      if (!pressed) return;
+    let gameCleanup = () => {};
 
-      const key = event.key.toLowerCase();
+    try {
+      gameCleanup = makeGame() || (() => {});
+    } catch (error) {
+      console.error(`Nexora ${id} error:`, error);
+      area.innerHTML = '<p class="nx-result">The game could not start. Tap Restart to try again.</p>';
+      setMessage('Game initialization failed.');
+    }
 
-      if (key === ' ' || key === 'arrowup' || key === 'w') {
-        flapQueued = true;
+    updatePadDisplay();
+
+    cleanupCurrent = () => {
+      try {
+        gameCleanup();
+      } catch (error) {
+        console.warn('Game cleanup error:', error);
       }
-    }));
 
-    const canvasTap = () => {
-      flapQueued = true;
+      localCleanups.forEach(cleanup => {
+        try { cleanup(); } catch (_) {}
+      });
+
+      cancelAnimationFrame(animationFrame);
+      intervalIds.forEach(clearInterval);
+      timeoutIds.forEach(clearTimeout);
+
+      controller.keys.clear();
+      resetPad();
+
+      boardTapHandler = null;
+      mathTapHandler = null;
+      rpsTapHandler = null;
+      hangmanTapHandler = null;
     };
-
-    el.addEventListener('pointerdown', canvasTap);
-
-    register(() => el.removeEventListener('pointerdown', canvasTap));
-
-    register(loop(dt => {
-      update(dt);
-      draw();
-    }));
-
-    register(() => { alive = false; });
   }
 
-  installStyles();
-  renderHome();
+  addStyles();
+
+  // Clear the initial loading message and render the arcade.
+  showHome();
+
 })();
