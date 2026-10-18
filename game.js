@@ -1,536 +1,599 @@
-/* ==========================================================
-   REXWEB NEXORA — 10-GAME ARCADE
-   Complete self-contained game.js
-   Mobile + Desktop | No external libraries
-   ========================================================== */
-
 (() => {
-  "use strict";
+  'use strict';
 
-  const ROOT_ID = "nexora-games";
-  const SCORE_KEY = "rexweb_nexora_arcade_scores_v1";
-
+  const ROOT_ID = 'nexora-games';
+  const SCORE_KEY = 'rexweb_nexora_arcade_scores_v1';
   const root = document.getElementById(ROOT_ID);
 
   if (!root) {
-    console.error("RexWeb Nexora: #nexora-games was not found.");
+    console.error('Nexora Arcade: #nexora-games was not found.');
     return;
   }
 
-  let cleanup = null;
-  let currentScore = 0;
-  let currentGame = "";
-  let gameToken = 0;
+  const $ = (selector, parent = root) => parent.querySelector(selector);
+  const $$ = (selector, parent = root) => [...parent.querySelectorAll(selector)];
 
-  function getScores() {
+  const games = [
+    { id: 'snake', name: 'Snake', icon: '🐍', description: 'Eat, grow, and avoid your tail.' },
+    { id: 'ttt', name: 'Tic-Tac-Toe', icon: '⭕', description: 'Challenge the computer.' },
+    { id: 'pong', name: 'Pong', icon: '🏓', description: 'Keep the ball in play.' },
+    { id: 'breakout', name: 'Brick Breaker', icon: '🧱', description: 'Destroy every brick.' },
+    { id: 'runner', name: 'Endless Runner', icon: '🏃', description: 'Jump over obstacles.' },
+    { id: 'shooter', name: 'Space Shooter', icon: '🚀', description: 'Dodge enemies and fire.' },
+    { id: 'math', name: 'Math Challenge', icon: '🧠', description: 'Solve as many questions as possible.' },
+    { id: 'rps', name: 'Rock Paper Scissors', icon: '✊', description: 'Choose your move.' },
+    { id: 'hangman', name: 'Hangman', icon: '🔤', description: 'Guess the hidden word.' },
+    { id: 'flappy', name: 'Flappy Flyer', icon: '🐦', description: 'Fly between the pipes.' }
+  ];
+
+  let currentGame = null;
+  let cleanupCurrent = () => {};
+  let gameToken = 0;
+  let scores = loadScores();
+
+  function loadScores() {
     try {
-      return JSON.parse(localStorage.getItem(SCORE_KEY)) || {};
+      return JSON.parse(localStorage.getItem(SCORE_KEY) || '{}');
     } catch (_) {
       return {};
     }
   }
 
-  function saveScore(name, score) {
-    const scores = getScores();
-    const value = Math.max(0, Math.floor(Number(score) || 0));
-
-    scores[name] = Math.max(scores[name] || 0, value);
-
+  function saveScores() {
     try {
       localStorage.setItem(SCORE_KEY, JSON.stringify(scores));
     } catch (_) {}
-
-    return scores[name];
   }
 
-  function bestScore(name) {
-    return getScores()[name] || 0;
+  function bestScore(id) {
+    return Number(scores[id] || 0);
+  }
+
+  function saveBest(id, score) {
+    if (score > bestScore(id)) {
+      scores[id] = score;
+      saveScores();
+    }
   }
 
   function escapeHTML(value) {
     return String(value).replace(/[&<>"']/g, char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
     })[char]);
   }
 
-  const games = [
-    { id: "snake", name: "Snake", icon: "🐍", description: "Eat food and grow longer." },
-    { id: "tictactoe", name: "Tic-Tac-Toe", icon: "❌", description: "Beat the computer." },
-    { id: "pong", name: "Pong", icon: "🏓", description: "Return the bouncing ball." },
-    { id: "brick", name: "Brick Breaker", icon: "🧱", description: "Break every brick." },
-    { id: "runner", name: "Endless Runner", icon: "🏃", description: "Jump over obstacles." },
-    { id: "shooter", name: "Space Shooter", icon: "🚀", description: "Defend space from enemies." },
-    { id: "math", name: "Math Challenge", icon: "🧠", description: "Solve sums against the clock." },
-    { id: "rps", name: "Rock Paper Scissors", icon: "✊", description: "Challenge the computer." },
-    { id: "hangman", name: "Hangman", icon: "🔤", description: "Guess the hidden word." },
-    { id: "flappy", name: "Flappy Flyer", icon: "🐦", description: "Fly through the gaps." }
-  ];
-
-  const styles = `
-    #nexora-games {
-      --nx-bg: #050914;
-      --nx-panel: #0b1427;
-      --nx-border: #263b5d;
-      --nx-blue: #37b6ff;
-      --nx-purple: #a78bfa;
-      --nx-text: #f4f7ff;
-      --nx-muted: #9eabc5;
-      color: var(--nx-text);
-      font-family: system-ui, Arial, sans-serif;
-      padding: 16px;
-    }
-
-    #nexora-games * { box-sizing: border-box; }
-
-    #nexora-games .nx-shell {
-      max-width: 1150px;
-      margin: auto;
-    }
-
-    #nexora-games .nx-title {
-      text-align: center;
-      font-size: clamp(25px, 5vw, 38px);
-      font-weight: 950;
-      margin: 8px 0;
-      background: linear-gradient(90deg,#fff,#37b6ff,#a78bfa);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    #nexora-games .nx-subtitle {
-      color: var(--nx-muted);
-      text-align: center;
-      margin: 0 0 22px;
-      font-size: 13px;
-    }
-
-    #nexora-games .nx-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 22px;
-    }
-
-    #nexora-games .nx-stat {
-      background: #101d34;
-      border: 1px solid var(--nx-border);
-      border-radius: 12px;
-      padding: 11px 17px;
-      text-align: center;
-      min-width: 115px;
-    }
-
-    #nexora-games .nx-stat strong {
-      display: block;
-      color: var(--nx-blue);
-      font-size: 21px;
-    }
-
-    #nexora-games .nx-stat span {
-      color: var(--nx-muted);
-      font-size: 11px;
-    }
-
-    #nexora-games .nx-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-    }
-
-    @media(min-width:650px) {
-      #nexora-games .nx-grid {
-        grid-template-columns: repeat(3, minmax(0,1fr));
-      }
-    }
-
-    @media(min-width:950px) {
-      #nexora-games .nx-grid {
-        grid-template-columns: repeat(5, minmax(0,1fr));
-      }
-    }
-
-    #nexora-games .nx-card {
-      min-width: 0;
-      background: linear-gradient(145deg,#101d34,#091120);
-      border: 1px solid var(--nx-border);
-      border-radius: 17px;
-      padding: 17px 12px;
-      text-align: center;
-      transition: transform .18s,border-color .18s,box-shadow .18s;
-    }
-
-    #nexora-games .nx-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--nx-blue);
-      box-shadow: 0 8px 28px #168bff16;
-    }
-
-    #nexora-games .nx-icon { font-size: 38px; }
-
-    #nexora-games .nx-card h3 {
-      font-size: 15px;
-      margin: 9px 0 5px;
-    }
-
-    #nexora-games .nx-card p {
-      min-height: 34px;
-      color: var(--nx-muted);
-      font-size: 12px;
-      margin: 0 0 12px;
-    }
-
-    #nexora-games button {
-      font: inherit;
-      cursor: pointer;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    #nexora-games .nx-btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid #36577f;
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: white;
-      background: #142844;
-      font-weight: 750;
-    }
-
-    #nexora-games .nx-btn:hover { border-color: var(--nx-blue); }
-
-    #nexora-games .nx-primary {
-      color: #06101f;
-      border-color: transparent;
-      background: linear-gradient(100deg,#37b6ff,#a78bfa);
-    }
-
-    #nexora-games .nx-wide { width: 100%; }
-
-    #nexora-games .nx-game-panel {
-      max-width: 850px;
-      margin: auto;
-      border: 1px solid var(--nx-border);
-      border-radius: 18px;
-      padding: 15px;
-      background: linear-gradient(145deg,#0c172b,#070d19);
-    }
-
-    #nexora-games .nx-game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    #nexora-games .nx-game-header h2 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    #nexora-games .nx-instructions {
-      color: var(--nx-muted);
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 10px 0 15px;
-    }
-
-    #nexora-games .nx-board {
-      margin: 12px auto;
-      max-width: 100%;
-    }
-
-    #nexora-games .nx-canvas {
-      display: block;
-      width: 100%;
-      max-width: 620px;
-      height: auto;
-      margin: auto;
-      background: #030813;
-      border: 1px solid #233957;
-      border-radius: 12px;
-      touch-action: none;
-    }
-
-    #nexora-games .nx-game-stats {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 10px 0;
-    }
-
-    #nexora-games .nx-pill {
-      background: #101f37;
-      border: 1px solid var(--nx-border);
-      border-radius: 10px;
-      padding: 8px 13px;
-      font-size: 13px;
-    }
-
-    #nexora-games .nx-pill strong { color: var(--nx-blue); }
-
-    /* ==========================================================
-       DEDICATED MINI TOUCHSCREEN CONTROLLER PANEL
-       ========================================================== */
-    #nexora-games .nx-gamepad {
-      background: #070e1c;
-      border: 1px solid #37b6ff;
-      box-shadow: 0 0 15px rgba(55, 182, 255, 0.15);
-      border-radius: 14px;
-      padding: 12px;
-      margin: 15px auto;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    #nexora-games .nx-gamepad-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      width: 100%;
-    }
-
-    #nexora-games .nx-pad-btn {
-      background: #10233f;
-      border: 1px solid #37b6ff;
-      color: #37b6ff;
-      font-weight: 800;
-      border-radius: 10px;
-      padding: 12px 18px;
-      min-width: 56px;
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
-    }
-
-    #nexora-games .nx-pad-btn:active,
-    #nexora-games .nx-pad-btn.nx-active {
-      background: #37b6ff;
-      color: #06101f;
-      box-shadow: 0 0 12px #37b6ff;
-      transform: scale(0.95);
-    }
-
-    #nexora-games .nx-pad-wide {
-      flex: 1;
-      max-width: 180px;
-      background: linear-gradient(100deg,#37b6ff,#a78bfa);
-      color: #06101f;
-      border: none;
-      font-size: 15px;
-    }
-
-    #nexora-games .nx-pad-wide:active,
-    #nexora-games .nx-pad-wide.nx-active {
-      background: linear-gradient(100deg,#2595dc,#9072e6);
-      color: #06101f;
-      box-shadow: 0 0 15px #a78bfa;
-    }
-
-    #nexora-games .nx-pad-info {
-      color: var(--nx-muted);
-      font-size: 12px;
-      text-align: center;
-      padding: 4px;
-      margin: 0;
-    }
-
-    #nexora-games .nx-message {
-      text-align: center;
-      font-weight: 800;
-      min-height: 25px;
-      margin: 10px 0;
-      color: #9de8ff;
-    }
-
-    #nexora-games .nx-tic-grid {
-      display: grid;
-      grid-template-columns: repeat(3,minmax(0,100px));
-      justify-content: center;
-      gap: 8px;
-      margin: 20px auto;
-    }
-
-    #nexora-games .nx-tic-cell {
-      height: 90px;
-      font-size: 34px;
-      font-weight: 900;
-      background: #101f37;
-      border: 1px solid #36577f;
-      border-radius: 13px;
-      color: white;
-    }
-
-    #nexora-games .nx-tic-cell:disabled { cursor: default; }
-
-    #nexora-games .nx-answer {
-      background: #0a1324;
-      border: 1px solid var(--nx-border);
-      border-radius: 12px;
-      padding: 13px;
-      color: white;
-      font-size: 21px;
-      width: 100%;
-      outline: none;
-    }
-
-    #nexora-games .nx-answer:focus { border-color: var(--nx-blue); }
-
-    #nexora-games .nx-letter-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      margin: 15px 0;
-    }
-
-    #nexora-games .nx-letter {
-      min-width: 36px;
-      min-height: 40px;
-      border: 1px solid #36577f;
-      border-radius: 8px;
-      background: #142844;
-      color: white;
-      font-weight: 800;
-    }
-
-    #nexora-games .nx-letter:disabled { opacity: .35; }
-
-    #nexora-games .nx-word {
-      text-align: center;
-      letter-spacing: 8px;
-      font-size: clamp(23px,6vw,34px);
-      font-weight: 900;
-      margin: 20px 0;
-      overflow-wrap: anywhere;
-    }
-
-    #nexora-games .nx-choice-grid {
-      display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 8px;
-      max-width: 430px;
-      margin: 20px auto;
-    }
-
-    #nexora-games .nx-choice {
-      padding: 15px 4px;
-      font-size: clamp(24px,5vw,36px);
-      background: #101f37;
-      border: 1px solid #36577f;
-      border-radius: 13px;
-      color: white;
-    }
-
-    #nexora-games .nx-choice span {
-      display: block;
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    #nexora-games .nx-footer {
-      text-align: center;
-      color: #7384a4;
-      font-size: 11px;
-      margin-top: 25px;
-    }
-  `;
-
   function injectStyles() {
-    if (document.getElementById("nexora-arcade-styles")) return;
+    if (document.getElementById('nexora-arcade-styles')) return;
 
-    const style = document.createElement("style");
-    style.id = "nexora-arcade-styles";
-    style.textContent = styles;
+    const style = document.createElement('style');
+    style.id = 'nexora-arcade-styles';
+    style.textContent = `
+      #nexora-games {
+        --nx-bg:#050914;
+        --nx-panel:#0b1425;
+        --nx-panel2:#101d32;
+        --nx-line:#223651;
+        --nx-text:#f2f7ff;
+        --nx-muted:#91a4bf;
+        --nx-cyan:#35e8ff;
+        --nx-purple:#9b6cff;
+        --nx-green:#43f5a5;
+        color:var(--nx-text);
+        background:var(--nx-bg);
+        font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        min-height:100%;
+        padding:16px;
+        box-sizing:border-box;
+        overflow:hidden;
+      }
+
+      #nexora-games * { box-sizing:border-box; }
+      #nexora-games button,
+      #nexora-games input { font:inherit; }
+      #nexora-games button { -webkit-tap-highlight-color:transparent; }
+
+      #nexora-games .nx-shell {
+        width:min(100%,1000px);
+        margin:0 auto;
+      }
+
+      #nexora-games .nx-header {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:18px;
+      }
+
+      #nexora-games .nx-brand {
+        display:flex;
+        align-items:center;
+        gap:11px;
+      }
+
+      #nexora-games .nx-logo {
+        width:46px;
+        height:46px;
+        display:grid;
+        place-items:center;
+        border:1px solid #27637c;
+        border-radius:14px;
+        color:var(--nx-cyan);
+        font-size:24px;
+        font-weight:900;
+        background:linear-gradient(135deg,#102b42,#161332);
+        box-shadow:0 0 22px #35e8ff19;
+      }
+
+      #nexora-games .nx-brand h1 {
+        font-size:clamp(17px,4vw,24px);
+        line-height:1.15;
+        margin:0;
+        letter-spacing:.6px;
+      }
+
+      #nexora-games .nx-brand p {
+        margin:5px 0 0;
+        color:var(--nx-muted);
+        font-size:12px;
+      }
+
+      #nexora-games .nx-btn {
+        border:1px solid var(--nx-line);
+        color:var(--nx-text);
+        background:var(--nx-panel2);
+        border-radius:11px;
+        padding:10px 14px;
+        min-height:42px;
+        cursor:pointer;
+        transition:transform .12s,border-color .12s,background .12s;
+      }
+
+      #nexora-games .nx-btn:active { transform:scale(.97); }
+      #nexora-games .nx-btn:focus-visible,
+      #nexora-games .nx-pad-btn:focus-visible {
+        outline:2px solid var(--nx-cyan);
+        outline-offset:3px;
+      }
+
+      #nexora-games .nx-btn-primary {
+        color:#001019;
+        font-weight:800;
+        background:var(--nx-cyan);
+        border-color:var(--nx-cyan);
+      }
+
+      #nexora-games .nx-btn-small { padding:7px 10px; min-height:35px; }
+
+      #nexora-games .nx-section-title {
+        font-size:17px;
+        margin:20px 0 12px;
+      }
+
+      #nexora-games .nx-game-grid {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:12px;
+      }
+
+      #nexora-games .nx-game-card {
+        text-align:left;
+        padding:16px;
+        border:1px solid var(--nx-line);
+        border-radius:16px;
+        background:linear-gradient(145deg,var(--nx-panel),#080f1e);
+        color:var(--nx-text);
+        min-width:0;
+        cursor:pointer;
+        transition:transform .15s,border-color .15s,box-shadow .15s;
+      }
+
+      #nexora-games .nx-game-card:hover {
+        border-color:#2684a5;
+        box-shadow:0 0 20px #35e8ff0b;
+      }
+
+      #nexora-games .nx-game-card:active { transform:scale(.985); }
+
+      #nexora-games .nx-card-icon {
+        font-size:29px;
+        margin-bottom:11px;
+        display:block;
+      }
+
+      #nexora-games .nx-card-title {
+        font-size:15px;
+        font-weight:800;
+        display:block;
+      }
+
+      #nexora-games .nx-card-description {
+        color:var(--nx-muted);
+        font-size:12px;
+        display:block;
+        margin-top:6px;
+        line-height:1.5;
+      }
+
+      #nexora-games .nx-card-best {
+        display:block;
+        color:var(--nx-cyan);
+        font-size:11px;
+        margin-top:12px;
+      }
+
+      #nexora-games .nx-panel {
+        border:1px solid var(--nx-line);
+        background:var(--nx-panel);
+        border-radius:18px;
+        overflow:hidden;
+      }
+
+      #nexora-games .nx-game-top {
+        padding:16px;
+        border-bottom:1px solid var(--nx-line);
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:12px;
+      }
+
+      #nexora-games .nx-game-heading {
+        display:flex;
+        align-items:center;
+        gap:10px;
+      }
+
+      #nexora-games .nx-game-heading h2 {
+        font-size:19px;
+        margin:0;
+      }
+
+      #nexora-games .nx-game-heading p {
+        font-size:12px;
+        color:var(--nx-muted);
+        margin:4px 0 0;
+      }
+
+      #nexora-games .nx-stats {
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+      }
+
+      #nexora-games .nx-stat {
+        padding:7px 10px;
+        border:1px solid var(--nx-line);
+        border-radius:10px;
+        background:#060d19;
+        font-size:12px;
+        white-space:nowrap;
+      }
+
+      #nexora-games .nx-stat strong { color:var(--nx-cyan); }
+
+      #nexora-games .nx-game-area {
+        padding:12px;
+        min-height:220px;
+        position:relative;
+      }
+
+      #nexora-games .nx-canvas-wrap {
+        width:100%;
+        position:relative;
+        margin:0 auto;
+      }
+
+      #nexora-games canvas {
+        display:block;
+        width:100%;
+        height:auto;
+        border-radius:12px;
+        background:#030914;
+        touch-action:none;
+      }
+
+      #nexora-games .nx-message {
+        text-align:center;
+        min-height:24px;
+        padding:5px 12px 12px;
+        color:var(--nx-cyan);
+        font-size:13px;
+      }
+
+      #nexora-games .nx-controls {
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:9px;
+        padding:0 12px 16px;
+      }
+
+      #nexora-games .nx-gamepad {
+        border-top:1px solid var(--nx-line);
+        padding:16px 12px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:10px;
+        background:linear-gradient(180deg,#091120,#060c18);
+        touch-action:none;
+        user-select:none;
+        -webkit-user-select:none;
+      }
+
+      #nexora-games .nx-pad-label {
+        color:var(--nx-muted);
+        font-size:10px;
+        letter-spacing:2px;
+        font-weight:800;
+      }
+
+      #nexora-games .nx-pad-row {
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+      }
+
+      #nexora-games .nx-pad-btn {
+        border:1px solid #2b526c;
+        border-radius:13px;
+        min-width:62px;
+        min-height:58px;
+        padding:8px;
+        display:grid;
+        place-items:center;
+        color:var(--nx-cyan);
+        font-size:22px;
+        font-weight:900;
+        background:linear-gradient(145deg,#14253b,#091321);
+        box-shadow:inset 0 1px #ffffff0a,0 5px 0 #030812;
+        cursor:pointer;
+        touch-action:none;
+        user-select:none;
+        -webkit-user-select:none;
+        -webkit-touch-callout:none;
+      }
+
+      #nexora-games .nx-pad-btn.nx-active,
+      #nexora-games .nx-pad-btn:active {
+        transform:translateY(3px);
+        box-shadow:inset 0 0 20px #35e8ff20,0 2px 0 #030812;
+        background:#15354b;
+        border-color:var(--nx-cyan);
+      }
+
+      #nexora-games .nx-pad-btn.nx-action {
+        min-width:100px;
+        color:#00120e;
+        background:linear-gradient(145deg,#5bffc1,#18c88c);
+        border-color:var(--nx-green);
+        font-size:14px;
+        letter-spacing:.7px;
+      }
+
+      #nexora-games .nx-pad-btn.nx-purple {
+        color:#fff;
+        background:linear-gradient(145deg,#8053d8,#43278b);
+        border-color:#9b6cff;
+      }
+
+      #nexora-games .nx-pad-info {
+        color:var(--nx-muted);
+        text-align:center;
+        font-size:12px;
+        max-width:340px;
+        line-height:1.5;
+      }
+
+      #nexora-games .nx-board {
+        display:grid;
+        gap:8px;
+        max-width:360px;
+        margin:12px auto;
+      }
+
+      #nexora-games .nx-ttt-board {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        width:min(100%,330px);
+      }
+
+      #nexora-games .nx-cell {
+        aspect-ratio:1;
+        border:1px solid #2a415e;
+        border-radius:13px;
+        background:#0c192a;
+        color:var(--nx-cyan);
+        font-size:clamp(28px,8vw,48px);
+        font-weight:900;
+        cursor:pointer;
+      }
+
+      #nexora-games .nx-cell:disabled { cursor:default; opacity:.95; }
+      #nexora-games .nx-cell.nx-o { color:var(--nx-purple); }
+
+      #nexora-games .nx-answer-grid {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px;
+        max-width:480px;
+        margin:16px auto;
+      }
+
+      #nexora-games .nx-answer {
+        padding:15px 10px;
+        border:1px solid var(--nx-line);
+        border-radius:12px;
+        color:var(--nx-text);
+        background:#0c192a;
+        font-weight:800;
+        cursor:pointer;
+      }
+
+      #nexora-games .nx-answer:active { border-color:var(--nx-cyan); }
+      #nexora-games .nx-word {
+        text-align:center;
+        font-size:clamp(22px,6vw,34px);
+        letter-spacing:7px;
+        margin:18px 0;
+        font-weight:900;
+        overflow-wrap:anywhere;
+      }
+
+      #nexora-games .nx-letter-grid {
+        display:grid;
+        grid-template-columns:repeat(7,minmax(0,1fr));
+        gap:6px;
+        max-width:460px;
+        margin:15px auto;
+      }
+
+      #nexora-games .nx-letter {
+        min-height:39px;
+        border:1px solid var(--nx-line);
+        border-radius:8px;
+        background:#0d192b;
+        color:var(--nx-text);
+        cursor:pointer;
+        font-weight:800;
+      }
+
+      #nexora-games .nx-letter:disabled { opacity:.3; cursor:default; }
+      #nexora-games .nx-question {
+        font-size:clamp(28px,8vw,43px);
+        font-weight:900;
+        text-align:center;
+        margin:20px 0;
+        color:var(--nx-cyan);
+      }
+
+      #nexora-games .nx-result {
+        font-size:14px;
+        color:var(--nx-muted);
+        text-align:center;
+        min-height:24px;
+      }
+
+      #nexora-games .nx-rps-buttons {
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:10px;
+        margin:18px auto;
+      }
+
+      #nexora-games .nx-rps-buttons .nx-btn { min-width:92px; }
+
+      #nexora-games .nx-footer {
+        text-align:center;
+        color:#60758f;
+        font-size:11px;
+        padding:18px 0 4px;
+      }
+
+      #nexora-games .nx-hidden { display:none !important; }
+
+      @media (min-width:650px) {
+        #nexora-games { padding:24px; }
+        #nexora-games .nx-game-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        #nexora-games .nx-game-area { padding:20px; }
+        #nexora-games .nx-pad-btn { min-width:68px; min-height:62px; }
+      }
+
+      @media (max-width:380px) {
+        #nexora-games { padding:10px; }
+        #nexora-games .nx-game-grid { gap:8px; }
+        #nexora-games .nx-game-card { padding:12px; }
+        #nexora-games .nx-pad-btn { min-width:55px; min-height:54px; }
+        #nexora-games .nx-letter-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
+      }
+
+      @media (prefers-reduced-motion:reduce) {
+        #nexora-games * { transition:none !important; }
+      }
+    `;
     document.head.appendChild(style);
   }
 
-  function setScore(score) {
-    currentScore = Math.max(0, Math.floor(Number(score) || 0));
-    saveScore(currentGame, currentScore);
+  function renderHome() {
+    stopCurrentGame();
 
-    const scoreEl = root.querySelector("[data-current-score]");
-    const bestEl = root.querySelector("[data-best-score]");
+    root.innerHTML = `
+      <div class="nx-shell">
+        <header class="nx-header">
+          <div class="nx-brand">
+            <div class="nx-logo">N</div>
+            <div>
+              <h1>REXWEB NEXORA</h1>
+              <p>ARCADE UNIVERSE · PLAY WITHOUT LIMITS</p>
+            </div>
+          </div>
+          <button class="nx-btn" data-action="refresh">↻ Refresh Scores</button>
+        </header>
 
-    if (scoreEl) scoreEl.textContent = currentScore;
-    if (bestEl) bestEl.textContent = bestScore(currentGame);
+        <h2 class="nx-section-title">Choose Your Game</h2>
+
+        <div class="nx-game-grid">
+          ${games.map(game => `
+            <button class="nx-game-card" data-open="${game.id}">
+              <span class="nx-card-icon">${game.icon}</span>
+              <span class="nx-card-title">${escapeHTML(game.name)}</span>
+              <span class="nx-card-description">${escapeHTML(game.description)}</span>
+              <span class="nx-card-best">BEST SCORE: ${bestScore(game.id)}</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <footer class="nx-footer">REXWEB NEXORA · YOUR DIGITAL WORLD, WITHOUT LIMITS</footer>
+      </div>
+    `;
+
+    $$('[data-open]').forEach(button => {
+      button.addEventListener('click', () => openGame(button.dataset.open));
+    });
+
+    $('[data-action="refresh"]').addEventListener('click', renderHome);
   }
 
   function stopCurrentGame() {
     gameToken++;
-
-    if (typeof cleanup === "function") {
-      try { cleanup(); } catch (error) {
-        console.error("Game cleanup error:", error);
-      }
+    try {
+      cleanupCurrent();
+    } catch (error) {
+      console.warn('Game cleanup issue:', error);
     }
-
-    cleanup = null;
+    cleanupCurrent = () => {};
+    currentGame = null;
   }
 
-  function menu() {
-    stopCurrentGame();
-    currentGame = "";
-    currentScore = 0;
+  function makeCanvas(width, height) {
+    const wrap = document.createElement('div');
+    wrap.className = 'nx-canvas-wrap';
+    wrap.style.maxWidth = width + 'px';
 
-    root.innerHTML = `
-      <div class="nx-shell">
-        <h2 class="nx-title">REXWEB NEXORA ARCADE</h2>
-        <p class="nx-subtitle">PLAY • COMPETE • BEAT YOUR HIGH SCORES</p>
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.setAttribute('aria-label', 'Game play area');
 
-        <div class="nx-stats">
-          <div class="nx-stat">
-            <strong>10</strong>
-            <span>GAMES AVAILABLE</span>
-          </div>
-          <div class="nx-stat">
-            <strong>${Object.keys(getScores()).length}</strong>
-            <span>GAMES WITH SAVED SCORES</span>
-          </div>
-        </div>
+    wrap.appendChild(canvas);
+    return { wrap, canvas, ctx: canvas.getContext('2d') };
+  }
 
-        <div class="nx-grid">
-          ${games.map(game => `
-            <article class="nx-card">
-              <div class="nx-icon">${game.icon}</div>
-              <h3>${escapeHTML(game.name)}</h3>
-              <p>${escapeHTML(game.description)}</p>
-              <div class="nx-pill" style="margin-bottom:10px">
-                Best: <strong>${bestScore(game.id)}</strong>
-              </div>
-              <button class="nx-btn nx-primary nx-wide"
-                data-play="${game.id}">PLAY NOW</button>
-            </article>
-          `).join("")}
-        </div>
-
-        <div class="nx-footer">REXWEB NEXORA • YOUR ARCADE, YOUR RECORDS</div>
-      </div>
-    `;
-
-    root.querySelectorAll("[data-play]").forEach(button => {
-      button.addEventListener("click", () => openGame(button.dataset.play));
-    });
+  function makeButton(label, action, className = '') {
+    const button = document.createElement('button');
+    button.className = 'nx-btn ' + className;
+    button.textContent = label;
+    button.type = 'button';
+    button.addEventListener('click', action);
+    return button;
   }
 
   function openGame(id) {
@@ -538,1700 +601,1618 @@
     if (!game) return;
 
     stopCurrentGame();
-
     currentGame = id;
-    currentScore = 0;
 
     const token = gameToken;
+    let score = 0;
+    let message = '';
+    let area;
+    let stats;
+    let scoreNode;
+    let bestNode;
+    let messageNode;
+    let gamepad;
+    let controls;
+    let gameCleanup = () => {};
+    let controllerCleanups = [];
 
     root.innerHTML = `
       <div class="nx-shell">
-        <section class="nx-game-panel">
-          <div class="nx-game-header">
-            <h2>${game.icon} ${escapeHTML(game.name)}</h2>
-            <button class="nx-btn" data-menu>← All Games</button>
+        <header class="nx-header">
+          <div class="nx-brand">
+            <div class="nx-logo">N</div>
+            <div>
+              <h1>REXWEB NEXORA</h1>
+              <p>ARCADE UNIVERSE · TOUCH TO PLAY</p>
+            </div>
+          </div>
+          <button class="nx-btn" data-action="all-games">← All Games</button>
+        </header>
+
+        <section class="nx-panel">
+          <div class="nx-game-top">
+            <div class="nx-game-heading">
+              <span style="font-size:28px">${game.icon}</span>
+              <div>
+                <h2>${escapeHTML(game.name)}</h2>
+                <p>${escapeHTML(game.description)}</p>
+              </div>
+            </div>
+            <div class="nx-stats">
+              <div class="nx-stat">SCORE: <strong data-score>0</strong></div>
+              <div class="nx-stat">BEST: <strong data-best>${bestScore(id)}</strong></div>
+            </div>
           </div>
 
-          <div class="nx-game-stats">
-            <div class="nx-pill">Score: <strong data-current-score>0</strong></div>
-            <div class="nx-pill">Best: <strong data-best-score>${bestScore(id)}</strong></div>
+          <div class="nx-game-area" data-game-area></div>
+          <div class="nx-message" data-message aria-live="polite"></div>
+          <div class="nx-gamepad" data-gamepad>
+            <div class="nx-pad-label">TOUCH CONTROLLER</div>
+            <div class="nx-pad-content" data-pad-content></div>
           </div>
-
-          <div class="nx-instructions">${escapeHTML(game.description)}</div>
-          <div data-game-area class="nx-board"></div>
-          
-          <div data-gamepad-area></div>
-          
-          <div class="nx-message" data-message></div>
-
           <div class="nx-controls">
-            <button class="nx-btn" data-restart>↻ Restart</button>
+            <button class="nx-btn nx-btn-primary" data-action="restart">↻ Restart</button>
+            <button class="nx-btn" data-action="all-games">▦ All Games</button>
           </div>
         </section>
+
+        <footer class="nx-footer">Use the touchscreen controller or your keyboard.</footer>
       </div>
     `;
 
-    root.querySelector("[data-menu]").addEventListener("click", menu);
+    area = $('[data-game-area]');
+    scoreNode = $('[data-score]');
+    bestNode = $('[data-best]');
+    messageNode = $('[data-message]');
+    gamepad = $('[data-gamepad]');
+    controls = $('[data-pad-content]');
 
-    root.querySelector("[data-restart]").addEventListener("click", () => {
+    $('[data-action="all-games"]').addEventListener('click', renderHome);
+    $('[data-action="restart"]').addEventListener('click', () => {
       if (token === gameToken) openGame(id);
     });
 
-    const area = root.querySelector("[data-game-area]");
-    const gamepadArea = root.querySelector("[data-gamepad-area]");
-    const message = root.querySelector("[data-message]");
-
-    function say(text) {
-      if (message) message.textContent = text;
+    function setMessage(text) {
+      message = text || '';
+      if (messageNode && messageNode.isConnected) messageNode.textContent = message;
     }
 
-    function addCleanup(fn) {
-      cleanup = fn;
+    function setScore(value) {
+      score = Math.max(0, Math.floor(Number(value) || 0));
+      if (scoreNode && scoreNode.isConnected) scoreNode.textContent = score;
+      saveBest(id, score);
+      if (bestNode && bestNode.isConnected) bestNode.textContent = bestScore(id);
     }
 
-    const context = {
-      area,
-      gamepadArea,
-      say,
-      setScore,
-      bestScore,
-      addCleanup,
-      token
-    };
-
-    try {
-      const handlers = {
-        snake: playSnake,
-        tictactoe: playTicTacToe,
-        pong: playPong,
-        brick: playBrickBreaker,
-        runner: playRunner,
-        shooter: playShooter,
-        math: playMath,
-        rps: playRPS,
-        hangman: playHangman,
-        flappy: playFlappy
-      };
-
-      handlers[id](context);
-    } catch (error) {
-      console.error("Arcade game error:", error);
-      area.innerHTML = `
-        <p style="text-align:center;color:#ff9eae">
-          This game encountered an error. Press Restart to try again.
-        </p>`;
-    }
-  }
-
-  /* ==========================================================
-     SHARED CANVAS & CONTROLLER HELPERS
-     ========================================================== */
-
-  function makeCanvas(area, width, height) {
-    area.innerHTML = `
-      <canvas class="nx-canvas"
-        width="${width}" height="${height}"
-        aria-label="Game play area"></canvas>
-    `;
-
-    return area.querySelector("canvas");
-  }
-
-  function renderGamepad(gamepadArea, type, config = {}) {
-    if (!gamepadArea) return;
-    
-    let html = "";
-    if (type === "dpad") {
-      html = `
-        <div class="nx-gamepad">
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn" data-pad="up">⬆️</button>
-          </div>
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn" data-pad="left">⬅️</button>
-            <button class="nx-pad-btn" data-pad="down">⬇️</button>
-            <button class="nx-pad-btn" data-pad="right">➡️</button>
-          </div>
-        </div>
-      `;
-    } else if (type === "paddle-vertical") {
-      html = `
-        <div class="nx-gamepad">
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn nx-pad-wide" data-pad="up">⬆️ UP</button>
-            <button class="nx-pad-btn nx-pad-wide" data-pad="down">⬇️ DOWN</button>
-          </div>
-        </div>
-      `;
-    } else if (type === "paddle-horizontal") {
-      html = `
-        <div class="nx-gamepad">
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn nx-pad-wide" data-pad="left">⬅️ LEFT</button>
-            <button class="nx-pad-btn nx-pad-wide" data-pad="right">➡️ RIGHT</button>
-          </div>
-        </div>
-      `;
-    } else if (type === "action-single") {
-      html = `
-        <div class="nx-gamepad">
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn nx-pad-wide" data-pad="action">${config.label || "ACTION"}</button>
-          </div>
-        </div>
-      `;
-    } else if (type === "shooter") {
-      html = `
-        <div class="nx-gamepad">
-          <div class="nx-gamepad-row">
-            <button class="nx-pad-btn" data-pad="left">⬅️</button>
-            <button class="nx-pad-btn nx-pad-wide" data-pad="action">🚀 FIRE</button>
-            <button class="nx-pad-btn" data-pad="right">➡️</button>
-          </div>
-        </div>
-      `;
-    } else {
-      html = `
-        <div class="nx-gamepad">
-          <p class="nx-pad-info">${config.info || "TAP THE GAME BOARD TO PLAY"}</p>
-        </div>
-      `;
+    function addScore(amount = 1) {
+      setScore(score + amount);
     }
 
-    gamepadArea.innerHTML = html;
-  }
-
-  function bindPadButton(gamepadArea, key, callbackStart, callbackEnd) {
-    const btn = gamepadArea.querySelector(`[data-pad="${key}"]`);
-    if (!btn) return () => {};
-
-    const handleStart = e => {
-      e.preventDefault();
-      btn.classList.add("nx-active");
-      if (typeof callbackStart === "function") callbackStart();
-    };
-
-    const handleEnd = e => {
-      e.preventDefault();
-      btn.classList.remove("nx-active");
-      if (typeof callbackEnd === "function") callbackEnd();
-    };
-
-    btn.addEventListener("pointerdown", handleStart);
-    btn.addEventListener("pointerup", handleEnd);
-    btn.addEventListener("pointerleave", handleEnd);
-    btn.addEventListener("pointercancel", handleEnd);
-
-    return () => {
-      btn.removeEventListener("pointerdown", handleStart);
-      btn.removeEventListener("pointerup", handleEnd);
-      btn.removeEventListener("pointerleave", handleEnd);
-      btn.removeEventListener("pointercancel", handleEnd);
-    };
-  }
-
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  /* ==========================================================
-     1. SNAKE
-     ========================================================== */
-
-  function playSnake(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const size = 20;
-    const canvas = makeCanvas(area, 400, 400);
-    const c = canvas.getContext("2d");
-
-    let snake, food, direction, nextDirection, score, timer, dead;
-    let lastTouch = null;
-
-    renderGamepad(gamepadArea, "dpad");
-
-    function reset() {
-      clearInterval(timer);
-      snake = [
-        { x: 10, y: 10 },
-        { x: 9, y: 10 },
-        { x: 8, y: 10 }
-      ];
-      direction = { x: 1, y: 0 };
-      nextDirection = direction;
-      score = 0;
-      dead = false;
-      setScore(0);
-      say("Use directional controls or gamepad.");
-
-      spawnFood();
-      draw();
-      timer = setInterval(step, 120);
+    function makePadButton(key, label, className = '') {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'nx-pad-btn ' + className;
+      button.dataset.pad = key;
+      button.textContent = label;
+      button.setAttribute('aria-label', label);
+      return button;
     }
 
-    function spawnFood() {
-      do {
-        food = { x: randomInt(0, 19), y: randomInt(0, 19) };
-      } while (snake.some(part => part.x === food.x && part.y === food.y));
-    }
+    function bindPadButton(key, onStart, onEnd) {
+      const button = controls.querySelector(`[data-pad="${key}"]`);
+      if (!button) return () => {};
 
-    function setDirection(x, y) {
-      if (x === -direction.x && y === -direction.y) return;
-      nextDirection = { x, y };
-    }
+      let active = false;
+      let pointerId = null;
 
-    function step() {
-      if (dead) return;
+      function start(event) {
+        if (active) return;
+        if (event.cancelable) event.preventDefault();
+        active = true;
+        pointerId = event.pointerId ?? null;
+        button.classList.add('nx-active');
 
-      direction = nextDirection;
+        if (pointerId !== null && button.setPointerCapture) {
+          try { button.setPointerCapture(pointerId); } catch (_) {}
+        }
 
-      const head = {
-        x: snake[0].x + direction.x,
-        y: snake[0].y + direction.y
-      };
-
-      const eating = head.x === food.x && head.y === food.y;
-
-      if (
-        head.x < 0 || head.y < 0 ||
-        head.x >= 20 || head.y >= 20 ||
-        snake.slice(0, eating ? snake.length : -1)
-          .some(part => part.x === head.x && part.y === head.y)
-      ) {
-        dead = true;
-        clearInterval(timer);
-        say("Game over! Score: " + score + ". Press Restart.");
-        return;
+        if (typeof onStart === 'function') onStart(event);
       }
 
-      snake.unshift(head);
+      function end(event) {
+        if (!active) return;
 
-      if (eating) {
-        score += 10;
-        setScore(score);
-        spawnFood();
-      } else {
-        snake.pop();
+        if (
+          event &&
+          pointerId !== null &&
+          event.pointerId !== undefined &&
+          event.pointerId !== pointerId
+        ) return;
+
+        active = false;
+        pointerId = null;
+        button.classList.remove('nx-active');
+
+        if (typeof onEnd === 'function') onEnd(event);
       }
 
-      draw();
-    }
-
-    function draw() {
-      c.fillStyle = "#030813";
-      c.fillRect(0, 0, 400, 400);
-
-      c.strokeStyle = "#101d32";
-      for (let i = 0; i <= 20; i++) {
-        c.beginPath();
-        c.moveTo(i * size, 0);
-        c.lineTo(i * size, 400);
-        c.stroke();
-
-        c.beginPath();
-        c.moveTo(0, i * size);
-        c.lineTo(400, i * size);
-        c.stroke();
+      function keyStart(event) {
+        if (event.repeat) return;
+        start(event);
       }
 
-      c.fillStyle = "#ff6384";
-      c.beginPath();
-      c.arc(food.x * size + 10, food.y * size + 10, 7, 0, Math.PI * 2);
-      c.fill();
+      button.addEventListener('pointerdown', start);
+      button.addEventListener('pointerup', end);
+      button.addEventListener('pointercancel', end);
+      button.addEventListener('lostpointercapture', end);
+      button.addEventListener('contextmenu', preventContextMenu);
 
-      snake.forEach((part, index) => {
-        c.fillStyle = index === 0 ? "#b6ff8c" : "#37d6a4";
-        c.fillRect(part.x * size + 2, part.y * size + 2, 16, 16);
-      });
-    }
-
-    const keyHandler = event => {
-      const map = {
-        ArrowUp: [0, -1],
-        w: [0, -1],
-        ArrowDown: [0, 1],
-        s: [0, 1],
-        ArrowLeft: [-1, 0],
-        a: [-1, 0],
-        ArrowRight: [1, 0],
-        d: [1, 0]
-      };
-
-      if (map[event.key]) {
+      function preventContextMenu(event) {
         event.preventDefault();
-        setDirection(...map[event.key]);
-      }
-    };
-
-    document.addEventListener("keydown", keyHandler);
-
-    const cleanupUp = bindPadButton(gamepadArea, "up", () => setDirection(0, -1));
-    const cleanupDown = bindPadButton(gamepadArea, "down", () => setDirection(0, 1));
-    const cleanupLeft = bindPadButton(gamepadArea, "left", () => setDirection(-1, 0));
-    const cleanupRight = bindPadButton(gamepadArea, "right", () => setDirection(1, 0));
-
-    const touchStart = event => {
-      const touch = event.changedTouches[0];
-      lastTouch = { x: touch.clientX, y: touch.clientY };
-    };
-
-    const touchEnd = event => {
-      if (!lastTouch) return;
-
-      const touch = event.changedTouches[0];
-      const dx = touch.clientX - lastTouch.x;
-      const dy = touch.clientY - lastTouch.y;
-
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          setDirection(dx > 0 ? 1 : -1, 0);
-        } else {
-          setDirection(0, dy > 0 ? 1 : -1);
-        }
       }
 
-      lastTouch = null;
-    };
+      return () => {
+        end();
+        button.removeEventListener('pointerdown', start);
+        button.removeEventListener('pointerup', end);
+        button.removeEventListener('pointercancel', end);
+        button.removeEventListener('lostpointercapture', end);
+        button.removeEventListener('contextmenu', preventContextMenu);
+      };
+    }
 
-    canvas.addEventListener("touchstart", touchStart, { passive: true });
-    canvas.addEventListener("touchend", touchEnd, { passive: true });
-
-    addCleanup(() => {
-      clearInterval(timer);
-      document.removeEventListener("keydown", keyHandler);
-      canvas.removeEventListener("touchstart", touchStart);
-      canvas.removeEventListener("touchend", touchEnd);
-      cleanupUp();
-      cleanupDown();
-      cleanupLeft();
-      cleanupRight();
-    });
-
-    reset();
-  }
-
-  /* ==========================================================
-     2. TIC-TAC-TOE
-     ========================================================== */
-
-  function playTicTacToe(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-
-    let board, finished, busy, roundScore;
-
-    renderGamepad(gamepadArea, "info", { info: "MAKE YOUR MOVE ON THE GRID" });
-
-    function reset() {
-      board = Array(9).fill("");
-      finished = false;
-      busy = false;
-      roundScore = 0;
-      setScore(0);
-
-      area.innerHTML = `
-        <p style="text-align:center">You are <strong style="color:#37b6ff">X</strong>.
-        The computer is O.</p>
-        <div class="nx-tic-grid">
-          ${board.map((_, i) => `
-            <button class="nx-tic-cell" data-cell="${i}"></button>
-          `).join("")}
-        </div>
-      `;
-
-      area.querySelectorAll("[data-cell]").forEach(button => {
-        button.addEventListener("click", () => playerMove(Number(button.dataset.cell)));
+    function setPad(type, handlers = {}) {
+      controllerCleanups.forEach(fn => {
+        try { fn(); } catch (_) {}
       });
+      controllerCleanups = [];
+      controls.innerHTML = '';
 
-      say("Make your move.");
-    }
+      const add = (key, label, className, start, end) => {
+        controls.appendChild(makePadButton(key, label, className));
+        controllerCleanups.push(bindPadButton(key, start, end));
+      };
 
-    const wins = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6]
-    ];
+      if (type === 'dpad') {
+        const pad = document.createElement('div');
+        pad.style.display = 'flex';
+        pad.style.flexDirection = 'column';
+        pad.style.alignItems = 'center';
+        pad.style.gap = '8px';
 
-    function winner(b) {
-      for (const line of wins) {
-        const [a, m, z] = line;
-        if (b[a] && b[a] === b[m] && b[a] === b[z]) {
-          return b[a];
-        }
-      }
-      return b.every(Boolean) ? "draw" : "";
-    }
+        const top = document.createElement('div');
+        top.className = 'nx-pad-row';
 
-    function paint() {
-      area.querySelectorAll("[data-cell]").forEach(button => {
-        const i = Number(button.dataset.cell);
-        button.textContent = board[i];
-        button.disabled = !!board[i] || finished || busy;
-        button.style.color = board[i] === "X" ? "#37b6ff" : "#ff9bca";
-      });
-    }
+        const middle = document.createElement('div');
+        middle.className = 'nx-pad-row';
 
-    function endRound(result) {
-      finished = true;
+        const bottom = document.createElement('div');
+        bottom.className = 'nx-pad-row';
 
-      if (result === "X") {
-        roundScore += 10;
-        setScore(roundScore);
-        say("You win! +10 points. Press Restart for another round.");
-      } else if (result === "O") {
-        say("The computer wins. Press Restart to try again.");
-      } else {
-        say("It's a draw! Press Restart to play again.");
-      }
+        const createInto = (container, key, label) => {
+          const button = makePadButton(key, label);
+          container.appendChild(button);
 
-      paint();
-    }
+          let active = false;
+          let pointerId = null;
 
-    function playerMove(index) {
-      if (finished || busy || board[index]) return;
+          function start(event) {
+            if (active) return;
+            if (event.cancelable) event.preventDefault();
+            active = true;
+            pointerId = event.pointerId ?? null;
+            button.classList.add('nx-active');
+            if (pointerId !== null && button.setPointerCapture) {
+              try { button.setPointerCapture(pointerId); } catch (_) {}
+            }
+            if (handlers[key]) handlers[key](true);
+          }
 
-      board[index] = "X";
-      paint();
+          function end(event) {
+            if (!active) return;
+            if (event && pointerId !== null && event.pointerId !== undefined && event.pointerId !== pointerId) return;
+            active = false;
+            pointerId = null;
+            button.classList.remove('nx-active');
+            if (handlers[key]) handlers[key](false);
+          }
 
-      const result = winner(board);
-      if (result) return endRound(result);
+          button.addEventListener('pointerdown', start);
+          button.addEventListener('pointerup', end);
+          button.addEventListener('pointercancel', end);
+          button.addEventListener('lostpointercapture', end);
 
-      busy = true;
-      paint();
-
-      setTimeout(() => {
-        if (!area.isConnected || finished) return;
-
-        const empty = board
-          .map((value, i) => value ? -1 : i)
-          .filter(i => i >= 0);
-
-        if (!empty.length) {
-          busy = false;
-          return endRound("draw");
-        }
-
-        let move = findWinningMove("O");
-
-        if (move < 0) move = findWinningMove("X");
-        if (move < 0 && !board[4]) move = 4;
-
-        if (move < 0) {
-          const corners = [0, 2, 6, 8].filter(i => !board[i]);
-          if (corners.length) move = corners[randomInt(0, corners.length - 1)];
-        }
-
-        if (move < 0) move = empty[randomInt(0, empty.length - 1)];
-
-        board[move] = "O";
-        busy = false;
-        paint();
-
-        const outcome = winner(board);
-        if (outcome) endRound(outcome);
-      }, 280);
-    }
-
-    function findWinningMove(symbol) {
-      for (let i = 0; i < 9; i++) {
-        if (board[i]) continue;
-        board[i] = symbol;
-        const result = winner(board);
-        board[i] = "";
-        if (result === symbol) return i;
-      }
-      return -1;
-    }
-
-    reset();
-    addCleanup(() => {});
-  }
-
-  /* ==========================================================
-     3. PONG
-     ========================================================== */
-
-  function playPong(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const canvas = makeCanvas(area, 600, 380);
-    const c = canvas.getContext("2d");
-
-    let playerY, cpuY, ballX, ballY, vx, vy, score, raf, running;
-    const keys = new Set();
-
-    renderGamepad(gamepadArea, "paddle-vertical");
-
-    function reset() {
-      score = 0;
-      playerY = cpuY = 150;
-      ballX = 300;
-      ballY = 190;
-      vx = 4;
-      vy = Math.random() * 4 - 2;
-      running = true;
-      setScore(0);
-      say("Move with ↑/↓, W/S, or gamepad. First to 5 wins.");
-    }
-
-    function draw() {
-      c.fillStyle = "#030813";
-      c.fillRect(0, 0, 600, 380);
-
-      c.setLineDash([8, 9]);
-      c.strokeStyle = "#29415e";
-      c.beginPath();
-      c.moveTo(300, 0);
-      c.lineTo(300, 380);
-      c.stroke();
-      c.setLineDash([]);
-
-      c.fillStyle = "#37b6ff";
-      c.fillRect(20, playerY, 12, 80);
-
-      c.fillStyle = "#a78bfa";
-      c.fillRect(568, cpuY, 12, 80);
-
-      c.fillStyle = "#ffffff";
-      c.beginPath();
-      c.arc(ballX, ballY, 8, 0, Math.PI * 2);
-      c.fill();
-
-      c.font = "28px system-ui";
-      c.textAlign = "center";
-      c.fillText(score, 250, 40);
-      c.fillText("CPU", 350, 40);
-    }
-
-    function frame() {
-      if (!running) return;
-
-      if (keys.has("ArrowUp") || keys.has("w")) playerY -= 6;
-      if (keys.has("ArrowDown") || keys.has("s")) playerY += 6;
-
-      playerY = clamp(playerY, 0, 300);
-      cpuY = clamp(cpuY + (ballY - 40 - cpuY) * 0.055, 0, 300);
-
-      ballX += vx;
-      ballY += vy;
-
-      if (ballY < 8 || ballY > 372) vy *= -1;
-
-      if (
-        vx < 0 && ballX < 40 &&
-        ballY > playerY && ballY < playerY + 80
-      ) {
-        vx = Math.abs(vx) + 0.2;
-        vy += (ballY - (playerY + 40)) * 0.08;
-      }
-
-      if (
-        vx > 0 && ballX > 560 &&
-        ballY > cpuY && ballY < cpuY + 80
-      ) {
-        vx = -Math.abs(vx) - 0.15;
-        vy += (ballY - (cpuY + 40)) * 0.06;
-      }
-
-      if (ballX < 0) {
-        running = false;
-        say("CPU scores. Press Restart to try again.");
-      }
-
-      if (ballX > 600) {
-        score++;
-        setScore(score);
-
-        if (score >= 5) {
-          running = false;
-          say("You win! Press Restart for another match.");
-        } else {
-          ballX = 300;
-          ballY = 190;
-          vx = -4;
-          vy = Math.random() * 4 - 2;
-        }
-      }
-
-      draw();
-
-      if (running) raf = requestAnimationFrame(frame);
-    }
-
-    function movePlayer(event) {
-      if (event.key.startsWith("Arrow")) event.preventDefault();
-      keys.add(event.key);
-    }
-
-    function stopPlayer(event) {
-      keys.delete(event.key);
-    }
-
-    document.addEventListener("keydown", movePlayer);
-    document.addEventListener("keyup", stopPlayer);
-
-    let moveIntervalUp = null;
-    let moveIntervalDown = null;
-
-    const cleanupUp = bindPadButton(gamepadArea, "up", () => {
-      clearInterval(moveIntervalUp);
-      moveIntervalUp = setInterval(() => {
-        playerY = clamp(playerY - 7, 0, 300);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalUp);
-      moveIntervalUp = null;
-    });
-
-    const cleanupDown = bindPadButton(gamepadArea, "down", () => {
-      clearInterval(moveIntervalDown);
-      moveIntervalDown = setInterval(() => {
-        playerY = clamp(playerY + 7, 0, 300);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalDown);
-      moveIntervalDown = null;
-    });
-
-    addCleanup(() => {
-      running = false;
-      cancelAnimationFrame(raf);
-      clearInterval(moveIntervalUp);
-      clearInterval(moveIntervalDown);
-      document.removeEventListener("keydown", movePlayer);
-      document.removeEventListener("keyup", stopPlayer);
-      cleanupUp();
-      cleanupDown();
-    });
-
-    reset();
-    frame();
-  }
-
-  /* ==========================================================
-     4. BRICK BREAKER
-     ========================================================== */
-
-  function playBrickBreaker(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const canvas = makeCanvas(area, 600, 420);
-    const c = canvas.getContext("2d");
-
-    let paddleX, ballX, ballY, vx, vy, bricks, score, lives, raf, running;
-    let pointerX = null;
-    const keys = new Set();
-
-    renderGamepad(gamepadArea, "paddle-horizontal");
-
-    function reset() {
-      paddleX = 250;
-      ballX = 300;
-      ballY = 350;
-      vx = 3;
-      vy = -4;
-      score = 0;
-      lives = 3;
-      running = true;
-      bricks = [];
-
-      for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < 9; col++) {
-          bricks.push({
-            x: 18 + col * 63,
-            y: 35 + row * 25,
-            w: 55,
-            h: 16,
-            alive: true
+          controllerCleanups.push(() => {
+            end();
+            button.removeEventListener('pointerdown', start);
+            button.removeEventListener('pointerup', end);
+            button.removeEventListener('pointercancel', end);
+            button.removeEventListener('lostpointercapture', end);
           });
-        }
-      }
+        };
 
-      setScore(0);
-      say("Move the paddle with mouse, touch, gamepad, or ← → keys.");
-    }
+        createInto(top, 'up', '↑');
+        createInto(middle, 'left', '←');
+        createInto(middle, 'right', '→');
+        createInto(bottom, 'down', '↓');
 
-    function draw() {
-      c.fillStyle = "#030813";
-      c.fillRect(0, 0, 600, 420);
+        pad.append(top, middle, bottom);
+        controls.appendChild(pad);
+      } else if (type === 'vertical') {
+        const row = document.createElement('div');
+        row.className = 'nx-pad-row';
+        controls.appendChild(row);
 
-      const colors = ["#37b6ff", "#a78bfa", "#ff7cc8", "#45e5b0", "#ffc857"];
+        ['up', 'down'].forEach(key => {
+          const label = key === 'up' ? '↑ UP' : '↓ DOWN';
+          const button = makePadButton(key, label);
+          row.appendChild(button);
+          controllerCleanups.push(bindPadButton(key, () => handlers[key]?.(true), () => handlers[key]?.(false)));
+        });
+      } else if (type === 'horizontal') {
+        const row = document.createElement('div');
+        row.className = 'nx-pad-row';
+        controls.appendChild(row);
 
-      bricks.forEach((brick, i) => {
-        if (!brick.alive) return;
-        c.fillStyle = colors[Math.floor(i / 9) % colors.length];
-        c.fillRect(brick.x, brick.y, brick.w, brick.h);
-      });
+        ['left', 'right'].forEach(key => {
+          const button = makePadButton(key, key === 'left' ? '← LEFT' : 'RIGHT →');
+          row.appendChild(button);
+          controllerCleanups.push(bindPadButton(key, () => handlers[key]?.(true), () => handlers[key]?.(false)));
+        });
+      } else if (type === 'jump') {
+        add('action', 'JUMP', 'nx-action', handlers.action, handlers.release);
+      } else if (type === 'flap') {
+        add('action', 'FLAP', 'nx-action', handlers.action, handlers.release);
+      } else if (type === 'shooter') {
+        const row = document.createElement('div');
+        row.className = 'nx-pad-row';
+        controls.appendChild(row);
 
-      c.fillStyle = "#ffffff";
-      c.fillRect(paddleX, 390, 100, 10);
+        ['left', 'right', 'action'].forEach(key => {
+          const label = key === 'left' ? '←' : key === 'right' ? '→' : 'FIRE';
+          const cls = key === 'action' ? 'nx-action' : '';
+          const button = makePadButton(key, label, cls);
+          row.appendChild(button);
 
-      c.beginPath();
-      c.arc(ballX, ballY, 7, 0, Math.PI * 2);
-      c.fill();
-
-      c.font = "16px system-ui";
-      c.fillText("Lives: " + lives, 15, 410);
-    }
-
-    function frame() {
-      if (!running) return;
-
-      if (pointerX !== null) {
-        paddleX = pointerX - 50;
+          controllerCleanups.push(
+            bindPadButton(
+              key,
+              () => handlers[key]?.(true),
+              () => handlers[key]?.(false)
+            )
+          );
+        });
       } else {
-        if (keys.has("ArrowLeft") || keys.has("a")) paddleX -= 7;
-        if (keys.has("ArrowRight") || keys.has("d")) paddleX += 7;
+        controls.innerHTML = `<div class="nx-pad-info">${escapeHTML(handlers.info || 'Use the game buttons on the screen.')}</div>`;
       }
+    }
 
-      paddleX = clamp(paddleX, 0, 500);
-
-      ballX += vx;
-      ballY += vy;
-
-      if (ballX < 7 || ballX > 593) vx *= -1;
-      if (ballY < 7) vy *= -1;
-
-      if (
-        vy > 0 && ballY >= 382 &&
-        ballX >= paddleX && ballX <= paddleX + 100
-      ) {
-        vy = -Math.abs(vy);
-        vx = clamp((ballX - (paddleX + 50)) * 0.12, -6, 6);
-        if (Math.abs(vx) < 1) vx = vx < 0 ? -1 : 1;
-      }
-
-      for (const brick of bricks) {
-        if (
-          brick.alive &&
-          ballX >= brick.x && ballX <= brick.x + brick.w &&
-          ballY >= brick.y && ballY <= brick.y + brick.h
-        ) {
-          brick.alive = false;
-          vy *= -1;
-          score += 10;
-          setScore(score);
-          break;
+    function listenKey(handler) {
+      function keydown(event) {
+        if (token !== gameToken) return;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) {
+          event.preventDefault();
         }
+        handler(event, true);
       }
 
-      if (ballY > 420) {
-        lives--;
-        if (lives <= 0) {
-          running = false;
-          say("Game over! Final score: " + score);
-        } else {
-          ballX = 300;
-          ballY = 350;
-          vx = 3;
-          vy = -4;
-        }
+      function keyup(event) {
+        if (token !== gameToken) return;
+        handler(event, false);
       }
 
-      if (bricks.every(brick => !brick.alive)) {
-        running = false;
-        say("Amazing! You cleared every brick!");
-      }
+      window.addEventListener('keydown', keydown);
+      window.addEventListener('keyup', keyup);
 
-      draw();
-      if (running) raf = requestAnimationFrame(frame);
+      return () => {
+        window.removeEventListener('keydown', keydown);
+        window.removeEventListener('keyup', keyup);
+      };
     }
 
-    const keydown = event => {
-      if (event.key === "ArrowLeft" || event.key === "ArrowRight") event.preventDefault();
-      keys.add(event.key);
-      pointerX = null;
-    };
+    function rafLoop(callback) {
+      let raf = 0;
+      let running = true;
+      let previous = 0;
 
-    const keyup = event => keys.delete(event.key);
-
-    const pointer = event => {
-      const rect = canvas.getBoundingClientRect();
-      pointerX = (event.clientX - rect.left) * 600 / rect.width;
-    };
-
-    canvas.addEventListener("pointermove", pointer);
-    document.addEventListener("keydown", keydown);
-    document.addEventListener("keyup", keyup);
-
-    let moveIntervalLeft = null;
-    let moveIntervalRight = null;
-
-    const cleanupLeft = bindPadButton(gamepadArea, "left", () => {
-      pointerX = null;
-      clearInterval(moveIntervalLeft);
-      moveIntervalLeft = setInterval(() => {
-        paddleX = clamp(paddleX - 8, 0, 500);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalLeft);
-      moveIntervalLeft = null;
-    });
-
-    const cleanupRight = bindPadButton(gamepadArea, "right", () => {
-      pointerX = null;
-      clearInterval(moveIntervalRight);
-      moveIntervalRight = setInterval(() => {
-        paddleX = clamp(paddleX + 8, 0, 500);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalRight);
-      moveIntervalRight = null;
-    });
-
-    addCleanup(() => {
-      running = false;
-      cancelAnimationFrame(raf);
-      clearInterval(moveIntervalLeft);
-      clearInterval(moveIntervalRight);
-      canvas.removeEventListener("pointermove", pointer);
-      document.removeEventListener("keydown", keydown);
-      document.removeEventListener("keyup", keyup);
-      cleanupLeft();
-      cleanupRight();
-    });
-
-    reset();
-    frame();
-  }
-
-  /* ==========================================================
-     5. ENDLESS RUNNER
-     ========================================================== */
-
-  function playRunner(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const canvas = makeCanvas(area, 600, 320);
-    const c = canvas.getContext("2d");
-
-    let playerY, velocity, obstacles, score, speed, raf, running, grounded;
-    let lastTime = 0;
-
-    renderGamepad(gamepadArea, "action-single", { label: "⬆ JUMP" });
-
-    function reset() {
-      playerY = 230;
-      velocity = 0;
-      grounded = true;
-      obstacles = [];
-      score = 0;
-      speed = 4;
-      running = true;
-      lastTime = 0;
-      setScore(0);
-      say("Tap Jump or use gamepad/space to avoid obstacles.");
-    }
-
-    function jump() {
-      if (!running) return;
-      if (grounded) {
-        velocity = -11;
-        grounded = false;
-      }
-    }
-
-    function draw() {
-      c.fillStyle = "#030813";
-      c.fillRect(0, 0, 600, 320);
-
-      c.fillStyle = "#10243e";
-      c.fillRect(0, 265, 600, 55);
-
-      c.strokeStyle = "#37b6ff";
-      c.beginPath();
-      c.moveTo(0, 265);
-      c.lineTo(600, 265);
-      c.stroke();
-
-      c.fillStyle = "#37b6ff";
-      c.fillRect(65, playerY, 30, 35);
-
-      c.fillStyle = "#ff6384";
-      obstacles.forEach(obstacle => {
-        c.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
-      });
-
-      c.fillStyle = "#ffffff";
-      c.font = "17px system-ui";
-      c.fillText("Score: " + score, 15, 25);
-    }
-
-    function frame(time) {
-      if (!running) return;
-
-      if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 16.67, 2);
-      lastTime = time;
-
-      velocity += 0.55 * dt;
-      playerY += velocity * dt;
-
-      if (playerY >= 230) {
-        playerY = 230;
-        velocity = 0;
-        grounded = true;
+      function frame(now) {
+        if (!running || token !== gameToken) return;
+        const dt = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
+        previous = now;
+        callback(dt, now);
+        raf = requestAnimationFrame(frame);
       }
 
-      if (Math.random() < 0.018 * dt) {
-        obstacles.push({
-          x: 610,
-          y: 230 + randomInt(0, 15),
-          w: randomInt(20, 32),
-          h: randomInt(25, 35)
-        });
-      }
-
-      obstacles.forEach(obstacle => obstacle.x -= speed * dt);
-      obstacles = obstacles.filter(obstacle => obstacle.x > -50);
-
-      for (const obstacle of obstacles) {
-        if (
-          65 + 30 > obstacle.x &&
-          65 < obstacle.x + obstacle.w &&
-          playerY + 35 > obstacle.y &&
-          playerY < obstacle.y + obstacle.h
-        ) {
-          running = false;
-          say("Game over! Score: " + score + ". Press Restart.");
-          draw();
-          return;
-        }
-      }
-
-      score += Math.floor(dt);
-      speed = Math.min(9, 4 + score / 400);
-      setScore(score);
-      draw();
       raf = requestAnimationFrame(frame);
+
+      return () => {
+        running = false;
+        cancelAnimationFrame(raf);
+      };
     }
 
-    const keydown = event => {
-      if (event.code === "Space" || event.key === "ArrowUp") {
-        event.preventDefault();
-        jump();
-      }
-    };
+    function intervalLoop(callback, delay) {
+      const timer = setInterval(() => {
+        if (token === gameToken) callback();
+      }, delay);
 
-    document.addEventListener("keydown", keydown);
-    canvas.addEventListener("pointerdown", jump);
-
-    const cleanupAction = bindPadButton(gamepadArea, "action", jump);
-
-    addCleanup(() => {
-      running = false;
-      cancelAnimationFrame(raf);
-      document.removeEventListener("keydown", keydown);
-      canvas.removeEventListener("pointerdown", jump);
-      cleanupAction();
-    });
-
-    reset();
-    raf = requestAnimationFrame(frame);
-  }
-
-  /* ==========================================================
-     6. SPACE SHOOTER
-     ========================================================== */
-
-  function playShooter(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const canvas = makeCanvas(area, 600, 420);
-    const c = canvas.getContext("2d");
-
-    let player, bullets, enemies, score, raf, running, lastSpawn;
-    const keys = new Set();
-    let lastTime = 0;
-    let lastShot = 0;
-
-    renderGamepad(gamepadArea, "shooter");
-
-    function reset() {
-      player = { x: 300, y: 370 };
-      bullets = [];
-      enemies = [];
-      score = 0;
-      running = true;
-      lastSpawn = 0;
-      lastTime = 0;
-      lastShot = 0;
-      setScore(0);
-      say("Move with ← → or gamepad. Tap FIRE to shoot.");
+      return () => clearInterval(timer);
     }
 
-    function shoot() {
-      if (!running) return;
-      const now = performance.now();
-      if (now - lastShot < 170) return;
-      lastShot = now;
-      bullets.push({ x: player.x, y: player.y - 15 });
+    function canvasGame(width, height) {
+      const item = makeCanvas(width, height);
+      area.appendChild(item.wrap);
+      return item;
     }
 
-    function draw() {
-      c.fillStyle = "#030813";
-      c.fillRect(0, 0, 600, 420);
-
-      for (let i = 0; i < 50; i++) {
-        const x = (i * 97) % 600;
-        const y = (i * 67) % 420;
-        c.fillStyle = "#243b5c";
-        c.fillRect(x, y, 2, 2);
-      }
-
-      c.fillStyle = "#37b6ff";
-      c.beginPath();
-      c.moveTo(player.x, player.y - 17);
-      c.lineTo(player.x - 14, player.y + 12);
-      c.lineTo(player.x + 14, player.y + 12);
-      c.closePath();
-      c.fill();
-
-      c.fillStyle = "#b6ff8c";
-      bullets.forEach(b => c.fillRect(b.x - 2, b.y - 7, 4, 12));
-
-      c.fillStyle = "#ff6384";
-      enemies.forEach(e => {
-        c.beginPath();
-        c.arc(e.x, e.y, e.r, 0, Math.PI * 2);
-        c.fill();
-      });
-
-      c.fillStyle = "#fff";
-      c.font = "16px system-ui";
-      c.fillText("Score: " + score, 12, 24);
+    function finishGame(text) {
+      setMessage(text);
     }
 
-    function frame(time) {
-      if (!running) return;
+    function restartHome() {
+      renderHome();
+    }
 
-      if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 16.67, 2);
-      lastTime = time;
+    // SNAKE
+    function startSnake() {
+      const { canvas, ctx } = canvasGame(360, 360);
+      const size = 18;
+      const cells = 20;
+      let snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
+      let direction = { x: 1, y: 0 };
+      let nextDirection = { x: 1, y: 0 };
+      let food = { x: 14, y: 10 };
+      let alive = true;
+      let accumulator = 0;
 
-      if (keys.has("ArrowLeft") || keys.has("a")) player.x -= 5 * dt;
-      if (keys.has("ArrowRight") || keys.has("d")) player.x += 5 * dt;
-
-      player.x = clamp(player.x, 18, 582);
-
-      if (time - lastSpawn > Math.max(300, 950 - score * 3)) {
-        enemies.push({
-          x: randomInt(20, 580),
-          y: -15,
-          r: randomInt(10, 16),
-          speed: 1.6 + Math.random() * 1.5 + score / 250
-        });
-        lastSpawn = time;
-      }
-
-      bullets.forEach(b => b.y -= 7 * dt);
-      enemies.forEach(e => e.y += e.speed * dt);
-
-      for (const bullet of bullets) {
-        for (const enemy of enemies) {
-          if (
-            !enemy.dead &&
-            Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y) <
-              enemy.r + 5
-          ) {
-            enemy.dead = true;
-            bullet.dead = true;
-            score += 10;
-            setScore(score);
+      function spawnFood() {
+        for (let tries = 0; tries < 500; tries++) {
+          const candidate = {
+            x: Math.floor(Math.random() * cells),
+            y: Math.floor(Math.random() * cells)
+          };
+          if (!snake.some(part => part.x === candidate.x && part.y === candidate.y)) {
+            food = candidate;
+            return;
           }
         }
       }
 
-      bullets = bullets.filter(b => !b.dead && b.y > -15);
-      enemies = enemies.filter(e => !e.dead && e.y < 450);
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < e.r + 12)) {
-        running = false;
-        say("Your ship was hit! Score: " + score);
-        draw();
-        return;
-      }
+        ctx.strokeStyle = '#102035';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= cells; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * size, 0);
+          ctx.lineTo(i * size, canvas.height);
+          ctx.stroke();
 
-      draw();
-      raf = requestAnimationFrame(frame);
-    }
-
-    const keydown = event => {
-      keys.add(event.key);
-      if (event.code === "Space") {
-        event.preventDefault();
-        shoot();
-      }
-    };
-
-    const keyup = event => keys.delete(event.key);
-
-    const pointermove = event => {
-      if (event.pointerType === "mouse" && event.buttons === 0) return;
-      const rect = canvas.getBoundingClientRect();
-      player.x = clamp((event.clientX - rect.left) * 600 / rect.width, 18, 582);
-    };
-
-    document.addEventListener("keydown", keydown);
-    document.addEventListener("keyup", keyup);
-    canvas.addEventListener("pointermove", pointermove);
-
-    let moveIntervalLeft = null;
-    let moveIntervalRight = null;
-
-    const cleanupLeft = bindPadButton(gamepadArea, "left", () => {
-      clearInterval(moveIntervalLeft);
-      moveIntervalLeft = setInterval(() => {
-        player.x = clamp(player.x - 8, 18, 582);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalLeft);
-      moveIntervalLeft = null;
-    });
-
-    const cleanupRight = bindPadButton(gamepadArea, "right", () => {
-      clearInterval(moveIntervalRight);
-      moveIntervalRight = setInterval(() => {
-        player.x = clamp(player.x + 8, 18, 582);
-      }, 25);
-    }, () => {
-      clearInterval(moveIntervalRight);
-      moveIntervalRight = null;
-    });
-
-    const cleanupAction = bindPadButton(gamepadArea, "action", shoot);
-
-    addCleanup(() => {
-      running = false;
-      cancelAnimationFrame(raf);
-      clearInterval(moveIntervalLeft);
-      clearInterval(moveIntervalRight);
-      document.removeEventListener("keydown", keydown);
-      document.removeEventListener("keyup", keyup);
-      canvas.removeEventListener("pointermove", pointermove);
-      cleanupLeft();
-      cleanupRight();
-      cleanupAction();
-    });
-
-    reset();
-    raf = requestAnimationFrame(frame);
-  }
-
-  /* ==========================================================
-     7. MATH CHALLENGE
-     ========================================================== */
-
-  function playMath(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-
-    let score = 0;
-    let timeLeft = 30;
-    let a, b, answer, interval, ended = false;
-
-    renderGamepad(gamepadArea, "info", { info: "SOLVE AS MANY SUMS AS YOU CAN" });
-
-    function question() {
-      const operation = randomInt(0, 2);
-
-      if (operation === 0) {
-        a = randomInt(1, 30);
-        b = randomInt(1, 30);
-        answer = a + b;
-      } else if (operation === 1) {
-        a = randomInt(10, 40);
-        b = randomInt(1, a);
-        answer = a - b;
-      } else {
-        a = randomInt(2, 12);
-        b = randomInt(2, 10);
-        answer = a * b;
-      }
-
-      const symbols = operation === 0 ? "+" : operation === 1 ? "−" : "×";
-      const qEl = area.querySelector("[data-question]");
-      const ansEl = area.querySelector("[data-answer]");
-      if (qEl) qEl.textContent = `${a} ${symbols} ${b} = ?`;
-      if (ansEl) {
-        ansEl.value = "";
-        ansEl.focus();
-      }
-    }
-
-    function render() {
-      area.innerHTML = `
-        <div style="max-width:420px;margin:auto;text-align:center">
-          <div class="nx-game-stats">
-            <div class="nx-pill">Time: <strong data-time>30</strong>s</div>
-            <div class="nx-pill">Correct: <strong data-correct>0</strong></div>
-          </div>
-          <h2 data-question style="font-size:38px;margin:30px 0"></h2>
-          <form data-form>
-            <input class="nx-answer" data-answer type="number"
-              inputmode="numeric" autocomplete="off"
-              placeholder="Your answer" required>
-            <button class="nx-btn nx-primary nx-wide" style="margin-top:12px">
-              SUBMIT ANSWER
-            </button>
-          </form>
-        </div>
-      `;
-
-      area.querySelector("[data-form]").addEventListener("submit", event => {
-        event.preventDefault();
-        if (ended) return;
-
-        const input = area.querySelector("[data-answer]");
-        if (!input || input.value.trim() === "") return;
-
-        if (Number(input.value) === answer) {
-          score += 10;
-          setScore(score);
-          const cEl = area.querySelector("[data-correct]");
-          if (cEl) cEl.textContent = score / 10;
-          say("Correct! +10 points.");
-        } else {
-          say("Not quite! The correct answer was " + answer + ".");
+          ctx.beginPath();
+          ctx.moveTo(0, i * size);
+          ctx.lineTo(canvas.width, i * size);
+          ctx.stroke();
         }
 
-        question();
-      });
+        ctx.fillStyle = '#ff5e89';
+        ctx.shadowColor = '#ff5e89';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(food.x * size + size / 2, food.y * size + size / 2, size * .34, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
 
-      question();
-    }
-
-    function finish() {
-      ended = true;
-      clearInterval(interval);
-
-      area.innerHTML = `
-        <div style="text-align:center;padding:25px">
-          <div style="font-size:50px">🧠</div>
-          <h2>Time's up!</h2>
-          <p>You earned <strong>${score}</strong> points.</p>
-          <p>Press Restart to try again.</p>
-        </div>
-      `;
-
-      say("Challenge completed.");
-    }
-
-    render();
-    setScore(0);
-    say("You have 30 seconds. Each correct answer earns 10 points.");
-
-    interval = setInterval(() => {
-      if (ended) return;
-
-      timeLeft--;
-
-      const timeEl = area.querySelector("[data-time]");
-      if (timeEl) timeEl.textContent = timeLeft;
-
-      if (timeLeft <= 0) finish();
-    }, 1000);
-
-    addCleanup(() => clearInterval(interval));
-  }
-
-  /* ==========================================================
-     8. ROCK PAPER SCISSORS
-     ========================================================== */
-
-  function playRPS(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-
-    let score = 0;
-    let round = 0;
-    let ended = false;
-
-    renderGamepad(gamepadArea, "info", { info: "TAP A CHOICE BUTTON ABOVE TO PLAY" });
-
-    const choices = [
-      { id: "rock", name: "Rock", icon: "✊" },
-      { id: "paper", name: "Paper", icon: "✋" },
-      { id: "scissors", name: "Scissors", icon: "✌️" }
-    ];
-
-    function reset() {
-      score = 0;
-      round = 0;
-      ended = false;
-      setScore(0);
-
-      area.innerHTML = `
-        <div style="max-width:520px;margin:auto;text-align:center">
-          <p>Play 10 rounds. Each win earns 10 points.</p>
-          <div class="nx-pill">Round: <strong data-round>0</strong> / 10</div>
-
-          <div class="nx-choice-grid">
-            ${choices.map(choice => `
-              <button class="nx-choice" data-choice="${choice.id}">
-                ${choice.icon}<span>${choice.name}</span>
-              </button>
-            `).join("")}
-          </div>
-
-          <div class="nx-message" data-result></div>
-          <p data-record></p>
-        </div>
-      `;
-
-      area.querySelectorAll("[data-choice]").forEach(button => {
-        button.addEventListener("click", () => play(button.dataset.choice));
-      });
-
-      say("Choose rock, paper, or scissors.");
-    }
-
-    function play(userChoice) {
-      if (ended) return;
-
-      const computerChoice = choices[randomInt(0, 2)].id;
-      round++;
-
-      let result;
-
-      if (userChoice === computerChoice) {
-        result = "Draw!";
-      } else if (
-        (userChoice === "rock" && computerChoice === "scissors") ||
-        (userChoice === "paper" && computerChoice === "rock") ||
-        (userChoice === "scissors" && computerChoice === "paper")
-      ) {
-        result = "You win this round! +10 points.";
-        score += 10;
-        setScore(score);
-      } else {
-        result = "Computer wins this round.";
-      }
-
-      const names = Object.fromEntries(choices.map(c => [c.id, c.name]));
-
-      const resEl = area.querySelector("[data-result]");
-      const rndEl = area.querySelector("[data-round]");
-      const recEl = area.querySelector("[data-record]");
-
-      if (resEl) resEl.textContent = `You: ${names[userChoice]} • Computer: ${names[computerChoice]} — ${result}`;
-      if (rndEl) rndEl.textContent = round;
-
-      if (round >= 10) {
-        ended = true;
-        area.querySelectorAll("[data-choice]").forEach(button => {
-          button.disabled = true;
+        snake.forEach((part, index) => {
+          ctx.fillStyle = index === 0 ? '#66ffd0' : '#1bc995';
+          ctx.shadowColor = '#35e8ff';
+          ctx.shadowBlur = index === 0 ? 12 : 4;
+          ctx.fillRect(part.x * size + 2, part.y * size + 2, size - 4, size - 4);
         });
-
-        if (recEl) recEl.textContent = `Game finished! Your score: ${score}. Press Restart to play again.`;
-        say("Match complete.");
-      }
-    }
-
-    reset();
-    addCleanup(() => {});
-  }
-
-  /* ==========================================================
-     9. HANGMAN
-     ========================================================== */
-
-  function playHangman(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-
-    renderGamepad(gamepadArea, "info", { info: "TAP LETTERS BELOW TO GUESS THE WORD" });
-
-    const words = [
-      "JAVASCRIPT", "COMPUTER", "GALAXY", "KEYBOARD",
-      "PROGRAM", "NETWORK", "ROBOT", "PLANET",
-      "BROWSER", "PUZZLE", "ARCADE", "RAINBOW",
-      "MONITOR", "PIXEL", "GAMING", "NEXORA"
-    ];
-
-    let word, guessed, mistakes, score, finished;
-
-    function reset() {
-      word = words[randomInt(0, words.length - 1)];
-      guessed = [];
-      mistakes = 0;
-      score = 0;
-      finished = false;
-      setScore(0);
-      render();
-      say("Guess the hidden word. You have 6 incorrect guesses.");
-    }
-
-    function render() {
-      const display = [...word]
-        .map(letter => guessed.includes(letter) ? letter : "_")
-        .join(" ");
-
-      area.innerHTML = `
-        <div style="max-width:600px;margin:auto;text-align:center">
-          <div style="font-size:52px">${["🙂","😐","😕","😟","😣","😵","💀"][mistakes]}</div>
-          <div class="nx-game-stats">
-            <div class="nx-pill">Mistakes: <strong>${mistakes}</strong>/6</div>
-            <div class="nx-pill">Letters found: <strong>${guessed.length}</strong></div>
-          </div>
-          <div class="nx-word">${display}</div>
-          <div class="nx-letter-grid">
-            ${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(letter => `
-              <button class="nx-letter" data-letter="${letter}"
-                ${guessed.includes(letter) || finished ? "disabled" : ""}>
-                ${letter}
-              </button>
-            `).join("")}
-          </div>
-          <p style="color:#9eabc5">Category: Everyday words and technology</p>
-        </div>
-      `;
-
-      area.querySelectorAll("[data-letter]").forEach(button => {
-        button.addEventListener("click", () => guess(button.dataset.letter));
-      });
-    }
-
-    function guess(letter) {
-      if (finished || guessed.includes(letter)) return;
-
-      guessed.push(letter);
-
-      if (word.includes(letter)) {
-        score += 5;
-        setScore(score);
-      } else {
-        mistakes++;
+        ctx.shadowBlur = 0;
       }
 
-      const won = [...word].every(char => guessed.includes(char));
+      function step() {
+        if (!alive) return;
+        direction = nextDirection;
 
-      if (won) {
-        finished = true;
-        score += 20;
-        setScore(score);
-        say("You guessed the word! +20 bonus points.");
-      } else if (mistakes >= 6) {
-        finished = true;
-        say("Game over! The word was " + word + ".");
-      } else if (word.includes(letter)) {
-        say("Correct letter!");
-      } else {
-        say("Wrong letter. Try another.");
-      }
+        const head = {
+          x: snake[0].x + direction.x,
+          y: snake[0].y + direction.y
+        };
 
-      render();
-
-      if (finished) {
-        area.insertAdjacentHTML("beforeend", `
-          <div style="text-align:center;margin:15px">
-            <p>The word was <strong>${word}</strong>.</p>
-            <button class="nx-btn nx-primary" data-next-word>New Word</button>
-          </div>
-        `);
-
-        const nextBtn = area.querySelector("[data-next-word]");
-        if (nextBtn) nextBtn.addEventListener("click", reset);
-      }
-    }
-
-    const keyHandler = event => {
-      if (/^[a-z]$/i.test(event.key)) guess(event.key.toUpperCase());
-    };
-
-    document.addEventListener("keydown", keyHandler);
-
-    addCleanup(() => document.removeEventListener("keydown", keyHandler));
-
-    reset();
-  }
-
-  /* ==========================================================
-     10. FLAPPY FLYER
-     ========================================================== */
-
-  function playFlappy(ctx) {
-    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
-    const canvas = makeCanvas(area, 400, 560);
-    const c = canvas.getContext("2d");
-
-    let birdY, velocity, pipes, score, raf, running, passed;
-    let lastTime = 0;
-    const birdX = 90;
-    const birdR = 12;
-
-    renderGamepad(gamepadArea, "action-single", { label: "🐦 FLAP" });
-
-    function reset() {
-      birdY = 270;
-      velocity = 0;
-      pipes = [];
-      score = 0;
-      passed = 0;
-      running = true;
-      lastTime = 0;
-      setScore(0);
-      say("Tap Flap or use gamepad/space to fly. Avoid the pipes!");
-      pipes.push(makePipe(420));
-    }
-
-    function makePipe(x) {
-      const gap = 155;
-      const top = randomInt(70, 330);
-
-      return {
-        x,
-        top,
-        bottom: top + gap,
-        gap,
-        passed: false
-      };
-    }
-
-    function flap() {
-      if (!running) return;
-      velocity = -6.2;
-    }
-
-    function draw() {
-      const gradient = c.createLinearGradient(0, 0, 0, 560);
-      gradient.addColorStop(0, "#08152c");
-      gradient.addColorStop(1, "#15314d");
-
-      c.fillStyle = gradient;
-      c.fillRect(0, 0, 400, 560);
-
-      for (let i = 0; i < 32; i++) {
-        c.fillStyle = "#ffffff";
-        c.fillRect((i * 83) % 400, (i * 97) % 560, 2, 2);
-      }
-
-      pipes.forEach(pipe => {
-        c.fillStyle = "#35d39a";
-        c.fillRect(pipe.x, 0, 52, pipe.top);
-        c.fillRect(pipe.x, pipe.bottom, 52, 560 - pipe.bottom);
-
-        c.fillStyle = "#1c9f75";
-        c.fillRect(pipe.x - 4, pipe.top - 12, 60, 12);
-        c.fillRect(pipe.x - 4, pipe.bottom, 60, 12);
-      });
-
-      c.fillStyle = "#ffd166";
-      c.beginPath();
-      c.arc(birdX, birdY, birdR, 0, Math.PI * 2);
-      c.fill();
-
-      c.fillStyle = "#ffffff";
-      c.beginPath();
-      c.arc(birdX + 4, birdY - 3, 3, 0, Math.PI * 2);
-      c.fill();
-
-      c.fillStyle = "#07101c";
-      c.beginPath();
-      c.arc(birdX + 5, birdY - 3, 1.3, 0, Math.PI * 2);
-      c.fill();
-
-      c.fillStyle = "#ff8b4a";
-      c.beginPath();
-      c.moveTo(birdX + 10, birdY + 1);
-      c.lineTo(birdX + 20, birdY + 4);
-      c.lineTo(birdX + 10, birdY + 7);
-      c.closePath();
-      c.fill();
-
-      c.fillStyle = "#fff";
-      c.font = "bold 24px system-ui";
-      c.textAlign = "center";
-      c.fillText(score, 200, 38);
-    }
-
-    function frame(time) {
-      if (!running) return;
-
-      if (!lastTime) lastTime = time;
-      const dt = Math.min((time - lastTime) / 16.67, 2);
-      lastTime = time;
-
-      velocity += 0.3 * dt;
-      birdY += velocity * dt;
-
-      pipes.forEach(pipe => pipe.x -= 2.6 * dt);
-
-      if (pipes.length && pipes[pipes.length - 1].x < 230) {
-        pipes.push(makePipe(420));
-      }
-
-      pipes = pipes.filter(pipe => pipe.x > -70);
-
-      for (const pipe of pipes) {
-        const overlaps = birdX + birdR > pipe.x && birdX - birdR < pipe.x + 52;
-        const hitsPipe = birdY - birdR < pipe.top || birdY + birdR > pipe.bottom;
-
-        if (overlaps && hitsPipe) {
-          running = false;
-          say("You hit a pipe! Score: " + score + ". Press Restart.");
-          draw();
+        if (
+          head.x < 0 || head.y < 0 ||
+          head.x >= cells || head.y >= cells ||
+          snake.some((part, index) => index > 0 && part.x === head.x && part.y === head.y)
+        ) {
+          alive = false;
+          finishGame('Game over! Tap Restart to play again.');
           return;
         }
 
-        if (!pipe.passed && pipe.x + 52 < birdX) {
-          pipe.passed = true;
-          score++;
-          setScore(score);
+        snake.unshift(head);
+
+        if (head.x === food.x && head.y === food.y) {
+          addScore(10);
+          spawnFood();
+        } else {
+          snake.pop();
+        }
+
+        draw();
+      }
+
+      function changeDirection(key) {
+        const map = {
+          up: { x: 0, y: -1 },
+          down: { x: 0, y: 1 },
+          left: { x: -1, y: 0 },
+          right: { x: 1, y: 0 }
+        };
+        const next = map[key];
+        if (!next) return;
+
+        if (next.x !== -direction.x || next.y !== -direction.y) {
+          nextDirection = next;
         }
       }
 
-      if (birdY - birdR < 0 || birdY + birdR > 560) {
-        running = false;
-        say("Game over! Score: " + score + ". Press Restart.");
-        draw();
-        return;
-      }
+      setPad('dpad', {
+        up: down => down && changeDirection('up'),
+        down: down => down && changeDirection('down'),
+        left: down => down && changeDirection('left'),
+        right: down => down && changeDirection('right')
+      });
+
+      const removeKeys = listenKey(event => {
+        if (!event[1]) return;
+        const key = event[0].key;
+        if (key === 'ArrowUp' || key.toLowerCase() === 'w') changeDirection('up');
+        if (key === 'ArrowDown' || key.toLowerCase() === 's') changeDirection('down');
+        if (key === 'ArrowLeft' || key.toLowerCase() === 'a') changeDirection('left');
+        if (key === 'ArrowRight' || key.toLowerCase() === 'd') changeDirection('right');
+      });
+
+      const removeLoop = rafLoop(dt => {
+        accumulator += dt;
+        if (accumulator >= 0.12) {
+          accumulator = 0;
+          step();
+        }
+      });
 
       draw();
-      raf = requestAnimationFrame(frame);
+      return () => {
+        removeLoop();
+        removeKeys();
+      };
     }
 
-    const keydown = event => {
-      if (event.code === "Space" || event.key === "ArrowUp") {
-        event.preventDefault();
-        flap();
+    // TIC-TAC-TOE
+    function startTicTacToe() {
+      setPad('info', { info: 'Tap any empty square to place X. The computer plays O.' });
+
+      area.innerHTML = `
+        <div class="nx-result" data-ttt-status>Your turn — you are X.</div>
+        <div class="nx-board nx-ttt-board" data-ttt-board>
+          ${Array.from({ length: 9 }, (_, i) => `<button class="nx-cell" data-cell="${i}" aria-label="Square ${i + 1}"></button>`).join('')}
+        </div>
+      `;
+
+      const board = Array(9).fill('');
+      let ended = false;
+      let aiTimer = null;
+      const boardElement = $('[data-ttt-board]', area);
+      const status = $('[data-ttt-status]', area);
+      const winLines = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
+
+      function winner() {
+        for (const line of winLines) {
+          const [a, b, c] = line;
+          if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            return board[a];
+          }
+        }
+        return board.every(Boolean) ? 'draw' : null;
+      }
+
+      function render() {
+        $$('[data-cell]', boardElement).forEach(button => {
+          const value = board[Number(button.dataset.cell)];
+          button.textContent = value;
+          button.disabled = ended || Boolean(value);
+          button.classList.toggle('nx-o', value === 'O');
+        });
+      }
+
+      function checkEnd() {
+        const result = winner();
+        if (!result) return false;
+        ended = true;
+        render();
+
+        if (result === 'X') {
+          addScore(1);
+          status.textContent = 'You win! +1 point.';
+        } else if (result === 'O') {
+          status.textContent = 'Computer wins. Try again!';
+        } else {
+          status.textContent = 'It is a draw.';
+        }
+        return true;
+      }
+
+      function aiMove() {
+        if (ended || token !== gameToken) return;
+
+        let move = findWinningMove('O');
+        if (move < 0) move = findWinningMove('X');
+        if (move < 0 && !board[4]) move = 4;
+
+        if (move < 0) {
+          const corners = [0, 2, 6, 8].filter(index => !board[index]);
+          if (corners.length) move = corners[Math.floor(Math.random() * corners.length)];
+        }
+
+        if (move < 0) {
+          const empty = board.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+          if (empty.length) move = empty[Math.floor(Math.random() * empty.length)];
+        }
+
+        if (move >= 0) board[move] = 'O';
+        render();
+        checkEnd();
+        if (!ended) status.textContent = 'Your turn — you are X.';
+      }
+
+      function findWinningMove(mark) {
+        for (let i = 0; i < 9; i++) {
+          if (board[i]) continue;
+          board[i] = mark;
+          const won = winner() === mark;
+          board[i] = '';
+          if (won) return i;
+        }
+        return -1;
+      }
+
+      function clickCell(event) {
+        const button = event.target.closest('[data-cell]');
+        if (!button || ended) return;
+        const index = Number(button.dataset.cell);
+        if (board[index]) return;
+
+        board[index] = 'X';
+        render();
+        if (checkEnd()) return;
+
+        status.textContent = 'Computer is thinking…';
+        aiTimer = setTimeout(aiMove, 350);
+      }
+
+      boardElement.addEventListener('click', clickCell);
+      render();
+
+      return () => {
+        clearTimeout(aiTimer);
+        boardElement.removeEventListener('click', clickCell);
+      };
+    }
+
+    // PONG
+    function startPong() {
+      const { canvas, ctx } = canvasGame(520, 320);
+      let playerY = 125;
+      let aiY = 125;
+      let ball = { x: 260, y: 160, vx: 210, vy: 125, r: 7 };
+      let playerScore = 0;
+      let aiScore = 0;
+      let up = false;
+      let down = false;
+      const paddleW = 10;
+      const paddleH = 70;
+
+      function resetBall(direction) {
+        ball = {
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: 205 * direction,
+          vy: (Math.random() * 160) - 80,
+          r: 7
+        };
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#1d3550';
+        ctx.setLineDash([7, 9]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#35e8ff';
+        ctx.shadowColor = '#35e8ff';
+        ctx.shadowBlur = 12;
+        ctx.fillRect(18, playerY, paddleW, paddleH);
+
+        ctx.fillStyle = '#9b6cff';
+        ctx.shadowColor = '#9b6cff';
+        ctx.fillRect(canvas.width - 28, aiY, paddleW, paddleH);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.font = 'bold 30px system-ui';
+        ctx.fillStyle = '#d9e8ff';
+        ctx.textAlign = 'center';
+        ctx.fillText(playerScore, canvas.width / 2 - 55, 42);
+        ctx.fillText(aiScore, canvas.width / 2 + 55, 42);
+      }
+
+      function update(dt) {
+        if (up) playerY -= 280 * dt;
+        if (down) playerY += 280 * dt;
+        playerY = Math.max(0, Math.min(canvas.height - paddleH, playerY));
+
+        const target = ball.y - paddleH / 2;
+        aiY += Math.sign(target - aiY) * Math.min(Math.abs(target - aiY), 205 * dt);
+        aiY = Math.max(0, Math.min(canvas.height - paddleH, aiY));
+
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+
+        if (ball.y < ball.r || ball.y > canvas.height - ball.r) ball.vy *= -1;
+
+        if (
+          ball.vx < 0 &&
+          ball.x - ball.r < 28 &&
+          ball.y > playerY &&
+          ball.y < playerY + paddleH
+        ) {
+          ball.vx = Math.abs(ball.vx) * 1.04;
+          ball.vy += ((ball.y - (playerY + paddleH / 2)) / (paddleH / 2)) * 65;
+          ball.x = 29;
+        }
+
+        if (
+          ball.vx > 0 &&
+          ball.x + ball.r > canvas.width - 28 &&
+          ball.y > aiY &&
+          ball.y < aiY + paddleH
+        ) {
+          ball.vx = -Math.abs(ball.vx) * 1.03;
+          ball.vy += ((ball.y - (aiY + paddleH / 2)) / (paddleH / 2)) * 55;
+          ball.x = canvas.width - 29;
+        }
+
+        if (ball.x < -10) {
+          aiScore++;
+          resetBall(1);
+        } else if (ball.x > canvas.width + 10) {
+          playerScore++;
+          addScore(1);
+          resetBall(-1);
+        }
+      }
+
+      setPad('vertical', {
+        up: active => { up = active; },
+        down: active => { down = active; }
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        const key = event.key.toLowerCase();
+        if (key === 'arrowup' || key === 'w') up = pressed;
+        if (key === 'arrowdown' || key === 's') down = pressed;
+      });
+
+      const removeLoop = rafLoop(dt => {
+        update(dt);
+        draw();
+      });
+
+      return () => {
+        up = down = false;
+        removeKeys();
+        removeLoop();
+      };
+    }
+
+    // BRICK BREAKER
+    function startBreakout() {
+      const { canvas, ctx } = canvasGame(480, 420);
+      const cols = 8;
+      const rows = 5;
+      const gap = 5;
+      const brickW = 50;
+      const brickH = 17;
+      const offsetX = 22;
+      const offsetY = 38;
+      let paddleX = 200;
+      const paddleW = 86;
+      const paddleH = 11;
+      let ball = { x: 240, y: 320, vx: 160, vy: -190, r: 7 };
+      let alive = true;
+      let left = false;
+      let right = false;
+      const bricks = [];
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          bricks.push({
+            x: offsetX + col * (brickW + gap),
+            y: offsetY + row * (brickH + gap),
+            w: brickW,
+            h: brickH,
+            alive: true,
+            color: ['#35e8ff', '#9b6cff', '#43f5a5', '#ffbe55', '#ff6d9a'][row]
+          });
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        bricks.forEach(brick => {
+          if (!brick.alive) return;
+          ctx.fillStyle = brick.color;
+          ctx.shadowColor = brick.color;
+          ctx.shadowBlur = 8;
+          ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
+        });
+
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = '#35e8ff';
+        ctx.fillStyle = '#35e8ff';
+        ctx.fillRect(paddleX, canvas.height - 32, paddleW, paddleH);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      function update(dt) {
+        if (!alive) return;
+
+        if (left) paddleX -= 330 * dt;
+        if (right) paddleX += 330 * dt;
+        paddleX = Math.max(0, Math.min(canvas.width - paddleW, paddleX));
+
+        ball.x += ball.vx * dt;
+        ball.y += ball.vy * dt;
+
+        if (ball.x < ball.r || ball.x > canvas.width - ball.r) ball.vx *= -1;
+        if (ball.y < ball.r) ball.vy = Math.abs(ball.vy);
+
+        const paddleY = canvas.height - 32;
+        if (
+          ball.vy > 0 &&
+          ball.y + ball.r >= paddleY &&
+          ball.y < paddleY + paddleH &&
+          ball.x >= paddleX &&
+          ball.x <= paddleX + paddleW
+        ) {
+          ball.vy = -Math.abs(ball.vy);
+          ball.vx += ((ball.x - (paddleX + paddleW / 2)) / (paddleW / 2)) * 95;
+          ball.y = paddleY - ball.r;
+        }
+
+        bricks.forEach(brick => {
+          if (!brick.alive) return;
+
+          if (
+            ball.x + ball.r > brick.x &&
+            ball.x - ball.r < brick.x + brick.w &&
+            ball.y + ball.r > brick.y &&
+            ball.y - ball.r < brick.y + brick.h
+          ) {
+            brick.alive = false;
+            ball.vy *= -1;
+            addScore(10);
+          }
+        });
+
+        if (bricks.every(brick => !brick.alive)) {
+          alive = false;
+          finishGame('You cleared every brick! Restart to play again.');
+        } else if (ball.y > canvas.height + 15) {
+          alive = false;
+          finishGame('Ball lost! Tap Restart to try again.');
+        }
+      }
+
+      setPad('horizontal', {
+        left: active => { left = active; },
+        right: active => { right = active; }
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        const key = event.key.toLowerCase();
+        if (key === 'arrowleft' || key === 'a') left = pressed;
+        if (key === 'arrowright' || key === 'd') right = pressed;
+      });
+
+      const removeLoop = rafLoop(dt => {
+        update(dt);
+        draw();
+      });
+
+      return () => {
+        left = right = false;
+        removeKeys();
+        removeLoop();
+      };
+    }
+
+    // ENDLESS RUNNER
+    function startRunner() {
+      const { canvas, ctx } = canvasGame(520, 280);
+      const ground = 225;
+      const player = { x: 70, y: ground - 35, w: 27, h: 35, vy: 0, jumping: false };
+      let obstacles = [];
+      let spawnTimer = 0;
+      let elapsed = 0;
+      let alive = true;
+      let jumpQueued = false;
+      let scoreTimer = 0;
+      let speed = 205;
+
+      function jump() {
+        if (!alive) return;
+        if (!player.jumping) {
+          player.vy = -390;
+          player.jumping = true;
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#152b43';
+        for (let i = 0; i < 12; i++) {
+          const x = (i * 53 - (elapsed * speed * .4) % 53);
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, ground);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#35e8ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, ground);
+        ctx.lineTo(canvas.width, ground);
+        ctx.stroke();
+
+        ctx.fillStyle = '#43f5a5';
+        ctx.shadowColor = '#43f5a5';
+        ctx.shadowBlur = 12;
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+
+        ctx.fillStyle = '#ff6d9a';
+        ctx.shadowColor = '#ff6d9a';
+        obstacles.forEach(obstacle => {
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
+        });
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#d9e8ff';
+        ctx.font = '13px system-ui';
+        ctx.fillText('DISTANCE ' + score, 12, 22);
+      }
+
+      let score = 0;
+
+      function update(dt) {
+        if (!alive) return;
+
+        elapsed += dt;
+        scoreTimer += dt;
+        speed = Math.min(340, 205 + elapsed * 2.2);
+
+        if (scoreTimer >= .1) {
+          const gained = Math.floor(scoreTimer * 10);
+          score += gained;
+          scoreTimer -= gained / 10;
+          setScore(score);
+        }
+
+        if (jumpQueued) {
+          jumpQueued = false;
+          jump();
+        }
+
+        if (player.jumping) {
+          player.vy += 1000 * dt;
+          player.y += player.vy * dt;
+          if (player.y >= ground - player.h) {
+            player.y = ground - player.h;
+            player.vy = 0;
+            player.jumping = false;
+          }
+        }
+
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          const h = 22 + Math.random() * 24;
+          obstacles.push({ x: canvas.width + 10, y: ground - h, w: 18 + Math.random() * 12, h });
+          spawnTimer = .85 + Math.random() * .85;
+        }
+
+        obstacles.forEach(obstacle => obstacle.x -= speed * dt);
+        obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -5);
+
+        for (const obstacle of obstacles) {
+          if (
+            player.x + player.w - 4 > obstacle.x &&
+            player.x + 4 < obstacle.x + obstacle.w &&
+            player.y + player.h - 3 > obstacle.y
+          ) {
+            alive = false;
+            finishGame('Game over! Distance: ' + score + '. Tap Restart to try again.');
+            break;
+          }
+        }
+      }
+
+      setPad('jump', {
+        action: () => { jumpQueued = true; }
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === ' ' || key === 'arrowup' || key === 'w') jumpQueued = true;
+      });
+
+      const removeLoop = rafLoop(dt => {
+        update(dt);
+        draw();
+      });
+
+      return () => {
+        alive = false;
+        removeKeys();
+        removeLoop();
+      };
+    }
+
+    // SPACE SHOOTER
+    function startShooter() {
+      const { canvas, ctx } = canvasGame(480, 400);
+      const player = { x: 240, y: 345, w: 28, h: 24 };
+      let bullets = [];
+      let enemies = [];
+      let particles = [];
+      let left = false;
+      let right = false;
+      let firing = false;
+      let fireCooldown = 0;
+      let spawnTimer = 0;
+      let elapsed = 0;
+      let alive = true;
+      let health = 3;
+
+      function shoot() {
+        if (!alive || fireCooldown > 0) return;
+        bullets.push({ x: player.x, y: player.y - 14, vy: -390 });
+        fireCooldown = .16;
+      }
+
+      function draw() {
+        ctx.fillStyle = '#030914';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < 65; i++) {
+          const x = (i * 79) % canvas.width;
+          const y = ((i * 113) + elapsed * 30) % canvas.height;
+          ctx.fillStyle = i % 4 === 0 ? '#35e8ff' : '#546a8c';
+          ctx.fillRect(x, y, 2, 2);
+        }
+
+        ctx.fillStyle = '#35e8ff';
+        ctx.shadowColor = '#35e8ff';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.moveTo(player.x, player.y - 16);
+        ctx.lineTo(player.x - 15, player.y + 12);
+        ctx.lineTo(player.x + 15, player.y + 12);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = '#f6fdff';
+        bullets.forEach(bullet => ctx.fillRect(bullet.x - 2, bullet.y - 8, 4, 12));
+
+        ctx.fillStyle = '#ff6d9a';
+        ctx.shadowColor = '#ff6d9a';
+        enemies.forEach(enemy => {
+          ctx.beginPath();
+          ctx.moveTo(enemy.x, enemy.y + 12);
+          ctx.lineTo(enemy.x - 13, enemy.y - 10);
+          ctx.lineTo(enemy.x + 13, enemy.y - 10);
+          ctx.closePath();
+          ctx.fill();
+        });
+
+        particles.forEach(particle => {
+          ctx.fillStyle = particle.color;
+          ctx.fillRect(particle.x, particle.y, 3, 3);
+        });
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#e6efff';
+        ctx.font = '13px system-ui';
+        ctx.fillText('HULL ' + '♥'.repeat(health), 12, 22);
+      }
+
+      function explode(x, y, color) {
+        for (let i = 0; i < 7; i++) {
+          particles.push({
+            x, y,
+            vx: (Math.random() - .5) * 150,
+            vy: (Math.random() - .5) * 150,
+            life: .4 + Math.random() * .35,
+            color
+          });
+        }
+      }
+
+      function update(dt) {
+        if (!alive) return;
+        elapsed += dt;
+
+        if (left) player.x -= 270 * dt;
+        if (right) player.x += 270 * dt;
+        player.x = Math.max(18, Math.min(canvas.width - 18, player.x));
+
+        fireCooldown -= dt;
+        if (firing && fireCooldown <= 0) shoot();
+
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          enemies.push({
+            x: 22 + Math.random() * (canvas.width - 44),
+            y: -18,
+            vy: 65 + Math.random() * 60 + elapsed * .6
+          });
+          spawnTimer = Math.max(.35, .85 - elapsed * .008) + Math.random() * .3;
+        }
+
+        bullets.forEach(bullet => bullet.y += bullet.vy * dt);
+        bullets = bullets.filter(bullet => bullet.y > -20);
+
+        enemies.forEach(enemy => enemy.y += enemy.vy * dt);
+
+        for (const enemy of enemies) {
+          if (
+            Math.abs(enemy.x - player.x) < 22 &&
+            Math.abs(enemy.y - player.y) < 25
+          ) {
+            enemy.dead = true;
+            health--;
+            explode(enemy.x, enemy.y, '#ff6d9a');
+
+            if (health <= 0) {
+              alive = false;
+              finishGame('Ship destroyed! Score: ' + score + '. Tap Restart to try again.');
+            }
+          }
+
+          for (const bullet of bullets) {
+            if (
+              !bullet.dead &&
+              !enemy.dead &&
+              Math.abs(bullet.x - enemy.x) < 16 &&
+              Math.abs(bullet.y - enemy.y) < 16
+            ) {
+              bullet.dead = true;
+              enemy.dead = true;
+              addScore(10);
+              explode(enemy.x, enemy.y, '#35e8ff');
+            }
+          }
+
+          if (enemy.y > canvas.height + 15) {
+            enemy.dead = true;
+            health--;
+            if (health <= 0) {
+              alive = false;
+              finishGame('Invaders broke through! Score: ' + score + '.');
+            }
+          }
+        }
+
+        bullets = bullets.filter(bullet => !bullet.dead);
+        enemies = enemies.filter(enemy => !enemy.dead);
+
+        particles.forEach(particle => {
+          particle.x += particle.vx * dt;
+          particle.y += particle.vy * dt;
+          particle.life -= dt;
+        });
+        particles = particles.filter(particle => particle.life > 0);
+      }
+
+      setPad('shooter', {
+        left: active => { left = active; },
+        right: active => { right = active; },
+        action: active => {
+          firing = active;
+          if (active) shoot();
+        }
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        const key = event.key.toLowerCase();
+        if (key === 'arrowleft' || key === 'a') left = pressed;
+        if (key === 'arrowright' || key === 'd') right = pressed;
+        if (key === ' ' || key === 'enter') {
+          firing = pressed;
+          if (pressed) shoot();
+        }
+      });
+
+      const removeLoop = rafLoop(dt => {
+        update(dt);
+        draw();
+      });
+
+      return () => {
+        left = right = firing = false;
+        removeKeys();
+        removeLoop();
+      };
+    }
+
+    // MATH CHALLENGE
+    function startMath() {
+      setPad('info', { info: 'Choose an answer below. Keyboard shortcuts 1–4 also work.' });
+
+      area.innerHTML = `
+        <div class="nx-result" data-math-info>Answer correctly to earn points.</div>
+        <div class="nx-question" data-question></div>
+        <div class="nx-answer-grid" data-answers></div>
+        <div class="nx-result" data-math-streak>Correct answers: 0</div>
+      `;
+
+      const questionNode = $('[data-question]', area);
+      const answersNode = $('[data-answers]', area);
+      const infoNode = $('[data-math-info]', area);
+      const streakNode = $('[data-math-streak]', area);
+      let answer = 0;
+      let streak = 0;
+      let locked = false;
+
+      function newQuestion() {
+        locked = false;
+        infoNode.textContent = 'Choose the correct answer.';
+        const operation = Math.floor(Math.random() * 4);
+        let a = 1 + Math.floor(Math.random() * 20);
+        let b = 1 + Math.floor(Math.random() * 20);
+        let symbol = '+';
+
+        if (operation === 0) {
+          answer = a + b;
+          symbol = '+';
+        } else if (operation === 1) {
+          if (b > a) [a, b] = [b, a];
+          answer = a - b;
+          symbol = '−';
+        } else if (operation === 2) {
+          a = 1 + Math.floor(Math.random() * 12);
+          b = 1 + Math.floor(Math.random() * 12);
+          answer = a * b;
+          symbol = '×';
+        } else {
+          b = 1 + Math.floor(Math.random() * 10);
+          answer = 1 + Math.floor(Math.random() * 12);
+          a = b * answer;
+          symbol = '÷';
+        }
+
+        questionNode.textContent = `${a} ${symbol} ${b} = ?`;
+
+        const choices = new Set([answer]);
+        while (choices.size < 4) {
+          const offset = Math.floor(Math.random() * 13) - 6;
+          choices.add(Math.max(0, answer + (offset || 1)));
+        }
+
+        const shuffled = [...choices].sort(() => Math.random() - .5);
+        answersNode.innerHTML = shuffled.map((value, index) =>
+          `<button class="nx-answer" data-answer="${value}">${index + 1}. ${value}</button>`
+        ).join('');
+      }
+
+      function choose(value) {
+        if (locked) return;
+        locked = true;
+
+        if (Number(value) === answer) {
+          streak++;
+          addScore(10);
+          infoNode.textContent = 'Correct! +10 points.';
+        } else {
+          streak = 0;
+          infoNode.textContent = 'Not quite. The answer was ' + answer + '.';
+        }
+
+        streakNode.textContent = 'Correct answers: ' + streak;
+        $$('[data-answer]', answersNode).forEach(button => button.disabled = true);
+        setTimeout(() => {
+          if (token === gameToken) newQuestion();
+        }, 650);
+      }
+
+      answersNode.addEventListener('click', event => {
+        const button = event.target.closest('[data-answer]');
+        if (button) choose(button.dataset.answer);
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key;
+        if (['1', '2', '3', '4'].includes(key)) {
+          const button = $$('[data-answer]', answersNode)[Number(key) - 1];
+          if (button) choose(button.dataset.answer);
+        }
+      });
+
+      newQuestion();
+
+      return () => {
+        removeKeys();
+      };
+    }
+
+    // ROCK PAPER SCISSORS
+    function startRPS() {
+      setPad('info', { info: 'Tap Rock, Paper, or Scissors to play.' });
+
+      area.innerHTML = `
+        <div class="nx-result">First to win a round earns 1 point.</div>
+        <div class="nx-rps-buttons" data-rps-buttons>
+          <button class="nx-btn" data-rps="rock">✊ Rock</button>
+          <button class="nx-btn" data-rps="paper">✋ Paper</button>
+          <button class="nx-btn" data-rps="scissors">✌️ Scissors</button>
+        </div>
+        <div class="nx-question" data-rps-result>Ready?</div>
+        <div class="nx-result" data-rps-score>Wins: 0 · Draws: 0 · Losses: 0</div>
+      `;
+
+      const resultNode = $('[data-rps-result]', area);
+      const scoreNodeRPS = $('[data-rps-score]', area);
+      const choices = ['rock', 'paper', 'scissors'];
+      const icons = { rock: '✊', paper: '✋', scissors: '✌️' };
+      let wins = 0;
+      let draws = 0;
+      let losses = 0;
+
+      function play(player) {
+        const computer = choices[Math.floor(Math.random() * 3)];
+        let result;
+
+        if (player === computer) {
+          draws++;
+          result = 'Draw!';
+        } else if (
+          (player === 'rock' && computer === 'scissors') ||
+          (player === 'paper' && computer === 'rock') ||
+          (player === 'scissors' && computer === 'paper')
+        ) {
+          wins++;
+          addScore(1);
+          result = 'You win!';
+        } else {
+          losses++;
+          result = 'Computer wins!';
+        }
+
+        resultNode.textContent = `${icons[player]} vs ${icons[computer]}`;
+        scoreNodeRPS.textContent = `${result} Wins: ${wins} · Draws: ${draws} · Losses: ${losses}`;
+      }
+
+      const buttons = $('[data-rps-buttons]', area);
+      const clickHandler = event => {
+        const button = event.target.closest('[data-rps]');
+        if (button) play(button.dataset.rps);
+      };
+
+      buttons.addEventListener('click', clickHandler);
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const map = { r: 'rock', p: 'paper', s: 'scissors' };
+        if (map[event.key.toLowerCase()]) play(map[event.key.toLowerCase()]);
+      });
+
+      return () => {
+        buttons.removeEventListener('click', clickHandler);
+        removeKeys();
+      };
+    }
+
+    // HANGMAN
+    function startHangman() {
+      setPad('info', { info: 'Choose letters from the keyboard on screen or your physical keyboard.' });
+
+      const wordList = [
+        'GALAXY', 'PLANET', 'ROCKET', 'JUNGLE', 'PUZZLE',
+        'ARCADE', 'NEXORA', 'GAMING', 'NEBULA', 'PYTHON',
+        'COMPUTER', 'RAINBOW', 'DIAMOND', 'OCEAN', 'FUTURE'
+      ];
+
+      let word = wordList[Math.floor(Math.random() * wordList.length)];
+      let guessed = new Set();
+      let mistakes = 0;
+      const maxMistakes = 6;
+      let ended = false;
+
+      area.innerHTML = `
+        <div class="nx-result" data-hangman-status>Guess the hidden word.</div>
+        <div class="nx-question" data-hangman-drawing>○</div>
+        <div class="nx-word" data-hangman-word></div>
+        <div class="nx-letter-grid" data-hangman-letters>
+          ${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter =>
+            `<button class="nx-letter" data-letter="${letter}">${letter}</button>`
+          ).join('')}
+        </div>
+      `;
+
+      const wordNode = $('[data-hangman-word]', area);
+      const drawingNode = $('[data-hangman-drawing]', area);
+      const statusNode = $('[data-hangman-status]', area);
+      const lettersNode = $('[data-hangman-letters]', area);
+      const drawing = ['○', '◔', '◑', '◕', '◉', '☠', '✖'];
+
+      function render() {
+        wordNode.textContent = word.split('').map(letter => guessed.has(letter) ? letter : '_').join(' ');
+        drawingNode.textContent = drawing[Math.min(mistakes, maxMistakes)];
+        $$('[data-letter]', lettersNode).forEach(button => {
+          button.disabled = guessed.has(button.dataset.letter) || ended;
+        });
+      }
+
+      function guess(letter) {
+        if (ended || guessed.has(letter)) return;
+        guessed.add(letter);
+
+        if (!word.includes(letter)) mistakes++;
+
+        if (word.split('').every(char => guessed.has(char))) {
+          ended = true;
+          addScore(10);
+          statusNode.textContent = `You solved it! The word was ${word}. +10 points.`;
+        } else if (mistakes >= maxMistakes) {
+          ended = true;
+          statusNode.textContent = `Game over! The word was ${word}.`;
+        } else {
+          statusNode.textContent = `Mistakes: ${mistakes}/${maxMistakes}`;
+        }
+
+        render();
+      }
+
+      const clickHandler = event => {
+        const button = event.target.closest('[data-letter]');
+        if (button) guess(button.dataset.letter);
+      };
+
+      lettersNode.addEventListener('click', clickHandler);
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed && /^[a-z]$/i.test(event.key)) {
+          guess(event.key.toUpperCase());
+        }
+      });
+
+      render();
+
+      return () => {
+        lettersNode.removeEventListener('click', clickHandler);
+        removeKeys();
+      };
+    }
+
+    // FLAPPY FLYER
+    function startFlappy() {
+      const { canvas, ctx } = canvasGame(360, 480);
+      const bird = { x: 82, y: 210, vy: 0, r: 12 };
+      let pipes = [];
+      let elapsed = 0;
+      let spawnTimer = 0;
+      let alive = true;
+      let started = false;
+      let flapQueued = false;
+      let distance = 0;
+      const gravity = 900;
+      const flapStrength = -300;
+      const pipeWidth = 54;
+      const gapHeight = 145;
+
+      function flap() {
+        if (!alive) return;
+        if (!started) started = true;
+        bird.vy = flapStrength;
+      }
+
+      function draw() {
+        ctx.fillStyle = '#071226';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < 28; i++) {
+          const x = (i * 37) % canvas.width;
+          const y = (i * 71) % canvas.height;
+          ctx.fillStyle = '#213957';
+          ctx.fillRect(x, y, 2, 2);
+        }
+
+        pipes.forEach(pipe => {
+          ctx.fillStyle = '#43f5a5';
+          ctx.shadowColor = '#43f5a5';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+          ctx.fillRect(pipe.x, pipe.top + gapHeight, pipeWidth, canvas.height - pipe.top - gapHeight);
+
+          ctx.fillStyle = '#1bbf88';
+          ctx.fillRect(pipe.x - 4, pipe.top - 10, pipeWidth + 8, 10);
+          ctx.fillRect(pipe.x - 4, pipe.top + gapHeight, pipeWidth + 8, 10);
+        });
+
+        ctx.shadowColor = '#ffdc68';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#ffdc68';
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#091120';
+        ctx.beginPath();
+        ctx.arc(bird.x + 4, bird.y - 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#eaf3ff';
+        ctx.font = 'bold 17px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('SCORE ' + score, canvas.width / 2, 30);
+
+        if (!started && alive) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 17px system-ui';
+          ctx.fillText('TAP FLAP TO START', canvas.width / 2, canvas.height / 2 + 65);
+        }
+      }
+
+      function update(dt) {
+        if (!alive) return;
+
+        if (flapQueued) {
+          flapQueued = false;
+          flap();
+        }
+
+        if (!started) return;
+
+        elapsed += dt;
+        bird.vy += gravity * dt;
+        bird.y += bird.vy * dt;
+
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          const top = 55 + Math.random() * (canvas.height - gapHeight - 115);
+          pipes.push({ x: canvas.width + 5, top, scored: false });
+          spawnTimer = 1.35;
+        }
+
+        pipes.forEach(pipe => {
+          pipe.x -= 145 * dt;
+
+          if (!pipe.scored && pipe.x + pipeWidth < bird.x) {
+            pipe.scored = true;
+            score++;
+            setScore(score);
+          }
+
+          const horizontal = bird.x + bird.r > pipe.x && bird.x - bird.r < pipe.x + pipeWidth;
+          const verticalHit = bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.top + gapHeight;
+
+          if (horizontal && verticalHit) {
+            alive = false;
+            finishGame('You hit a pipe! Score: ' + score + '. Tap Restart to try again.');
+          }
+        });
+
+        pipes = pipes.filter(pipe => pipe.x + pipeWidth > -5);
+
+        if (bird.y - bird.r < 0 || bird.y + bird.r > canvas.height) {
+          alive = false;
+          finishGame('Flight ended! Score: ' + score + '. Tap Restart to try again.');
+        }
+      }
+
+      let score = 0;
+
+      setPad('flap', {
+        action: () => { flapQueued = true; }
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === ' ' || key === 'arrowup' || key === 'w') flapQueued = true;
+      });
+
+      const clickFlap = () => { flapQueued = true; };
+      canvas.addEventListener('pointerdown', clickFlap);
+
+      const removeLoop = rafLoop(dt => {
+        update(dt);
+        draw();
+      });
+
+      return () => {
+        alive = false;
+        removeKeys();
+        removeLoop();
+        canvas.removeEventListener('pointerdown', clickFlap);
+      };
+    }
+
+    try {
+      switch (id) {
+        case 'snake': gameCleanup = startSnake(); break;
+        case 'ttt': gameCleanup = startTicTacToe(); break;
+        case 'pong': gameCleanup = startPong(); break;
+        case 'breakout': gameCleanup = startBreakout(); break;
+        case 'runner': gameCleanup = startRunner(); break;
+        case 'shooter': gameCleanup = startShooter(); break;
+        case 'math': gameCleanup = startMath(); break;
+        case 'rps': gameCleanup = startRPS(); break;
+        case 'hangman': gameCleanup = startHangman(); break;
+        case 'flappy': gameCleanup = startFlappy(); break;
+        default:
+          area.textContent = 'This game is not available.';
+      }
+    } catch (error) {
+      console.error('Nexora game error:', error);
+      area.innerHTML = '<p class="nx-result">The game could not start. Tap Restart to try again.</p>';
+    }
+
+    cleanupCurrent = () => {
+      controllerCleanups.forEach(fn => {
+        try { fn(); } catch (_) {}
+      });
+      controllerCleanups = [];
+
+      try { gameCleanup(); } catch (_) {}
+
+      if (gamepad && gamepad.isConnected) {
+        gamepad.querySelectorAll('button').forEach(button => {
+          button.classList.remove('nx-active');
+        });
       }
     };
-
-    document.addEventListener("keydown", keydown);
-    canvas.addEventListener("pointerdown", flap);
-
-    const cleanupAction = bindPadButton(gamepadArea, "action", flap);
-
-    addCleanup(() => {
-      running = false;
-      cancelAnimationFrame(raf);
-      document.removeEventListener("keydown", keydown);
-      canvas.removeEventListener("pointerdown", flap);
-      cleanupAction();
-    });
-
-    reset();
-    raf = requestAnimationFrame(frame);
   }
 
-  /* ==========================================================
-     STARTUP
-     ========================================================== */
-
-  try {
-    injectStyles();
-    menu();
-
-    const loadingMessage = document.getElementById("loading-error");
-    if (loadingMessage) loadingMessage.remove();
-
-    console.log("RexWeb Nexora Arcade loaded successfully.");
-  } catch (error) {
-    console.error("RexWeb Nexora Arcade failed to start:", error);
-
-    root.innerHTML = `
-      <div style="padding:20px;text-align:center;color:#ffb4c4">
-        <h2>Arcade loading error</h2>
-        <p>Reload the page and check that game.js is saved correctly.</p>
-        <button onclick="location.reload()">Reload Arcade</button>
-      </div>
-    `;
-  }
+  injectStyles();
+  renderHome();
 })();
