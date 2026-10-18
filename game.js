@@ -280,15 +280,80 @@
 
     #nexora-games .nx-pill strong { color: var(--nx-blue); }
 
-    #nexora-games .nx-controls {
+    /* ==========================================================
+       DEDICATED MINI TOUCHSCREEN CONTROLLER PANEL
+       ========================================================== */
+    #nexora-games .nx-gamepad {
+      background: #070e1c;
+      border: 1px solid #37b6ff;
+      box-shadow: 0 0 15px rgba(55, 182, 255, 0.15);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 15px auto;
+      max-width: 420px;
       display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 13px 0;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    #nexora-games .nx-controls .nx-btn { min-width: 48px; }
+    #nexora-games .nx-gamepad-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    #nexora-games .nx-pad-btn {
+      background: #10233f;
+      border: 1px solid #37b6ff;
+      color: #37b6ff;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 12px 18px;
+      min-width: 56px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
+    }
+
+    #nexora-games .nx-pad-btn:active,
+    #nexora-games .nx-pad-btn.nx-active {
+      background: #37b6ff;
+      color: #06101f;
+      box-shadow: 0 0 12px #37b6ff;
+      transform: scale(0.95);
+    }
+
+    #nexora-games .nx-pad-wide {
+      flex: 1;
+      max-width: 180px;
+      background: linear-gradient(100deg,#37b6ff,#a78bfa);
+      color: #06101f;
+      border: none;
+      font-size: 15px;
+    }
+
+    #nexora-games .nx-pad-wide:active,
+    #nexora-games .nx-pad-wide.nx-active {
+      background: linear-gradient(100deg,#2595dc,#9072e6);
+      color: #06101f;
+      box-shadow: 0 0 15px #a78bfa;
+    }
+
+    #nexora-games .nx-pad-info {
+      color: var(--nx-muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 4px;
+      margin: 0;
+    }
 
     #nexora-games .nx-message {
       text-align: center;
@@ -494,6 +559,9 @@
 
           <div class="nx-instructions">${escapeHTML(game.description)}</div>
           <div data-game-area class="nx-board"></div>
+          
+          <div data-gamepad-area></div>
+          
           <div class="nx-message" data-message></div>
 
           <div class="nx-controls">
@@ -510,6 +578,7 @@
     });
 
     const area = root.querySelector("[data-game-area]");
+    const gamepadArea = root.querySelector("[data-gamepad-area]");
     const message = root.querySelector("[data-message]");
 
     function say(text) {
@@ -522,6 +591,7 @@
 
     const context = {
       area,
+      gamepadArea,
       say,
       setScore,
       bestScore,
@@ -554,7 +624,7 @@
   }
 
   /* ==========================================================
-     SHARED CANVAS HELPERS
+     SHARED CANVAS & CONTROLLER HELPERS
      ========================================================== */
 
   function makeCanvas(area, width, height) {
@@ -567,9 +637,97 @@
     return area.querySelector("canvas");
   }
 
-  function listen(target, event, handler, options) {
-    target.addEventListener(event, handler, options);
-    return () => target.removeEventListener(event, handler, options);
+  function renderGamepad(gamepadArea, type, config = {}) {
+    if (!gamepadArea) return;
+    
+    let html = "";
+    if (type === "dpad") {
+      html = `
+        <div class="nx-gamepad">
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn" data-pad="up">⬆️</button>
+          </div>
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn" data-pad="left">⬅️</button>
+            <button class="nx-pad-btn" data-pad="down">⬇️</button>
+            <button class="nx-pad-btn" data-pad="right">➡️</button>
+          </div>
+        </div>
+      `;
+    } else if (type === "paddle-vertical") {
+      html = `
+        <div class="nx-gamepad">
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn nx-pad-wide" data-pad="up">⬆️ UP</button>
+            <button class="nx-pad-btn nx-pad-wide" data-pad="down">⬇️ DOWN</button>
+          </div>
+        </div>
+      `;
+    } else if (type === "paddle-horizontal") {
+      html = `
+        <div class="nx-gamepad">
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn nx-pad-wide" data-pad="left">⬅️ LEFT</button>
+            <button class="nx-pad-btn nx-pad-wide" data-pad="right">➡️ RIGHT</button>
+          </div>
+        </div>
+      `;
+    } else if (type === "action-single") {
+      html = `
+        <div class="nx-gamepad">
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn nx-pad-wide" data-pad="action">${config.label || "ACTION"}</button>
+          </div>
+        </div>
+      `;
+    } else if (type === "shooter") {
+      html = `
+        <div class="nx-gamepad">
+          <div class="nx-gamepad-row">
+            <button class="nx-pad-btn" data-pad="left">⬅️</button>
+            <button class="nx-pad-btn nx-pad-wide" data-pad="action">🚀 FIRE</button>
+            <button class="nx-pad-btn" data-pad="right">➡️</button>
+          </div>
+        </div>
+      `;
+    } else {
+      html = `
+        <div class="nx-gamepad">
+          <p class="nx-pad-info">${config.info || "TAP THE GAME BOARD TO PLAY"}</p>
+        </div>
+      `;
+    }
+
+    gamepadArea.innerHTML = html;
+  }
+
+  function bindPadButton(gamepadArea, key, callbackStart, callbackEnd) {
+    const btn = gamepadArea.querySelector(`[data-pad="${key}"]`);
+    if (!btn) return () => {};
+
+    const handleStart = e => {
+      e.preventDefault();
+      btn.classList.add("nx-active");
+      if (typeof callbackStart === "function") callbackStart();
+    };
+
+    const handleEnd = e => {
+      e.preventDefault();
+      btn.classList.remove("nx-active");
+      if (typeof callbackEnd === "function") callbackEnd();
+    };
+
+    btn.addEventListener("pointerdown", handleStart);
+    btn.addEventListener("pointerup", handleEnd);
+    btn.addEventListener("pointerleave", handleEnd);
+    btn.addEventListener("pointercancel", handleEnd);
+
+    return () => {
+      btn.removeEventListener("pointerdown", handleStart);
+      btn.removeEventListener("pointerup", handleEnd);
+      btn.removeEventListener("pointerleave", handleEnd);
+      btn.removeEventListener("pointercancel", handleEnd);
+    };
   }
 
   function clamp(value, min, max) {
@@ -585,13 +743,15 @@
      ========================================================== */
 
   function playSnake(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const size = 20;
     const canvas = makeCanvas(area, 400, 400);
     const c = canvas.getContext("2d");
 
     let snake, food, direction, nextDirection, score, timer, dead;
     let lastTouch = null;
+
+    renderGamepad(gamepadArea, "dpad");
 
     function reset() {
       clearInterval(timer);
@@ -605,7 +765,7 @@
       score = 0;
       dead = false;
       setScore(0);
-      say("Use arrow keys or the direction buttons.");
+      say("Use directional controls or gamepad.");
 
       spawnFood();
       draw();
@@ -708,29 +868,10 @@
 
     document.addEventListener("keydown", keyHandler);
 
-    area.insertAdjacentHTML("beforeend", `
-      <div class="nx-controls">
-        <button class="nx-btn" data-dir="up">⬆️</button>
-      </div>
-      <div class="nx-controls">
-        <button class="nx-btn" data-dir="left">⬅️</button>
-        <button class="nx-btn" data-dir="down">⬇️</button>
-        <button class="nx-btn" data-dir="right">➡️</button>
-      </div>
-    `);
-
-    const directions = {
-      up: [0, -1],
-      down: [0, 1],
-      left: [-1, 0],
-      right: [1, 0]
-    };
-
-    area.querySelectorAll("[data-dir]").forEach(button => {
-      button.addEventListener("click", () => {
-        setDirection(...directions[button.dataset.dir]);
-      });
-    });
+    const cleanupUp = bindPadButton(gamepadArea, "up", () => setDirection(0, -1));
+    const cleanupDown = bindPadButton(gamepadArea, "down", () => setDirection(0, 1));
+    const cleanupLeft = bindPadButton(gamepadArea, "left", () => setDirection(-1, 0));
+    const cleanupRight = bindPadButton(gamepadArea, "right", () => setDirection(1, 0));
 
     const touchStart = event => {
       const touch = event.changedTouches[0];
@@ -763,6 +904,10 @@
       document.removeEventListener("keydown", keyHandler);
       canvas.removeEventListener("touchstart", touchStart);
       canvas.removeEventListener("touchend", touchEnd);
+      cleanupUp();
+      cleanupDown();
+      cleanupLeft();
+      cleanupRight();
     });
 
     reset();
@@ -773,9 +918,11 @@
      ========================================================== */
 
   function playTicTacToe(ctx) {
-    const { area, say, setScore } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
 
     let board, finished, busy, roundScore;
+
+    renderGamepad(gamepadArea, "info", { info: "MAKE YOUR MOVE ON THE GRID" });
 
     function reset() {
       board = Array(9).fill("");
@@ -866,7 +1013,6 @@
           return endRound("draw");
         }
 
-        // Try to win, then block, then choose a sensible square.
         let move = findWinningMove("O");
 
         if (move < 0) move = findWinningMove("X");
@@ -900,6 +1046,7 @@
     }
 
     reset();
+    addCleanup(() => {});
   }
 
   /* ==========================================================
@@ -907,12 +1054,14 @@
      ========================================================== */
 
   function playPong(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const canvas = makeCanvas(area, 600, 380);
     const c = canvas.getContext("2d");
 
     let playerY, cpuY, ballX, ballY, vx, vy, score, raf, running;
     const keys = new Set();
+
+    renderGamepad(gamepadArea, "paddle-vertical");
 
     function reset() {
       score = 0;
@@ -923,7 +1072,7 @@
       vy = Math.random() * 4 - 2;
       running = true;
       setScore(0);
-      say("Move with ↑/↓, W/S, or the buttons. First to 5 wins.");
+      say("Move with ↑/↓, W/S, or gamepad. First to 5 wins.");
     }
 
     function draw() {
@@ -1022,43 +1171,38 @@
     document.addEventListener("keydown", movePlayer);
     document.addEventListener("keyup", stopPlayer);
 
-    area.insertAdjacentHTML("beforeend", `
-      <div class="nx-controls">
-        <button class="nx-btn" data-pong="-1">⬆️ UP</button>
-        <button class="nx-btn" data-pong="1">⬇️ DOWN</button>
-      </div>
-    `);
+    let moveIntervalUp = null;
+    let moveIntervalDown = null;
 
-    let moveInterval = null;
+    const cleanupUp = bindPadButton(gamepadArea, "up", () => {
+      clearInterval(moveIntervalUp);
+      moveIntervalUp = setInterval(() => {
+        playerY = clamp(playerY - 7, 0, 300);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalUp);
+      moveIntervalUp = null;
+    });
 
-    area.querySelectorAll("[data-pong]").forEach(button => {
-      const amount = Number(button.dataset.pong);
-
-      const start = event => {
-        event.preventDefault();
-        clearInterval(moveInterval);
-        moveInterval = setInterval(() => {
-          playerY = clamp(playerY + amount * 7, 0, 300);
-        }, 30);
-      };
-
-      const stop = () => {
-        clearInterval(moveInterval);
-        moveInterval = null;
-      };
-
-      button.addEventListener("pointerdown", start);
-      button.addEventListener("pointerup", stop);
-      button.addEventListener("pointerleave", stop);
-      button.addEventListener("pointercancel", stop);
+    const cleanupDown = bindPadButton(gamepadArea, "down", () => {
+      clearInterval(moveIntervalDown);
+      moveIntervalDown = setInterval(() => {
+        playerY = clamp(playerY + 7, 0, 300);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalDown);
+      moveIntervalDown = null;
     });
 
     addCleanup(() => {
       running = false;
       cancelAnimationFrame(raf);
-      clearInterval(moveInterval);
+      clearInterval(moveIntervalUp);
+      clearInterval(moveIntervalDown);
       document.removeEventListener("keydown", movePlayer);
       document.removeEventListener("keyup", stopPlayer);
+      cleanupUp();
+      cleanupDown();
     });
 
     reset();
@@ -1070,12 +1214,15 @@
      ========================================================== */
 
   function playBrickBreaker(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const canvas = makeCanvas(area, 600, 420);
     const c = canvas.getContext("2d");
 
     let paddleX, ballX, ballY, vx, vy, bricks, score, lives, raf, running;
     let pointerX = null;
+    const keys = new Set();
+
+    renderGamepad(gamepadArea, "paddle-horizontal");
 
     function reset() {
       paddleX = 250;
@@ -1101,7 +1248,7 @@
       }
 
       setScore(0);
-      say("Move the paddle with your mouse, finger, or ← → keys.");
+      say("Move the paddle with mouse, touch, gamepad, or ← → keys.");
     }
 
     function draw() {
@@ -1130,7 +1277,13 @@
     function frame() {
       if (!running) return;
 
-      if (pointerX !== null) paddleX = pointerX - 50;
+      if (pointerX !== null) {
+        paddleX = pointerX - 50;
+      } else {
+        if (keys.has("ArrowLeft") || keys.has("a")) paddleX -= 7;
+        if (keys.has("ArrowRight") || keys.has("d")) paddleX += 7;
+      }
+
       paddleX = clamp(paddleX, 0, 500);
 
       ballX += vx;
@@ -1185,15 +1338,12 @@
     }
 
     const keydown = event => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        paddleX -= 25;
-      }
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        paddleX += 25;
-      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") event.preventDefault();
+      keys.add(event.key);
+      pointerX = null;
     };
+
+    const keyup = event => keys.delete(event.key);
 
     const pointer = event => {
       const rect = canvas.getBoundingClientRect();
@@ -1202,12 +1352,43 @@
 
     canvas.addEventListener("pointermove", pointer);
     document.addEventListener("keydown", keydown);
+    document.addEventListener("keyup", keyup);
+
+    let moveIntervalLeft = null;
+    let moveIntervalRight = null;
+
+    const cleanupLeft = bindPadButton(gamepadArea, "left", () => {
+      pointerX = null;
+      clearInterval(moveIntervalLeft);
+      moveIntervalLeft = setInterval(() => {
+        paddleX = clamp(paddleX - 8, 0, 500);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalLeft);
+      moveIntervalLeft = null;
+    });
+
+    const cleanupRight = bindPadButton(gamepadArea, "right", () => {
+      pointerX = null;
+      clearInterval(moveIntervalRight);
+      moveIntervalRight = setInterval(() => {
+        paddleX = clamp(paddleX + 8, 0, 500);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalRight);
+      moveIntervalRight = null;
+    });
 
     addCleanup(() => {
       running = false;
       cancelAnimationFrame(raf);
+      clearInterval(moveIntervalLeft);
+      clearInterval(moveIntervalRight);
       canvas.removeEventListener("pointermove", pointer);
       document.removeEventListener("keydown", keydown);
+      document.removeEventListener("keyup", keyup);
+      cleanupLeft();
+      cleanupRight();
     });
 
     reset();
@@ -1219,12 +1400,14 @@
      ========================================================== */
 
   function playRunner(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const canvas = makeCanvas(area, 600, 320);
     const c = canvas.getContext("2d");
 
     let playerY, velocity, obstacles, score, speed, raf, running, grounded;
     let lastTime = 0;
+
+    renderGamepad(gamepadArea, "action-single", { label: "⬆ JUMP" });
 
     function reset() {
       playerY = 230;
@@ -1236,7 +1419,7 @@
       running = true;
       lastTime = 0;
       setScore(0);
-      say("Tap Jump or press Space to avoid obstacles.");
+      say("Tap Jump or use gamepad/space to avoid obstacles.");
     }
 
     function jump() {
@@ -1332,19 +1515,14 @@
     document.addEventListener("keydown", keydown);
     canvas.addEventListener("pointerdown", jump);
 
-    area.insertAdjacentHTML("beforeend", `
-      <div class="nx-controls">
-        <button class="nx-btn nx-primary" data-jump>⬆ JUMP</button>
-      </div>
-    `);
-
-    area.querySelector("[data-jump]").addEventListener("click", jump);
+    const cleanupAction = bindPadButton(gamepadArea, "action", jump);
 
     addCleanup(() => {
       running = false;
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", keydown);
       canvas.removeEventListener("pointerdown", jump);
+      cleanupAction();
     });
 
     reset();
@@ -1356,7 +1534,7 @@
      ========================================================== */
 
   function playShooter(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const canvas = makeCanvas(area, 600, 420);
     const c = canvas.getContext("2d");
 
@@ -1364,6 +1542,8 @@
     const keys = new Set();
     let lastTime = 0;
     let lastShot = 0;
+
+    renderGamepad(gamepadArea, "shooter");
 
     function reset() {
       player = { x: 300, y: 370 };
@@ -1375,7 +1555,7 @@
       lastTime = 0;
       lastShot = 0;
       setScore(0);
-      say("Move with ← → or drag your finger. Tap SHOOT to fire.");
+      say("Move with ← → or gamepad. Tap FIRE to shoot.");
     }
 
     function shoot() {
@@ -1494,49 +1674,42 @@
     document.addEventListener("keyup", keyup);
     canvas.addEventListener("pointermove", pointermove);
 
-    area.insertAdjacentHTML("beforeend", `
-      <div class="nx-controls">
-        <button class="nx-btn" data-move="-1">⬅ LEFT</button>
-        <button class="nx-btn nx-primary" data-shoot>🚀 SHOOT</button>
-        <button class="nx-btn" data-move="1">RIGHT ➡</button>
-      </div>
-    `);
+    let moveIntervalLeft = null;
+    let moveIntervalRight = null;
 
-    const intervals = [];
-
-    area.querySelectorAll("[data-move]").forEach(button => {
-      let interval = null;
-      const amount = Number(button.dataset.move);
-
-      const start = event => {
-        event.preventDefault();
-        clearInterval(interval);
-        interval = setInterval(() => {
-          player.x = clamp(player.x + amount * 8, 18, 582);
-        }, 25);
-      };
-
-      const stop = () => {
-        clearInterval(interval);
-        interval = null;
-      };
-
-      button.addEventListener("pointerdown", start);
-      button.addEventListener("pointerup", stop);
-      button.addEventListener("pointerleave", stop);
-      button.addEventListener("pointercancel", stop);
-      intervals.push(() => clearInterval(interval));
+    const cleanupLeft = bindPadButton(gamepadArea, "left", () => {
+      clearInterval(moveIntervalLeft);
+      moveIntervalLeft = setInterval(() => {
+        player.x = clamp(player.x - 8, 18, 582);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalLeft);
+      moveIntervalLeft = null;
     });
 
-    area.querySelector("[data-shoot]").addEventListener("click", shoot);
+    const cleanupRight = bindPadButton(gamepadArea, "right", () => {
+      clearInterval(moveIntervalRight);
+      moveIntervalRight = setInterval(() => {
+        player.x = clamp(player.x + 8, 18, 582);
+      }, 25);
+    }, () => {
+      clearInterval(moveIntervalRight);
+      moveIntervalRight = null;
+    });
+
+    const cleanupAction = bindPadButton(gamepadArea, "action", shoot);
 
     addCleanup(() => {
       running = false;
       cancelAnimationFrame(raf);
+      clearInterval(moveIntervalLeft);
+      clearInterval(moveIntervalRight);
       document.removeEventListener("keydown", keydown);
       document.removeEventListener("keyup", keyup);
       canvas.removeEventListener("pointermove", pointermove);
-      intervals.forEach(fn => fn());
+      cleanupLeft();
+      cleanupRight();
+      cleanupAction();
     });
 
     reset();
@@ -1548,11 +1721,13 @@
      ========================================================== */
 
   function playMath(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
 
     let score = 0;
     let timeLeft = 30;
     let a, b, answer, interval, ended = false;
+
+    renderGamepad(gamepadArea, "info", { info: "SOLVE AS MANY SUMS AS YOU CAN" });
 
     function question() {
       const operation = randomInt(0, 2);
@@ -1572,9 +1747,13 @@
       }
 
       const symbols = operation === 0 ? "+" : operation === 1 ? "−" : "×";
-      area.querySelector("[data-question]").textContent = `${a} ${symbols} ${b} = ?`;
-      area.querySelector("[data-answer]").value = "";
-      area.querySelector("[data-answer]").focus();
+      const qEl = area.querySelector("[data-question]");
+      const ansEl = area.querySelector("[data-answer]");
+      if (qEl) qEl.textContent = `${a} ${symbols} ${b} = ?`;
+      if (ansEl) {
+        ansEl.value = "";
+        ansEl.focus();
+      }
     }
 
     function render() {
@@ -1601,12 +1780,13 @@
         if (ended) return;
 
         const input = area.querySelector("[data-answer]");
-        if (input.value.trim() === "") return;
+        if (!input || input.value.trim() === "") return;
 
         if (Number(input.value) === answer) {
           score += 10;
           setScore(score);
-          area.querySelector("[data-correct]").textContent = score / 10;
+          const cEl = area.querySelector("[data-correct]");
+          if (cEl) cEl.textContent = score / 10;
           say("Correct! +10 points.");
         } else {
           say("Not quite! The correct answer was " + answer + ".");
@@ -1657,11 +1837,13 @@
      ========================================================== */
 
   function playRPS(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
 
     let score = 0;
     let round = 0;
     let ended = false;
+
+    renderGamepad(gamepadArea, "info", { info: "TAP A CHOICE BUTTON ABOVE TO PLAY" });
 
     const choices = [
       { id: "rock", name: "Rock", icon: "✊" },
@@ -1724,10 +1906,12 @@
 
       const names = Object.fromEntries(choices.map(c => [c.id, c.name]));
 
-      area.querySelector("[data-result]").textContent =
-        `You: ${names[userChoice]} • Computer: ${names[computerChoice]} — ${result}`;
+      const resEl = area.querySelector("[data-result]");
+      const rndEl = area.querySelector("[data-round]");
+      const recEl = area.querySelector("[data-record]");
 
-      area.querySelector("[data-round]").textContent = round;
+      if (resEl) resEl.textContent = `You: ${names[userChoice]} • Computer: ${names[computerChoice]} — ${result}`;
+      if (rndEl) rndEl.textContent = round;
 
       if (round >= 10) {
         ended = true;
@@ -1735,9 +1919,7 @@
           button.disabled = true;
         });
 
-        area.querySelector("[data-record]").textContent =
-          `Game finished! Your score: ${score}. Press Restart to play again.`;
-
+        if (recEl) recEl.textContent = `Game finished! Your score: ${score}. Press Restart to play again.`;
         say("Match complete.");
       }
     }
@@ -1751,7 +1933,9 @@
      ========================================================== */
 
   function playHangman(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
+
+    renderGamepad(gamepadArea, "info", { info: "TAP LETTERS BELOW TO GUESS THE WORD" });
 
     const words = [
       "JAVASCRIPT", "COMPUTER", "GALAXY", "KEYBOARD",
@@ -1841,7 +2025,8 @@
           </div>
         `);
 
-        area.querySelector("[data-next-word]").addEventListener("click", reset);
+        const nextBtn = area.querySelector("[data-next-word]");
+        if (nextBtn) nextBtn.addEventListener("click", reset);
       }
     }
 
@@ -1861,7 +2046,7 @@
      ========================================================== */
 
   function playFlappy(ctx) {
-    const { area, say, setScore, addCleanup } = ctx;
+    const { area, gamepadArea, say, setScore, addCleanup } = ctx;
     const canvas = makeCanvas(area, 400, 560);
     const c = canvas.getContext("2d");
 
@@ -1869,6 +2054,8 @@
     let lastTime = 0;
     const birdX = 90;
     const birdR = 12;
+
+    renderGamepad(gamepadArea, "action-single", { label: "🐦 FLAP" });
 
     function reset() {
       birdY = 270;
@@ -1879,7 +2066,7 @@
       running = true;
       lastTime = 0;
       setScore(0);
-      say("Tap the game or press Space to flap. Avoid the pipes!");
+      say("Tap Flap or use gamepad/space to fly. Avoid the pipes!");
       pipes.push(makePipe(420));
     }
 
@@ -1909,7 +2096,6 @@
       c.fillStyle = gradient;
       c.fillRect(0, 0, 400, 560);
 
-      // Stars
       for (let i = 0; i < 32; i++) {
         c.fillStyle = "#ffffff";
         c.fillRect((i * 83) % 400, (i * 97) % 560, 2, 2);
@@ -2011,19 +2197,14 @@
     document.addEventListener("keydown", keydown);
     canvas.addEventListener("pointerdown", flap);
 
-    area.insertAdjacentHTML("beforeend", `
-      <div class="nx-controls">
-        <button class="nx-btn nx-primary" data-flap>🐦 FLAP</button>
-      </div>
-    `);
-
-    area.querySelector("[data-flap]").addEventListener("click", flap);
+    const cleanupAction = bindPadButton(gamepadArea, "action", flap);
 
     addCleanup(() => {
       running = false;
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", keydown);
       canvas.removeEventListener("pointerdown", flap);
+      cleanupAction();
     });
 
     reset();
