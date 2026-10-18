@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#050914">
+  <meta name="description" content="Play free arcade games on RexWeb Nexora.">
 
   <title>Games Hub | RexWeb Nexora</title>
 
   <style>
     * {
       box-sizing: border-box;
+    }
+
+    html {
+      background: #050914;
     }
 
     body {
@@ -21,6 +26,7 @@
     }
 
     .page-header {
+      position: relative;
       padding: 22px 14px;
       text-align: center;
       background: #080e1d;
@@ -38,8 +44,10 @@
     }
 
     .page-header p {
+      margin: 9px 0 17px;
       color: #9eabc5;
       font-size: 13px;
+      letter-spacing: 1px;
     }
 
     .back-link {
@@ -50,9 +58,16 @@
       background: #17243c;
       color: white;
       text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .back-link:active {
+      transform: scale(.97);
     }
 
     #nexora-games {
+      width: 100%;
       min-height: 70vh;
     }
 
@@ -87,39 +102,36 @@
 
   <main id="nexora-games">
     <div id="loading-error">
-      Loading the Nexora Arcade...
+      Loading Nexora Arcade...
     </div>
   </main>
 
   <script>
     window.addEventListener("error", function (event) {
       const box = document.getElementById("loading-error");
-
       if (!box) return;
 
       box.classList.add("error");
 
       if (event.target && event.target !== window) {
         box.textContent =
-          "Could not load a required file. Check that game.js exists beside games.html.";
+          "Could not load game.js. Check the filename and folder.";
       } else {
         box.textContent =
-          "A JavaScript error occurred. Check game.js and try again.";
+          "A JavaScript error occurred. Check the browser console.";
       }
     }, true);
 
     window.addEventListener("load", function () {
       setTimeout(function () {
         const box = document.getElementById("loading-error");
-        const root = document.getElementById("nexora-games");
 
-        // Keep the error visible if the arcade never replaced it.
-        if (box && root && box.parentNode === root) {
+        if (box && document.getElementById("nexora-games")) {
           box.classList.add("error");
           box.textContent =
-            "The arcade did not start. Check the game.js filename and its location.";
+            "The arcade has not started. Check game.js and make sure it is saved beside games.html.";
         }
-      }, 1000);
+      }, 2000);
     });
   </script>
 
