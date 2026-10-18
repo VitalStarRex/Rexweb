@@ -1,3 +1,9 @@
+/* ==========================================================
+   REXWEB NEXORA — LAPTOP-STYLE GAMING INTERFACE ARCADE
+   Complete self-contained game.js
+   Mobile + Desktop | Touchpad & Laptop Styling
+   ========================================================== */
+
 (() => {
   'use strict';
 
@@ -73,12 +79,12 @@
     style.id = 'nexora-arcade-styles';
     style.textContent = `
       #nexora-games {
-        --nx-bg:#050914;
-        --nx-panel:#0b1425;
-        --nx-panel2:#101d32;
-        --nx-line:#223651;
-        --nx-text:#f2f7ff;
-        --nx-muted:#91a4bf;
+        --nx-bg:#030712;
+        --nx-panel:#08101d;
+        --nx-panel2:#0d182b;
+        --nx-line:#1e314d;
+        --nx-text:#edf4ff;
+        --nx-muted:#8399b9;
         --nx-cyan:#35e8ff;
         --nx-purple:#9b6cff;
         --nx-green:#43f5a5;
@@ -88,7 +94,6 @@
         min-height:100%;
         padding:16px;
         box-sizing:border-box;
-        overflow:hidden;
       }
 
       #nexora-games * { box-sizing:border-box; }
@@ -97,7 +102,7 @@
       #nexora-games button { -webkit-tap-highlight-color:transparent; }
 
       #nexora-games .nx-shell {
-        width:min(100%,1000px);
+        width:min(100%,1100px);
         margin:0 auto;
       }
 
@@ -117,48 +122,47 @@
       }
 
       #nexora-games .nx-logo {
-        width:46px;
-        height:46px;
+        width:42px;
+        height:42px;
         display:grid;
         place-items:center;
         border:1px solid #27637c;
-        border-radius:14px;
+        border-radius:12px;
         color:var(--nx-cyan);
-        font-size:24px;
+        font-size:22px;
         font-weight:900;
-        background:linear-gradient(135deg,#102b42,#161332);
-        box-shadow:0 0 22px #35e8ff19;
+        background:linear-gradient(135deg,#0d2538,#13102c);
+        box-shadow:0 0 18px #35e8ff15;
       }
 
       #nexora-games .nx-brand h1 {
-        font-size:clamp(17px,4vw,24px);
+        font-size:clamp(16px,3.5vw,22px);
         line-height:1.15;
         margin:0;
-        letter-spacing:.6px;
+        letter-spacing:.5px;
       }
 
       #nexora-games .nx-brand p {
-        margin:5px 0 0;
+        margin:4px 0 0;
         color:var(--nx-muted);
-        font-size:12px;
+        font-size:11px;
       }
 
       #nexora-games .nx-btn {
         border:1px solid var(--nx-line);
         color:var(--nx-text);
         background:var(--nx-panel2);
-        border-radius:11px;
-        padding:10px 14px;
-        min-height:42px;
+        border-radius:10px;
+        padding:8px 14px;
+        min-height:38px;
         cursor:pointer;
-        transition:transform .12s,border-color .12s,background .12s;
+        transition:transform .1s,border-color .1s,background .1s;
       }
 
       #nexora-games .nx-btn:active { transform:scale(.97); }
-      #nexora-games .nx-btn:focus-visible,
-      #nexora-games .nx-pad-btn:focus-visible {
+      #nexora-games .nx-btn:focus-visible {
         outline:2px solid var(--nx-cyan);
-        outline-offset:3px;
+        outline-offset:2px;
       }
 
       #nexora-games .nx-btn-primary {
@@ -168,11 +172,9 @@
         border-color:var(--nx-cyan);
       }
 
-      #nexora-games .nx-btn-small { padding:7px 10px; min-height:35px; }
-
       #nexora-games .nx-section-title {
-        font-size:17px;
-        margin:20px 0 12px;
+        font-size:16px;
+        margin:16px 0 12px;
       }
 
       #nexora-games .nx-game-grid {
@@ -183,65 +185,69 @@
 
       #nexora-games .nx-game-card {
         text-align:left;
-        padding:16px;
+        padding:15px;
         border:1px solid var(--nx-line);
-        border-radius:16px;
-        background:linear-gradient(145deg,var(--nx-panel),#080f1e);
+        border-radius:14px;
+        background:linear-gradient(145deg,var(--nx-panel),#060c18);
         color:var(--nx-text);
         min-width:0;
         cursor:pointer;
-        transition:transform .15s,border-color .15s,box-shadow .15s;
+        transition:transform .12s,border-color .12s,box-shadow .12s;
       }
 
       #nexora-games .nx-game-card:hover {
         border-color:#2684a5;
-        box-shadow:0 0 20px #35e8ff0b;
+        box-shadow:0 0 16px #35e8ff0a;
       }
 
       #nexora-games .nx-game-card:active { transform:scale(.985); }
 
       #nexora-games .nx-card-icon {
-        font-size:29px;
-        margin-bottom:11px;
+        font-size:26px;
+        margin-bottom:10px;
         display:block;
       }
 
       #nexora-games .nx-card-title {
-        font-size:15px;
+        font-size:14px;
         font-weight:800;
         display:block;
       }
 
       #nexora-games .nx-card-description {
         color:var(--nx-muted);
-        font-size:12px;
+        font-size:11px;
         display:block;
-        margin-top:6px;
-        line-height:1.5;
+        margin-top:5px;
+        line-height:1.4;
       }
 
       #nexora-games .nx-card-best {
         display:block;
         color:var(--nx-cyan);
-        font-size:11px;
-        margin-top:12px;
+        font-size:10px;
+        margin-top:10px;
       }
 
-      #nexora-games .nx-panel {
-        border:1px solid var(--nx-line);
-        background:var(--nx-panel);
-        border-radius:18px;
-        overflow:hidden;
+      /* LAPTOP CHASSIS STYLING */
+      #nexora-games .nx-laptop-chassis {
+        border:2px solid #233958;
+        background:linear-gradient(180deg,#0a1324,#050a14);
+        border-radius:20px;
+        padding:16px;
+        box-shadow:0 14px 40px rgba(0,0,0,0.6);
+        max-width:960px;
+        margin:0 auto;
       }
 
       #nexora-games .nx-game-top {
-        padding:16px;
-        border-bottom:1px solid var(--nx-line);
         display:flex;
         justify-content:space-between;
         align-items:center;
         flex-wrap:wrap;
-        gap:12px;
+        gap:10px;
+        margin-bottom:12px;
+        padding:0 4px;
       }
 
       #nexora-games .nx-game-heading {
@@ -251,14 +257,14 @@
       }
 
       #nexora-games .nx-game-heading h2 {
-        font-size:19px;
+        font-size:18px;
         margin:0;
       }
 
       #nexora-games .nx-game-heading p {
-        font-size:12px;
+        font-size:11px;
         color:var(--nx-muted);
-        margin:4px 0 0;
+        margin:3px 0 0;
       }
 
       #nexora-games .nx-stats {
@@ -268,150 +274,131 @@
       }
 
       #nexora-games .nx-stat {
-        padding:7px 10px;
+        padding:6px 10px;
         border:1px solid var(--nx-line);
-        border-radius:10px;
-        background:#060d19;
-        font-size:12px;
+        border-radius:8px;
+        background:#050b16;
+        font-size:11px;
         white-space:nowrap;
       }
 
       #nexora-games .nx-stat strong { color:var(--nx-cyan); }
 
-      #nexora-games .nx-game-area {
-        padding:12px;
-        min-height:220px;
+      #nexora-games .nx-game-screen {
+        background:#02050c;
+        border:1px solid #1c2e4a;
+        border-radius:14px;
+        padding:16px;
+        min-height:260px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
         position:relative;
+        overflow:hidden;
       }
 
       #nexora-games .nx-canvas-wrap {
         width:100%;
-        position:relative;
-        margin:0 auto;
+        display:flex;
+        justify-content:center;
       }
 
       #nexora-games canvas {
         display:block;
-        width:100%;
+        max-width:100%;
         height:auto;
-        border-radius:12px;
-        background:#030914;
+        border-radius:10px;
+        background:#010307;
         touch-action:none;
       }
 
       #nexora-games .nx-message {
         text-align:center;
-        min-height:24px;
-        padding:5px 12px 12px;
+        min-height:22px;
+        padding:6px 12px;
         color:var(--nx-cyan);
-        font-size:13px;
+        font-size:12px;
       }
 
-      #nexora-games .nx-controls {
-        display:flex;
-        justify-content:center;
-        flex-wrap:wrap;
-        gap:9px;
-        padding:0 12px 16px;
-      }
-
-      #nexora-games .nx-gamepad {
-        border-top:1px solid var(--nx-line);
-        padding:16px 12px;
+      /* LAPTOP TOUCHPAD SECTION */
+      #nexora-games .nx-laptop-deck {
+        margin-top:16px;
+        padding-top:14px;
+        border-top:1px solid #1a2c46;
         display:flex;
         flex-direction:column;
         align-items:center;
         gap:10px;
-        background:linear-gradient(180deg,#091120,#060c18);
-        touch-action:none;
-        user-select:none;
-        -webkit-user-select:none;
       }
 
-      #nexora-games .nx-pad-label {
-        color:var(--nx-muted);
-        font-size:10px;
-        letter-spacing:2px;
-        font-weight:800;
-      }
-
-      #nexora-games .nx-pad-row {
+      #nexora-games .nx-touchpad {
+        width:min(100%,320px);
+        height:76px;
+        background:linear-gradient(145deg,#081120,#050a13);
+        border:1px solid #284266;
+        border-radius:12px;
+        box-shadow:inset 0 2px 5px rgba(0,0,0,0.5), 0 0 12px #35e8ff08;
         display:flex;
         align-items:center;
         justify-content:center;
-        gap:9px;
-      }
-
-      #nexora-games .nx-pad-btn {
-        border:1px solid #2b526c;
-        border-radius:13px;
-        min-width:62px;
-        min-height:58px;
-        padding:8px;
-        display:grid;
-        place-items:center;
-        color:var(--nx-cyan);
-        font-size:22px;
-        font-weight:900;
-        background:linear-gradient(145deg,#14253b,#091321);
-        box-shadow:inset 0 1px #ffffff0a,0 5px 0 #030812;
-        cursor:pointer;
+        position:relative;
         touch-action:none;
         user-select:none;
         -webkit-user-select:none;
-        -webkit-touch-callout:none;
+        cursor:pointer;
+        transition:border-color .15s, box-shadow .15s;
       }
 
-      #nexora-games .nx-pad-btn.nx-active,
-      #nexora-games .nx-pad-btn:active {
-        transform:translateY(3px);
-        box-shadow:inset 0 0 20px #35e8ff20,0 2px 0 #030812;
-        background:#15354b;
+      #nexora-games .nx-touchpad.nx-active {
         border-color:var(--nx-cyan);
+        box-shadow:inset 0 2px 8px rgba(0,0,0,0.7), 0 0 16px #35e8ff25;
+        background:linear-gradient(145deg,#0a172c,#070d18);
       }
 
-      #nexora-games .nx-pad-btn.nx-action {
-        min-width:100px;
-        color:#00120e;
-        background:linear-gradient(145deg,#5bffc1,#18c88c);
-        border-color:var(--nx-green);
-        font-size:14px;
-        letter-spacing:.7px;
+      #nexora-games .nx-touchpad-indicator {
+        width:44px;
+        height:4px;
+        background:#1e3554;
+        border-radius:2px;
       }
 
-      #nexora-games .nx-pad-btn.nx-purple {
-        color:#fff;
-        background:linear-gradient(145deg,#8053d8,#43278b);
-        border-color:#9b6cff;
-      }
-
-      #nexora-games .nx-pad-info {
+      #nexora-games .nx-touchpad-hint {
+        position:absolute;
+        bottom:6px;
+        font-size:9px;
         color:var(--nx-muted);
-        text-align:center;
-        font-size:12px;
-        max-width:340px;
-        line-height:1.5;
+        letter-spacing:1px;
+        font-weight:700;
+        pointer-events:none;
+      }
+
+      #nexora-games .nx-deck-actions {
+        display:flex;
+        justify-content:center;
+        gap:10px;
+        width:100%;
       }
 
       #nexora-games .nx-board {
         display:grid;
         gap:8px;
-        max-width:360px;
-        margin:12px auto;
+        max-width:340px;
+        margin:8px auto;
       }
 
       #nexora-games .nx-ttt-board {
         grid-template-columns:repeat(3,minmax(0,1fr));
-        width:min(100%,330px);
+        width:min(100%,310px);
       }
 
       #nexora-games .nx-cell {
         aspect-ratio:1;
-        border:1px solid #2a415e;
-        border-radius:13px;
-        background:#0c192a;
+        border:1px solid #243956;
+        border-radius:11px;
+        background:#081424;
         color:var(--nx-cyan);
-        font-size:clamp(28px,8vw,48px);
+        font-size:clamp(26px,7vw,42px);
         font-weight:900;
         cursor:pointer;
       }
@@ -422,27 +409,29 @@
       #nexora-games .nx-answer-grid {
         display:grid;
         grid-template-columns:repeat(2,minmax(0,1fr));
-        gap:10px;
-        max-width:480px;
-        margin:16px auto;
+        gap:8px;
+        max-width:440px;
+        margin:12px auto;
+        width:100%;
       }
 
       #nexora-games .nx-answer {
-        padding:15px 10px;
+        padding:12px 10px;
         border:1px solid var(--nx-line);
-        border-radius:12px;
+        border-radius:10px;
         color:var(--nx-text);
-        background:#0c192a;
+        background:#081424;
         font-weight:800;
         cursor:pointer;
       }
 
       #nexora-games .nx-answer:active { border-color:var(--nx-cyan); }
+      
       #nexora-games .nx-word {
         text-align:center;
-        font-size:clamp(22px,6vw,34px);
-        letter-spacing:7px;
-        margin:18px 0;
+        font-size:clamp(20px,5vw,30px);
+        letter-spacing:6px;
+        margin:14px 0;
         font-weight:900;
         overflow-wrap:anywhere;
       }
@@ -450,69 +439,60 @@
       #nexora-games .nx-letter-grid {
         display:grid;
         grid-template-columns:repeat(7,minmax(0,1fr));
-        gap:6px;
-        max-width:460px;
-        margin:15px auto;
+        gap:5px;
+        max-width:440px;
+        margin:10px auto;
       }
 
       #nexora-games .nx-letter {
-        min-height:39px;
+        min-height:36px;
         border:1px solid var(--nx-line);
-        border-radius:8px;
-        background:#0d192b;
+        border-radius:7px;
+        background:#091424;
         color:var(--nx-text);
         cursor:pointer;
         font-weight:800;
+        font-size:13px;
       }
 
       #nexora-games .nx-letter:disabled { opacity:.3; cursor:default; }
+      
       #nexora-games .nx-question {
-        font-size:clamp(28px,8vw,43px);
+        font-size:clamp(24px,7vw,38px);
         font-weight:900;
         text-align:center;
-        margin:20px 0;
+        margin:14px 0;
         color:var(--nx-cyan);
       }
 
       #nexora-games .nx-result {
-        font-size:14px;
+        font-size:13px;
         color:var(--nx-muted);
         text-align:center;
-        min-height:24px;
+        min-height:20px;
       }
 
       #nexora-games .nx-rps-buttons {
         display:flex;
         justify-content:center;
         flex-wrap:wrap;
-        gap:10px;
-        margin:18px auto;
+        gap:8px;
+        margin:14px auto;
       }
 
-      #nexora-games .nx-rps-buttons .nx-btn { min-width:92px; }
+      #nexora-games .nx-rps-buttons .nx-btn { min-width:88px; }
 
       #nexora-games .nx-footer {
         text-align:center;
-        color:#60758f;
-        font-size:11px;
-        padding:18px 0 4px;
+        color:#506682;
+        font-size:10px;
+        padding:16px 0 2px;
       }
-
-      #nexora-games .nx-hidden { display:none !important; }
 
       @media (min-width:650px) {
         #nexora-games { padding:24px; }
         #nexora-games .nx-game-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-        #nexora-games .nx-game-area { padding:20px; }
-        #nexora-games .nx-pad-btn { min-width:68px; min-height:62px; }
-      }
-
-      @media (max-width:380px) {
-        #nexora-games { padding:10px; }
-        #nexora-games .nx-game-grid { gap:8px; }
-        #nexora-games .nx-game-card { padding:12px; }
-        #nexora-games .nx-pad-btn { min-width:55px; min-height:54px; }
-        #nexora-games .nx-letter-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
+        #nexora-games .nx-touchpad { height:84px; width:340px; }
       }
 
       @media (prefers-reduced-motion:reduce) {
@@ -532,7 +512,7 @@
             <div class="nx-logo">N</div>
             <div>
               <h1>REXWEB NEXORA</h1>
-              <p>ARCADE UNIVERSE · PLAY WITHOUT LIMITS</p>
+              <p>LAPTOP ARCADE UNIVERSE · PLAY WITHOUT LIMITS</p>
             </div>
           </div>
           <button class="nx-btn" data-action="refresh">↻ Refresh Scores</button>
@@ -551,7 +531,7 @@
           `).join('')}
         </div>
 
-        <footer class="nx-footer">REXWEB NEXORA · YOUR DIGITAL WORLD, WITHOUT LIMITS</footer>
+        <footer class="nx-footer">REXWEB NEXORA · LAPTOP GAMING INTERFACE</footer>
       </div>
     `;
 
@@ -576,7 +556,6 @@
   function makeCanvas(width, height) {
     const wrap = document.createElement('div');
     wrap.className = 'nx-canvas-wrap';
-    wrap.style.maxWidth = width + 'px';
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -585,15 +564,6 @@
 
     wrap.appendChild(canvas);
     return { wrap, canvas, ctx: canvas.getContext('2d') };
-  }
-
-  function makeButton(label, action, className = '') {
-    const button = document.createElement('button');
-    button.className = 'nx-btn ' + className;
-    button.textContent = label;
-    button.type = 'button';
-    button.addEventListener('click', action);
-    return button;
   }
 
   function openGame(id) {
@@ -607,14 +577,12 @@
     let score = 0;
     let message = '';
     let area;
-    let stats;
     let scoreNode;
     let bestNode;
     let messageNode;
-    let gamepad;
-    let controls;
+    let touchpad;
     let gameCleanup = () => {};
-    let controllerCleanups = [];
+    let touchpadCleanup = () => {};
 
     root.innerHTML = `
       <div class="nx-shell">
@@ -623,16 +591,16 @@
             <div class="nx-logo">N</div>
             <div>
               <h1>REXWEB NEXORA</h1>
-              <p>ARCADE UNIVERSE · TOUCH TO PLAY</p>
+              <p>LAPTOP GAMING INTERFACE</p>
             </div>
           </div>
           <button class="nx-btn" data-action="all-games">← All Games</button>
         </header>
 
-        <section class="nx-panel">
+        <div class="nx-laptop-chassis">
           <div class="nx-game-top">
             <div class="nx-game-heading">
-              <span style="font-size:28px">${game.icon}</span>
+              <span style="font-size:24px">${game.icon}</span>
               <div>
                 <h2>${escapeHTML(game.name)}</h2>
                 <p>${escapeHTML(game.description)}</p>
@@ -644,19 +612,22 @@
             </div>
           </div>
 
-          <div class="nx-game-area" data-game-area></div>
+          <div class="nx-game-screen" data-game-area></div>
           <div class="nx-message" data-message aria-live="polite"></div>
-          <div class="nx-gamepad" data-gamepad>
-            <div class="nx-pad-label">TOUCH CONTROLLER</div>
-            <div class="nx-pad-content" data-pad-content></div>
-          </div>
-          <div class="nx-controls">
-            <button class="nx-btn nx-btn-primary" data-action="restart">↻ Restart</button>
-            <button class="nx-btn" data-action="all-games">▦ All Games</button>
-          </div>
-        </section>
 
-        <footer class="nx-footer">Use the touchscreen controller or your keyboard.</footer>
+          <div class="nx-laptop-deck">
+            <div class="nx-touchpad" data-touchpad>
+              <div class="nx-touchpad-indicator"></div>
+              <span class="nx-touchpad-hint">TOUCHPAD</span>
+            </div>
+            <div class="nx-deck-actions">
+              <button class="nx-btn nx-btn-primary" data-action="restart">↻ Restart</button>
+              <button class="nx-btn" data-action="all-games">▦ Game Menu</button>
+            </div>
+          </div>
+        </div>
+
+        <footer class="nx-footer">Use touchpad gestures, clicks, or your keyboard.</footer>
       </div>
     `;
 
@@ -664,10 +635,12 @@
     scoreNode = $('[data-score]');
     bestNode = $('[data-best]');
     messageNode = $('[data-message]');
-    gamepad = $('[data-gamepad]');
-    controls = $('[data-pad-content]');
+    touchpad = $('[data-touchpad]');
 
-    $('[data-action="all-games"]').addEventListener('click', renderHome);
+    $$('[data-action="all-games"]').forEach(btn => {
+      btn.addEventListener('click', renderHome);
+    });
+
     $('[data-action="restart"]').addEventListener('click', () => {
       if (token === gameToken) openGame(id);
     });
@@ -688,203 +661,84 @@
       setScore(score + amount);
     }
 
-    function makePadButton(key, label, className = '') {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'nx-pad-btn ' + className;
-      button.dataset.pad = key;
-      button.textContent = label;
-      button.setAttribute('aria-label', label);
-      return button;
-    }
+    // Touchpad Gesture & Event Handler Setup
+    function setupTouchpad(callbacks = {}) {
+      if (!touchpad) return () => {};
 
-    function bindPadButton(key, onStart, onEnd) {
-      const button = controls.querySelector(`[data-pad="${key}"]`);
-      if (!button) return () => {};
+      let startX = 0;
+      let startY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let tracking = false;
+      let startTime = 0;
+      let lastTapTime = 0;
 
-      let active = false;
-      let pointerId = null;
+      function pointerDown(e) {
+        if (e.cancelable) e.preventDefault();
+        tracking = true;
+        startX = lastX = e.clientX;
+        startY = lastY = e.clientY;
+        startTime = performance.now();
+        touchpad.classList.add('nx-active');
+        if (touchpad.setPointerCapture) {
+          try { touchpad.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+        if (callbacks.onDown) callbacks.onDown(e.clientX, e.clientY);
+      }
 
-      function start(event) {
-        if (active) return;
-        if (event.cancelable) event.preventDefault();
-        active = true;
-        pointerId = event.pointerId ?? null;
-        button.classList.add('nx-active');
+      function pointerMove(e) {
+        if (!tracking) return;
+        if (e.cancelable) e.preventDefault();
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
 
-        if (pointerId !== null && button.setPointerCapture) {
-          try { button.setPointerCapture(pointerId); } catch (_) {}
+        if (callbacks.onMove) callbacks.onMove(dx, dy, e.clientX, e.clientY);
+      }
+
+      function pointerUp(e) {
+        if (!tracking) return;
+        tracking = false;
+        touchpad.classList.remove('nx-active');
+
+        const totalDx = lastX - startX;
+        const totalDy = lastY - startY;
+        const duration = performance.now() - startTime;
+        const absDx = Math.abs(totalDx);
+        const absDy = Math.abs(totalDy);
+
+        if (absDx < 12 && absDy < 12 && duration < 300) {
+          const now = performance.now();
+          const isDouble = now - lastTapTime < 320;
+          lastTapTime = now;
+          if (callbacks.onTap) callbacks.onTap(isDouble);
+        } else if (Math.max(absDx, absDy) > 20) {
+          if (absDx > absDy) {
+            if (callbacks.onSwipeHorizontal) callbacks.onSwipeHorizontal(totalDx > 0 ? 'right' : 'left');
+          } else {
+            if (callbacks.onSwipeVertical) callbacks.onSwipeVertical(totalDy > 0 ? 'down' : 'up');
+          }
         }
 
-        if (typeof onStart === 'function') onStart(event);
+        if (callbacks.onUp) callbacks.onUp();
       }
 
-      function end(event) {
-        if (!active) return;
+      touchpad.addEventListener('pointerdown', pointerDown);
+      touchpad.addEventListener('pointermove', pointerMove);
+      touchpad.addEventListener('pointerup', pointerUp);
+      touchpad.addEventListener('pointercancel', pointerUp);
 
-        if (
-          event &&
-          pointerId !== null &&
-          event.pointerId !== undefined &&
-          event.pointerId !== pointerId
-        ) return;
-
-        active = false;
-        pointerId = null;
-        button.classList.remove('nx-active');
-
-        if (typeof onEnd === 'function') onEnd(event);
-      }
-
-      function keyStart(event) {
-        if (event.repeat) return;
-        start(event);
-      }
-
-      button.addEventListener('pointerdown', start);
-      button.addEventListener('pointerup', end);
-      button.addEventListener('pointercancel', end);
-      button.addEventListener('lostpointercapture', end);
-      button.addEventListener('contextmenu', preventContextMenu);
-
-      function preventContextMenu(event) {
-        event.preventDefault();
-      }
+      const preventMenu = e => e.preventDefault();
+      touchpad.addEventListener('contextmenu', preventMenu);
 
       return () => {
-        end();
-        button.removeEventListener('pointerdown', start);
-        button.removeEventListener('pointerup', end);
-        button.removeEventListener('pointercancel', end);
-        button.removeEventListener('lostpointercapture', end);
-        button.removeEventListener('contextmenu', preventContextMenu);
+        touchpad.removeEventListener('pointerdown', pointerDown);
+        touchpad.removeEventListener('pointermove', pointerMove);
+        touchpad.removeEventListener('pointerup', pointerUp);
+        touchpad.removeEventListener('pointercancel', pointerUp);
+        touchpad.removeEventListener('contextmenu', preventMenu);
       };
-    }
-
-    function setPad(type, handlers = {}) {
-      controllerCleanups.forEach(fn => {
-        try { fn(); } catch (_) {}
-      });
-      controllerCleanups = [];
-      controls.innerHTML = '';
-
-      const add = (key, label, className, start, end) => {
-        controls.appendChild(makePadButton(key, label, className));
-        controllerCleanups.push(bindPadButton(key, start, end));
-      };
-
-      if (type === 'dpad') {
-        const pad = document.createElement('div');
-        pad.style.display = 'flex';
-        pad.style.flexDirection = 'column';
-        pad.style.alignItems = 'center';
-        pad.style.gap = '8px';
-
-        const top = document.createElement('div');
-        top.className = 'nx-pad-row';
-
-        const middle = document.createElement('div');
-        middle.className = 'nx-pad-row';
-
-        const bottom = document.createElement('div');
-        bottom.className = 'nx-pad-row';
-
-        const createInto = (container, key, label) => {
-          const button = makePadButton(key, label);
-          container.appendChild(button);
-
-          let active = false;
-          let pointerId = null;
-
-          function start(event) {
-            if (active) return;
-            if (event.cancelable) event.preventDefault();
-            active = true;
-            pointerId = event.pointerId ?? null;
-            button.classList.add('nx-active');
-            if (pointerId !== null && button.setPointerCapture) {
-              try { button.setPointerCapture(pointerId); } catch (_) {}
-            }
-            if (handlers[key]) handlers[key](true);
-          }
-
-          function end(event) {
-            if (!active) return;
-            if (event && pointerId !== null && event.pointerId !== undefined && event.pointerId !== pointerId) return;
-            active = false;
-            pointerId = null;
-            button.classList.remove('nx-active');
-            if (handlers[key]) handlers[key](false);
-          }
-
-          button.addEventListener('pointerdown', start);
-          button.addEventListener('pointerup', end);
-          button.addEventListener('pointercancel', end);
-          button.addEventListener('lostpointercapture', end);
-
-          controllerCleanups.push(() => {
-            end();
-            button.removeEventListener('pointerdown', start);
-            button.removeEventListener('pointerup', end);
-            button.removeEventListener('pointercancel', end);
-            button.removeEventListener('lostpointercapture', end);
-          });
-        };
-
-        createInto(top, 'up', '↑');
-        createInto(middle, 'left', '←');
-        createInto(middle, 'right', '→');
-        createInto(bottom, 'down', '↓');
-
-        pad.append(top, middle, bottom);
-        controls.appendChild(pad);
-      } else if (type === 'vertical') {
-        const row = document.createElement('div');
-        row.className = 'nx-pad-row';
-        controls.appendChild(row);
-
-        ['up', 'down'].forEach(key => {
-          const label = key === 'up' ? '↑ UP' : '↓ DOWN';
-          const button = makePadButton(key, label);
-          row.appendChild(button);
-          controllerCleanups.push(bindPadButton(key, () => handlers[key]?.(true), () => handlers[key]?.(false)));
-        });
-      } else if (type === 'horizontal') {
-        const row = document.createElement('div');
-        row.className = 'nx-pad-row';
-        controls.appendChild(row);
-
-        ['left', 'right'].forEach(key => {
-          const button = makePadButton(key, key === 'left' ? '← LEFT' : 'RIGHT →');
-          row.appendChild(button);
-          controllerCleanups.push(bindPadButton(key, () => handlers[key]?.(true), () => handlers[key]?.(false)));
-        });
-      } else if (type === 'jump') {
-        add('action', 'JUMP', 'nx-action', handlers.action, handlers.release);
-      } else if (type === 'flap') {
-        add('action', 'FLAP', 'nx-action', handlers.action, handlers.release);
-      } else if (type === 'shooter') {
-        const row = document.createElement('div');
-        row.className = 'nx-pad-row';
-        controls.appendChild(row);
-
-        ['left', 'right', 'action'].forEach(key => {
-          const label = key === 'left' ? '←' : key === 'right' ? '→' : 'FIRE';
-          const cls = key === 'action' ? 'nx-action' : '';
-          const button = makePadButton(key, label, cls);
-          row.appendChild(button);
-
-          controllerCleanups.push(
-            bindPadButton(
-              key,
-              () => handlers[key]?.(true),
-              () => handlers[key]?.(false)
-            )
-          );
-        });
-      } else {
-        controls.innerHTML = `<div class="nx-pad-info">${escapeHTML(handlers.info || 'Use the game buttons on the screen.')}</div>`;
-      }
     }
 
     function listenKey(handler) {
@@ -931,14 +785,6 @@
       };
     }
 
-    function intervalLoop(callback, delay) {
-      const timer = setInterval(() => {
-        if (token === gameToken) callback();
-      }, delay);
-
-      return () => clearInterval(timer);
-    }
-
     function canvasGame(width, height) {
       const item = makeCanvas(width, height);
       area.appendChild(item.wrap);
@@ -949,11 +795,7 @@
       setMessage(text);
     }
 
-    function restartHome() {
-      renderHome();
-    }
-
-    // SNAKE
+    // 1. SNAKE
     function startSnake() {
       const { canvas, ctx } = canvasGame(360, 360);
       const size = 18;
@@ -979,10 +821,10 @@
       }
 
       function draw() {
-        ctx.fillStyle = '#030914';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = '#102035';
+        ctx.strokeStyle = '#0b1626';
         ctx.lineWidth = 1;
         for (let i = 0; i <= cells; i++) {
           ctx.beginPath();
@@ -998,7 +840,7 @@
 
         ctx.fillStyle = '#ff5e89';
         ctx.shadowColor = '#ff5e89';
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(food.x * size + size / 2, food.y * size + size / 2, size * .34, 0, Math.PI * 2);
         ctx.fill();
@@ -1007,7 +849,7 @@
         snake.forEach((part, index) => {
           ctx.fillStyle = index === 0 ? '#66ffd0' : '#1bc995';
           ctx.shadowColor = '#35e8ff';
-          ctx.shadowBlur = index === 0 ? 12 : 4;
+          ctx.shadowBlur = index === 0 ? 10 : 3;
           ctx.fillRect(part.x * size + 2, part.y * size + 2, size - 4, size - 4);
         });
         ctx.shadowBlur = 0;
@@ -1044,35 +886,32 @@
         draw();
       }
 
-      function changeDirection(key) {
+      function changeDir(dir) {
         const map = {
           up: { x: 0, y: -1 },
           down: { x: 0, y: 1 },
           left: { x: -1, y: 0 },
           right: { x: 1, y: 0 }
         };
-        const next = map[key];
+        const next = map[dir];
         if (!next) return;
-
         if (next.x !== -direction.x || next.y !== -direction.y) {
           nextDirection = next;
         }
       }
 
-      setPad('dpad', {
-        up: down => down && changeDirection('up'),
-        down: down => down && changeDirection('down'),
-        left: down => down && changeDirection('left'),
-        right: down => down && changeDirection('right')
+      touchpadCleanup = setupTouchpad({
+        onSwipeHorizontal: dir => changeDir(dir),
+        onSwipeVertical: dir => changeDir(dir)
       });
 
       const removeKeys = listenKey(event => {
         if (!event[1]) return;
         const key = event[0].key;
-        if (key === 'ArrowUp' || key.toLowerCase() === 'w') changeDirection('up');
-        if (key === 'ArrowDown' || key.toLowerCase() === 's') changeDirection('down');
-        if (key === 'ArrowLeft' || key.toLowerCase() === 'a') changeDirection('left');
-        if (key === 'ArrowRight' || key.toLowerCase() === 'd') changeDirection('right');
+        if (key === 'ArrowUp' || key.toLowerCase() === 'w') changeDir('up');
+        if (key === 'ArrowDown' || key.toLowerCase() === 's') changeDir('down');
+        if (key === 'ArrowLeft' || key.toLowerCase() === 'a') changeDir('left');
+        if (key === 'ArrowRight' || key.toLowerCase() === 'd') changeDir('right');
       });
 
       const removeLoop = rafLoop(dt => {
@@ -1087,12 +926,13 @@
       return () => {
         removeLoop();
         removeKeys();
+        touchpadCleanup();
       };
     }
 
-    // TIC-TAC-TOE
+    // 2. TIC-TAC-TOE
     function startTicTacToe() {
-      setPad('info', { info: 'Tap any empty square to place X. The computer plays O.' });
+      setMessage('Tap the touchpad or click grid cells to play X.');
 
       area.innerHTML = `
         <div class="nx-result" data-ttt-status>Your turn — you are X.</div>
@@ -1182,58 +1022,71 @@
         return -1;
       }
 
-      function clickCell(event) {
-        const button = event.target.closest('[data-cell]');
-        if (!button || ended) return;
-        const index = Number(button.dataset.cell);
-        if (board[index]) return;
-
+      function playerMove(index) {
+        if (ended || board[index]) return;
         board[index] = 'X';
         render();
         if (checkEnd()) return;
 
         status.textContent = 'Computer is thinking…';
-        aiTimer = setTimeout(aiMove, 350);
+        aiTimer = setTimeout(aiMove, 300);
       }
 
-      boardElement.addEventListener('click', clickCell);
+      const clickHandler = event => {
+        const button = event.target.closest('[data-cell]');
+        if (button) playerMove(Number(button.dataset.cell));
+      };
+
+      boardElement.addEventListener('click', clickHandler);
+
+      // Touchpad tap cycles through available cells
+      touchpadCleanup = setupTouchpad({
+        onTap: () => {
+          if (ended) return;
+          const available = board.map((v, i) => v === '' ? i : -1).filter(i => i >= 0);
+          if (available.length) {
+            const pick = available[Math.floor(Math.random() * available.length)];
+            playerMove(pick);
+          }
+        }
+      });
+
       render();
 
       return () => {
         clearTimeout(aiTimer);
-        boardElement.removeEventListener('click', clickCell);
+        boardElement.removeEventListener('click', clickHandler);
+        touchpadCleanup();
       };
     }
 
-    // PONG
+    // 3. PONG
     function startPong() {
-      const { canvas, ctx } = canvasGame(520, 320);
-      let playerY = 125;
-      let aiY = 125;
-      let ball = { x: 260, y: 160, vx: 210, vy: 125, r: 7 };
+      const { canvas, ctx } = canvasGame(500, 300);
+      let playerY = 115;
+      let aiY = 115;
+      let ball = { x: 250, y: 150, vx: 210, vy: 120, r: 7 };
       let playerScore = 0;
       let aiScore = 0;
-      let up = false;
-      let down = false;
       const paddleW = 10;
-      const paddleH = 70;
+      const paddleH = 68;
 
       function resetBall(direction) {
         ball = {
           x: canvas.width / 2,
           y: canvas.height / 2,
-          vx: 205 * direction,
-          vy: (Math.random() * 160) - 80,
+          vx: 200 * direction,
+          vy: (Math.random() * 150) - 75,
           r: 7
         };
       }
 
       function draw() {
-        ctx.fillStyle = '#030914';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = '#1d3550';
-        ctx.setLineDash([7, 9]);
+        ctx.strokeStyle = '#152438';
+        ctx.setLineDash([6, 8]);
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, 0);
         ctx.lineTo(canvas.width / 2, canvas.height);
@@ -1242,12 +1095,12 @@
 
         ctx.fillStyle = '#35e8ff';
         ctx.shadowColor = '#35e8ff';
-        ctx.shadowBlur = 12;
-        ctx.fillRect(18, playerY, paddleW, paddleH);
+        ctx.shadowBlur = 10;
+        ctx.fillRect(16, playerY, paddleW, paddleH);
 
         ctx.fillStyle = '#9b6cff';
         ctx.shadowColor = '#9b6cff';
-        ctx.fillRect(canvas.width - 28, aiY, paddleW, paddleH);
+        ctx.fillRect(canvas.width - 26, aiY, paddleW, paddleH);
 
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
@@ -1255,20 +1108,29 @@
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        ctx.font = 'bold 30px system-ui';
+        ctx.font = 'bold 28px system-ui';
         ctx.fillStyle = '#d9e8ff';
         ctx.textAlign = 'center';
-        ctx.fillText(playerScore, canvas.width / 2 - 55, 42);
-        ctx.fillText(aiScore, canvas.width / 2 + 55, 42);
+        ctx.fillText(playerScore, canvas.width / 2 - 50, 38);
+        ctx.fillText(aiScore, canvas.width / 2 + 50, 38);
       }
 
-      function update(dt) {
-        if (up) playerY -= 280 * dt;
-        if (down) playerY += 280 * dt;
-        playerY = Math.max(0, Math.min(canvas.height - paddleH, playerY));
+      touchpadCleanup = setupTouchpad({
+        onMove: (dx, dy) => {
+          playerY += dy * 1.3;
+          playerY = Math.max(0, Math.min(canvas.height - paddleH, playerY));
+        }
+      });
 
-        const target = ball.y - paddleH / 2;
-        aiY += Math.sign(target - aiY) * Math.min(Math.abs(target - aiY), 205 * dt);
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === 'arrowup' || key === 'w') playerY = Math.max(0, playerY - 24);
+        if (key === 'arrowdown' || key === 's') playerY = Math.min(canvas.height - paddleH, playerY + 24);
+      });
+
+      const removeLoop = rafLoop(dt => {
+        aiY += Math.sign((ball.y - paddleH / 2) - aiY) * Math.min(Math.abs((ball.y - paddleH / 2) - aiY), 190 * dt);
         aiY = Math.max(0, Math.min(canvas.height - paddleH, aiY));
 
         ball.x += ball.vx * dt;
@@ -1278,24 +1140,24 @@
 
         if (
           ball.vx < 0 &&
-          ball.x - ball.r < 28 &&
+          ball.x - ball.r < 26 &&
           ball.y > playerY &&
           ball.y < playerY + paddleH
         ) {
           ball.vx = Math.abs(ball.vx) * 1.04;
-          ball.vy += ((ball.y - (playerY + paddleH / 2)) / (paddleH / 2)) * 65;
-          ball.x = 29;
+          ball.vy += ((ball.y - (playerY + paddleH / 2)) / (paddleH / 2)) * 60;
+          ball.x = 27;
         }
 
         if (
           ball.vx > 0 &&
-          ball.x + ball.r > canvas.width - 28 &&
+          ball.x + ball.r > canvas.width - 26 &&
           ball.y > aiY &&
           ball.y < aiY + paddleH
         ) {
           ball.vx = -Math.abs(ball.vx) * 1.03;
-          ball.vy += ((ball.y - (aiY + paddleH / 2)) / (paddleH / 2)) * 55;
-          ball.x = canvas.width - 29;
+          ball.vy += ((ball.y - (aiY + paddleH / 2)) / (paddleH / 2)) * 50;
+          ball.x = canvas.width - 27;
         }
 
         if (ball.x < -10) {
@@ -1306,48 +1168,32 @@
           addScore(1);
           resetBall(-1);
         }
-      }
 
-      setPad('vertical', {
-        up: active => { up = active; },
-        down: active => { down = active; }
-      });
-
-      const removeKeys = listenKey((event, pressed) => {
-        const key = event.key.toLowerCase();
-        if (key === 'arrowup' || key === 'w') up = pressed;
-        if (key === 'arrowdown' || key === 's') down = pressed;
-      });
-
-      const removeLoop = rafLoop(dt => {
-        update(dt);
         draw();
       });
 
       return () => {
-        up = down = false;
         removeKeys();
         removeLoop();
+        touchpadCleanup();
       };
     }
 
-    // BRICK BREAKER
+    // 4. BRICK BREAKER
     function startBreakout() {
-      const { canvas, ctx } = canvasGame(480, 420);
+      const { canvas, ctx } = canvasGame(480, 400);
       const cols = 8;
       const rows = 5;
       const gap = 5;
       const brickW = 50;
-      const brickH = 17;
-      const offsetX = 22;
-      const offsetY = 38;
-      let paddleX = 200;
-      const paddleW = 86;
-      const paddleH = 11;
-      let ball = { x: 240, y: 320, vx: 160, vy: -190, r: 7 };
+      const brickH = 16;
+      const offsetX = 20;
+      const offsetY = 36;
+      let paddleX = 190;
+      const paddleW = 84;
+      const paddleH = 10;
+      let ball = { x: 240, y: 310, vx: 150, vy: -180, r: 7 };
       let alive = true;
-      let left = false;
-      let right = false;
       const bricks = [];
 
       for (let row = 0; row < rows; row++) {
@@ -1364,21 +1210,21 @@
       }
 
       function draw() {
-        ctx.fillStyle = '#030914';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         bricks.forEach(brick => {
           if (!brick.alive) return;
           ctx.fillStyle = brick.color;
           ctx.shadowColor = brick.color;
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 6;
           ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
         });
 
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 10;
         ctx.shadowColor = '#35e8ff';
         ctx.fillStyle = '#35e8ff';
-        ctx.fillRect(paddleX, canvas.height - 32, paddleW, paddleH);
+        ctx.fillRect(paddleX, canvas.height - 30, paddleW, paddleH);
 
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
@@ -1387,12 +1233,22 @@
         ctx.shadowBlur = 0;
       }
 
-      function update(dt) {
-        if (!alive) return;
+      touchpadCleanup = setupTouchpad({
+        onMove: (dx) => {
+          paddleX += dx * 1.5;
+          paddleX = Math.max(0, Math.min(canvas.width - paddleW, paddleX));
+        }
+      });
 
-        if (left) paddleX -= 330 * dt;
-        if (right) paddleX += 330 * dt;
-        paddleX = Math.max(0, Math.min(canvas.width - paddleW, paddleX));
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === 'arrowleft' || key === 'a') paddleX = Math.max(0, paddleX - 25);
+        if (key === 'arrowright' || key === 'd') paddleX = Math.min(canvas.width - paddleW, paddleX + 25);
+      });
+
+      const removeLoop = rafLoop(dt => {
+        if (!alive) return;
 
         ball.x += ball.vx * dt;
         ball.y += ball.vy * dt;
@@ -1400,7 +1256,7 @@
         if (ball.x < ball.r || ball.x > canvas.width - ball.r) ball.vx *= -1;
         if (ball.y < ball.r) ball.vy = Math.abs(ball.vy);
 
-        const paddleY = canvas.height - 32;
+        const paddleY = canvas.height - 30;
         if (
           ball.vy > 0 &&
           ball.y + ball.r >= paddleY &&
@@ -1409,13 +1265,12 @@
           ball.x <= paddleX + paddleW
         ) {
           ball.vy = -Math.abs(ball.vy);
-          ball.vx += ((ball.x - (paddleX + paddleW / 2)) / (paddleW / 2)) * 95;
+          ball.vx += ((ball.x - (paddleX + paddleW / 2)) / (paddleW / 2)) * 90;
           ball.y = paddleY - ball.r;
         }
 
         bricks.forEach(brick => {
           if (!brick.alive) return;
-
           if (
             ball.x + ball.r > brick.x &&
             ball.x - ball.r < brick.x + brick.w &&
@@ -1435,59 +1290,44 @@
           alive = false;
           finishGame('Ball lost! Tap Restart to try again.');
         }
-      }
 
-      setPad('horizontal', {
-        left: active => { left = active; },
-        right: active => { right = active; }
-      });
-
-      const removeKeys = listenKey((event, pressed) => {
-        const key = event.key.toLowerCase();
-        if (key === 'arrowleft' || key === 'a') left = pressed;
-        if (key === 'arrowright' || key === 'd') right = pressed;
-      });
-
-      const removeLoop = rafLoop(dt => {
-        update(dt);
         draw();
       });
 
       return () => {
-        left = right = false;
         removeKeys();
         removeLoop();
+        touchpadCleanup();
       };
     }
 
-    // ENDLESS RUNNER
+    // 5. ENDLESS RUNNER
     function startRunner() {
-      const { canvas, ctx } = canvasGame(520, 280);
-      const ground = 225;
-      const player = { x: 70, y: ground - 35, w: 27, h: 35, vy: 0, jumping: false };
+      const { canvas, ctx } = canvasGame(500, 260);
+      const ground = 205;
+      const player = { x: 65, y: ground - 32, w: 25, h: 32, vy: 0, jumping: false };
       let obstacles = [];
       let spawnTimer = 0;
       let elapsed = 0;
       let alive = true;
       let jumpQueued = false;
       let scoreTimer = 0;
-      let speed = 205;
+      let speed = 200;
+      let score = 0;
 
       function jump() {
-        if (!alive) return;
-        if (!player.jumping) {
-          player.vy = -390;
-          player.jumping = true;
-        }
+        if (!alive || player.jumping) return;
+        player.vy = -380;
+        player.jumping = true;
       }
 
       function draw() {
-        ctx.fillStyle = '#030914';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = '#152b43';
+        ctx.strokeStyle = '#122238';
         for (let i = 0; i < 12; i++) {
-          const x = (i * 53 - (elapsed * speed * .4) % 53);
+          const x = (i * 50 - (elapsed * speed * .4) % 50);
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, ground);
@@ -1503,29 +1343,39 @@
 
         ctx.fillStyle = '#43f5a5';
         ctx.shadowColor = '#43f5a5';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 10;
         ctx.fillRect(player.x, player.y, player.w, player.h);
 
         ctx.fillStyle = '#ff6d9a';
         ctx.shadowColor = '#ff6d9a';
-        obstacles.forEach(obstacle => {
-          ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
+        obstacles.forEach(obs => {
+          ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
         });
         ctx.shadowBlur = 0;
 
         ctx.fillStyle = '#d9e8ff';
-        ctx.font = '13px system-ui';
-        ctx.fillText('DISTANCE ' + score, 12, 22);
+        ctx.font = '12px system-ui';
+        ctx.fillText('DISTANCE ' + score, 12, 20);
       }
 
-      let score = 0;
+      touchpadCleanup = setupTouchpad({
+        onSwipeVertical: dir => {
+          if (dir === 'up') jumpQueued = true;
+        },
+        onTap: () => { jumpQueued = true; }
+      });
 
-      function update(dt) {
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === ' ' || key === 'arrowup' || key === 'w') jumpQueued = true;
+      });
+
+      const removeLoop = rafLoop(dt => {
         if (!alive) return;
-
         elapsed += dt;
         scoreTimer += dt;
-        speed = Math.min(340, 205 + elapsed * 2.2);
+        speed = Math.min(320, 200 + elapsed * 2);
 
         if (scoreTimer >= .1) {
           const gained = Math.floor(scoreTimer * 10);
@@ -1540,7 +1390,7 @@
         }
 
         if (player.jumping) {
-          player.vy += 1000 * dt;
+          player.vy += 1050 * dt;
           player.y += player.vy * dt;
           if (player.y >= ground - player.h) {
             player.y = ground - player.h;
@@ -1551,59 +1401,43 @@
 
         spawnTimer -= dt;
         if (spawnTimer <= 0) {
-          const h = 22 + Math.random() * 24;
-          obstacles.push({ x: canvas.width + 10, y: ground - h, w: 18 + Math.random() * 12, h });
-          spawnTimer = .85 + Math.random() * .85;
+          const h = 20 + Math.random() * 22;
+          obstacles.push({ x: canvas.width + 10, y: ground - h, w: 16 + Math.random() * 12, h });
+          spawnTimer = .9 + Math.random() * .8;
         }
 
-        obstacles.forEach(obstacle => obstacle.x -= speed * dt);
-        obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.w > -5);
+        obstacles.forEach(obs => obs.x -= speed * dt);
+        obstacles = obstacles.filter(obs => obs.x + obs.w > -5);
 
-        for (const obstacle of obstacles) {
+        for (const obs of obstacles) {
           if (
-            player.x + player.w - 4 > obstacle.x &&
-            player.x + 4 < obstacle.x + obstacle.w &&
-            player.y + player.h - 3 > obstacle.y
+            player.x + player.w - 3 > obs.x &&
+            player.x + 3 < obs.x + obs.w &&
+            player.y + player.h - 2 > obs.y
           ) {
             alive = false;
-            finishGame('Game over! Distance: ' + score + '. Tap Restart to try again.');
+            finishGame('Game over! Distance: ' + score + '. Tap Restart.');
             break;
           }
         }
-      }
 
-      setPad('jump', {
-        action: () => { jumpQueued = true; }
-      });
-
-      const removeKeys = listenKey((event, pressed) => {
-        if (!pressed) return;
-        const key = event.key.toLowerCase();
-        if (key === ' ' || key === 'arrowup' || key === 'w') jumpQueued = true;
-      });
-
-      const removeLoop = rafLoop(dt => {
-        update(dt);
         draw();
       });
 
       return () => {
-        alive = false;
         removeKeys();
         removeLoop();
+        touchpadCleanup();
       };
     }
 
-    // SPACE SHOOTER
+    // 6. SPACE SHOOTER
     function startShooter() {
-      const { canvas, ctx } = canvasGame(480, 400);
-      const player = { x: 240, y: 345, w: 28, h: 24 };
+      const { canvas, ctx } = canvasGame(480, 380);
+      const player = { x: 240, y: 325, w: 26, h: 22 };
       let bullets = [];
       let enemies = [];
       let particles = [];
-      let left = false;
-      let right = false;
-      let firing = false;
       let fireCooldown = 0;
       let spawnTimer = 0;
       let elapsed = 0;
@@ -1612,179 +1446,158 @@
 
       function shoot() {
         if (!alive || fireCooldown > 0) return;
-        bullets.push({ x: player.x, y: player.y - 14, vy: -390 });
-        fireCooldown = .16;
+        bullets.push({ x: player.x, y: player.y - 12, vy: -380 });
+        fireCooldown = .15;
       }
 
       function draw() {
-        ctx.fillStyle = '#030914';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < 65; i++) {
+        for (let i = 0; i < 50; i++) {
           const x = (i * 79) % canvas.width;
-          const y = ((i * 113) + elapsed * 30) % canvas.height;
-          ctx.fillStyle = i % 4 === 0 ? '#35e8ff' : '#546a8c';
+          const y = ((i * 113) + elapsed * 25) % canvas.height;
+          ctx.fillStyle = i % 3 === 0 ? '#35e8ff' : '#425a7c';
           ctx.fillRect(x, y, 2, 2);
         }
 
         ctx.fillStyle = '#35e8ff';
         ctx.shadowColor = '#35e8ff';
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.moveTo(player.x, player.y - 16);
-        ctx.lineTo(player.x - 15, player.y + 12);
-        ctx.lineTo(player.x + 15, player.y + 12);
+        ctx.moveTo(player.x, player.y - 14);
+        ctx.lineTo(player.x - 14, player.y + 10);
+        ctx.lineTo(player.x + 14, player.y + 10);
         ctx.closePath();
         ctx.fill();
 
-        ctx.shadowBlur = 8;
-        ctx.fillStyle = '#f6fdff';
-        bullets.forEach(bullet => ctx.fillRect(bullet.x - 2, bullet.y - 8, 4, 12));
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = '#ffffff';
+        bullets.forEach(b => ctx.fillRect(b.x - 2, b.y - 6, 4, 10));
 
         ctx.fillStyle = '#ff6d9a';
         ctx.shadowColor = '#ff6d9a';
-        enemies.forEach(enemy => {
+        enemies.forEach(e => {
           ctx.beginPath();
-          ctx.moveTo(enemy.x, enemy.y + 12);
-          ctx.lineTo(enemy.x - 13, enemy.y - 10);
-          ctx.lineTo(enemy.x + 13, enemy.y - 10);
+          ctx.moveTo(e.x, e.y + 10);
+          ctx.lineTo(e.x - 12, e.y - 8);
+          ctx.lineTo(e.x + 12, e.y - 8);
           ctx.closePath();
           ctx.fill();
         });
 
-        particles.forEach(particle => {
-          ctx.fillStyle = particle.color;
-          ctx.fillRect(particle.x, particle.y, 3, 3);
+        particles.forEach(p => {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, 3, 3);
         });
 
         ctx.shadowBlur = 0;
-        ctx.fillStyle = '#e6efff';
-        ctx.font = '13px system-ui';
-        ctx.fillText('HULL ' + '♥'.repeat(health), 12, 22);
+        ctx.fillStyle = '#d9e8ff';
+        ctx.font = '12px system-ui';
+        ctx.fillText('HULL ' + '♥'.repeat(health), 12, 20);
       }
 
       function explode(x, y, color) {
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 6; i++) {
           particles.push({
             x, y,
-            vx: (Math.random() - .5) * 150,
-            vy: (Math.random() - .5) * 150,
-            life: .4 + Math.random() * .35,
+            vx: (Math.random() - .5) * 140,
+            vy: (Math.random() - .5) * 140,
+            life: .35 + Math.random() * .3,
             color
           });
         }
       }
 
-      function update(dt) {
+      touchpadCleanup = setupTouchpad({
+        onMove: (dx) => {
+          player.x += dx * 1.5;
+          player.x = Math.max(16, Math.min(canvas.width - 16, player.x));
+        },
+        onTap: () => shoot()
+      });
+
+      const removeKeys = listenKey((event, pressed) => {
+        if (!pressed) return;
+        const key = event.key.toLowerCase();
+        if (key === 'arrowleft' || key === 'a') player.x = Math.max(16, player.x - 22);
+        if (key === 'arrowright' || key === 'd') player.x = Math.min(canvas.width - 16, player.x + 22);
+        if (key === ' ' || key === 'enter') shoot();
+      });
+
+      const removeLoop = rafLoop(dt => {
         if (!alive) return;
         elapsed += dt;
-
-        if (left) player.x -= 270 * dt;
-        if (right) player.x += 270 * dt;
-        player.x = Math.max(18, Math.min(canvas.width - 18, player.x));
-
         fireCooldown -= dt;
-        if (firing && fireCooldown <= 0) shoot();
 
         spawnTimer -= dt;
         if (spawnTimer <= 0) {
           enemies.push({
-            x: 22 + Math.random() * (canvas.width - 44),
-            y: -18,
-            vy: 65 + Math.random() * 60 + elapsed * .6
+            x: 20 + Math.random() * (canvas.width - 40),
+            y: -16,
+            vy: 60 + Math.random() * 55 + elapsed * .5
           });
-          spawnTimer = Math.max(.35, .85 - elapsed * .008) + Math.random() * .3;
+          spawnTimer = Math.max(.3, .8 - elapsed * .007) + Math.random() * .3;
         }
 
-        bullets.forEach(bullet => bullet.y += bullet.vy * dt);
-        bullets = bullets.filter(bullet => bullet.y > -20);
+        bullets.forEach(b => b.y += b.vy * dt);
+        bullets = bullets.filter(b => b.y > -20);
 
-        enemies.forEach(enemy => enemy.y += enemy.vy * dt);
+        enemies.forEach(e => e.y += e.vy * dt);
 
-        for (const enemy of enemies) {
-          if (
-            Math.abs(enemy.x - player.x) < 22 &&
-            Math.abs(enemy.y - player.y) < 25
-          ) {
-            enemy.dead = true;
+        for (const e of enemies) {
+          if (Math.abs(e.x - player.x) < 20 && Math.abs(e.y - player.y) < 22) {
+            e.dead = true;
             health--;
-            explode(enemy.x, enemy.y, '#ff6d9a');
-
+            explode(e.x, e.y, '#ff6d9a');
             if (health <= 0) {
               alive = false;
-              finishGame('Ship destroyed! Score: ' + score + '. Tap Restart to try again.');
+              finishGame('Ship destroyed! Score: ' + score + '. Tap Restart.');
             }
           }
 
-          for (const bullet of bullets) {
-            if (
-              !bullet.dead &&
-              !enemy.dead &&
-              Math.abs(bullet.x - enemy.x) < 16 &&
-              Math.abs(bullet.y - enemy.y) < 16
-            ) {
-              bullet.dead = true;
-              enemy.dead = true;
+          for (const b of bullets) {
+            if (!b.dead && !e.dead && Math.abs(b.x - e.x) < 14 && Math.abs(b.y - e.y) < 14) {
+              b.dead = true;
+              e.dead = true;
               addScore(10);
-              explode(enemy.x, enemy.y, '#35e8ff');
+              explode(e.x, e.y, '#35e8ff');
             }
           }
 
-          if (enemy.y > canvas.height + 15) {
-            enemy.dead = true;
+          if (e.y > canvas.height + 15) {
+            e.dead = true;
             health--;
             if (health <= 0) {
               alive = false;
-              finishGame('Invaders broke through! Score: ' + score + '.');
+              finishGame('Invaders broke through! Score: ' + score);
             }
           }
         }
 
-        bullets = bullets.filter(bullet => !bullet.dead);
-        enemies = enemies.filter(enemy => !enemy.dead);
+        bullets = bullets.filter(b => !b.dead);
+        enemies = enemies.filter(e => !e.dead);
 
-        particles.forEach(particle => {
-          particle.x += particle.vx * dt;
-          particle.y += particle.vy * dt;
-          particle.life -= dt;
+        particles.forEach(p => {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt;
         });
-        particles = particles.filter(particle => particle.life > 0);
-      }
+        particles = particles.filter(p => p.life > 0);
 
-      setPad('shooter', {
-        left: active => { left = active; },
-        right: active => { right = active; },
-        action: active => {
-          firing = active;
-          if (active) shoot();
-        }
-      });
-
-      const removeKeys = listenKey((event, pressed) => {
-        const key = event.key.toLowerCase();
-        if (key === 'arrowleft' || key === 'a') left = pressed;
-        if (key === 'arrowright' || key === 'd') right = pressed;
-        if (key === ' ' || key === 'enter') {
-          firing = pressed;
-          if (pressed) shoot();
-        }
-      });
-
-      const removeLoop = rafLoop(dt => {
-        update(dt);
         draw();
       });
 
       return () => {
-        left = right = firing = false;
         removeKeys();
         removeLoop();
+        touchpadCleanup();
       };
     }
 
-    // MATH CHALLENGE
+    // 7. MATH CHALLENGE
     function startMath() {
-      setPad('info', { info: 'Choose an answer below. Keyboard shortcuts 1–4 also work.' });
+      setMessage('Tap the touchpad or click answer choices.');
 
       area.innerHTML = `
         <div class="nx-result" data-math-info>Answer correctly to earn points.</div>
@@ -1800,6 +1613,7 @@
       let answer = 0;
       let streak = 0;
       let locked = false;
+      let currentChoices = [];
 
       function newQuestion() {
         locked = false;
@@ -1832,12 +1646,12 @@
 
         const choices = new Set([answer]);
         while (choices.size < 4) {
-          const offset = Math.floor(Math.random() * 13) - 6;
+          const offset = Math.floor(Math.random() * 11) - 5;
           choices.add(Math.max(0, answer + (offset || 1)));
         }
 
-        const shuffled = [...choices].sort(() => Math.random() - .5);
-        answersNode.innerHTML = shuffled.map((value, index) =>
+        currentChoices = [...choices].sort(() => Math.random() - .5);
+        answersNode.innerHTML = currentChoices.map((value, index) =>
           `<button class="nx-answer" data-answer="${value}">${index + 1}. ${value}</button>`
         ).join('');
       }
@@ -1856,22 +1670,8 @@
         }
 
         streakNode.textContent = 'Correct answers: ' + streak;
-        $$('[data-answer]', answersNode).forEach(button => button.disabled = true);
-        setTimeout(() => {
-          if (token === gameToken) newQuestion();
-        }, 650);
-      }
-
-      answersNode.addEventListener('click', event => {
-        const button = event.target.closest('[data-answer]');
-        if (button) choose(button.dataset.answer);
-      });
-
-      const removeKeys = listenKey((event, pressed) => {
-        if (!pressed) return;
-        const key = event.key;
-        if (['1', '2', '3', '4'].includes(key)) {
-          const button = $$('[data-answer]', answersNode)[Number(key) - 1];
+        $$('[data-answer]', answersNode).forEach(btn => btn.disabled = true); setTimeout(() => { if (token === gameToken) newQuestion(); }, 600); }        const clickHandler = event => { const button = event.target.closest('[data-answer]'); if (button) choose(button.dataset.answer); };        answersNode.addEventListener('click', clickHandler);        touchpadCleanup = setupTouchpad({ onTap: () => { if (locked \vert{}\vert{} !currentChoices.length) return; const pick = currentChoices[Math.floor(Math.random() * currentChoices.length)]; choose(pick); } });        const removeKeys = listenKey((event, pressed) => { if (!pressed) return; const key = event.key; if (['1', '2', '3', '4'].includes(key)) { const button = $$
+('[data-answer]', answersNode)[Number(key) - 1];
           if (button) choose(button.dataset.answer);
         }
       });
@@ -1879,13 +1679,15 @@
       newQuestion();
 
       return () => {
+        answersNode.removeEventListener('click', clickHandler);
         removeKeys();
+        touchpadCleanup();
       };
     }
 
-    // ROCK PAPER SCISSORS
+    // 8. ROCK PAPER SCISSORS
     function startRPS() {
-      setPad('info', { info: 'Tap Rock, Paper, or Scissors to play.' });
+      setMessage('Choose Rock, Paper, or Scissors above.');
 
       area.innerHTML = `
         <div class="nx-result">First to win a round earns 1 point.</div>
@@ -1938,6 +1740,13 @@
 
       buttons.addEventListener('click', clickHandler);
 
+      touchpadCleanup = setupTouchpad({
+        onTap: () => {
+          const pick = choices[Math.floor(Math.random() * choices.length)];
+          play(pick);
+        }
+      });
+
       const removeKeys = listenKey((event, pressed) => {
         if (!pressed) return;
         const map = { r: 'rock', p: 'paper', s: 'scissors' };
@@ -1947,12 +1756,13 @@
       return () => {
         buttons.removeEventListener('click', clickHandler);
         removeKeys();
+        touchpadCleanup();
       };
     }
 
-    // HANGMAN
+    // 9. HANGMAN
     function startHangman() {
-      setPad('info', { info: 'Choose letters from the keyboard on screen or your physical keyboard.' });
+      setMessage('Tap letter buttons or use your keyboard.');
 
       const wordList = [
         'GALAXY', 'PLANET', 'ROCKET', 'JUNGLE', 'PUZZLE',
@@ -1980,13 +1790,7 @@
       const wordNode = $('[data-hangman-word]', area);
       const drawingNode = $('[data-hangman-drawing]', area);
       const statusNode = $('[data-hangman-status]', area);
-      const lettersNode = $('[data-hangman-letters]', area);
-      const drawing = ['○', '◔', '◑', '◕', '◉', '☠', '✖'];
-
-      function render() {
-        wordNode.textContent = word.split('').map(letter => guessed.has(letter) ? letter : '_').join(' ');
-        drawingNode.textContent = drawing[Math.min(mistakes, maxMistakes)];
-        $$('[data-letter]', lettersNode).forEach(button => {
+      const lettersNode = $('[data-hangman-letters]', area); const drawing = ['○', '◔', '◑', '◕', '◉', '☠', '✖'];        function render() { wordNode.textContent = word.split('').map(letter => guessed.has(letter) ? letter : '_').join(' '); drawingNode.textContent = drawing[Math.min(mistakes, maxMistakes)]; $$('[data-letter]', lettersNode).forEach(button => {
           button.disabled = guessed.has(button.dataset.letter) || ended;
         });
       }
@@ -1994,7 +1798,6 @@
       function guess(letter) {
         if (ended || guessed.has(letter)) return;
         guessed.add(letter);
-
         if (!word.includes(letter)) mistakes++;
 
         if (word.split('').every(char => guessed.has(char))) {
@@ -2007,7 +1810,6 @@
         } else {
           statusNode.textContent = `Mistakes: ${mistakes}/${maxMistakes}`;
         }
-
         render();
       }
 
@@ -2017,6 +1819,18 @@
       };
 
       lettersNode.addEventListener('click', clickHandler);
+
+      touchpadCleanup = setupTouchpad({
+        onTap: () => {
+          if (ended) return;
+          const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+          const available = alphabet.filter(l => !guessed.has(l));
+          if (available.length) {
+            const pick = available[Math.floor(Math.random() * available.length)];
+            guess(pick);
+          }
+        }
+      });
 
       const removeKeys = listenKey((event, pressed) => {
         if (!pressed && /^[a-z]$/i.test(event.key)) {
@@ -2029,24 +1843,25 @@
       return () => {
         lettersNode.removeEventListener('click', clickHandler);
         removeKeys();
+        touchpadCleanup();
       };
     }
 
-    // FLAPPY FLYER
+    // 10. FLAPPY FLYER
     function startFlappy() {
-      const { canvas, ctx } = canvasGame(360, 480);
-      const bird = { x: 82, y: 210, vy: 0, r: 12 };
+      const { canvas, ctx } = canvasGame(350, 460);
+      const bird = { x: 80, y: 200, vy: 0, r: 12 };
       let pipes = [];
       let elapsed = 0;
       let spawnTimer = 0;
       let alive = true;
       let started = false;
       let flapQueued = false;
-      let distance = 0;
-      const gravity = 900;
-      const flapStrength = -300;
-      const pipeWidth = 54;
-      const gapHeight = 145;
+      let score = 0;
+      const gravity = 880;
+      const flapStrength = -290;
+      const pipeWidth = 52;
+      const gapHeight = 140;
 
       function flap() {
         if (!alive) return;
@@ -2055,20 +1870,20 @@
       }
 
       function draw() {
-        ctx.fillStyle = '#071226';
+        ctx.fillStyle = '#010307';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < 28; i++) {
+        for (let i = 0; i < 25; i++) {
           const x = (i * 37) % canvas.width;
           const y = (i * 71) % canvas.height;
-          ctx.fillStyle = '#213957';
+          ctx.fillStyle = '#1c2d44';
           ctx.fillRect(x, y, 2, 2);
         }
 
         pipes.forEach(pipe => {
           ctx.fillStyle = '#43f5a5';
           ctx.shadowColor = '#43f5a5';
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 6;
           ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
           ctx.fillRect(pipe.x, pipe.top + gapHeight, pipeWidth, canvas.height - pipe.top - gapHeight);
 
@@ -2078,81 +1893,32 @@
         });
 
         ctx.shadowColor = '#ffdc68';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 10;
         ctx.fillStyle = '#ffdc68';
         ctx.beginPath();
         ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.shadowBlur = 0;
-        ctx.fillStyle = '#091120';
+        ctx.fillStyle = '#010307';
         ctx.beginPath();
         ctx.arc(bird.x + 4, bird.y - 3, 2.5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#eaf3ff';
-        ctx.font = 'bold 17px system-ui';
+        ctx.fillStyle = '#d9e8ff';
+        ctx.font = 'bold 16px system-ui';
         ctx.textAlign = 'center';
-        ctx.fillText('SCORE ' + score, canvas.width / 2, 30);
+        ctx.fillText('SCORE ' + score, canvas.width / 2, 28);
 
         if (!started && alive) {
           ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 17px system-ui';
-          ctx.fillText('TAP FLAP TO START', canvas.width / 2, canvas.height / 2 + 65);
+          ctx.font = 'bold 16px system-ui';
+          ctx.fillText('TAP TOUCHPAD TO START', canvas.width / 2, canvas.height / 2 + 55);
         }
       }
 
-      function update(dt) {
-        if (!alive) return;
-
-        if (flapQueued) {
-          flapQueued = false;
-          flap();
-        }
-
-        if (!started) return;
-
-        elapsed += dt;
-        bird.vy += gravity * dt;
-        bird.y += bird.vy * dt;
-
-        spawnTimer -= dt;
-        if (spawnTimer <= 0) {
-          const top = 55 + Math.random() * (canvas.height - gapHeight - 115);
-          pipes.push({ x: canvas.width + 5, top, scored: false });
-          spawnTimer = 1.35;
-        }
-
-        pipes.forEach(pipe => {
-          pipe.x -= 145 * dt;
-
-          if (!pipe.scored && pipe.x + pipeWidth < bird.x) {
-            pipe.scored = true;
-            score++;
-            setScore(score);
-          }
-
-          const horizontal = bird.x + bird.r > pipe.x && bird.x - bird.r < pipe.x + pipeWidth;
-          const verticalHit = bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.top + gapHeight;
-
-          if (horizontal && verticalHit) {
-            alive = false;
-            finishGame('You hit a pipe! Score: ' + score + '. Tap Restart to try again.');
-          }
-        });
-
-        pipes = pipes.filter(pipe => pipe.x + pipeWidth > -5);
-
-        if (bird.y - bird.r < 0 || bird.y + bird.r > canvas.height) {
-          alive = false;
-          finishGame('Flight ended! Score: ' + score + '. Tap Restart to try again.');
-        }
-      }
-
-      let score = 0;
-
-      setPad('flap', {
-        action: () => { flapQueued = true; }
+      touchpadCleanup = setupTouchpad({
+        onTap: () => { flapQueued = true; }
       });
 
       const removeKeys = listenKey((event, pressed) => {
@@ -2165,7 +1931,54 @@
       canvas.addEventListener('pointerdown', clickFlap);
 
       const removeLoop = rafLoop(dt => {
-        update(dt);
+        if (!alive) return;
+
+        if (flapQueued) {
+          flapQueued = false;
+          flap();
+        }
+
+        if (!started) {
+          draw();
+          return;
+        }
+
+        elapsed += dt;
+        bird.vy += gravity * dt;
+        bird.y += bird.vy * dt;
+
+        spawnTimer -= dt;
+        if (spawnTimer <= 0) {
+          const top = 50 + Math.random() * (canvas.height - gapHeight - 110);
+          pipes.push({ x: canvas.width + 5, top, scored: false });
+          spawnTimer = 1.3;
+        }
+
+        pipes.forEach(pipe => {
+          pipe.x -= 140 * dt;
+
+          if (!pipe.scored && pipe.x + pipeWidth < bird.x) {
+            pipe.scored = true;
+            score++;
+            setScore(score);
+          }
+
+          const horizontal = bird.x + bird.r > pipe.x && bird.x - bird.r < pipe.x + pipeWidth;
+          const verticalHit = bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.top + gapHeight;
+
+          if (horizontal && verticalHit) {
+            alive = false;
+            finishGame('You hit a pipe! Score: ' + score + '. Tap Restart.');
+          }
+        });
+
+        pipes = pipes.filter(pipe => pipe.x + pipeWidth > -5);
+
+        if (bird.y - bird.r < 0 || bird.y + bird.r > canvas.height) {
+          alive = false;
+          finishGame('Flight ended! Score: ' + score + '. Tap Restart.');
+        }
+
         draw();
       });
 
@@ -2173,6 +1986,7 @@
         alive = false;
         removeKeys();
         removeLoop();
+        touchpadCleanup();
         canvas.removeEventListener('pointerdown', clickFlap);
       };
     }
@@ -2198,21 +2012,12 @@
     }
 
     cleanupCurrent = () => {
-      controllerCleanups.forEach(fn => {
-        try { fn(); } catch (_) {}
-      });
-      controllerCleanups = [];
-
+      try { touchpadCleanup(); } catch (_) {}
       try { gameCleanup(); } catch (_) {}
-
-      if (gamepad && gamepad.isConnected) {
-        gamepad.querySelectorAll('button').forEach(button => {
-          button.classList.remove('nx-active');
-        });
-      }
     };
   }
 
   injectStyles();
   renderHome();
 })();
+
