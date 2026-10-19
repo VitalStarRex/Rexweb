@@ -45,12 +45,11 @@ h1{font-size:clamp(32px,6vw,48px);margin:15px 0}
 .tool-heading{display:flex;align-items:center;gap:10px}
 .tool-icon{font-size:24px}
 .tool-heading h3{font-size:16px}
-.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px;flex-shrink:0}
+.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px;flex-shrink:0;transition:transform .2s}
 .tool-toggle:hover{border-color:var(--blue)}
 .tool-content{padding-top:13px}
 .tool-card.collapsed .tool-content{display:none}
 .tool-card.collapsed .tool-toggle{transform:rotate(-90deg)}
-.tool-toggle{transition:transform .2s}
 .tool-card .desc{color:var(--muted);font-size:12px;line-height:1.6;margin:9px 0 13px}
 label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
 input:not([type=checkbox]):not([type=range]):not([type=color]),textarea,select{
@@ -77,6 +76,28 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 .menu{display:none;position:fixed;z-index:50;right:10px;top:65px;width:min(300px,90vw);padding:15px;background:var(--surface);border:1px solid var(--border);border-radius:12px;max-height:80vh;overflow:auto}
 .menu.open{display:block}
 .menu a{display:block;padding:12px;border:1px solid var(--border);border-radius:8px;margin:6px 0;font-size:13px}
+
+/* NAVIGATION BRANDING */
+.nav-brand{
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px 0 16px;
+font-size:15px;
+font-weight:900;
+letter-spacing:2px;
+color:var(--blue);
+}
+.nav-brand span{
+width:28px;
+height:28px;
+display:grid;
+place-items:center;
+border-radius:8px;
+background:linear-gradient(135deg,#008dff,#8650ff);
+color:#fff;
+letter-spacing:0;
+}
 
 /* CODE BOARD & PREVIEW WRAPPER */
 .preview-wrapper{position:relative;border:2px solid var(--blue);border-radius:12px;overflow:hidden;background:white}
@@ -105,28 +126,30 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 <div class="container topbar">
 <a class="brand" href="index.html">Rex<span>Web</span></a>
 <div class="actions">
-<button class="icon-btn" id="themeToggle" aria-label="Switch theme">☀️</button>
-<button class="icon-btn" id="menuToggle" aria-label="Open menu">☰</button>
+<button class="icon-btn" id="themeToggle" aria-label="Switch theme" type="button">☀️</button>
+<button class="icon-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false" type="button">☰</button>
 </div>
 </div>
-<nav class="category-nav">
+
+<nav class="category-nav" aria-label="Main navigation">
 <div class="container category-row">
 <a href="index.html">🏠 Home</a>
 <a href="tools.html">🛠️ Tools</a>
 <a href="templates.html">💻 Web Templates</a>
-<a href="video-editor.html">🎬Video Editor</a>
+<a href="video-editor.html">🎬 Video Editor</a>
 <a href="ebooks.html">📚 Ebooks</a>
 <a href="games.html">🎮 Games</a>
 <a href="marketplace.html">🛍️ Marketplace</a>
 </div>
+<div class="container nav-brand"><span>R</span> REXWEB DIGITAL</div>
 </nav>
 </header>
 
-<nav class="menu" id="sideMenu">
+<nav class="menu" id="sideMenu" aria-label="Additional navigation">
 <a href="index.html">🏠 Home</a>
-<a href="tools.html">🛠️ Digital Tools</a>
+<a href="tools.html">🛠️ Tools</a>
 <a href="templates.html">💻 Web Templates</a>
-<a href="video-editor.html">🎬Video Editor</a>
+<a href="video-editor.html">🎬 Video Editor</a>
 <a href="ebooks.html">📚 Ebooks</a>
 <a href="games.html">🎮 Games</a>
 <a href="marketplace.html">🛍️ Marketplace</a>
@@ -149,16 +172,14 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </section>
 
 <main class="container section">
-<h2>Explore Online Tools</h2>
-<p class="muted">Tap + to expand a tool and − to collapse it.</p>
-<input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools...">
+<input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools..." aria-label="Search tools">
 
 <div class="grid" id="toolsGrid">
 
 <!-- ================= CALCULATING TOOLS ================= -->
 
 <!-- SCIENTIFIC CALCULATOR -->
-<article class="tool-card calc collapsed" data-name="scientific calculator math trigonometry">
+<article class="tool-card calc collapsed" data-name="scientific calculator math trigonometry" data-category="Calculators">
 <div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Scientific Calculator">+</button></div>
 <div class="tool-content">
 <p class="desc">Scientific functions, powers, roots, trigonometry and arithmetic. Trigonometric functions use degrees.</p>
@@ -178,396 +199,111 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- STOPWATCH AND TIMER -->
-<article class="tool-card collapsed" data-name="stopwatch and timer clock countdown">
+<article class="tool-card collapsed" data-name="stopwatch and timer clock countdown" data-category="Time">
 <div class="tool-heading"><span class="tool-icon">⏱️</span><h3>Stopwatch and Timer</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stopwatch and Timer">+</button></div>
 <div class="tool-content">
 <p class="desc">Precise stopwatch with lap tracking and countdown timer functionality.</p>
 <h4 style="margin-top:10px;font-size:14px;color:var(--blue);">Stopwatch</h4>
 <div class="result" id="stopwatchDisplay" style="font-size:24px;text-align:center;font-weight:bold;">00:00:00</div>
 <div class="row">
-<button class="btn" id="swStart">Start</button>
-<button class="btn alt" id="swPause">Pause</button>
-<button class="btn alt" id="swLap">Lap</button>
-<button class="btn alt" id="swReset">Reset</button>
+<button class="btn" id="swStart">Start</button><button class="btn alt" id="swPause">Pause</button><button class="btn alt" id="swLap">Lap</button><button class="btn alt" id="swReset">Reset</button>
 </div>
 <div class="result" id="swLaps" style="max-height:90px;overflow:auto;font-size:12px;">No laps recorded.</div>
-
 <h4 style="margin-top:20px;font-size:14px;color:var(--blue);">Countdown Timer</h4>
 <div class="row">
 <input type="number" id="timerSeconds" placeholder="Seconds" value="60" min="1" style="max-width:140px;">
-<button class="btn" id="timerStart">Start Timer</button>
-<button class="btn alt" id="timerReset">Reset</button>
+<button class="btn" id="timerStart">Start Timer</button><button class="btn alt" id="timerReset">Reset</button>
 </div>
 <div class="result" id="timerDisplay" style="font-size:20px;text-align:center;font-weight:bold;">00:00</div>
 </div>
 </article>
 
-<!-- REXWEB ENHANCED AGE CALCULATOR -->
-<article class="tool-card collapsed" data-name="age calculator date birthday calendar">
-
-  <div class="tool-heading">
-    <span class="tool-icon">📅</span>
-    <h3>Age Calculator</h3>
-    <button class="tool-toggle"
-      aria-expanded="false"
-      aria-label="Expand Age Calculator">+</button>
-  </div>
-
-  <div class="tool-content">
-
-    <p class="desc">
-      Calculate your exact age in years, months, and days.
-    </p>
-
-    <style>
-      .rex-age-box {
-        background: #071329;
-        border: 1px solid #123d70;
-        border-radius: 18px;
-        padding: 16px;
-        color: #f4f7ff;
-        margin-top: 15px;
-      }
-
-      .rex-age-box * {
-        box-sizing: border-box;
-      }
-
-      .rex-age-title {
-        font-size: 22px;
-        font-weight: 800;
-        margin-bottom: 6px;
-      }
-
-      .rex-age-subtitle {
-        color: #9db8ed;
-        margin-bottom: 20px;
-        font-size: 14px;
-      }
-
-      .rex-age-fields {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-      }
-
-      .rex-age-field label {
-        display: block;
-        font-size: 12px;
-        color: #a8c4f5;
-        margin-bottom: 7px;
-      }
-
-      .rex-age-field select {
-        width: 100%;
-        min-width: 0;
-        padding: 12px 5px;
-        border-radius: 10px;
-        background: #0a1b36;
-        border: 1px solid #00cfff;
-        color: white;
-        font-size: 14px;
-        outline: none;
-      }
-
-      .rex-age-field select:focus {
-        border-color: #a855ff;
-        box-shadow: 0 0 0 2px #a855ff33;
-      }
-
-      .rex-age-calendar {
-        margin-top: 18px;
-        background: #061127;
-        border: 1px solid #16477c;
-        border-radius: 14px;
-        padding: 12px;
-      }
-
-      .rex-age-calendar-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-      }
-
-      .rex-age-calendar-head strong {
-        color: #c6b0ff;
-        font-size: 15px;
-      }
-
-      .rex-age-nav {
-        display: flex;
-        gap: 6px;
-      }
-
-      .rex-age-nav button {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #174779;
-        background: #0a1b36;
-        color: #fff;
-        border-radius: 9px;
-        font-size: 20px;
-        cursor: pointer;
-      }
-
-      .rex-age-weekdays,
-      .rex-age-days {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 4px;
-      }
-
-      .rex-age-weekdays span {
-        text-align: center;
-        color: #8caee9;
-        font-size: 12px;
-        padding: 8px 0;
-      }
-
-      .rex-age-days button {
-        min-width: 0;
-        aspect-ratio: 1 / 1;
-        border: 1px solid transparent;
-        background: transparent;
-        color: #eef3ff;
-        border-radius: 9px;
-        font-size: 13px;
-        cursor: pointer;
-      }
-
-      .rex-age-days button:not(:disabled):hover {
-        border-color: #00d9ff;
-        background: #0d2a4d;
-      }
-
-      .rex-age-days button.selected {
-        background: linear-gradient(135deg, #a855ff, #6735ff);
-        color: white;
-        font-weight: bold;
-      }
-
-      .rex-age-days button:disabled {
-        color: #34445f;
-        cursor: not-allowed;
-      }
-
-      .rex-age-selected {
-        background: #091b38;
-        border: 1px solid #16477c;
-        border-radius: 12px;
-        padding: 15px;
-        margin-top: 15px;
-      }
-
-      .rex-age-selected small {
-        color: #9db8ed;
-        display: block;
-        margin-bottom: 5px;
-      }
-
-      .rex-age-selected strong {
-        display: block;
-        font-size: 16px;
-        line-height: 1.5;
-        overflow-wrap: anywhere;
-      }
-
-      .rex-age-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .rex-age-actions button {
-        padding: 13px 8px;
-        border-radius: 11px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .rex-age-clear {
-        background: transparent;
-        border: 1px solid #00d9ff;
-        color: #00d9ff;
-      }
-
-      .rex-age-apply {
-        background: linear-gradient(135deg, #a855ff, #6735ff);
-        border: 0;
-        color: white;
-      }
-
-      .rex-age-result {
-        margin-top: 16px;
-        padding: 15px;
-        border-radius: 14px;
-        border: 1px solid #16477c;
-        background: #071329;
-        line-height: 1.8;
-        overflow-wrap: anywhere;
-      }
-
-      .rex-age-result .age-heading {
-        color: #65eaff;
-        font-size: 15px;
-        font-weight: bold;
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      .rex-age-result .age-label {
-        color: #65eaff;
-        font-weight: bold;
-      }
-
-      @media (max-width: 360px) {
-        .rex-age-box {
-          padding: 10px;
-        }
-
-        .rex-age-field select {
-          font-size: 12px;
-        }
-
-        .rex-age-days button {
-          font-size: 12px;
-        }
-      }
-    </style>
-
-    <div class="rex-age-box">
-
-      <div class="rex-age-title">Select Your Birthday</div>
-
-      <div class="rex-age-subtitle">
-        Choose your year, month, and day.
-      </div>
-
-      <div class="rex-age-fields">
-
-        <div class="rex-age-field">
-          <label for="rexBirthYear">YEAR</label>
-          <select id="rexBirthYear">
-            <option value="">Year</option>
-          </select>
-        </div>
-
-        <div class="rex-age-field">
-          <label for="rexBirthMonth">MONTH</label>
-          <select id="rexBirthMonth">
-            <option value="">Month</option>
-          </select>
-        </div>
-
-        <div class="rex-age-field">
-          <label for="rexBirthDay">DAY</label>
-          <select id="rexBirthDay">
-            <option value="">Day</option>
-          </select>
-        </div>
-
-      </div>
-
-      <div class="rex-age-calendar">
-
-        <div class="rex-age-calendar-head">
-          <strong id="rexCalendarTitle">Choose a date</strong>
-
-          <div class="rex-age-nav">
-            <button type="button" id="rexPrevMonth"
-              aria-label="Previous month">‹</button>
-
-            <button type="button" id="rexNextMonth"
-              aria-label="Next month">›</button>
-          </div>
-        </div>
-
-        <div class="rex-age-weekdays">
-          <span>S</span>
-          <span>M</span>
-          <span>T</span>
-          <span>W</span>
-          <span>T</span>
-          <span>F</span>
-          <span>S</span>
-        </div>
-
-        <div class="rex-age-days" id="rexCalendarDays"></div>
-
-      </div>
-
-      <div class="rex-age-selected">
-        <small>Selected Birthday</small>
-        <strong id="rexSelectedDate">No date selected</strong>
-      </div>
-
-      <div class="rex-age-actions">
-        <button type="button" class="rex-age-clear"
-          id="rexClearDate">Clear</button>
-
-        <button type="button" class="rex-age-apply"
-          id="rexApplyDate">Use Birthday ✓</button>
-      </div>
-
-      <div class="rex-age-result" id="ageResult" aria-live="polite">
-        Your age details will appear here.
-      </div>
-
-    </div>
-
-  </div>
+<!-- AGE CALCULATOR -->
+<article class="tool-card collapsed" data-name="age calculator date birthday calendar" data-category="Calculators">
+<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Age Calculator">+</button></div>
+<div class="tool-content">
+<p class="desc">Calculate your exact age in years, months, and days.</p>
+<style>
+.rex-age-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;color:var(--text);margin-top:15px}
+.rex-age-box *{box-sizing:border-box}
+.rex-age-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.rex-age-subtitle{color:var(--muted);margin-bottom:20px;font-size:14px}
+.rex-age-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rex-age-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+.rex-age-field select{width:100%;min-width:0;padding:12px 5px;border-radius:10px;background:var(--bg);border:1px solid var(--blue);color:var(--text);font-size:14px;outline:none}
+.rex-age-calendar{margin-top:18px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:12px}
+.rex-age-calendar-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.rex-age-calendar-head strong{color:#a56aff;font-size:15px}
+.rex-age-nav{display:flex;gap:6px}
+.rex-age-nav button{width:36px;height:36px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:9px;font-size:20px}
+.rex-age-weekdays,.rex-age-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.rex-age-weekdays span{text-align:center;color:var(--muted);font-size:12px;padding:8px 0}
+.rex-age-days button{min-width:0;aspect-ratio:1;border:1px solid transparent;background:transparent;color:var(--text);border-radius:9px;font-size:13px}
+.rex-age-days button:not(:disabled):hover{border-color:var(--blue);background:var(--card)}
+.rex-age-days button.selected{background:linear-gradient(135deg,#a855ff,#6735ff);color:white;font-weight:bold}
+.rex-age-days button:disabled{color:var(--muted);opacity:.35;cursor:not-allowed}
+.rex-age-selected{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;margin-top:15px}
+.rex-age-selected small{color:var(--muted);display:block;margin-bottom:5px}
+.rex-age-selected strong{display:block;font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+.rex-age-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.rex-age-actions button{padding:13px 8px;border-radius:11px;font-size:14px;font-weight:bold}
+.rex-age-clear{background:transparent;border:1px solid var(--blue);color:var(--blue)}
+.rex-age-apply{background:linear-gradient(135deg,#a855ff,#6735ff);border:0;color:white}
+.rex-age-result{margin-top:16px;padding:15px;border-radius:14px;border:1px solid var(--border);background:var(--card);line-height:1.8;overflow-wrap:anywhere}
+.rex-age-result .age-heading{color:var(--blue);font-size:15px;font-weight:bold;display:block;margin-bottom:4px}
+.rex-age-result .age-label{color:var(--blue);font-weight:bold}
+@media(max-width:360px){.rex-age-box{padding:10px}.rex-age-field select,.rex-age-days button{font-size:12px}}
+</style>
+<div class="rex-age-box">
+<div class="rex-age-title">Select Your Birthday</div>
+<div class="rex-age-subtitle">Choose your year, month, and day.</div>
+<div class="rex-age-fields">
+<div class="rex-age-field"><label for="rexBirthYear">YEAR</label><select id="rexBirthYear"><option value="">Year</option></select></div>
+<div class="rex-age-field"><label for="rexBirthMonth">MONTH</label><select id="rexBirthMonth"><option value="">Month</option></select></div>
+<div class="rex-age-field"><label for="rexBirthDay">DAY</label><select id="rexBirthDay"><option value="">Day</option></select></div>
+</div>
+<div class="rex-age-calendar">
+<div class="rex-age-calendar-head"><strong id="rexCalendarTitle">Choose a date</strong><div class="rex-age-nav"><button type="button" id="rexPrevMonth" aria-label="Previous month">‹</button><button type="button" id="rexNextMonth" aria-label="Next month">›</button></div></div>
+<div class="rex-age-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+<div class="rex-age-days" id="rexCalendarDays"></div>
+</div>
+<div class="rex-age-selected"><small>Selected Birthday</small><strong id="rexSelectedDate">No date selected</strong></div>
+<div class="rex-age-actions"><button type="button" class="rex-age-clear" id="rexClearDate">Clear</button><button type="button" class="rex-age-apply" id="rexApplyDate">Use Birthday ✓</button></div>
+<div class="rex-age-result" id="ageResult" aria-live="polite">Your age details will appear here.</div>
+</div>
+</div>
 </article>
 
 <!-- PERCENTAGE CALCULATOR -->
-<article class="tool-card collapsed" data-name="percentage calculator math finance">
+<article class="tool-card collapsed" data-name="percentage calculator math finance" data-category="Calculators">
 <div class="tool-heading"><span class="tool-icon">💯</span><h3>Percentage Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Percentage Calculator">+</button></div>
 <div class="tool-content">
 <p class="desc">Calculate percentages, increases, decreases, and proportions instantly.</p>
 <label>What is</label>
-<div class="row">
-<input type="number" id="p1" placeholder="X" style="flex:1;">
-<span style="align-self:center;color:var(--muted)">% of</span>
-<input type="number" id="p2" placeholder="Y" style="flex:1;">
-</div>
+<div class="row"><input type="number" id="p1" placeholder="X" style="flex:1;"><span style="align-self:center;color:var(--muted)">% of</span><input type="number" id="p2" placeholder="Y" style="flex:1;"></div>
 <div class="row"><button class="btn" id="calcPercent1">Calculate</button></div>
 <div class="result" id="percentResult1">Result will appear here.</div>
-
 <label style="margin-top:15px;">Percentage Increase / Decrease from X to Y</label>
-<div class="row">
-<input type="number" id="p3" placeholder="Initial value X" style="flex:1;">
-<input type="number" id="p4" placeholder="Final value Y" style="flex:1;">
-</div>
+<div class="row"><input type="number" id="p3" placeholder="Initial value X" style="flex:1;"><input type="number" id="p4" placeholder="Final value Y" style="flex:1;"></div>
 <div class="row"><button class="btn" id="calcPercent2">Calculate Change</button></div>
 <div class="result" id="percentResult2">Change result will appear here.</div>
 </div>
 </article>
 
-
-<!-- ================= CONVERTERS ================= -->
-
 <!-- CASE CONVERTER -->
-<article class="tool-card collapsed" data-name="case converter uppercase lowercase title text">
+<article class="tool-card collapsed" data-name="case converter uppercase lowercase title text" data-category="Text">
 <div class="tool-heading"><span class="tool-icon">🔠</span><h3>Case Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Case Converter">+</button></div>
 <div class="tool-content">
 <p class="desc">Convert text into uppercase, lowercase, title case, or sentence case.</p>
 <textarea id="caseInput" placeholder="Enter your text..."></textarea>
-<div class="row">
-<button class="btn" data-case="upper">UPPERCASE</button>
-<button class="btn" data-case="lower">lowercase</button>
-<button class="btn" data-case="title">Title Case</button>
-<button class="btn alt" data-case="sentence">Sentence case</button>
-</div>
+<div class="row"><button class="btn" data-case="upper">UPPERCASE</button><button class="btn" data-case="lower">lowercase</button><button class="btn" data-case="title">Title Case</button><button class="btn alt" data-case="sentence">Sentence case</button></div>
 <div class="row"><button class="btn alt" id="copyCase">Copy Result</button></div>
 <div class="result" id="caseResult">Converted text appears in the editor above.</div>
 </div>
 </article>
 
 <!-- URL CONVERTER -->
-<article class="tool-card collapsed" data-name="url encoder decoder links">
+<article class="tool-card collapsed" data-name="url encoder decoder links" data-category="Converters">
 <div class="tool-heading"><span class="tool-icon">🔗</span><h3>URL Encoder / Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand URL Encoder / Decoder">+</button></div>
 <div class="tool-content">
 <p class="desc">Encode or decode URL text.</p>
@@ -578,88 +314,56 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- NUMBER BASE CONVERTER -->
-<article class="tool-card collapsed" data-name="number base binary decimal hexadecimal converter">
+<article class="tool-card collapsed" data-name="number base binary decimal hexadecimal converter" data-category="Converters">
 <div class="tool-heading"><span class="tool-icon">🔢</span><h3>Number Base Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Number Base Converter">+</button></div>
 <div class="tool-content">
 <p class="desc">Convert whole numbers between binary, octal, decimal, and hexadecimal.</p>
 <label>Number</label><input id="baseInput" placeholder="Example: 1010">
-<label>Input base</label>
-<select id="baseFrom"><option value="2">Binary</option><option value="8">Octal</option><option value="10" selected>Decimal</option><option value="16">Hexadecimal</option></select>
+<label>Input base</label><select id="baseFrom"><option value="2">Binary</option><option value="8">Octal</option><option value="10" selected>Decimal</option><option value="16">Hexadecimal</option></select>
 <div class="row"><button class="btn" id="convertBase">Convert</button></div>
 <div class="result" id="baseResult">Converted values appear here.</div>
 </div>
 </article>
 
-<!-- IMAGE FORMAT CONVERTER (10 FORMATS) -->
-<article class="tool-card collapsed" data-name="image format converter png jpeg webp avif bmp ico gif tiff heic svg">
+<!-- IMAGE FORMAT CONVERTER -->
+<article class="tool-card collapsed" data-name="image format converter png jpeg webp avif bmp ico gif tiff heic svg" data-category="Images">
 <div class="tool-heading"><span class="tool-icon">🔄</span><h3>Image Format Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Image Format Converter">+</button></div>
 <div class="tool-content">
-<p class="desc">Convert images across 10 different formats instantly in your browser.</p>
-<label for="convImageFile">Upload Image</label>
-<input type="file" id="convImageFile" accept="image/*">
+<p class="desc">Convert images across 10 different formats in your browser. Browser support varies by format.</p>
+<label for="convImageFile">Upload Image</label><input type="file" id="convImageFile" accept="image/*">
 <label>Target Format</label>
-<select id="targetFormat">
-<option value="image/png">PNG (.png)</option>
-<option value="image/jpeg">JPEG (.jpg)</option>
-<option value="image/webp">WEBP (.webp)</option>
-<option value="image/avif">AVIF (.avif)</option>
-<option value="image/bmp">BMP (.bmp)</option>
-<option value="image/x-icon">ICO (.ico)</option>
-<option value="image/gif">GIF (.gif)</option>
-<option value="image/tiff">TIFF (.tiff)</option>
-<option value="image/heic">HEIC (.heic)</option>
-<option value="image/svg+xml">SVG (.svg)</option>
-</select>
-<div class="row">
-<button class="btn" id="convertImgBtn">Convert & Download</button>
-</div>
+<select id="targetFormat"><option value="image/png">PNG (.png)</option><option value="image/jpeg">JPEG (.jpg)</option><option value="image/webp">WEBP (.webp)</option><option value="image/avif">AVIF (.avif)</option><option value="image/bmp">BMP (.bmp)</option><option value="image/x-icon">ICO (.ico)</option><option value="image/gif">GIF (.gif)</option><option value="image/tiff">TIFF (.tiff)</option><option value="image/heic">HEIC (.heic)</option><option value="image/svg+xml">SVG (.svg)</option></select>
+<div class="row"><button class="btn" id="convertImgBtn">Convert & Download</button></div>
 <div class="result" id="convImgResult">Upload an image and choose format to convert.</div>
 </div>
 </article>
 
 <!-- UNIT CONVERTER -->
-<article class="tool-card collapsed" data-name="unit converter length weight temperature data">
+<article class="tool-card collapsed" data-name="unit converter length weight temperature data" data-category="Converters">
 <div class="tool-heading"><span class="tool-icon">⚖️</span><h3>Unit Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Unit Converter">+</button></div>
 <div class="tool-content">
 <p class="desc">Convert length, weight, temperature, and digital data units.</p>
-<label>Category</label>
-<select id="unitCategory">
-<option value="length">Length (Meters, Feet, Inches, Kilometers)</option>
-<option value="weight">Weight (Kilograms, Pounds, Grams, Ounces)</option>
-<option value="temp">Temperature (Celsius, Fahrenheit, Kelvin)</option>
-<option value="data">Data Storage (MB, GB, TB, KB)</option>
-</select>
-<label>Value</label>
-<input type="number" id="unitVal" value="1">
-<div class="row">
-<div style="flex:1;"><label>From</label><select id="unitFrom"></select></div>
-<div style="flex:1;"><label>To</label><select id="unitTo"></select></div>
-</div>
+<label>Category</label><select id="unitCategory"><option value="length">Length (Meters, Feet, Inches, Kilometers)</option><option value="weight">Weight (Kilograms, Pounds, Grams, Ounces)</option><option value="temp">Temperature (Celsius, Fahrenheit, Kelvin)</option><option value="data">Data Storage (MB, GB, TB, KB)</option></select>
+<label>Value</label><input type="number" id="unitVal" value="1">
+<div class="row"><div style="flex:1;"><label>From</label><select id="unitFrom"></select></div><div style="flex:1;"><label>To</label><select id="unitTo"></select></div></div>
 <div class="row"><button class="btn" id="convertUnitBtn">Convert</button></div>
 <div class="result" id="unitResult">Converted result appears here.</div>
 </div>
 </article>
 
 <!-- HTML ENTITY ENCODER AND DECODER -->
-<article class="tool-card collapsed" data-name="html entity encoder decoder escape">
+<article class="tool-card collapsed" data-name="html entity encoder decoder escape" data-category="Coding">
 <div class="tool-heading"><span class="tool-icon">🔤</span><h3>HTML Entity Encoder and Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Entity Encoder and Decoder">+</button></div>
 <div class="tool-content">
 <p class="desc">Encode special characters into safe HTML entities or decode entities back to text.</p>
 <textarea id="entityInput" placeholder="Enter text or HTML entities (&lt;div&gt;)..."></textarea>
-<div class="row">
-<button class="btn" id="encodeEntity">Encode Entities</button>
-<button class="btn" id="decodeEntity">Decode Entities</button>
-<button class="btn alt" id="copyEntity">Copy Result</button>
-</div>
+<div class="row"><button class="btn" id="encodeEntity">Encode Entities</button><button class="btn" id="decodeEntity">Decode Entities</button><button class="btn alt" id="copyEntity">Copy Result</button></div>
 <div class="result" id="entityResult">Converted result appears here.</div>
 </div>
 </article>
 
-
-<!-- ================= CODING & UTILITY TOOLS ================= -->
-
 <!-- ADVANCED TEXT COUNTER -->
-<article class="tool-card collapsed" data-name="text word character sentence paragraph counter reading time">
+<article class="tool-card collapsed" data-name="text word character sentence paragraph counter reading time" data-category="Text">
 <div class="tool-heading"><span class="tool-icon">📝</span><h3>Advanced Text Counter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Text Counter">+</button></div>
 <div class="tool-content">
 <p class="desc">Track words, characters, paragraphs, sentences, spaces, and estimated reading time.</p>
@@ -670,7 +374,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- PASSWORD GENERATOR -->
-<article class="tool-card collapsed" data-name="password generator secure random">
+<article class="tool-card collapsed" data-name="password generator secure random" data-category="Security">
 <div class="tool-heading"><span class="tool-icon">🔐</span><h3>Password Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Password Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Create a random password locally in your browser.</p>
@@ -684,42 +388,28 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- ADVANCED CODE BOARD -->
-<article class="tool-card collapsed" data-name="code board html css javascript editor preview upload files fullscreen">
+<article class="tool-card collapsed" data-name="code board html css javascript editor preview upload files fullscreen" data-category="Coding">
 <div class="tool-heading"><span class="tool-icon">💻</span><h3>Advanced Code Board</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Code Board">+</button></div>
 <div class="tool-content">
 <p class="desc">Write code, upload HTML/CSS/JS files, and preview your project. Tap the preview to open fullscreen.</p>
-
 <label>Live Preview — Tap to Open Fullscreen</label>
-<div class="preview-wrapper" id="previewWrapper">
-<button class="preview-action" id="fullscreenPreview" type="button">⛶ Fullscreen</button>
-<iframe id="codePreview" class="preview-frame" title="Live code preview" sandbox="allow-scripts"></iframe>
-<div class="preview-hint" id="previewHint">👆 Tap here to open fullscreen preview</div>
-</div>
-
-<label for="codeFiles">Upload HTML, CSS or JavaScript files</label>
-<input type="file" id="codeFiles" accept=".html,.htm,.css,.js,text/html,text/css,text/javascript,application/javascript" multiple>
+<div class="preview-wrapper" id="previewWrapper"><button class="preview-action" id="fullscreenPreview" type="button">⛶ Fullscreen</button><iframe id="codePreview" class="preview-frame" title="Live code preview" sandbox="allow-scripts"></iframe><div class="preview-hint" id="previewHint">👆 Tap here to open fullscreen preview</div></div>
+<label for="codeFiles">Upload HTML, CSS or JavaScript files</label><input type="file" id="codeFiles" accept=".html,.htm,.css,.js,text/html,text/css,text/javascript,application/javascript" multiple>
 <p class="desc">Select your HTML file and any CSS or JavaScript files it needs.</p>
 <div class="result file-list" id="uploadedFiles">No files selected.</div>
-
 <label for="codeInput">HTML / CSS / JavaScript Editor</label>
 <textarea id="codeInput" style="min-height:220px;font-family:monospace" spellcheck="false" placeholder="<!DOCTYPE html>
 <html>
 <head><title>My Project</title></head>
 <body><h1>Hello RexWeb!</h1></body>
 </html>"></textarea>
-
-<div class="row">
-<button class="btn" id="runCode">▶ Run Preview</button>
-<button class="btn alt" id="copyCode">Copy Code</button>
-<button class="btn alt" id="clearCode">Clear Editor</button>
-<button class="btn alt" id="clearFiles">Remove Files</button>
-</div>
+<div class="row"><button class="btn" id="runCode">▶ Run Preview</button><button class="btn alt" id="copyCode">Copy Code</button><button class="btn alt" id="clearCode">Clear Editor</button><button class="btn alt" id="clearFiles">Remove Files</button></div>
 <div class="result" id="codeStatus">Ready to preview your project.</div>
 </div>
 </article>
 
 <!-- COLOR PICKER -->
-<article class="tool-card collapsed" data-name="color picker hex rgb colour design">
+<article class="tool-card collapsed" data-name="color picker hex rgb colour design" data-category="Design">
 <div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Picker</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Picker">+</button></div>
 <div class="tool-content">
 <p class="desc">Select a color and obtain HEX and RGB values.</p>
@@ -730,7 +420,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- TEXT REVERSER -->
-<article class="tool-card collapsed" data-name="text reverse letters">
+<article class="tool-card collapsed" data-name="text reverse letters" data-category="Text">
 <div class="tool-heading"><span class="tool-icon">🔄</span><h3>Text Reverser</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Text Reverser">+</button></div>
 <div class="tool-content">
 <p class="desc">Reverse the order of characters in text.</p>
@@ -741,7 +431,7 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- HTML FORMATTER -->
-<article class="tool-card collapsed" data-name="html formatter code developer">
+<article class="tool-card collapsed" data-name="html formatter code developer" data-category="Coding">
 <div class="tool-heading"><span class="tool-icon">🧩</span><h3>HTML Formatter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Formatter">+</button></div>
 <div class="tool-content">
 <p class="desc">Format basic HTML with indentation for easier reading.</p>
@@ -752,14 +442,11 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- CSS GRADIENT GENERATOR -->
-<article class="tool-card collapsed" data-name="css gradient generator color background designer">
+<article class="tool-card collapsed" data-name="css gradient generator color background designer" data-category="Design">
 <div class="tool-heading"><span class="tool-icon">🌈</span><h3>CSS Gradient Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Create beautiful linear or radial CSS gradients with custom color stops and angles.</p>
-<div class="row">
-<div style="flex:1;"><label>Color 1</label><input type="color" id="gradColor1" value="#00c8ff"></div>
-<div style="flex:1;"><label>Color 2</label><input type="color" id="gradColor2" value="#8650ff"></div>
-</div>
+<div class="row"><div style="flex:1;"><label>Color 1</label><input type="color" id="gradColor1" value="#00c8ff"></div><div style="flex:1;"><label>Color 2</label><input type="color" id="gradColor2" value="#8650ff"></div></div>
 <label>Direction / Angle: <span id="gradAngleVal">90</span>°</label>
 <input type="range" id="gradAngle" min="0" max="360" value="90">
 <div id="gradPreview" style="width:100%;height:80px;border-radius:8px;margin:12px 0;border:1px solid var(--border);"></div>
@@ -769,10 +456,10 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- QR CODE GENERATOR -->
-<article class="tool-card collapsed" data-name="qr code generator link text barcode">
+<article class="tool-card collapsed" data-name="qr code generator link text barcode" data-category="Utilities">
 <div class="tool-heading"><span class="tool-icon">📱</span><h3>QR Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand QR Code Generator">+</button></div>
 <div class="tool-content">
-<p class="desc">Generate a clean QR code from any text or website link.</p>
+<p class="desc">Generate a QR code from any text or website link.</p>
 <textarea id="qrInput" placeholder="Enter text or URL..."></textarea>
 <div class="row"><button class="btn" id="generateQr">Generate QR Code</button></div>
 <div style="text-align:center;margin-top:12px;" id="qrContainer"></div>
@@ -781,32 +468,23 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- JSON FORMATTER AND VALIDATOR -->
-<article class="tool-card collapsed" data-name="json formatter validator parser code">
+<article class="tool-card collapsed" data-name="json formatter validator parser code" data-category="Coding">
 <div class="tool-heading"><span class="tool-icon">📋</span><h3>JSON Formatter & Validator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand JSON Formatter & Validator">+</button></div>
 <div class="tool-content">
-<p class="desc">Pretty print, minify, and validate JSON data strings effortlessly.</p>
+<p class="desc">Pretty print, minify, and validate JSON data strings.</p>
 <textarea id="jsonInput" style="font-family:monospace" placeholder='{"name": "RexWeb", "version": 1.0}'></textarea>
-<div class="row">
-<button class="btn" id="formatJson">Format / Pretty Print</button>
-<button class="btn alt" id="minifyJson">Minify</button>
-<button class="btn alt" id="validateJson">Validate</button>
-</div>
+<div class="row"><button class="btn" id="formatJson">Format / Pretty Print</button><button class="btn alt" id="minifyJson">Minify</button><button class="btn alt" id="validateJson">Validate</button></div>
 <div class="result" id="jsonResult">Formatted JSON or validation status appears here.</div>
 </div>
 </article>
 
 <!-- CSS GRADIENT-TO-CODE GENERATOR -->
-<article class="tool-card collapsed" data-name="css gradient to code generator multi stop">
+<article class="tool-card collapsed" data-name="css gradient to code generator multi stop" data-category="Design">
 <div class="tool-heading"><span class="tool-icon">🎨</span><h3>CSS Gradient-to-Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient-to-Code Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Generate production-ready multi-stop CSS gradient snippets with cross-browser fallbacks.</p>
 <label>Preset Style</label>
-<select id="gradPreset">
-<option value="sunset">Sunset Glow</option>
-<option value="ocean">Ocean Blue</option>
-<option value="neon">Neon Cyberpunk</option>
-<option value="emerald">Emerald Lush</option>
-</select>
+<select id="gradPreset"><option value="sunset">Sunset Glow</option><option value="ocean">Ocean Blue</option><option value="neon">Neon Cyberpunk</option><option value="emerald">Emerald Lush</option></select>
 <div id="gradPresetBox" style="width:100%;height:70px;border-radius:8px;margin:10px 0;border:1px solid var(--border);"></div>
 <div class="result" id="gradPresetResult">CSS code will appear here.</div>
 <div class="row"><button class="btn" id="copyGradPreset">Copy CSS Code</button></div>
@@ -814,20 +492,19 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 </article>
 
 <!-- COLOR PALETTE GENERATOR -->
-<article class="tool-card collapsed" data-name="color palette generator harmony design">
+<article class="tool-card collapsed" data-name="color palette generator harmony design" data-category="Design">
 <div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Palette Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Palette Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Generate harmonious color palettes based on any base color choice.</p>
-<label>Base Color</label>
-<input type="color" id="paletteBase" value="#008dff">
+<label>Base Color</label><input type="color" id="paletteBase" value="#008dff">
 <div class="row"><button class="btn" id="generatePalette">Generate Palette</button></div>
 <div class="row" id="paletteBoxes" style="margin-top:12px;gap:8px;"></div>
 <div class="result" id="paletteResult">Palette colors will appear here.</div>
 </div>
 </article>
 
-<!-- STYLISH TEXT GENERATOR (50 STYLES) -->
-<article class="tool-card collapsed" data-name="stylish text generator fonts unicode cool">
+<!-- STYLISH TEXT GENERATOR -->
+<article class="tool-card collapsed" data-name="stylish text generator fonts unicode cool" data-category="Text">
 <div class="tool-heading"><span class="tool-icon">✨</span><h3>Stylish Text Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stylish Text Generator">+</button></div>
 <div class="tool-content">
 <p class="desc">Transform your plain text into 50 unique Unicode styles and decorative effects.</p>
@@ -842,19 +519,15 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 
 <footer>
 <div class="container">
-<strong>RexWeb Nexora</strong>
+<strong>REXWEB DIGITAL</strong>
 <p style="margin-top:8px">Explore · Create · Grow</p>
 <p style="margin-top:8px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
 </div>
 </footer>
 
-<!-- FULLSCREEN PREVIEW -->
 <div id="previewFullscreen" class="fullscreen-overlay">
 <div class="fullscreen-layout">
-<div class="fullscreen-header">
-<strong>💻 RexWeb Live Preview</strong>
-<button id="closeFullscreen" class="close-preview">✕ Close</button>
-</div>
+<div class="fullscreen-header"><strong>💻 RexWeb Live Preview</strong><button id="closeFullscreen" class="close-preview">✕ Close</button></div>
 <iframe id="fullscreenFrame" class="fullscreen-frame" title="Fullscreen code preview"></iframe>
 </div>
 </div>
@@ -863,51 +536,178 @@ footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surfa
 const $=id=>document.getElementById(id);
 const show=(id,text)=>$(id).textContent=text;
 
-/* THEME */
+/* THEME: index.html is the source of truth */
+function getSharedTheme(){
+try{
+return localStorage.getItem("rexweb-theme")||
+localStorage.getItem("theme")||
+document.documentElement.dataset.theme||
+"dark";
+}catch(e){return document.documentElement.dataset.theme||"dark";}
+}
 function setTheme(theme){
+theme=theme==="light"?"light":"dark";
 document.documentElement.dataset.theme=theme;
 $("themeToggle").textContent=theme==="dark"?"☀️":"🌙";
 $("themeColor").content=theme==="dark"?"#050b19":"#f2f6ff";
-try{localStorage.setItem("rexweb-theme",theme)}catch(e){}
+try{
+localStorage.setItem("rexweb-theme",theme);
+localStorage.setItem("theme",theme);
+}catch(e){}
 }
-let savedTheme="dark";
-try{savedTheme=localStorage.getItem("rexweb-theme")||"dark"}catch(e){}
-setTheme(savedTheme);
-$("themeToggle").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
-
-/* MENU */
-$("menuToggle").onclick=()=>$("sideMenu").classList.toggle("open");
-document.addEventListener("click",e=>{
-if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle"))$("sideMenu").classList.remove("open");
+setTheme(getSharedTheme());
+$("themeToggle").onclick=()=>{
+const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
+setTheme(next);
+window.dispatchEvent(new CustomEvent("rexweb:themechange",{detail:{theme:next}}));
+};
+window.addEventListener("storage",e=>{
+if(e.key==="rexweb-theme"||e.key==="theme")setTheme(e.newValue||"dark");
 });
 
+/* MENU */
+$("menuToggle").onclick=()=>{
+const menu=$("sideMenu");
+const opened=menu.classList.toggle("open");
+$("menuToggle").setAttribute("aria-expanded",String(opened));
+$("menuToggle").setAttribute("aria-label",opened?"Close menu":"Open menu");
+};
+document.addEventListener("click",e=>{
+if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle")){
+$("sideMenu").classList.remove("open");
+$("menuToggle").setAttribute("aria-expanded","false");
+$("menuToggle").setAttribute("aria-label","Open menu");
+}
+});
+
+/* TOOL CATEGORIES AND FILTER */
+const toolsGrid=$("toolsGrid");
+const toolCards=Array.from(document.querySelectorAll(".tool-card"));
+const categories=["All",...new Set(toolCards.map(card=>card.dataset.category||"Other"))];
+let activeCategory="All";
+let searchQuery="";
+
+const categoryBar=document.createElement("div");
+categoryBar.className="category-filters";
+categoryBar.setAttribute("aria-label","Filter tools by category");
+categoryBar.style.cssText="display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:thin;";
+$("toolSearch").insertAdjacentElement("afterend",categoryBar);
+
+categories.forEach(category=>{
+const button=document.createElement("button");
+button.type="button";
+button.textContent=category;
+button.dataset.categoryFilter=category;
+button.style.cssText="flex-shrink:0;padding:9px 13px;border:1px solid var(--border);border-radius:20px;background:var(--card);color:var(--text);font-size:12px;font-weight:bold;";
+button.setAttribute("aria-pressed",String(category==="All"));
+button.onclick=()=>{
+activeCategory=category;
+categoryBar.querySelectorAll("button").forEach(b=>{
+const active=b.dataset.categoryFilter===category;
+b.setAttribute("aria-pressed",String(active));
+b.style.background=active?"linear-gradient(110deg,#008dff,#7545ff)":"var(--card)";
+b.style.color=active?"#fff":"var(--text)";
+b.style.borderColor=active?"var(--blue)":"var(--border)";
+});
+filterTools();
+};
+categoryBar.appendChild(button);
+});
+categoryBar.querySelector('[data-category-filter="All"]').click();
+
+function filterTools(){
+toolCards.forEach(card=>{
+const matchesCategory=activeCategory==="All"||(card.dataset.category||"Other")===activeCategory;
+const matchesSearch=(card.dataset.name+" "+card.textContent).toLowerCase().includes(searchQuery);
+card.hidden=!(matchesCategory&&matchesSearch);
+});
+}
+$("toolSearch").addEventListener("input",function(){
+searchQuery=this.value.toLowerCase().trim();
+filterTools();
+});
+
+/* RECENTLY USED TOOLS */
+const RECENT_KEY="rexweb_nexora_recent_tools_v1";
+function getRecentTools(){
+try{
+const value=JSON.parse(localStorage.getItem(RECENT_KEY)||"[]");
+return Array.isArray(value)?value:[];
+}catch(e){return [];}
+}
+function saveRecentTool(card){
+const name=card.querySelector("h3").textContent;
+let recent=getRecentTools().filter(item=>item.name!==name);
+recent.unshift({name:name,category:card.dataset.category||"Other"});
+recent=recent.slice(0,6);
+try{localStorage.setItem(RECENT_KEY,JSON.stringify(recent));}catch(e){}
+renderRecentTools();
+}
+const recentSection=document.createElement("section");
+recentSection.className="recent-section";
+recentSection.style.cssText="margin:8px 0 20px;";
+recentSection.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="font-size:16px">🕘 Recently Used Tools</h3><button type="button" id="clearRecent" class="btn alt">Clear</button></div><div id="recentTools" style="display:flex;gap:8px;overflow-x:auto;padding:3px 0"></div>';
+categoryBar.insertAdjacentElement("afterend",recentSection);
+
+function renderRecentTools(){
+const box=$("recentTools");
+box.innerHTML="";
+const recent=getRecentTools();
+if(!recent.length){
+const empty=document.createElement("p");
+empty.className="muted";
+empty.textContent="Your recently opened tools will appear here.";
+box.appendChild(empty);
+return;
+}
+recent.forEach(item=>{
+const card=toolCards.find(c=>c.querySelector("h3").textContent===item.name);
+if(!card)return;
+const button=document.createElement("button");
+button.type="button";
+button.style.cssText="flex-shrink:0;text-align:left;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:12px;";
+button.textContent=(card.querySelector(".tool-icon")?.textContent||"🛠️")+" "+item.name;
+button.onclick=()=>{
+activeCategory="All";
+searchQuery="";
+$("toolSearch").value="";
+categoryBar.querySelector('[data-category-filter="All"]').click();
+card.hidden=false;
+card.classList.remove("collapsed");
+const toggle=card.querySelector(".tool-toggle");
+toggle.textContent="−";
+toggle.setAttribute("aria-expanded","true");
+card.scrollIntoView({behavior:"smooth",block:"start"});
+saveRecentTool(card);
+};
+box.appendChild(button);
+});
+}
+$("clearRecent").onclick=()=>{
+try{localStorage.removeItem(RECENT_KEY);}catch(e){}
+renderRecentTools();
+};
+renderRecentTools();
+
 /* EXPAND / COLLAPSE */
-document.querySelectorAll(".tool-card").forEach(card=>{
+toolCards.forEach(card=>{
 const btn=card.querySelector(".tool-toggle");
 card.classList.add("collapsed");
 btn.textContent="+";
 btn.setAttribute("aria-expanded","false");
 btn.setAttribute("aria-label","Expand "+card.querySelector("h3").textContent);
-
 btn.onclick=()=>{
 const collapsed=card.classList.toggle("collapsed");
 btn.textContent=collapsed?"+":"−";
 btn.setAttribute("aria-expanded",String(!collapsed));
 btn.setAttribute("aria-label",(collapsed?"Expand ":"Collapse ")+card.querySelector("h3").textContent);
+if(!collapsed)saveRecentTool(card);
 };
-});
-
-/* SEARCH */
-$("toolSearch").addEventListener("input",function(){
-const q=this.value.toLowerCase().trim();
-document.querySelectorAll(".tool-card").forEach(card=>{
-card.hidden=!(card.dataset.name+" "+card.textContent).toLowerCase().includes(q);
-});
 });
 
 /* COPY HELPER */
 async function copyValue(value,id){
-if(!value){show(id,"Nothing to copy yet.");return}
+if(!value){show(id,"Nothing to copy yet.");return;}
 try{
 await navigator.clipboard.writeText(value);
 show(id,"Copied successfully!");
@@ -924,90 +724,39 @@ show(id,ok?"Copied successfully!":"Copy manually, please.");
 
 /* SCIENTIFIC CALCULATOR */
 let lastAnswer=0;
-document.querySelectorAll("[data-calc]").forEach(b=>{
-b.onclick=()=>{
-$("calcDisplay").value+=b.dataset.calc;
-};
-});
-$("calcClear").onclick=()=>{
-$("calcDisplay").value="";
-show("calcResult","Cleared.");
-};
+document.querySelectorAll("[data-calc]").forEach(b=>b.onclick=()=>{$("calcDisplay").value+=b.dataset.calc;});
+$("calcClear").onclick=()=>{$("calcDisplay").value="";show("calcResult","Cleared.");};
 $("calcBack").onclick=()=>$("calcDisplay").value=$("calcDisplay").value.slice(0,-1);
 
 function factorial(n){
 if(!Number.isInteger(n)||n<0||n>170)throw Error("Factorial needs a whole number from 0 to 170.");
-let r=1;
-for(let i=2;i<=n;i++)r*=i;
-return r;
+let r=1;for(let i=2;i<=n;i++)r*=i;return r;
 }
-
 function sciCalc(source){
 let s=source.replace(/\s/g,"").replace(/π/g,"pi");
 if(!s||s.length>180)throw Error("Enter a valid expression.");
 if(!/^[0-9+\-*/().%^!,a-zA-Z]+$/.test(s))throw Error("Unsupported character.");
-
 const tokens=s.match(/sin|cos|tan|sqrt|log|ln|pi|Ans|e|[0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?|[()+\-*/%^!]/gi)||[];
 if(tokens.join("")!==s)throw Error("Check the expression.");
-
 let i=0;
-function expr(){
-let x=term();
-while(tokens[i]==="+"||tokens[i]==="-"){
-let op=tokens[i++],y=term();
-x=op==="+"?x+y:x-y;
-}
-return x;
-}
-function term(){
-let x=unary();
-while(["*","/","%"].includes(tokens[i])){
-let op=tokens[i++],y=unary();
-if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");
-x=op==="*"?x*y:op==="/"?x/y:x%y;
-}
-return x;
-}
-function unary(){
-if(tokens[i]==="+"){i++;return unary()}
-if(tokens[i]==="-"){i++;return-unary()}
-return power();
-}
-function power(){
-let x=atom();
-if(tokens[i]==="^"){i++;x=Math.pow(x,unary())}
-while(tokens[i]==="!"){i++;x=factorial(x)}
-return x;
-}
+function expr(){let x=term();while(tokens[i]==="+"||tokens[i]==="-"){let op=tokens[i++],y=term();x=op==="+"?x+y:x-y;}return x;}
+function term(){let x=unary();while(["*","/","%"].includes(tokens[i])){let op=tokens[i++],y=unary();if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");x=op==="*"?x*y:op==="/"?x/y:x%y;}return x;}
+function unary(){if(tokens[i]==="+"){i++;return unary();}if(tokens[i]==="-"){i++;return-unary();}return power();}
+function power(){let x=atom();if(tokens[i]==="^"){i++;x=Math.pow(x,unary());}while(tokens[i]==="!"){i++;x=factorial(x);}return x;}
 function atom(){
 let t=tokens[i++];
-if(t==="("){
-let x=expr();
-if(tokens[i++]!==")")throw Error("Check brackets.");
-return x;
-}
+if(t==="("){let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");return x;}
 if(/^\d/.test(t||""))return Number(t);
-if(t==="pi")return Math.PI;
-if(t==="e")return Math.E;
-if(t==="Ans")return lastAnswer;
-
+if(t==="pi")return Math.PI;if(t==="e")return Math.E;if(t==="Ans")return lastAnswer;
 if(["sin","cos","tan","sqrt","log","ln"].includes(t)){
 if(tokens[i++]!=="(")throw Error("Use function(argument).");
-let x=expr();
-if(tokens[i++]!==")")throw Error("Check brackets.");
+let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");
 if(t==="sin")return Math.sin(x*Math.PI/180);
 if(t==="cos")return Math.cos(x*Math.PI/180);
 if(t==="tan")return Math.tan(x*Math.PI/180);
-if(t==="sqrt"){
-if(x<0)throw Error("Square root requires a non-negative number.");
-return Math.sqrt(x);
-}
-if(t==="log"){
-if(x<=0)throw Error("Log requires a positive number.");
-return Math.log10(x);
-}
-if(x<=0)throw Error("Natural log requires a positive number.");
-return Math.log(x);
+if(t==="sqrt"){if(x<0)throw Error("Square root requires a non-negative number.");return Math.sqrt(x);}
+if(t==="log"){if(x<=0)throw Error("Log requires a positive number.");return Math.log10(x);}
+if(x<=0)throw Error("Natural log requires a positive number.");return Math.log(x);
 }
 throw Error("Check the expression.");
 }
@@ -1015,379 +764,121 @@ const result=expr();
 if(i<tokens.length||!Number.isFinite(result))throw Error("Invalid expression.");
 return result;
 }
-
 $("calcEquals").onclick=()=>{
-try{
-lastAnswer=sciCalc($("calcDisplay").value);
-$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));
-show("calcResult","Answer: "+$("calcDisplay").value);
-}catch(e){
-show("calcResult",e.message||"Invalid expression.");
-}
+try{lastAnswer=sciCalc($("calcDisplay").value);$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));show("calcResult","Answer: "+$("calcDisplay").value);}
+catch(e){show("calcResult",e.message||"Invalid expression.");}
 };
 
 /* STOPWATCH AND TIMER */
-let swTimer=null, swSeconds=0, laps=[];
-function formatTime(sec){
-const hrs=Math.floor(sec/3600).toString().padStart(2,'0');
-const mins=Math.floor((sec%3600)/60).toString().padStart(2,'0');
-const s=(sec%60).toFixed(1).padStart(4,'0');
-return `${hrs}:${mins}:${s}`;
-}
-$("swStart").onclick=()=>{
-if(swTimer)return;
-swTimer=setInterval(()=>{
-swSeconds+=0.1;
-show("stopwatchDisplay",formatTime(swSeconds));
-},100);
-};
+let swTimer=null,swSeconds=0,laps=[];
+function formatTime(sec){const hrs=Math.floor(sec/3600).toString().padStart(2,'0');const mins=Math.floor((sec%3600)/60).toString().padStart(2,'0');const s=(sec%60).toFixed(1).padStart(4,'0');return `${hrs}:${mins}:${s}`;}
+$("swStart").onclick=()=>{if(swTimer)return;swTimer=setInterval(()=>{swSeconds+=0.1;show("stopwatchDisplay",formatTime(swSeconds));},100);};
 $("swPause").onclick=()=>{clearInterval(swTimer);swTimer=null;};
-$("swLap").onclick=()=>{
-laps.push(formatTime(swSeconds));
-show("swLaps",laps.join("\n"));
-};
-$("swReset").onclick=()=>{
-clearInterval(swTimer);swTimer=null;swSeconds=0;laps=[];
-show("stopwatchDisplay","00:00:00");
-show("swLaps","No laps recorded.");
-};
-
+$("swLap").onclick=()=>{laps.push(formatTime(swSeconds));show("swLaps",laps.join("\n"));};
+$("swReset").onclick=()=>{clearInterval(swTimer);swTimer=null;swSeconds=0;laps=[];show("stopwatchDisplay","00:00:00");show("swLaps","No laps recorded.");};
 let countdownInterval=null;
 $("timerStart").onclick=()=>{
-let sec=+$("timerSeconds").value;
-if(isNaN(sec)||sec<=0)return;
+let sec=+$("timerSeconds").value;if(!Number.isFinite(sec)||sec<=0)return;
 clearInterval(countdownInterval);
-countdownInterval=setInterval(()=>{
-if(sec<=0){
-clearInterval(countdownInterval);
-show("timerDisplay","Time's up!");
-return;
-}
-sec--;
-const m=Math.floor(sec/60).toString().padStart(2,'0');
-const s=(sec%60).toString().padStart(2,'0');
-show("timerDisplay",`${m}:${s}`);
-},1000);
+const end=Date.now()+sec*1000;
+const tick=()=>{
+sec=Math.max(0,Math.ceil((end-Date.now())/1000));
+show("timerDisplay",`${Math.floor(sec/60).toString().padStart(2,'0')}:${(sec%60).toString().padStart(2,'0')}`);
+if(sec<=0){clearInterval(countdownInterval);countdownInterval=null;show("timerDisplay","Time's up!");}
 };
-$("timerReset").onclick=()=>{
-clearInterval(countdownInterval);
-show("timerDisplay","00:00");
+tick();countdownInterval=setInterval(tick,250);
 };
+$("timerReset").onclick=()=>{clearInterval(countdownInterval);countdownInterval=null;show("timerDisplay","00:00");};
 
 /* AGE CALCULATOR */
-(() => {
-  const yearSelect = document.getElementById('rexBirthYear');
-  const monthSelect = document.getElementById('rexBirthMonth');
-  const daySelect = document.getElementById('rexBirthDay');
-  const calendarDays = document.getElementById('rexCalendarDays');
-  const calendarTitle = document.getElementById('rexCalendarTitle');
-  const selectedDate = document.getElementById('rexSelectedDate');
-  const result = document.getElementById('ageResult');
-
-  if (!yearSelect || yearSelect.dataset.ready) return;
-  yearSelect.dataset.ready = 'true';
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const months = [
-    'January', 'February', 'March', 'April',
-    'May', 'June', 'July', 'August',
-    'September', 'October', 'November', 'December'
-  ];
-
-  const weekdays = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-    'Thursday', 'Friday', 'Saturday'
-  ];
-
-  let chosen = null;
-  let viewYear = today.getFullYear();
-  let viewMonth = today.getMonth();
-
-  for (let y = today.getFullYear(); y >= 1900; y--) {
-    const option = document.createElement('option');
-    option.value = y;
-    option.textContent = y;
-    yearSelect.appendChild(option);
-  }
-
-  months.forEach((name, index) => {
-    const option = document.createElement('option');
-    option.value = index;
-    option.textContent = name;
-    monthSelect.appendChild(option);
-  });
-
-  function daysInMonth(year, month) {
-    return new Date(year, month + 1, 0).getDate();
-  }
-
-  function formatDate(date) {
-    if (!date) return 'No date selected';
-
-    return weekdays[date.getDay()] + ', ' +
-      months[date.getMonth()] + ' ' +
-      date.getDate() + ', ' + date.getFullYear();
-  }
-
-  function syncSelectors() {
-    yearSelect.value = viewYear;
-    monthSelect.value = viewMonth;
-    fillDays();
-  }
-
-  function fillDays() {
-    const oldDay = chosen ? chosen.getDate() : 1;
-    const total = daysInMonth(viewYear, viewMonth);
-
-    daySelect.innerHTML = '<option value="">Day</option>';
-
-    for (let d = 1; d <= total; d++) {
-      const option = document.createElement('option');
-      option.value = d;
-      option.textContent = d;
-      daySelect.appendChild(option);
-    }
-
-    if (oldDay <= total && chosen) {
-      daySelect.value = oldDay;
-    }
-
-    renderCalendar();
-  }
-
-  function renderCalendar() {
-    calendarTitle.textContent =
-      months[viewMonth] + ' ' + viewYear;
-
-    calendarDays.innerHTML = '';
-
-    const firstDay = new Date(
-      viewYear, viewMonth, 1
-    ).getDay();
-
-    const total = daysInMonth(viewYear, viewMonth);
-
-    for (let i = 0; i < firstDay; i++) {
-      calendarDays.appendChild(document.createElement('span'));
-    }
-
-    for (let d = 1; d <= total; d++) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = d;
-      button.setAttribute('aria-label', months[viewMonth] + ' ' + d);
-
-      const date = new Date(viewYear, viewMonth, d);
-      date.setHours(0, 0, 0, 0);
-
-      button.disabled = date > today;
-
-      if (chosen &&
-          chosen.getFullYear() === viewYear &&
-          chosen.getMonth() === viewMonth &&
-          chosen.getDate() === d) {
-        button.classList.add('selected');
-        button.setAttribute('aria-pressed', 'true');
-      }
-
-      button.addEventListener('click', () => {
-        chosen = new Date(viewYear, viewMonth, d);
-        chosen.setHours(0, 0, 0, 0);
-
-        syncSelectors();
-        selectedDate.textContent = formatDate(chosen);
-      });
-
-      calendarDays.appendChild(button);
-    }
-  }
-
-  yearSelect.addEventListener('change', () => {
-    if (!yearSelect.value) return;
-
-    viewYear = Number(yearSelect.value);
-
-    if (viewYear === today.getFullYear() &&
-        viewMonth > today.getMonth()) {
-      viewMonth = today.getMonth();
-    }
-
-    if (chosen && chosen.getFullYear() !== viewYear) {
-      chosen = null;
-      selectedDate.textContent = 'No date selected';
-    }
-
-    fillDays();
-  });
-
-  monthSelect.addEventListener('change', () => {
-    if (monthSelect.value === '') return;
-
-    viewMonth = Number(monthSelect.value);
-
-    if (viewYear === today.getFullYear() &&
-        viewMonth > today.getMonth()) {
-      viewMonth = today.getMonth();
-      monthSelect.value = viewMonth;
-    }
-
-    if (chosen &&
-        (chosen.getFullYear() !== viewYear ||
-         chosen.getMonth() !== viewMonth)) {
-      chosen = null;
-      selectedDate.textContent = 'No date selected';
-    }
-
-    fillDays();
-  });
-
-  daySelect.addEventListener('change', () => {
-    if (!daySelect.value) return;
-
-    const date = new Date(
-      viewYear, viewMonth, Number(daySelect.value)
-    );
-
-    if (date > today) return;
-
-    chosen = date;
-    selectedDate.textContent = formatDate(chosen);
-    renderCalendar();
-  });
-
-  document.getElementById('rexPrevMonth')
-    .addEventListener('click', () => {
-      if (viewYear === 1900 && viewMonth === 0) return;
-
-      viewMonth--;
-
-      if (viewMonth < 0) {
-        viewMonth = 11;
-        viewYear--;
-      }
-
-      chosen = null;
-      syncSelectors();
-      selectedDate.textContent = 'No date selected';
-    });
-
-  document.getElementById('rexNextMonth')
-    .addEventListener('click', () => {
-      if (viewYear === today.getFullYear() &&
-          viewMonth >= today.getMonth()) return;
-
-      viewMonth++;
-
-      if (viewMonth > 11) {
-        viewMonth = 0;
-        viewYear++;
-      }
-
-      chosen = null;
-      syncSelectors();
-      selectedDate.textContent = 'No date selected';
-    });
-
-  document.getElementById('rexClearDate')
-    .addEventListener('click', () => {
-      chosen = null;
-      yearSelect.value = '';
-      monthSelect.value = '';
-      daySelect.value = '';
-      selectedDate.textContent = 'No date selected';
-      result.textContent = 'Your age details will appear here.';
-      renderCalendar();
-    });
-
-  document.getElementById('rexApplyDate')
-    .addEventListener('click', () => {
-      if (!chosen) {
-        result.textContent =
-          'Please select your birth year, month, and day first.';
-        return;
-      }
-
-      calculateAge();
-    });
-
-  function calculateAge() {
-    if (!chosen || chosen > today) {
-      result.textContent = 'Please select a valid birthday.';
-      return;
-    }
-
-    let years = today.getFullYear() - chosen.getFullYear();
-    let monthsOld = today.getMonth() - chosen.getMonth();
-    let daysOld = today.getDate() - chosen.getDate();
-
-    if (daysOld < 0) {
-      monthsOld--;
-      const previousMonth = new Date(
-        today.getFullYear(), today.getMonth(), 0
-      );
-      daysOld += previousMonth.getDate();
-    }
-
-    if (monthsOld < 0) {
-      years--;
-      monthsOld += 12;
-    }
-
-    const nextBirthday = new Date(
-      today.getFullYear(),
-      chosen.getMonth(),
-      Math.min(
-        chosen.getDate(),
-        daysInMonth(today.getFullYear(), chosen.getMonth())
-      )
-    );
-
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(today.getFullYear() + 1);
-    }
-
-    const millisecondsPerDay = 86400000;
-    const daysUntil = Math.round(
-      (nextBirthday - today) / millisecondsPerDay
-    );
-
-    const birthdayWithoutYear = weekdays[chosen.getDay()] + ', ' +
-      months[chosen.getMonth()] + ' ' +
-      chosen.getDate();
-
-    result.innerHTML =
-      '<span class="age-heading">Your Exact Age</span>' +
-      years + ' years, ' +
-      monthsOld + ' months, ' +
-      daysOld + ' days<br>' +
-      '<span class="age-label">Birthday:</span> ' +
-      birthdayWithoutYear + '<br>' +
-      '<span class="age-label">Next Birthday:</span> ' +
-      daysUntil + ' day' +
-      (daysUntil === 1 ? '' : 's') + ' to go.<br>' +
-      '<span class="age-label">Date(NBD):</span> ' +
-      formatDate(nextBirthday);
-  }
-
-  syncSelectors();
+(()=>{
+const yearSelect=$("rexBirthYear"),monthSelect=$("rexBirthMonth"),daySelect=$("rexBirthDay"),calendarDays=$("rexCalendarDays"),calendarTitle=$("rexCalendarTitle"),selectedDate=$("rexSelectedDate"),result=$("ageResult");
+if(!yearSelect||yearSelect.dataset.ready)return;
+yearSelect.dataset.ready="true";
+const today=new Date();today.setHours(0,0,0,0);
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const weekdays=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+let chosen=null,viewYear=today.getFullYear(),viewMonth=today.getMonth();
+for(let y=today.getFullYear();y>=1900;y--){const o=document.createElement("option");o.value=y;o.textContent=y;yearSelect.appendChild(o);}
+months.forEach((name,index)=>{const o=document.createElement("option");o.value=index;o.textContent=name;monthSelect.appendChild(o);});
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+function formatDate(date){return date?weekdays[date.getDay()]+", "+months[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear():"No date selected";}
+function syncSelectors(){yearSelect.value=viewYear;monthSelect.value=viewMonth;fillDays();}
+function fillDays(){
+const oldDay=chosen?chosen.getDate():1,total=daysInMonth(viewYear,viewMonth);
+daySelect.innerHTML='<option value="">Day</option>';
+for(let d=1;d<=total;d++){const o=document.createElement("option");o.value=d;o.textContent=d;daySelect.appendChild(o);}
+if(oldDay<=total&&chosen)daySelect.value=oldDay;
+renderCalendar();
+}
+function renderCalendar(){
+calendarTitle.textContent=months[viewMonth]+" "+viewYear;calendarDays.innerHTML="";
+const firstDay=new Date(viewYear,viewMonth,1).getDay(),total=daysInMonth(viewYear,viewMonth);
+for(let i=0;i<firstDay;i++)calendarDays.appendChild(document.createElement("span"));
+for(let d=1;d<=total;d++){
+const button=document.createElement("button");button.type="button";button.textContent=d;button.setAttribute("aria-label",months[viewMonth]+" "+d);
+const date=new Date(viewYear,viewMonth,d);date.setHours(0,0,0,0);button.disabled=date>today;
+if(chosen&&chosen.getFullYear()===viewYear&&chosen.getMonth()===viewMonth&&chosen.getDate()===d){button.classList.add("selected");button.setAttribute("aria-pressed","true");}
+button.addEventListener("click",()=>{chosen=new Date(viewYear,viewMonth,d);chosen.setHours(0,0,0,0);syncSelectors();selectedDate.textContent=formatDate(chosen);});
+calendarDays.appendChild(button);
+}
+}
+yearSelect.addEventListener("change",()=>{
+if(!yearSelect.value)return;viewYear=Number(yearSelect.value);
+if(viewYear===today.getFullYear()&&viewMonth>today.getMonth())viewMonth=today.getMonth();
+if(chosen&&chosen.getFullYear()!==viewYear){chosen=null;selectedDate.textContent="No date selected";}
+fillDays();
+});
+monthSelect.addEventListener("change",()=>{
+if(monthSelect.value==="")return;viewMonth=Number(monthSelect.value);
+if(viewYear===today.getFullYear()&&viewMonth>today.getMonth()){viewMonth=today.getMonth();monthSelect.value=viewMonth;}
+if(chosen&&(chosen.getFullYear()!==viewYear||chosen.getMonth()!==viewMonth)){chosen=null;selectedDate.textContent="No date selected";}
+fillDays();
+});
+daySelect.addEventListener("change",()=>{
+if(!daySelect.value)return;const date=new Date(viewYear,viewMonth,Number(daySelect.value));if(date>today)return;
+chosen=date;selectedDate.textContent=formatDate(chosen);renderCalendar();
+});
+$("rexPrevMonth").addEventListener("click",()=>{
+if(viewYear===1900&&viewMonth===0)return;viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}
+chosen=null;syncSelectors();selectedDate.textContent="No date selected";
+});
+$("rexNextMonth").addEventListener("click",()=>{
+if(viewYear===today.getFullYear()&&viewMonth>=today.getMonth())return;
+viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}
+chosen=null;syncSelectors();selectedDate.textContent="No date selected";
+});
+$("rexClearDate").addEventListener("click",()=>{
+chosen=null;yearSelect.value="";monthSelect.value="";daySelect.value="";
+selectedDate.textContent="No date selected";result.textContent="Your age details will appear here.";renderCalendar();
+});
+$("rexApplyDate").addEventListener("click",()=>{
+if(!chosen){result.textContent="Please select your birth year, month, and day first.";return;}
+calculateAge();
+});
+function calculateAge(){
+if(!chosen||chosen>today){result.textContent="Please select a valid birthday.";return;}
+let years=today.getFullYear()-chosen.getFullYear(),monthsOld=today.getMonth()-chosen.getMonth(),daysOld=today.getDate()-chosen.getDate();
+if(daysOld<0){monthsOld--;daysOld+=new Date(today.getFullYear(),today.getMonth(),0).getDate();}
+if(monthsOld<0){years--;monthsOld+=12;}
+const nextBirthday=new Date(today.getFullYear(),chosen.getMonth(),Math.min(chosen.getDate(),daysInMonth(today.getFullYear(),chosen.getMonth())));
+if(nextBirthday<today)nextBirthday.setFullYear(today.getFullYear()+1);
+const daysUntil=Math.round((nextBirthday-today)/86400000);
+result.innerHTML='<span class="age-heading">Your Exact Age</span>'+years+' years, '+monthsOld+' months, '+daysOld+' days<br><span class="age-label">Birthday:</span> '+weekdays[chosen.getDay()]+', '+months[chosen.getMonth()]+' '+chosen.getDate()+'<br><span class="age-label">Next Birthday:</span> '+daysUntil+' day'+(daysUntil===1?'':'s')+' to go.<br><span class="age-label">Date (NBD):</span> '+formatDate(nextBirthday);
+}
+syncSelectors();
 })();
 
 /* PERCENTAGE CALCULATOR */
 $("calcPercent1").onclick=()=>{
-const x=parseFloat($("p1").value);
-const y=parseFloat($("p2").value);
+const x=parseFloat($("p1").value),y=parseFloat($("p2").value);
 if(isNaN(x)||isNaN(y)){show("percentResult1","Enter valid numbers.");return;}
-const res=(x/100)*y;
-show("percentResult1",`${x}% of ${y} = ${res}`);
+show("percentResult1",`${x}% of ${y} = ${(x/100)*y}`);
 };
 $("calcPercent2").onclick=()=>{
-const x=parseFloat($("p3").value);
-const y=parseFloat($("p4").value);
+const x=parseFloat($("p3").value),y=parseFloat($("p4").value);
 if(isNaN(x)||isNaN(y)||x===0){show("percentResult2","Enter valid numbers.");return;}
-const change=((y-x)/x)*100;
-show("percentResult2",`Change: ${change.toFixed(2)}% (${change>=0?'Increase':'Decrease'})`);
+const change=((y-x)/x)*100;show("percentResult2",`Change: ${change.toFixed(2)}% (${change>=0?'Increase':'Decrease'})`);
 };
 
 /* CASE CONVERTER */
@@ -1397,66 +888,55 @@ if(b.dataset.case==="upper")t=t.toUpperCase();
 if(b.dataset.case==="lower")t=t.toLowerCase();
 if(b.dataset.case==="title")t=t.toLowerCase().replace(/\b\p{L}/gu,m=>m.toUpperCase());
 if(b.dataset.case==="sentence")t=t.toLowerCase().replace(/(^\s*\p{L}|[.!?]\s+\p{L})/gu,m=>m.toUpperCase());
-$("caseInput").value=t;
-show("caseResult","Text converted successfully.");
+$("caseInput").value=t;show("caseResult","Text converted successfully.");
 });
 $("copyCase").onclick=()=>copyValue($("caseInput").value,"caseResult");
 
 /* URL ENCODER / DECODER */
 $("urlEncode").onclick=()=>show("urlResult",encodeURIComponent($("urlInput").value));
-$("urlDecode").onclick=()=>{
-try{
-show("urlResult",decodeURIComponent($("urlInput").value));
-}catch(e){
-show("urlResult","Invalid encoded text.");
-}
-};
+$("urlDecode").onclick=()=>{try{show("urlResult",decodeURIComponent($("urlInput").value));}catch(e){show("urlResult","Invalid encoded text.");}};
 $("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
 
 /* NUMBER BASE CONVERTER */
 $("convertBase").onclick=()=>{
-const raw=$("baseInput").value.trim();
-const base=+$("baseFrom").value;
+const raw=$("baseInput").value.trim(),base=+$("baseFrom").value;
 if(!raw||!/^[+-]?[0-9a-f]+$/i.test(raw)){show("baseResult","Enter a valid whole number.");return;}
-const digits=raw.replace(/^[+-]/,"");
-const validDigits={2:/^[01]+$/, 8:/^[0-7]+$/, 10:/^[0-9]+$/, 16:/^[0-9a-f]+$/i};
+const digits=raw.replace(/^[+-]/,""),validDigits={2:/^[01]+$/,8:/^[0-7]+$/,10:/^[0-9]+$/,16:/^[0-9a-f]+$/i};
 if(!validDigits[base].test(digits)){show("baseResult","Invalid digits for selected base.");return;}
 const n=parseInt(raw,base);
 if(!Number.isSafeInteger(n)){show("baseResult","Number too large.");return;}
 show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);
 };
 
-/* IMAGE FORMAT CONVERTER (10 FORMATS SUPPORTED) */
+/* IMAGE FORMAT CONVERTER */
 $("convertImgBtn").onclick=()=>{
-const f=$("convImageFile").files[0];
-const target=$("targetFormat").value;
+const f=$("convImageFile").files[0],target=$("targetFormat").value;
 if(!f){show("convImgResult","Please upload an image first.");return;}
-const reader=new FileReader();
-reader.onload=function(e){
-const img=new Image();
-img.onload=function(){
-const canvas=document.createElement("canvas");
-canvas.width=img.width;
-canvas.height=img.height;
-const ctx=canvas.getContext("2d");
-if(target==='image/jpeg'||target==='image/bmp'){
-ctx.fillStyle="#FFFFFF";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+if(["image/svg+xml","image/heic","image/tiff","image/gif","image/x-icon","image/bmp"].includes(target)){
+show("convImgResult","This format is not reliably supported by the browser's Canvas API. Please choose PNG, JPEG, or WEBP.");return;
 }
+const reader=new FileReader();
+reader.onload=e=>{
+const img=new Image();
+img.onload=()=>{
+const canvas=document.createElement("canvas");canvas.width=img.width;canvas.height=img.height;
+const ctx=canvas.getContext("2d");
+if(target==="image/jpeg"){ctx.fillStyle="#FFFFFF";ctx.fillRect(0,0,canvas.width,canvas.height);}
 ctx.drawImage(img,0,0);
-const exportMime = (target==='image/svg+xml'||target==='image/heic')?'image/png':target;
-const dataUrl=canvas.toDataURL(exportMime,0.92);
-const ext=target.split('/')[1].replace('+xml','');
-const a=document.createElement("a");
-a.href=dataUrl;
-a.download=`converted-image.${ext}`;
-document.body.appendChild(a);
-a.click();
-a.remove();
-show("convImgResult",`Successfully converted to ${ext.toUpperCase()} and downloaded!`);
+if(!canvas.toBlob){show("convImgResult","Image conversion is not supported by this browser.");return;}
+canvas.toBlob(blob=>{
+if(!blob){show("convImgResult","This image format is not supported by your browser.");return;}
+const ext=target==="image/jpeg"?"jpg":target.split("/")[1];
+const url=URL.createObjectURL(blob),a=document.createElement("a");
+a.href=url;a.download=`converted-image.${ext}`;document.body.appendChild(a);a.click();a.remove();
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+show("convImgResult",`Successfully converted to ${ext.toUpperCase()} and downloaded.`);
+},target,0.92);
 };
+img.onerror=()=>show("convImgResult","The uploaded image could not be opened.");
 img.src=e.target.result;
 };
+reader.onerror=()=>show("convImgResult","Unable to read this file.");
 reader.readAsDataURL(f);
 };
 
@@ -1464,64 +944,46 @@ reader.readAsDataURL(f);
 const unitData={
 length:{Meters:1,Feet:3.28084,Inches:39.3701,Kilometers:0.001},
 weight:{Kilograms:1,Pounds:2.20462,Grams:1000,Ounces:35.274},
-temp:{Celsius:'C',Fahrenheit:'F',Kelvin:'K'},
-data:{MB:1,GB:0.000976562,TB:9.5367e-7,KB:1024}
+temp:{Celsius:"C",Fahrenheit:"F",Kelvin:"K"},
+data:{MB:1,GB:1/1024,TB:1/(1024*1024),KB:1024}
 };
 function updateUnitDropdowns(){
-const cat=$("unitCategory").value;
-const keys=Object.keys(unitData[cat]);
+const cat=$("unitCategory").value,keys=Object.keys(unitData[cat]);
 $("unitFrom").innerHTML=keys.map(k=>`<option value="${k}">${k}</option>`).join("");
-$("unitTo").innerHTML=keys.map(k=>`<option value="${k}" ${k===keys[1]?'selected':''}>${k}</option>`).join("");
+$("unitTo").innerHTML=keys.map((k,i)=>`<option value="${k}" ${i===1?'selected':''}>${k}</option>`).join("");
 }
-$("unitCategory").onchange=updateUnitDropdowns;
-updateUnitDropdowns();
-
+$("unitCategory").onchange=updateUnitDropdowns;updateUnitDropdowns();
 $("convertUnitBtn").onclick=()=>{
-const cat=$("unitCategory").value;
-const val=parseFloat($("unitVal").value);
-const from=$("unitFrom").value;
-const to=$("unitTo").value;
-if(isNaN(val)){show("unitResult","Enter a valid number.");return;}
-if(cat==='temp'){
+const cat=$("unitCategory").value,val=parseFloat($("unitVal").value),from=$("unitFrom").value,to=$("unitTo").value;
+if(!Number.isFinite(val)){show("unitResult","Enter a valid number.");return;}
+if(cat==="temp"){
+let c;
+if(from==="Celsius")c=val;
+else if(from==="Fahrenheit")c=(val-32)*5/9;
+else c=val-273.15;
 let res;
-if(from==='Celsius'&&to==='Fahrenheit')res=(val*9/5)+32;
-else if(from==='Fahrenheit'&&to==='Celsius')res=(val-32)*5/9;
-else if(from==='Celsius'&&to==='Kelvin')res=val+273.15;
-else if(from==='Kelvin'&&to==='Celsius')res=val-273.15;
-else if(from==='Fahrenheit'&&to==='Kelvin')res=(val-32)*5/9+273.15;
-else if(from==='Kelvin'&&to==='Fahrenheit')res=(val-273.15)*9/5+32;
-else res=val;
+if(to==="Celsius")res=c;
+else if(to==="Fahrenheit")res=c*9/5+32;
+else res=c+273.15;
 show("unitResult",`${val} ${from} = ${res.toFixed(2)} ${to}`);
 }else{
-const base=val/unitData[cat][from];
-const res=base*unitData[cat][to];
-show("unitResult",`${val} ${from} = ${res.toPrecision(6)} ${to}`);
+const res=val/unitData[cat][from]*unitData[cat][to];
+show("unitResult",`${val} ${from} = ${Number(res.toPrecision(8))} ${to}`);
 }
 };
 
 /* HTML ENTITY ENCODER / DECODER */
-$("encodeEntity").onclick=()=>{
-const t=$("entityInput").value;
-show("entityResult",t.replace(/[\u00A0-\u9999<>&]/g,i=>'#'+i.charCodeAt(0)+';'));
-};
-$("decodeEntity").onclick=()=>{
-const t=$("entityInput").value;
-const doc=new DOMParser().parseFromString(t, "text/html");
-show("entityResult",doc.documentElement.textContent);
-};
+$("encodeEntity").onclick=()=>show("entityResult",$("entityInput").value.replace(/[\u00A0-\u9999<>&]/g,i=>'&#'+i.charCodeAt(0)+';'));
+$("decodeEntity").onclick=()=>show("entityResult",new DOMParser().parseFromString($("entityInput").value,"text/html").documentElement.textContent);
 $("copyEntity").onclick=()=>copyValue($("entityResult").textContent,"entityResult");
 
 /* ADVANCED TEXT COUNTER */
 $("wordInput").addEventListener("input",()=>{
-const t=$("wordInput").value;
-const words=t.trim()?t.trim().split(/\s+/u).length:0;
-const chars=Array.from(t).length;
-const sentences=(t.match(/[.!?]+(?=\s|$)/g)||[]).length;
-const paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
-const reading=Math.ceil(words/200);
-show("wordResult",`Words: ${words}\nCharacters: ${chars}\nSentences: ${sentences}\nParagraphs: ${paragraphs}\nEst. Reading: ${reading} min`);
+const t=$("wordInput").value,words=t.trim()?t.trim().split(/\s+/u).length:0,chars=Array.from(t).length;
+const sentences=(t.match(/[.!?]+(?=\s|$)/g)||[]).length,paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
+show("wordResult",`Words: ${words}\nCharacters: ${chars}\nSentences: ${sentences}\nParagraphs: ${paragraphs}\nEst. Reading: ${Math.ceil(words/200)} min`);
 });
-$("clearText").onclick=()=>{ $("wordInput").value=""; $("wordInput").dispatchEvent(new Event("input")); };
+$("clearText").onclick=()=>{$("wordInput").value="";$("wordInput").dispatchEvent(new Event("input"));};
 $("copyText").onclick=()=>copyValue($("wordInput").value,"wordResult");
 
 /* PASSWORD GENERATOR */
@@ -1530,20 +992,15 @@ $("generatePass").onclick=()=>{
 let chars="abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
 if($("passNumbers").checked)chars+="23456789";
 if($("passSymbols").checked)chars+="!@#$%^&*()-_=+?";
-const length=+$("passLength").value;
-const arr=new Uint32Array(length);
+const length=+$("passLength").value,arr=new Uint32Array(length);
 crypto.getRandomValues(arr);
-let p="";
-for(let i=0;i<length;i++)p+=chars[arr[i]%chars.length];
+let p="";for(let i=0;i<length;i++)p+=chars[arr[i]%chars.length];
 show("passResult",p);
 };
 $("copyPass").onclick=()=>copyValue($("passResult").textContent,"passResult");
 
 /* ADVANCED CODE BOARD */
-let uploadedCodeFiles={};
-let fullscreenOpen=false;
-let previousBodyOverflow="";
-
+let uploadedCodeFiles={},fullscreenOpen=false,previousBodyOverflow="";
 function buildPreview(){
 let html=$("codeInput").value.trim();
 if(!html)html="<!DOCTYPE html><html><body><h2>Welcome to RexWeb</h2></body></html>";
@@ -1554,60 +1011,44 @@ if(js)html=html.replace(/<\/body\s*>/i,`<script>\n${js}\n<\/script>\n</body>`);
 return html;
 }
 function runCodePreview(){
-const html=buildPreview();
-$("codePreview").srcdoc=html;
+const html=buildPreview();$("codePreview").srcdoc=html;
 if(fullscreenOpen)$("fullscreenFrame").srcdoc=html;
 show("codeStatus","Preview updated.");
 }
 $("runCode").onclick=runCodePreview;
 $("codeInput").oninput=()=>show("codeStatus","Code changed. Tap Run Preview.");
-
 $("codeFiles").addEventListener("change",async function(){
-const files=Array.from(this.files||[]);
-const loaded={};
-for(const f of files){
-if(/\.(html?|css|js)$/i.test(f.name))loaded[f.name]=await f.text();
-}
+const files=Array.from(this.files||[]),loaded={};
+for(const f of files){if(/\.(html?|css|js)$/i.test(f.name))loaded[f.name]=await f.text();}
 uploadedCodeFiles=loaded;
 const htmlEntry=Object.entries(loaded).find(([n])=>/\.html?$/i.test(n));
 if(htmlEntry)$("codeInput").value=htmlEntry[1];
 show("uploadedFiles",Object.keys(loaded).length?"Loaded: "+Object.keys(loaded).join(", "):"No files.");
 runCodePreview();
 });
-
 function openFullscreenPreview(){
 if(fullscreenOpen)return;
 previousBodyOverflow=document.body.style.overflow;
-$("previewFullscreen").style.display="block";
-document.body.style.overflow="hidden";
-const fsFrame=$("fullscreenFrame");
-fsFrame.removeAttribute("srcdoc");
-fsFrame.srcdoc=buildPreview();
-fullscreenOpen=true;
+$("previewFullscreen").style.display="block";document.body.style.overflow="hidden";
+$("fullscreenFrame").srcdoc=buildPreview();fullscreenOpen=true;
 }
-
 function closeFullscreenPreview(){
 if(!fullscreenOpen)return;
-$("previewFullscreen").style.display="none";
-document.body.style.overflow=previousBodyOverflow;
-$("fullscreenFrame").srcdoc="";
-$("fullscreenFrame").src="";
-fullscreenOpen=false;
+$("previewFullscreen").style.display="none";document.body.style.overflow=previousBodyOverflow;
+$("fullscreenFrame").srcdoc="";$("fullscreenFrame").src="";fullscreenOpen=false;
 }
-
 $("fullscreenPreview").onclick=openFullscreenPreview;
 $("previewHint").onclick=openFullscreenPreview;
 $("closeFullscreen").onclick=closeFullscreenPreview;
-
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeFullscreenPreview();});
 $("copyCode").onclick=()=>copyValue($("codeInput").value,"codeStatus");
-$("clearCode").onclick=()=>{ $("codeInput").value=""; runCodePreview(); };
-$("clearFiles").onclick=()=>{ uploadedCodeFiles={}; $("codeFiles").value=""; show("uploadedFiles","None."); runCodePreview(); };
+$("clearCode").onclick=()=>{$("codeInput").value="";runCodePreview();};
+$("clearFiles").onclick=()=>{uploadedCodeFiles={};$("codeFiles").value="";show("uploadedFiles","None.");runCodePreview();};
 runCodePreview();
 
 /* COLOR PICKER */
 $("colorInput").oninput=function(){
-const hex=this.value.toUpperCase();
-const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+const hex=this.value.toUpperCase(),r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
 show("colorResult",`HEX: ${hex} · RGB: ${r}, ${g}, ${b}`);
 };
 $("copyColor").onclick=()=>copyValue($("colorInput").value.toUpperCase(),"colorResult");
@@ -1625,7 +1066,7 @@ let depth=0,out=[];
 for(const t of tokens){
 if(/^<\//.test(t))depth=Math.max(0,depth-1);
 out.push("  ".repeat(depth)+t);
-if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&!/\/>$/.test(t)&&!/^<\//.test(t))depth++;
+if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&!/^<\//.test(t)&&!/<\/[^>]+>/.test(t))depth++;
 }
 show("htmlResult",out.join("\n"));
 };
@@ -1633,43 +1074,40 @@ $("copyHtml").onclick=()=>copyValue($("htmlResult").textContent,"htmlResult");
 
 /* CSS GRADIENT GENERATOR */
 function updateGradient(){
-const c1=$("gradColor1").value, c2=$("gradColor2").value, ang=$("gradAngle").value;
+const c1=$("gradColor1").value,c2=$("gradColor2").value,ang=$("gradAngle").value;
 show("gradAngleVal",ang);
 const css=`background: linear-gradient(${ang}deg, ${c1}, ${c2});`;
 $("gradPreview").style.background=`linear-gradient(${ang}deg, ${c1}, ${c2})`;
 show("gradResult",css);
 }
-$("gradColor1").oninput=updateGradient;
-$("gradColor2").oninput=updateGradient;
-$("gradAngle").oninput=updateGradient;
-updateGradient();
+$("gradColor1").oninput=updateGradient;$("gradColor2").oninput=updateGradient;$("gradAngle").oninput=updateGradient;updateGradient();
 $("copyGrad").onclick=()=>copyValue($("gradResult").textContent,"gradResult");
 
 /* QR CODE GENERATOR */
 $("generateQr").onclick=()=>{
-const val=$("qrInput").value.trim();
-const container=$("qrContainer");
+const val=$("qrInput").value.trim(),container=$("qrContainer");
 container.innerHTML="";
 if(!val){show("qrResult","Enter text or URL.");return;}
 const img=document.createElement("img");
-img.src=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(val)}`;
-img.style.borderRadius="8px";
-container.appendChild(img);
-show("qrResult","QR Code generated!");
+img.alt="Generated QR code";
+img.src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(val)}`;
+img.style.cssText="max-width:100%;border-radius:8px";
+img.onerror=()=>show("qrResult","Could not load the QR service. Check your internet connection.");
+container.appendChild(img);show("qrResult","QR Code requested. Save the image when it loads.");
 };
 
 /* JSON FORMATTER */
 $("formatJson").onclick=()=>{
-try{ const o=JSON.parse($("jsonInput").value); $("jsonInput").value=JSON.stringify(o,null,2); show("jsonResult","Formatted!"); }
-catch(e){ show("jsonResult","Error: "+e.message); }
+try{const o=JSON.parse($("jsonInput").value);$("jsonInput").value=JSON.stringify(o,null,2);show("jsonResult","Formatted!");}
+catch(e){show("jsonResult","Error: "+e.message);}
 };
 $("minifyJson").onclick=()=>{
-try{ const o=JSON.parse($("jsonInput").value); $("jsonInput").value=JSON.stringify(o); show("jsonResult","Minified!"); }
-catch(e){ show("jsonResult","Error: "+e.message); }
+try{const o=JSON.parse($("jsonInput").value);$("jsonInput").value=JSON.stringify(o);show("jsonResult","Minified!");}
+catch(e){show("jsonResult","Error: "+e.message);}
 };
 $("validateJson").onclick=()=>{
-try{ JSON.parse($("jsonInput").value); show("jsonResult","Valid JSON format."); }
-catch(e){ show("jsonResult","Invalid: "+e.message); }
+try{JSON.parse($("jsonInput").value);show("jsonResult","Valid JSON format.");}
+catch(e){show("jsonResult","Invalid: "+e.message);}
 };
 
 /* GRADIENT PRESETS */
@@ -1681,121 +1119,55 @@ emerald:"linear-gradient(135deg, #0ba360 0%, #3cba92 100%)"
 };
 function updatePreset(){
 const val=presets[$("gradPreset").value];
-$("gradPresetBox").style.background=val;
-show("gradPresetResult",`background: ${val};`);
+$("gradPresetBox").style.background=val;show("gradPresetResult",`background: ${val};`);
 }
-$("gradPreset").onchange=updatePreset;
-updatePreset();
-$("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"copyGradPreset");
+$("gradPreset").onchange=updatePreset;updatePreset();
+$("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"gradPresetResult");
 
 /* COLOR PALETTE GENERATOR */
 $("generatePalette").onclick=()=>{
-const base=$("paletteBase").value, boxes=$("paletteBoxes");
+const base=$("paletteBase").value,boxes=$("paletteBoxes"),hex=base.replace("#","");
 boxes.innerHTML="";
-const hex=base.replace("#","");
-const r=parseInt(hex.substring(0,2),16), g=parseInt(hex.substring(2,4),16), b=parseInt(hex.substring(4,6),16);
-let colors=[base];
+const r=parseInt(hex.substring(0,2),16),g=parseInt(hex.substring(2,4),16),b=parseInt(hex.substring(4,6),16);
+const colors=[base];
 for(let i=1;i<=4;i++){
-const f=1+(i*0.2);
+const f=1+i*.2;
 colors.push("#"+((1<<24)+(Math.round(r/f)<<16)+(Math.round(g/f)<<8)+Math.round(b/f)).toString(16).slice(1).toUpperCase());
 }
 colors.forEach(c=>{
-const div=document.createElement("div");
-div.style.cssText=`flex:1;height:50px;background:${c};border-radius:6px;border:1px solid var(--border);`;
-div.title=c;
-boxes.appendChild(div);
+const div=document.createElement("button");div.type="button";div.title="Copy "+c;
+div.style.cssText=`flex:1;min-width:40px;height:50px;background:${c};border-radius:6px;border:1px solid var(--border);`;
+div.onclick=()=>copyValue(c,"paletteResult");boxes.appendChild(div);
 });
 show("paletteResult","Palette: "+colors.join(", "));
 };
 
-/* STYLISH TEXT GENERATOR (50 STYLES) */
+/* STYLISH TEXT GENERATOR */
 const sMaps={
 bold:{a:'𝗮',b:'𝗯',c:'𝗰',d:'𝗱',e:'𝗲',f:'𝗳',g:'𝗴',h:'𝗵',i:'𝗶',j:'𝗷',k:'𝗸',l:'𝗹',m:'𝗺',n:'𝗻',o:'𝗼',p:'𝗽',q:'𝗾',r:'𝗿',s:'𝘀',t:'𝘁',u:'𝘂',v:'𝘃',w:'𝘄',x:'𝘅',y:'𝘆',z:'𝘇',A:'𝗔',B:'𝗕',C:'𝗖',D:'𝗗',E:'𝗘',F:'𝗙',G:'𝗚',H:'𝗛',I:'𝗜',J:'𝗝',K:'𝗞',L:'𝗟',M:'𝗠',N:'𝗡',O:'𝗢',P:'𝗣',Q:'𝗤',R:'𝗥',S:'𝗦',T:'𝗧',U:'𝗨',V:'𝗩',W:'𝗪',X:'𝗫',Y:'𝗬',Z:'𝗭'},
 italic:{a:'𝑎',b:'𝑏',c:'𝑐',d:'𝑑',e:'𝑒',f:'𝑓',g:'𝑔',h:'ℎ',i:'𝑖',j:'𝑗',k:'𝑘',l:'𝑙',m:'𝑚',n:'𝑛',o:'𝑜',p:'𝑝',q:'𝑞',r:'𝑟',s:'𝑠',t:'𝑡',u:'𝑢',v:'𝑣',w:'𝑤',x:'𝑥',y:'𝑦',z:'𝑧',A:'𝐴',B:'𝐵',C:'𝐶',D:'𝐷',E:'𝐸',F:'𝐹',G:'𝐺',H:'𝐻',I:'𝐼',J:'𝐽',K:'𝐾',L:'𝐿',M:'𝑀',N:'𝑁',O:'𝑂',P:'𝑃',Q:'𝑄',R:'𝑅',S:'𝑆',T:'𝑇',U:'𝑈',V:'𝑉',W:'𝑊',X:'𝑋',Y:'𝑌',Z:'𝑍'},
 gothic:{a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷',A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'Ⓜ',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ'},
-script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝒱',w:'𝓌',x:'𝒳',y:'𝓎',z:'𝒵',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'𝒱',G:'𝒢',H:'𝒋',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
+script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝓋',w:'𝓌',x:'𝓍',y:'𝓎',z:'𝓏',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'ℱ',G:'𝒢',H:'ℋ',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
 mono:{a:'𝚊',b:'𝚋',c:'𝚌',d:'𝚍',e:'𝚎',f:'𝚏',g:'𝚐',h:'𝚑',i:'𝚒',j:'𝚓',k:'𝚔',l:'𝚕',m:'𝚖',n:'𝚗',o:'𝚘',p:'𝚙',q:'𝚚',r:'𝚛',s:'𝚜',t:'𝚝',u:'𝚞',v:'𝚟',w:'𝚠',x:'𝚡',y:'𝚢',z:'𝚣',A:'𝙰',B:'𝙱',C:'𝙲',D:'𝙳',E:'𝙴',F:'𝙵',G:'𝙶',H:'𝙷',I:'𝙸',J:'𝙹',K:'𝙺',L:'𝙻',M:'𝙼',N:'𝙽',O:'𝙾',P:'𝙿',Q:'𝚀',R:'𝚁',S:'𝚂',T:'𝚃',U:'𝚄',V:'𝚅',W:'𝚆',X:'𝚇',Y:'𝚈',Z:'𝚉'},
 double:{a:'𝕒',b:'𝕓',c:'𝕔',d:'𝕕',e:'𝕖',f:'𝕗',g:'𝕘',h:'𝕙',i:'𝕚',j:'𝕛',k:'𝕜',l:'𝕝',m:'𝕞',n:'𝕟',o:'𝕠',p:'𝕡',q:'𝕢',r:'𝕣',s:'𝕤',t:'𝕥',u:'𝕦',v:'𝕧',w:'𝕨',x:'𝕩',y:'𝕪',z:'𝕫',A:'𝔸',B:'𝔹',C:'ℂ',D:'𝔻',E:'𝔼',F:'𝔽',G:'𝔾',H:'ℍ',I:'𝕀',J:'𝕁',K:'𝕂',L:'𝕃',M:'𝕄',N:'ℕ',O:'𝕆',P:'ℙ',Q:'ℚ',R:'ℝ',S:'𝕊',T:'𝕋',U:'𝕌',V:'𝕍',W:'𝕎',X:'𝕏',Y:'𝕐',Z:'ℤ'},
-circled:{a:'Ⓐ',b:'Ⓑ',c:'Ⓒ',d:'Ⓓ',e:'Ⓔ',f:'Ⓕ',g:'Ⓖ',h:'Ⓗ',i:'Ⓘ',j:'Ⓙ',k:'Ⓚ',l:'Ⓛ',m:'Ⓜ',n:'Ⓝ',o:'Ⓞ',p:'Ⓟ',q:'Ⓠ',r:'Ⓡ',s:'Ⓢ',t:'Ⓣ',u:'Ⓤ',v:'Ⓥ',w:'Ⓦ',x:'Ⓧ',y:'Ⓨ',z:'Ⓩ',A:'Ⓐ',B:'Ⓑ',C:'Ⓒ',D:'Ⓓ',E:'Ⓔ',F:'Ⓕ',G:'Ⓖ',H:'Ⓗ',I:'Ⓘ',J:'Ⓙ',K:'Ⓚ',L:'Ⓛ',M:'Ⓜ',N:'Ⓝ',O:'Ⓞ',P:'Ⓟ',Q:'Ⓠ',R:'Ⓡ',S:'Ⓢ',T:'Ⓣ',U:'Ⓤ',V:'Ⓥ',W:'Ⓦ',X:'Ⓧ',Y:'Ⓨ',Z:'Ⓩ'},
-fullWidth:(str)=>str.split('').map(c=>c===' '?' ':String.fromCharCode(c.charCodeAt(0)+65248)).join('')
+circled:{a:'ⓐ',b:'ⓑ',c:'ⓒ',d:'ⓓ',e:'ⓔ',f:'ⓕ',g:'ⓖ',h:'ⓗ',i:'ⓘ',j:'ⓙ',k:'ⓚ',l:'ⓛ',m:'ⓜ',n:'ⓝ',o:'ⓞ',p:'ⓟ',q:'ⓠ',r:'ⓡ',s:'ⓢ',t:'ⓣ',u:'ⓤ',v:'ⓥ',w:'ⓦ',x:'ⓧ',y:'ⓨ',z:'ⓩ',A:'Ⓐ',B:'Ⓑ',C:'Ⓒ',D:'Ⓓ',E:'Ⓔ',F:'Ⓕ',G:'Ⓖ',H:'Ⓗ',I:'Ⓘ',J:'Ⓙ',K:'Ⓚ',L:'Ⓛ',M:'Ⓜ',N:'Ⓝ',O:'Ⓞ',P:'Ⓟ',Q:'Ⓠ',R:'Ⓡ',S:'Ⓢ',T:'Ⓣ',U:'Ⓤ',V:'Ⓥ',W:'Ⓦ',X:'Ⓧ',Y:'Ⓨ',Z:'Ⓩ'},
+fullWidth:str=>str.split('').map(c=>c===' '?' ':c.charCodeAt(0)>=33&&c.charCodeAt(0)<=126?String.fromCharCode(c.charCodeAt(0)+65248):c).join('')
 };
-
 $("generateStylish").onclick=()=>{
-const txt=$("stylishInput").value.trim()||"Ameh Christian Chidubem";
-const t=(map)=>typeof map==='function'?map(txt):txt.split('').map(c=>map[c]||c).join('');
+const txt=$("stylishInput").value.trim()||"RexWeb Digital";
+const t=map=>typeof map==="function"?map(txt):txt.split("").map(c=>map[c]||c).join("");
 const styles=[
-  t(sMaps.script),
-  t(sMaps.double),
-  t(sMaps.bold),
-  t(sMaps.italic),
-  t(sMaps.bold),
-  t(sMaps.mono),
-  t(sMaps.gothic),
-  t(sMaps.gothic),
-  t(sMaps.circled),
-  t(sMaps.fullWidth),
-  "꧁༒☬" + txt + "☬༒꧂",
-  "꧁𓊈𒆜" + txt + "𒆜𓊉꧂",
-  "★彡[" + txt + "]彡★",
-  "『" + t(sMaps.fullWidth) + "』",
-  "♛ " + t(sMaps.italic) + " ♛",
-  "✦ " + t(sMaps.script) + " ✦",
-  "𓆩★𓆪 " + txt + " 𓆩★𓆪",
-  "⚡" + txt + "⚡",
-  "☯︎ " + txt.toUpperCase() + " ☯︎",
-  "♡ " + txt + " ♡",
-  "亗 " + txt + " 亗",
-  "༺☆༻" + txt + "༺☆༻",
-  "꧁ঔৣ☬" + txt + "☬ঔৣ꧂",
-  "✧༺♥༻∞ " + txt + " ∞༺♥༻✧",
-  "『★』" + txt + "『★』",
-  "☠ " + txt.toUpperCase() + " ☠",
-  "么 " + txt + " 么",
-  "࿐ ࿔:･ﾟ" + txt + "･ﾟ:࿐",
-  "♜ " + txt.toUpperCase() + " ♜",
-  "⫷ " + txt + " ⫸",
-  "乂❤‿❤乂 " + txt,
-  "✨『" + txt + "』✨",
-  "⚜️ " + t(sMaps.gothic) + " ⚜️",
-  "♕ " + t(sMaps.double) + " ♕",
-  "☾⋆⁺₊✧ " + txt + " ✧₊⁺⋆☽",
-  "ᯓ★ " + txt,
-  "𖤐 " + txt.toUpperCase() + " 𖤐",
-  "༒︎" + txt + "༒︎",
-  "✺ " + t(sMaps.italic) + " ✺",
-  "⊹ ࣪ ˖ " + txt + " ˖ ࣪ ⊹",
-  "꧁༺" + txt.toUpperCase() + "༻꧂",
-  "★彡 " + t(sMaps.bold) + " 彡★",
-  "◥꧁ད" + txt + "ཌ꧂◤",
-  "𓆩⚡𓆪 " + t(sMaps.script),
-  "♡︎₊˚ " + txt + " ˚₊♡︎",
-  "✯ " + txt + " ✯",
-  "乂 " + txt.toUpperCase() + " 乂",
-  "⌁༺ " + txt + " ༻⌁",
-  "𖣘『" + t(sMaps.italic) + "』𖣘",
-  "👑 " + t(sMaps.script) + " 👑"
+t(sMaps.script),t(sMaps.double),t(sMaps.bold),t(sMaps.italic),t(sMaps.mono),t(sMaps.gothic),t(sMaps.circled),t(sMaps.fullWidth),
+"꧁༒☬"+txt+"☬༒꧂","꧁𓊈𒆜"+txt+"𒆜𓊉꧂","★彡["+txt+"]彡★","『"+t(sMaps.fullWidth)+"』","♛ "+t(sMaps.italic)+" ♛","✦ "+t(sMaps.script)+" ✦","𓆩★𓆪 "+txt+" 𓆩★𓆪","⚡"+txt+"⚡","☯︎ "+txt.toUpperCase()+" ☯︎","♡ "+txt+" ♡","亗 "+txt+" 亗","༺☆༻"+txt+"༺☆༻","꧁ঔৣ☬"+txt+"☬ঔৣ꧂","✧༺♥༻∞ "+txt+" ∞༺♥༻✧","『★』"+txt+"『★』","☠ "+txt.toUpperCase()+" ☠","么 "+txt+" 么","࿐ ࿔:･ﾟ"+txt+"･ﾟ:࿐","♜ "+txt.toUpperCase()+" ♜","⫷ "+txt+" ⫸","乂❤‿❤乂 "+txt,"✨『"+txt+"』✨","⚜️ "+t(sMaps.gothic)+" ⚜️","♕ "+t(sMaps.double)+" ♕","☾⋆⁺₊✧ "+txt+" ✧₊⁺⋆☽","ᯓ★ "+txt,"𖤐 "+txt.toUpperCase()+" 𖤐","༒︎"+txt+"༒︎","✺ "+t(sMaps.italic)+" ✺","⊹ ࣪ ˖ "+txt+" ˖ ࣪ ⊹","꧁༺"+txt.toUpperCase()+"༻꧂","★彡 "+t(sMaps.bold)+" 彡★","◥꧁ད"+txt+"ཌ꧂◤","𓆩⚡𓆪 "+t(sMaps.script),"♡︎₊˚ "+txt+" ˚₊♡︎","✯ "+txt+" ✯","乂 "+txt.toUpperCase()+" 乂","⌁༺ "+txt+" ༻⌁","𖣘『"+t(sMaps.italic)+"』𖣘","👑 "+t(sMaps.script)+" 👑","⟡ "+txt+" ⟡","『ツ』"+txt+"『ツ』","༄ᶦᶰᵈ᭄ "+txt,"✧･ﾟ: *✧ "+txt+" ✧*:･ﾟ✧","𓂀 "+txt+" 𓂀"
 ];
-
-const container = $("stylishResult");
-container.innerHTML = "";
-
-styles.forEach((styledText, idx) => {
-  const item = document.createElement("div");
-  item.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);border:1px solid var(--border);padding:8px 12px;border-radius:8px;";
-  
-  const span = document.createElement("span");
-  span.textContent = `${idx + 1}. ${styledText}`;
-  span.style.overflowWrap = "anywhere";
-  
-  const copyBtn = document.createElement("button");
-  copyBtn.textContent = "Copy";
-  copyBtn.className = "btn alt";
-  copyBtn.style.cssText = "padding:6px 10px;font-size:11px;flex-shrink:0;";
-  copyBtn.onclick = () => copyValue(styledText, "stylishResult");
-  
-  item.appendChild(span);
-  item.appendChild(copyBtn);
-  container.appendChild(item);
+const container=$("stylishResult");container.innerHTML="";
+styles.forEach((styledText,idx)=>{
+const item=document.createElement("div");
+item.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);border:1px solid var(--border);padding:8px 12px;border-radius:8px;";
+const span=document.createElement("span");span.textContent=`${idx+1}. ${styledText}`;span.style.overflowWrap="anywhere";
+const copyBtn=document.createElement("button");copyBtn.textContent="Copy";copyBtn.className="btn alt";copyBtn.style.cssText="padding:6px 10px;font-size:11px;flex-shrink:0;";
+copyBtn.onclick=()=>copyValue(styledText,"stylishResult");
+item.appendChild(span);item.appendChild(copyBtn);container.appendChild(item);
 });
 };
 
@@ -1805,4 +1177,3 @@ $("year").textContent=new Date().getFullYear();
 
 </body>
 </html>
-
