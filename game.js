@@ -69,8 +69,8 @@
         color: var(--text);
         background: var(--bg);
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        min-height: 70vh;
-        padding: 16px;
+        min-height: 60vh;
+        padding: 8px;
         overflow: hidden;
       }
       #nexora-games * {
@@ -81,53 +81,53 @@
         -webkit-tap-highlight-color: transparent;
       }
       #nexora-games .nx-shell {
-        width: min(100%, 1000px);
+        width: min(100%, 960px);
         margin: 0 auto;
       }
       #nexora-games .nx-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
-        margin-bottom: 18px;
+        margin-bottom: 10px;
       }
       #nexora-games .nx-brand {
         display: flex;
         align-items: center;
-        gap: 11px;
+        gap: 8px;
       }
       #nexora-games .nx-logo {
-        width: 46px;
-        height: 46px;
+        width: 36px;
+        height: 36px;
         display: grid;
         place-items: center;
         border: 1px solid #27637c;
-        border-radius: 14px;
+        border-radius: 10px;
         color: var(--cyan);
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 900;
         background: linear-gradient(135deg, #102b42, #161332);
-        box-shadow: 0 0 22px #35e8ff19;
+        box-shadow: 0 0 16px #35e8ff19;
       }
       #nexora-games .nx-brand h1 {
-        font-size: clamp(17px, 4vw, 24px);
-        line-height: 1.15;
+        font-size: clamp(15px, 3.5vw, 20px);
+        line-height: 1.1;
         margin: 0;
-        letter-spacing: .6px;
+        letter-spacing: .5px;
       }
       #nexora-games .nx-brand p {
-        margin: 5px 0 0;
+        margin: 2px 0 0;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 10px;
       }
       #nexora-games .nx-btn {
         border: 1px solid var(--line);
         color: var(--text);
         background: var(--panel2);
-        border-radius: 11px;
-        padding: 10px 14px;
-        min-height: 42px;
+        border-radius: 9px;
+        padding: 6px 10px;
+        min-height: 34px;
         cursor: pointer;
         transition: transform .12s, border-color .12s;
       }
@@ -141,19 +141,19 @@
         border-color: var(--cyan);
       }
       #nexora-games .nx-title {
-        font-size: 17px;
-        margin: 20px 0 12px;
+        font-size: 15px;
+        margin: 10px 0 8px;
       }
       #nexora-games .nx-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 8px;
       }
       #nexora-games .nx-card {
         text-align: left;
-        padding: 16px;
+        padding: 10px;
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-radius: 12px;
         background: linear-gradient(145deg, var(--panel), #080f1e);
         color: var(--text);
         min-width: 0;
@@ -163,107 +163,108 @@
         border-color: #2684a5;
       }
       #nexora-games .nx-card-icon {
-        font-size: 29px;
+        font-size: 22px;
         display: block;
-        margin-bottom: 11px;
+        margin-bottom: 6px;
       }
       #nexora-games .nx-card-title {
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 800;
         display: block;
       }
       #nexora-games .nx-card-description {
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
         display: block;
-        margin-top: 6px;
-        line-height: 1.5;
+        margin-top: 4px;
+        line-height: 1.3;
       }
       #nexora-games .nx-card-best {
         display: block;
         color: var(--cyan);
-        font-size: 11px;
-        margin-top: 12px;
+        font-size: 10px;
+        margin-top: 6px;
       }
       #nexora-games .nx-panel {
         border: 1px solid var(--line);
         background: var(--panel);
-        border-radius: 20px;
+        border-radius: 14px;
         overflow: hidden;
       }
       #nexora-games .nx-game-top {
-        padding: 16px;
+        padding: 8px 12px;
         border-bottom: 1px solid var(--line);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 6px;
       }
       #nexora-games .nx-game-heading {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
       }
       #nexora-games .nx-game-heading h2 {
-        font-size: clamp(19px, 4vw, 26px);
+        font-size: clamp(16px, 3.5vw, 21px);
         margin: 0;
       }
       #nexora-games .nx-game-heading p {
-        font-size: 13px;
+        font-size: 11px;
         color: var(--muted);
-        margin: 4px 0 0;
+        margin: 2px 0 0;
       }
       #nexora-games .nx-stats {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         flex-wrap: wrap;
       }
       #nexora-games .nx-stat {
-        padding: 9px 12px;
+        padding: 4px 8px;
         border: 1px solid var(--line);
-        border-radius: 12px;
+        border-radius: 8px;
         background: #060d19;
-        font-size: 13px;
+        font-size: 11px;
         white-space: nowrap;
       }
       #nexora-games .nx-stat strong {
         color: var(--cyan);
       }
       #nexora-games .nx-game-area {
-        padding: 14px;
-        min-height: 220px;
+        padding: 8px;
+        min-height: 150px;
       }
       #nexora-games .nx-canvas-wrap {
         width: 100%;
-        max-width: 520px;
+        max-width: 380px;
         margin: 0 auto;
       }
       #nexora-games canvas {
         display: block;
         width: 100%;
         height: auto;
-        border-radius: 14px;
+        max-height: 240px;
+        border-radius: 10px;
         background: #030914;
         border: 1px solid #1b3854;
         touch-action: none;
       }
       #nexora-games .nx-message {
         text-align: center;
-        min-height: 25px;
-        padding: 7px 12px 14px;
+        min-height: 18px;
+        padding: 2px 8px 6px;
         color: var(--cyan);
-        font-size: 13px;
+        font-size: 11px;
       }
       #nexora-games .nx-controls {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 10px;
-        padding: 12px;
+        gap: 6px;
+        padding: 6px;
       }
       #nexora-games .nx-controller {
-        padding: 18px 12px;
+        padding: 8px 10px;
         border-top: 1px solid #18334d;
         background: linear-gradient(180deg, #071326, #040a16);
       }
@@ -271,20 +272,20 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
         color: #a7c8ed;
-        font-size: 12px;
+        font-size: 10px;
         font-weight: 900;
-        letter-spacing: 2px;
-        margin-bottom: 16px;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
         text-align: center;
       }
       #nexora-games .nx-controller-title:before,
       #nexora-games .nx-controller-title:after {
         content: "";
-        height: 2px;
+        height: 1px;
         flex: 1;
-        max-width: 120px;
+        max-width: 80px;
         background: linear-gradient(90deg, transparent, var(--cyan));
       }
       #nexora-games .nx-controller-title:after {
@@ -292,33 +293,33 @@
       }
       #nexora-games .nx-controller-layout {
         display: grid;
-        grid-template-columns: minmax(70px, .7fr) minmax(150px, 1.5fr) minmax(70px, .7fr);
+        grid-template-columns: minmax(60px, .6fr) minmax(130px, 1.4fr) minmax(60px, .6fr);
         align-items: center;
-        gap: 12px;
-        max-width: 850px;
+        gap: 8px;
+        max-width: 750px;
         margin: auto;
       }
       #nexora-games .nx-instructions,
       #nexora-games .nx-pad-status {
         min-width: 0;
-        padding: 12px;
+        padding: 6px 8px;
         border: 1px solid #17466b;
-        border-radius: 15px;
+        border-radius: 10px;
         background: #07182c;
         color: #a9c9ed;
-        font-size: 12px;
-        line-height: 1.7;
+        font-size: 10px;
+        line-height: 1.4;
       }
       #nexora-games .nx-instructions .nx-hand {
         display: block;
-        font-size: 28px;
-        margin-bottom: 5px;
+        font-size: 18px;
+        margin-bottom: 2px;
       }
       #nexora-games .nx-pad-status strong {
         display: block;
         color: #9bc9ff;
-        margin-bottom: 7px;
-        font-size: 12px;
+        margin-bottom: 2px;
+        font-size: 10px;
       }
       #nexora-games .nx-ready {
         color: var(--green);
@@ -326,14 +327,14 @@
       }
       #nexora-games .nx-pad {
         position: relative;
-        height: 170px;
+        height: 100px;
         width: 100%;
-        border: 3px solid #087ca5;
-        border-radius: 23px;
+        border: 2px solid #087ca5;
+        border-radius: 14px;
         background: linear-gradient(90deg, transparent 49.6%, #1681a744 50%, transparent 50.5%),
                     linear-gradient(transparent 49.6%, #1681a744 50%, transparent 50.5%),
                     radial-gradient(ellipse at center, #123c5c, #071a30 75%);
-        box-shadow: 0 0 0 4px #00d9ff12, 0 0 20px #00cfff22, inset 0 0 22px #00cfff14;
+        box-shadow: 0 0 0 2px #00d9ff12, 0 0 10px #00cfff22, inset 0 0 12px #00cfff14;
         overflow: hidden;
         touch-action: none;
         user-select: none;
@@ -343,45 +344,45 @@
       #nexora-games .nx-pad:before {
         content: "";
         position: absolute;
-        inset: 10px;
+        inset: 6px;
         border: 1px solid #42caff22;
-        border-radius: 13px;
+        border-radius: 8px;
         pointer-events: none;
       }
       #nexora-games .nx-pad.nx-pad-active {
         border-color: var(--cyan);
-        box-shadow: 0 0 0 4px #00d9ff20, 0 0 25px #00cfff55, inset 0 0 28px #00cfff24;
+        box-shadow: 0 0 0 2px #00d9ff20, 0 0 15px #00cfff55, inset 0 0 15px #00cfff24;
       }
       #nexora-games .nx-pad-knob {
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 48px;
-        height: 48px;
-        border: 3px solid #25e7ff;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #25e7ff;
         border-radius: 50%;
         background: radial-gradient(circle, #35e8ff 0 22%, #087fa7 27%, #063554 70%);
-        box-shadow: 0 0 0 10px #00d9ff19, 0 0 0 20px #00d9ff0d, 0 0 20px #00d9ff88;
+        box-shadow: 0 0 0 6px #00d9ff19, 0 0 12px #00d9ff88;
         transform: translate(-50%, -50%);
         pointer-events: none;
       }
       #nexora-games .nx-board {
         display: grid;
-        gap: 8px;
-        max-width: 360px;
-        margin: 12px auto;
+        gap: 6px;
+        max-width: 260px;
+        margin: 6px auto;
       }
       #nexora-games .nx-ttt-board {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        width: min(100%, 330px);
+        width: min(100%, 250px);
       }
       #nexora-games .nx-cell {
         aspect-ratio: 1;
         border: 1px solid #2a415e;
-        border-radius: 13px;
+        border-radius: 10px;
         background: #0c192a;
         color: var(--cyan);
-        font-size: clamp(28px, 8vw, 48px);
+        font-size: clamp(22px, 6vw, 36px);
         font-weight: 900;
         cursor: pointer;
       }
@@ -389,29 +390,29 @@
         color: var(--purple);
       }
       #nexora-games .nx-result {
-        font-size: 14px;
+        font-size: 11px;
         color: var(--muted);
         text-align: center;
-        min-height: 24px;
+        min-height: 18px;
       }
       #nexora-games .nx-question {
-        font-size: clamp(28px, 8vw, 43px);
+        font-size: clamp(20px, 6vw, 32px);
         font-weight: 900;
         text-align: center;
-        margin: 20px 0;
+        margin: 10px 0;
         color: var(--cyan);
       }
       #nexora-games .nx-answer-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        max-width: 480px;
-        margin: 16px auto;
+        gap: 8px;
+        max-width: 380px;
+        margin: 10px auto;
       }
       #nexora-games .nx-answer {
-        padding: 15px 10px;
+        padding: 10px 8px;
         border: 1px solid var(--line);
-        border-radius: 12px;
+        border-radius: 10px;
         color: var(--text);
         background: #0c192a;
         font-weight: 800;
@@ -421,32 +422,33 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 10px;
-        margin: 18px auto;
+        gap: 8px;
+        margin: 10px auto;
       }
       #nexora-games .nx-word {
         text-align: center;
-        font-size: clamp(22px, 6vw, 34px);
-        letter-spacing: 7px;
-        margin: 18px 0;
+        font-size: clamp(18px, 5vw, 26px);
+        letter-spacing: 5px;
+        margin: 10px 0;
         font-weight: 900;
         overflow-wrap: anywhere;
       }
       #nexora-games .nx-letter-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 6px;
-        max-width: 460px;
-        margin: 15px auto;
+        gap: 4px;
+        max-width: 360px;
+        margin: 8px auto;
       }
       #nexora-games .nx-letter {
-        min-height: 39px;
+        min-height: 30px;
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 6px;
         background: #0d192b;
         color: var(--text);
         cursor: pointer;
         font-weight: 800;
+        font-size: 11px;
       }
       #nexora-games .nx-letter:disabled {
         opacity: .3;
@@ -455,22 +457,16 @@
       #nexora-games .nx-footer {
         text-align: center;
         color: #60758f;
-        font-size: 11px;
-        padding: 18px 0 4px;
-      }
-      @media(min-width: 650px) {
-        #nexora-games { padding: 24px; }
-        #nexora-games .nx-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        #nexora-games .nx-game-area { padding: 20px; }
-        #nexora-games .nx-pad { height: 200px; }
+        font-size: 10px;
+        padding: 8px 0 2px;
       }
       @media(max-width: 480px) {
-        #nexora-games .nx-controller-layout { grid-template-columns: 1fr; gap: 10px; }
-        #nexora-games .nx-instructions { text-align: center; padding: 7px 10px; }
-        #nexora-games .nx-instructions .nx-hand { display: inline; margin-right: 8px; }
-        #nexora-games .nx-pad-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 12px; }
+        #nexora-games .nx-controller-layout { grid-template-columns: 1fr; gap: 6px; }
+        #nexora-games .nx-instructions { text-align: center; padding: 4px 8px; }
+        #nexora-games .nx-instructions .nx-hand { display: inline; margin-right: 6px; font-size: 14px; }
+        #nexora-games .nx-pad-status { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 8px; }
         #nexora-games .nx-pad-status strong { margin: 0; }
-        #nexora-games .nx-pad { height: 165px; }
+        #nexora-games .nx-pad { height: 95px; }
       }
     `;
     document.head.appendChild(style);
@@ -499,7 +495,7 @@
               <p>ARCADE UNIVERSE · PLAY WITHOUT LIMITS</p>
             </div>
           </div>
-          <button class="nx-btn" data-action="refresh">↻ Refresh Scores</button>
+          <button class="nx-btn" data-action="refresh">↻ Refresh</button>
         </header>
         <h2 class="nx-title">Choose Your Game</h2>
         <div class="nx-grid">
@@ -508,11 +504,11 @@
               <span class="nx-card-icon">${game.icon}</span>
               <span class="nx-card-title">${escapeHTML(game.name)}</span>
               <span class="nx-card-description">${escapeHTML(game.description)}</span>
-              <span class="nx-card-best">BEST SCORE: ${best(game.id)}</span>
+              <span class="nx-card-best">BEST: ${best(game.id)}</span>
             </button>
           `).join('')}
         </div>
-        <footer class="nx-footer">REXWEB NEXORA · YOUR DIGITAL WORLD, WITHOUT LIMITS</footer>
+        <footer class="nx-footer">REXWEB NEXORA · YOUR DIGITAL WORLD</footer>
       </div>
     `;
 
@@ -539,15 +535,15 @@
             <div class="nx-logo">N</div>
             <div>
               <h1>REXWEB NEXORA</h1>
-              <p>ARCADE UNIVERSE · TOUCH TO PLAY</p>
+              <p>ARCADE UNIVERSE</p>
             </div>
           </div>
-          <button class="nx-btn" data-action="home">← All Games</button>
+          <button class="nx-btn" data-action="home">← Back</button>
         </header>
         <section class="nx-panel">
           <div class="nx-game-top">
             <div class="nx-game-heading">
-              <span style="font-size:32px">${game.icon}</span>
+              <span style="font-size:24px">${game.icon}</span>
               <div>
                 <h2>${escapeHTML(game.name)}</h2>
                 <p>${escapeHTML(game.description)}</p>
@@ -587,7 +583,7 @@
             <button class="nx-btn" data-action="home">▦ All Games</button>
           </div>
         </section>
-        <footer class="nx-footer">Use the touchpad or your keyboard to play.</footer>
+        <footer class="nx-footer">REXWEB NEXORA</footer>
       </div>
     `;
 
@@ -692,8 +688,8 @@
     }
 
     function updatePadDisplay() {
-      knob.style.left = `${50 + controller.x * 43}%`;
-      knob.style.top = `${50 + controller.y * 43}%`;
+      knob.style.left = `${50 + controller.x * 40}%`;
+      knob.style.top = `${50 + controller.y * 40}%`;
       padX.textContent = (0.5 + controller.x / 2).toFixed(2);
       padY.textContent = (0.5 + controller.y / 2).toFixed(2);
       padState.textContent = controller.active ? '● Active' : '● Ready';
@@ -737,9 +733,7 @@
       updateFromPointer(event);
       if (id === 'shooter') {
         controller.fire = true;
-      } else if (id === 'flappy') {
-        controller.jump = true;
-      } else if (id === 'runner') {
+      } else if (id === 'flappy' || id === 'runner') {
         controller.jump = true;
       } else if (id === 'snake') {
         steerSnakeFromVector(controller.x, controller.y);
@@ -794,8 +788,7 @@
       controller.down = controller.keys.has('arrowdown') || controller.keys.has('s');
 
       if (key === ' ' || key === 'arrowup' || key === 'w') {
-        if (id === 'runner') controller.jump = true;
-        if (id === 'flappy') controller.jump = true;
+        if (id === 'runner' || id === 'flappy') controller.jump = true;
         if (id === 'shooter') controller.fire = true;
       }
 
@@ -876,15 +869,11 @@
     }
 
     function gameSnake() {
-      setInstructions('Drag anywhere on the pad to steer');
-      const { canvas, ctx } = makeCanvas(360, 360);
-      const size = 18;
+      setInstructions('Drag pad to steer');
+      const { canvas, ctx } = makeCanvas(300, 300);
+      const size = 15;
       const grid = 20;
-      let snake = [
-        { x: 9, y: 10 },
-        { x: 8, y: 10 },
-        { x: 7, y: 10 }
-      ];
+      let snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
       let food = { x: 14, y: 10 };
       let alive = true;
       let elapsed = 0;
@@ -919,14 +908,14 @@
         }
         ctx.fillStyle = '#ff5e89';
         ctx.shadowColor = '#ff5e89';
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(food.x * size + size / 2, food.y * size + size / 2, size * 0.34, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
         snake.forEach((part, index) => {
           ctx.fillStyle = index === 0 ? '#66ffd0' : '#1bc995';
-          ctx.fillRect(part.x * size + 2, part.y * size + 2, size - 4, size - 4);
+          ctx.fillRect(part.x * size + 1, part.y * size + 1, size - 2, size - 2);
         });
       }
 
@@ -946,7 +935,7 @@
           snake.some((part, index) => index > 0 && part.x === head.x && part.y === head.y)
         ) {
           alive = false;
-          setMessage('Game over! Tap Restart to play again.');
+          setMessage('Game over! Tap Restart.');
           return;
         }
         snake.unshift(head);
@@ -971,7 +960,7 @@
     }
 
     function gameTicTacToe() {
-      setInstructions('Tap the pad cells or board to play');
+      setInstructions('Tap cells to play');
       const status = document.createElement('div');
       status.className = 'nx-result';
       status.textContent = 'Your turn — you are X.';
@@ -1020,7 +1009,7 @@
           addScore(1);
           status.textContent = 'You win! +1 point.';
         } else if (result === 'O') {
-          status.textContent = 'Computer wins. Try again!';
+          status.textContent = 'Computer wins.';
         } else {
           status.textContent = 'It is a draw.';
         }
@@ -1063,7 +1052,7 @@
         state[index] = 'X';
         render();
         if (finish()) return;
-        status.textContent = 'Computer is thinking…';
+        status.textContent = 'Computer thinking…';
         computerTimer = timeout(computerMove, 300);
       }
 
@@ -1090,27 +1079,21 @@
     }
 
     function gamePong() {
-      setInstructions('Drag the pad up and down to move');
-      const { canvas, ctx } = makeCanvas(520, 320);
-      let playerY = 125;
-      let enemyY = 125;
-      const paddleWidth = 10;
-      const paddleHeight = 70;
-      let ball = {
-        x: 260,
-        y: 160,
-        vx: 205,
-        vy: Math.random() * 140 - 70,
-        r: 7
-      };
+      setInstructions('Drag pad up and down');
+      const { canvas, ctx } = makeCanvas(400, 240);
+      let playerY = 90;
+      let enemyY = 90;
+      const paddleWidth = 8;
+      const paddleHeight = 55;
+      let ball = { x: 200, y: 120, vx: 180, vy: Math.random() * 100 - 50, r: 6 };
 
       function resetBall(direction) {
         ball = {
           x: canvas.width / 2,
           y: canvas.height / 2,
-          vx: 205 * direction,
-          vy: Math.random() * 140 - 70,
-          r: 7
+          vx: 180 * direction,
+          vy: Math.random() * 100 - 50,
+          r: 6
         };
       }
 
@@ -1118,33 +1101,33 @@
         ctx.fillStyle = '#030914';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = '#1d3550';
-        ctx.setLineDash([7, 9]);
+        ctx.setLineDash([5, 7]);
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, 0);
         ctx.lineTo(canvas.width / 2, canvas.height);
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = '#35e8ff';
-        ctx.fillRect(18, playerY, paddleWidth, paddleHeight);
+        ctx.fillRect(14, playerY, paddleWidth, paddleHeight);
         ctx.fillStyle = '#9b6cff';
-        ctx.fillRect(canvas.width - 28, enemyY, paddleWidth, paddleHeight);
+        ctx.fillRect(canvas.width - 22, enemyY, paddleWidth, paddleHeight);
         ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#d9e8ff';
-        ctx.font = 'bold 30px system-ui';
+        ctx.font = 'bold 24px system-ui';
         ctx.textAlign = 'center';
-        ctx.fillText(score, canvas.width / 2 - 55, 42);
+        ctx.fillText(score, canvas.width / 2 - 40, 32);
       }
 
       const stop = frame(dt => {
-        const movement = controller.y * 320;
+        const movement = controller.y * 260;
         playerY += movement * dt;
         playerY = Math.max(0, Math.min(canvas.height - paddleHeight, playerY));
 
         const enemyTarget = ball.y - paddleHeight / 2;
-        enemyY += Math.sign(enemyTarget - enemyY) * Math.min(Math.abs(enemyTarget - enemyY), 195 * dt);
+        enemyY += Math.sign(enemyTarget - enemyY) * Math.min(Math.abs(enemyTarget - enemyY), 160 * dt);
         enemyY = Math.max(0, Math.min(canvas.height - paddleHeight, enemyY));
 
         ball.x += ball.vx * dt;
@@ -1155,21 +1138,21 @@
         }
 
         if (
-          ball.vx < 0 && ball.x - ball.r < 28 &&
+          ball.vx < 0 && ball.x - ball.r < 22 &&
           ball.y >= playerY && ball.y <= playerY + paddleHeight
         ) {
           ball.vx = Math.abs(ball.vx) * 1.035;
-          ball.vy += (ball.y - (playerY + paddleHeight / 2)) / (paddleHeight / 2) * 65;
-          ball.x = 29;
+          ball.vy += (ball.y - (playerY + paddleHeight / 2)) / (paddleHeight / 2) * 50;
+          ball.x = 23;
         }
 
         if (
-          ball.vx > 0 && ball.x + ball.r > canvas.width - 28 &&
+          ball.vx > 0 && ball.x + ball.r > canvas.width - 22 &&
           ball.y >= enemyY && ball.y <= enemyY + paddleHeight
         ) {
           ball.vx = -Math.abs(ball.vx) * 1.02;
-          ball.vy += (ball.y - (enemyY + paddleHeight / 2)) / (paddleHeight / 2) * 45;
-          ball.x = canvas.width - 29;
+          ball.vy += (ball.y - (enemyY + paddleHeight / 2)) / (paddleHeight / 2) * 40;
+          ball.x = canvas.width - 23;
         }
 
         if (ball.x < -10) {
@@ -1186,19 +1169,19 @@
     }
 
     function gameBreakout() {
-      setInstructions('Drag left or right on the pad');
-      const { canvas, ctx } = makeCanvas(480, 420);
+      setInstructions('Drag left or right');
+      const { canvas, ctx } = makeCanvas(380, 300);
       const cols = 8;
-      const rows = 5;
-      const brickW = 50;
-      const brickH = 17;
-      const gap = 5;
-      const startX = 22;
-      const startY = 38;
-      let paddleX = 200;
-      const paddleW = 86;
-      const paddleH = 11;
-      let ball = { x: 240, y: 320, vx: 160, vy: -190, r: 7 };
+      const rows = 4;
+      const brickW = 40;
+      const brickH = 14;
+      const gap = 4;
+      const startX = 18;
+      const startY = 30;
+      let paddleX = 150;
+      const paddleW = 72;
+      const paddleH = 10;
+      let ball = { x: 190, y: 220, vx: 140, vy: -170, r: 6 };
       let alive = true;
       let bricks = [];
 
@@ -1212,7 +1195,7 @@
               w: brickW,
               h: brickH,
               alive: true,
-              color: ['#35e8ff', '#9b6cff', '#43f5a5', '#ffbe55', '#ff6d9a'][row]
+              color: ['#35e8ff', '#9b6cff', '#43f5a5', '#ffbe55'][row]
             });
           }
         }
@@ -1225,13 +1208,13 @@
           if (!brick.alive) return;
           ctx.fillStyle = brick.color;
           ctx.shadowColor = brick.color;
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 6;
           ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
         });
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 10;
         ctx.shadowColor = '#35e8ff';
         ctx.fillStyle = '#35e8ff';
-        ctx.fillRect(paddleX, canvas.height - 32, paddleW, paddleH);
+        ctx.fillRect(paddleX, canvas.height - 26, paddleW, paddleH);
         ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
@@ -1246,7 +1229,7 @@
           draw();
           return;
         }
-        paddleX += controller.x * 360 * dt;
+        paddleX += controller.x * 300 * dt;
         paddleX = Math.max(0, Math.min(canvas.width - paddleW, paddleX));
 
         ball.x += ball.vx * dt;
@@ -1259,7 +1242,7 @@
           ball.vy = Math.abs(ball.vy);
         }
 
-        const paddleY = canvas.height - 32;
+        const paddleY = canvas.height - 26;
         if (
           ball.vy > 0 &&
           ball.y + ball.r >= paddleY &&
@@ -1268,7 +1251,7 @@
           ball.x <= paddleX + paddleW
         ) {
           ball.vy = -Math.abs(ball.vy);
-          ball.vx += (ball.x - (paddleX + paddleW / 2)) / (paddleW / 2) * 95;
+          ball.vx += (ball.x - (paddleX + paddleW / 2)) / (paddleW / 2) * 80;
           ball.y = paddleY - ball.r;
         }
 
@@ -1289,10 +1272,10 @@
 
         if (bricks.every(brick => !brick.alive)) {
           alive = false;
-          setMessage('You cleared every brick! Restart to play again.');
+          setMessage('Cleared all bricks!');
         } else if (ball.y > canvas.height + 15) {
           alive = false;
-          setMessage('Ball lost! Tap Restart to try again.');
+          setMessage('Ball lost! Tap Restart.');
         }
 
         draw();
@@ -1305,21 +1288,21 @@
     }
 
     function gameRunner() {
-      setInstructions('Tap the pad to jump over obstacles');
-      const { canvas, ctx } = makeCanvas(520, 280);
-      const ground = 225;
-      const player = { x: 70, y: ground - 35, w: 27, h: 35, vy: 0, jumping: false };
+      setInstructions('Tap pad to jump');
+      const { canvas, ctx } = makeCanvas(400, 220);
+      const ground = 180;
+      const player = { x: 50, y: ground - 28, w: 22, h: 28, vy: 0, jumping: false };
       let obstacles = [];
       let alive = true;
       let elapsed = 0;
       let spawnTimer = 0;
-      let speed = 205;
+      let speed = 180;
       let distance = 0;
 
       function jump() {
         if (!alive) return;
         if (!player.jumping) {
-          player.vy = -390;
+          player.vy = -340;
           player.jumping = true;
         }
       }
@@ -1328,8 +1311,8 @@
         ctx.fillStyle = '#030914';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = '#152b43';
-        for (let i = 0; i < 12; i++) {
-          const x = (i * 53 - elapsed * speed * 0.4) % canvas.width;
+        for (let i = 0; i < 10; i++) {
+          const x = (i * 45 - elapsed * speed * 0.4) % canvas.width;
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, ground);
@@ -1343,7 +1326,7 @@
 
         ctx.fillStyle = '#43f5a5';
         ctx.shadowColor = '#43f5a5';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 8;
         ctx.fillRect(player.x, player.y, player.w, player.h);
 
         ctx.fillStyle = '#ff6d9a';
@@ -1354,8 +1337,8 @@
         ctx.shadowBlur = 0;
 
         ctx.fillStyle = '#d9e8ff';
-        ctx.font = '13px system-ui';
-        ctx.fillText(`DISTANCE ${Math.floor(distance)}`, 12, 22);
+        ctx.font = '11px system-ui';
+        ctx.fillText(`DIST ${Math.floor(distance)}`, 10, 18);
       }
 
       const stop = frame(dt => {
@@ -1365,7 +1348,7 @@
         }
         elapsed += dt;
         distance += dt * 10;
-        speed = Math.min(340, 205 + elapsed * 2.2);
+        speed = Math.min(280, 180 + elapsed * 2);
         setScore(Math.floor(distance));
 
         if (controller.tap || controller.jump) {
@@ -1375,7 +1358,7 @@
         }
 
         if (player.jumping) {
-          player.vy += 1000 * dt;
+          player.vy += 900 * dt;
           player.y += player.vy * dt;
           if (player.y >= ground - player.h) {
             player.y = ground - player.h;
@@ -1386,14 +1369,14 @@
 
         spawnTimer -= dt;
         if (spawnTimer <= 0) {
-          const height = 22 + Math.random() * 24;
+          const height = 18 + Math.random() * 20;
           obstacles.push({
             x: canvas.width + 10,
             y: ground - height,
-            w: 18 + Math.random() * 12,
+            w: 14 + Math.random() * 10,
             h: height
           });
-          spawnTimer = 0.85 + Math.random() * 0.85;
+          spawnTimer = 0.9 + Math.random() * 0.8;
         }
 
         obstacles.forEach(obstacle => {
@@ -1403,12 +1386,12 @@
 
         for (const obstacle of obstacles) {
           if (
-            player.x + player.w - 4 > obstacle.x &&
-            player.x + 4 < obstacle.x + obstacle.w &&
-            player.y + player.h - 3 > obstacle.y
+            player.x + player.w - 3 > obstacle.x &&
+            player.x + 3 < obstacle.x + obstacle.w &&
+            player.y + player.h - 2 > obstacle.y
           ) {
             alive = false;
-            setMessage(`Game over! Distance: ${Math.floor(distance)}. Tap Restart to try again.`);
+            setMessage(`Game over! Distance: ${Math.floor(distance)}`);
             break;
           }
         }
@@ -1423,9 +1406,9 @@
     }
 
     function gameShooter() {
-      setInstructions('Swipe to move. Tap pad to fire.');
-      const { canvas, ctx } = makeCanvas(480, 400);
-      const ship = { x: 240, y: 345 };
+      setInstructions('Swipe to move, tap to fire');
+      const { canvas, ctx } = makeCanvas(380, 260);
+      const ship = { x: 190, y: 220 };
       let bullets = [];
       let enemies = [];
       let particles = [];
@@ -1437,18 +1420,17 @@
 
       function fire() {
         if (!alive || fireTimer > 0) return;
-        bullets.push({ x: ship.x, y: ship.y - 14, vx: 0, vy: -390 });
+        bullets.push({ x: ship.x, y: ship.y - 12, vx: 0, vy: -320 });
         fireTimer = 0.16;
       }
 
       function explode(x, y, color) {
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 5; i++) {
           particles.push({
-            x,
-            y,
-            vx: 150 * (Math.random() - 0.5),
-            vy: 150 * (Math.random() - 0.5),
-            life: 0.4 + Math.random() * 0.35,
+            x, y,
+            vx: 120 * (Math.random() - 0.5),
+            vy: 120 * (Math.random() - 0.5),
+            life: 0.3 + Math.random() * 0.3,
             color
           });
         }
@@ -1457,47 +1439,47 @@
       function draw() {
         ctx.fillStyle = '#030914';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < 65; i++) {
-          const x = (79 * i) % canvas.width;
-          const y = (113 * i + elapsed * 22) % canvas.height;
+        for (let i = 0; i < 40; i++) {
+          const x = (67 * i) % canvas.width;
+          const y = (97 * i + elapsed * 20) % canvas.height;
           ctx.fillStyle = i % 4 === 0 ? '#35e8ff' : '#546a8c';
-          ctx.fillRect(x, y, 2, 2);
+          ctx.fillRect(x, y, 1.5, 1.5);
         }
         ctx.fillStyle = '#35e8ff';
         ctx.shadowColor = '#35e8ff';
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
-        ctx.moveTo(ship.x, ship.y - 16);
-        ctx.lineTo(ship.x - 15, ship.y + 12);
-        ctx.lineTo(ship.x + 15, ship.y + 12);
+        ctx.moveTo(ship.x, ship.y - 12);
+        ctx.lineTo(ship.x - 12, ship.y + 10);
+        ctx.lineTo(ship.x + 12, ship.y + 10);
         ctx.closePath();
         ctx.fill();
 
         ctx.fillStyle = '#f6fdff';
         bullets.forEach(bullet => {
-          ctx.fillRect(bullet.x - 2, bullet.y - 8, 4, 12);
+          ctx.fillRect(bullet.x - 1.5, bullet.y - 6, 3, 10);
         });
 
         ctx.fillStyle = '#ff4f8b';
         ctx.shadowColor = '#ff4f8b';
         enemies.forEach(enemy => {
           ctx.beginPath();
-          ctx.moveTo(enemy.x, enemy.y + 12);
-          ctx.lineTo(enemy.x - 13, enemy.y - 10);
-          ctx.lineTo(enemy.x + 13, enemy.y - 10);
+          ctx.moveTo(enemy.x, enemy.y + 10);
+          ctx.lineTo(enemy.x - 10, enemy.y - 8);
+          ctx.lineTo(enemy.x + 10, enemy.y - 8);
           ctx.closePath();
           ctx.fill();
         });
 
         particles.forEach(particle => {
           ctx.fillStyle = particle.color;
-          ctx.fillRect(particle.x, particle.y, 3, 3);
+          ctx.fillRect(particle.x, particle.y, 2.5, 2.5);
         });
         ctx.shadowBlur = 0;
 
         ctx.fillStyle = '#e6efff';
-        ctx.font = 'bold 13px system-ui';
-        ctx.fillText(`HULL ${'♥'.repeat(hull)}`, 12, 22);
+        ctx.font = 'bold 11px system-ui';
+        ctx.fillText(`HULL ${'♥'.repeat(hull)}`, 10, 18);
       }
 
       const stop = frame(dt => {
@@ -1507,8 +1489,8 @@
           return;
         }
 
-        ship.x += controller.x * 320 * dt;
-        ship.x = Math.max(18, Math.min(canvas.width - 18, ship.x));
+        ship.x += controller.x * 280 * dt;
+        ship.x = Math.max(14, Math.min(canvas.width - 14, ship.x));
 
         fireTimer -= dt;
         if (controller.tap || controller.fire) {
@@ -1520,12 +1502,12 @@
         spawnTimer -= dt;
         if (spawnTimer <= 0) {
           enemies.push({
-            x: 22 + (canvas.width - 44) * Math.random(),
-            y: -18,
-            vy: 65 + 60 * Math.random() + elapsed * 0.6,
+            x: 18 + (canvas.width - 36) * Math.random(),
+            y: -14,
+            vy: 55 + 50 * Math.random() + elapsed * 0.5,
             dead: false
           });
-          spawnTimer = Math.max(0.35, 0.85 - elapsed * 0.008) + Math.random() * 0.3;
+          spawnTimer = Math.max(0.4, 0.9 - elapsed * 0.008) + Math.random() * 0.25;
         }
 
         bullets.forEach(bullet => {
@@ -1537,15 +1519,15 @@
         enemies.forEach(enemy => {
           enemy.y += enemy.vy * dt;
           if (
-            Math.abs(enemy.x - ship.x) < 22 &&
-            Math.abs(enemy.y - ship.y) < 25
+            Math.abs(enemy.x - ship.x) < 18 &&
+            Math.abs(enemy.y - ship.y) < 20
           ) {
             enemy.dead = true;
             hull--;
             explode(enemy.x, enemy.y, '#ff6d9a');
             if (hull <= 0) {
               alive = false;
-              setMessage(`Ship destroyed! Score: ${score}. Tap Restart to try again.`);
+              setMessage(`Ship destroyed! Score: ${score}`);
             }
           }
 
@@ -1553,8 +1535,8 @@
             if (
               !bullet.dead &&
               !enemy.dead &&
-              Math.abs(bullet.x - enemy.x) < 16 &&
-              Math.abs(bullet.y - enemy.y) < 16
+              Math.abs(bullet.x - enemy.x) < 14 &&
+              Math.abs(bullet.y - enemy.y) < 14
             ) {
               bullet.dead = true;
               enemy.dead = true;
@@ -1568,7 +1550,7 @@
             hull--;
             if (hull <= 0) {
               alive = false;
-              setMessage(`Invaders broke through! Score: ${score}.`);
+              setMessage(`Invaders broke through! Score: ${score}`);
             }
           }
         });
@@ -1593,10 +1575,10 @@
     }
 
     function gameMath() {
-      setInstructions('Tap pad or answers to choose');
+      setInstructions('Tap answers');
       const status = document.createElement('div');
       status.className = 'nx-result';
-      status.textContent = 'Answer correctly to earn points.';
+      status.textContent = 'Solve correctly for points.';
 
       const question = document.createElement('div');
       question.className = 'nx-question';
@@ -1606,7 +1588,7 @@
 
       const streak = document.createElement('div');
       streak.className = 'nx-result';
-      streak.textContent = 'Correct answers: 0';
+      streak.textContent = 'Correct streak: 0';
 
       area.append(status, question, answers, streak);
 
@@ -1617,10 +1599,10 @@
 
       function newQuestion() {
         locked = false;
-        status.textContent = 'Choose the correct answer.';
+        status.textContent = 'Choose correct answer.';
         const operation = Math.floor(Math.random() * 4);
-        let a = 1 + Math.floor(Math.random() * 20);
-        let b = 1 + Math.floor(Math.random() * 20);
+        let a = 1 + Math.floor(Math.random() * 15);
+        let b = 1 + Math.floor(Math.random() * 15);
         let symbol = '+';
 
         if (operation === 0) {
@@ -1631,13 +1613,13 @@
           answer = a - b;
           symbol = '−';
         } else if (operation === 2) {
-          a = 1 + Math.floor(Math.random() * 12);
-          b = 1 + Math.floor(Math.random() * 12);
+          a = 1 + Math.floor(Math.random() * 10);
+          b = 1 + Math.floor(Math.random() * 10);
           answer = a * b;
           symbol = '×';
         } else {
-          b = 1 + Math.floor(Math.random() * 10);
-          answer = 1 + Math.floor(Math.random() * 12);
+          b = 1 + Math.floor(Math.random() * 9);
+          answer = 1 + Math.floor(Math.random() * 10);
           a = b * answer;
           symbol = '÷';
         }
@@ -1645,7 +1627,7 @@
         question.textContent = `${a} ${symbol} ${b} = ?`;
         const options = new Set([answer]);
         while (options.size < 4) {
-          const offset = Math.floor(Math.random() * 13) - 6;
+          const offset = Math.floor(Math.random() * 11) - 5;
           options.add(Math.max(0, answer + (offset || 1)));
         }
         choices = [...options].sort(() => Math.random() - 0.5);
@@ -1660,12 +1642,12 @@
         if (Number(choices[index]) === answer) {
           correctStreak++;
           addScore(10);
-          status.textContent = 'Correct! +10 points.';
+          status.textContent = 'Correct! +10 pts';
         } else {
           correctStreak = 0;
-          status.textContent = `Not quite. The answer was ${answer}.`;
+          status.textContent = `Answer was ${answer}`;
         }
-        streak.textContent = `Correct answers: ${correctStreak}`;
+        streak.textContent = `Correct streak: ${correctStreak}`;
         $$('[data-answer]', answers).forEach(button => {
           button.disabled = true;
         });
@@ -1695,10 +1677,10 @@
     }
 
     function gameRPS() {
-      setInstructions('Tap left, middle, or right on pad');
+      setInstructions('Choose move');
       const status = document.createElement('div');
       status.className = 'nx-result';
-      status.textContent = 'Choose Rock, Paper, or Scissors.';
+      status.textContent = 'Rock, Paper, or Scissors.';
 
       const buttons = document.createElement('div');
       buttons.className = 'nx-rps-buttons';
@@ -1764,7 +1746,7 @@
     }
 
     function gameHangman() {
-      setInstructions('Tap pad to select grid letters');
+      setInstructions('Select grid letters');
       const wordList = [
         'GALAXY', 'PLANET', 'ROCKET', 'JUNGLE', 'PUZZLE',
         'ARCADE', 'NEXORA', 'GAMING', 'NEBULA', 'PYTHON',
@@ -1795,7 +1777,7 @@
         guessed = new Set();
         mistakes = 0;
         ended = false;
-        status.textContent = 'Guess the hidden word.';
+        status.textContent = 'Guess hidden word.';
         render();
       }
 
@@ -1817,10 +1799,10 @@
         if (word.split('').every(char => guessed.has(char))) {
           ended = true;
           addScore(10);
-          status.textContent = `You solved it! The word was ${word}. +10 points.`;
+          status.textContent = `Solved! Word: ${word}`;
         } else if (mistakes >= maxMistakes) {
           ended = true;
-          status.textContent = `Game over! The word was ${word}.`;
+          status.textContent = `Game over! Word: ${word}`;
         } else {
           status.textContent = `Mistakes: ${mistakes}/${maxMistakes}`;
         }
@@ -1848,19 +1830,19 @@
     }
 
     function gameFlappy() {
-      setInstructions('Tap the pad to flap and fly');
-      const { canvas, ctx } = makeCanvas(360, 480);
-      const bird = { x: 82, y: 210, vy: 0, r: 12 };
+      setInstructions('Tap pad to flap');
+      const { canvas, ctx } = makeCanvas(300, 380);
+      const bird = { x: 70, y: 170, vy: 0, r: 10 };
       let pipes = [];
       let elapsed = 0;
       let spawnTimer = 0;
       let alive = true;
       let started = false;
       let passed = 0;
-      const gravity = 900;
-      const flapVelocity = -300;
-      const pipeW = 54;
-      const gap = 145;
+      const gravity = 850;
+      const flapVelocity = -280;
+      const pipeW = 46;
+      const gap = 120;
 
       function flap() {
         if (!alive) return;
@@ -1871,25 +1853,25 @@
       function draw() {
         ctx.fillStyle = '#071226';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < 28; i++) {
-          const x = (37 * i) % canvas.width;
-          const y = (71 * i) % canvas.height;
+        for (let i = 0; i < 20; i++) {
+          const x = (31 * i) % canvas.width;
+          const y = (59 * i) % canvas.height;
           ctx.fillStyle = '#213957';
-          ctx.fillRect(x, y, 2, 2);
+          ctx.fillRect(x, y, 1.5, 1.5);
         }
         pipes.forEach(pipe => {
           ctx.fillStyle = '#43f5a5';
           ctx.shadowColor = '#43f5a5';
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 6;
           ctx.fillRect(pipe.x, 0, pipeW, pipe.top);
           ctx.fillRect(pipe.x, pipe.top + gap, pipeW, canvas.height - pipe.top - gap);
           ctx.fillStyle = '#1bbf88';
-          ctx.fillRect(pipe.x - 4, pipe.top - 10, pipeW + 8, 10);
-          ctx.fillRect(pipe.x - 4, pipe.top + gap, pipeW + 8, 10);
+          ctx.fillRect(pipe.x - 3, pipe.top - 8, pipeW + 6, 8);
+          ctx.fillRect(pipe.x - 3, pipe.top + gap, pipeW + 6, 8);
         });
 
         ctx.shadowColor = '#ffdc68';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 10;
         ctx.fillStyle = '#ffdc68';
         ctx.beginPath();
         ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
@@ -1898,17 +1880,17 @@
 
         ctx.fillStyle = '#091120';
         ctx.beginPath();
-        ctx.arc(bird.x + 4, bird.y - 3, 2.5, 0, Math.PI * 2);
+        ctx.arc(bird.x + 3, bird.y - 2, 2, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = '#eaf3ff';
-        ctx.font = 'bold 17px system-ui';
+        ctx.font = 'bold 15px system-ui';
         ctx.textAlign = 'center';
-        ctx.fillText(`SCORE ${passed}`, canvas.width / 2, 30);
+        ctx.fillText(`SCORE ${passed}`, canvas.width / 2, 24);
 
         if (!started && alive) {
           ctx.fillStyle = '#fff';
-          ctx.fillText('TAP PAD TO START', canvas.width / 2, canvas.height / 2 + 65);
+          ctx.fillText('TAP PAD TO START', canvas.width / 2, canvas.height / 2 + 50);
         }
       }
 
@@ -1931,18 +1913,18 @@
 
           spawnTimer -= dt;
           if (spawnTimer <= 0) {
-            const minTop = 55;
-            const maxTop = canvas.height - gap - 55;
+            const minTop = 45;
+            const maxTop = canvas.height - gap - 45;
             pipes.push({
               x: canvas.width + 5,
               top: minTop + Math.random() * (maxTop - minTop),
               scored: false
             });
-            spawnTimer = 1.35;
+            spawnTimer = 1.3;
           }
 
           pipes.forEach(pipe => {
-            pipe.x -= 145 * dt;
+            pipe.x -= 130 * dt;
             if (!pipe.scored && pipe.x + pipeW < bird.x) {
               pipe.scored = true;
               passed++;
@@ -1953,7 +1935,7 @@
             const outsideGap = bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.top + gap;
             if (overlapsX && outsideGap) {
               alive = false;
-              setMessage(`You hit a pipe! Score: ${passed}. Tap Restart to try again.`);
+              setMessage(`Hit pipe! Score: ${passed}`);
             }
           });
 
@@ -1961,7 +1943,7 @@
 
           if (bird.y - bird.r < 0 || bird.y + bird.r > canvas.height) {
             alive = false;
-            setMessage(`Flight ended! Score: ${passed}. Tap Restart to try again.`);
+            setMessage(`Flight ended! Score: ${passed}`);
           }
         }
 
@@ -1979,8 +1961,8 @@
       gameCleanup = makeGame() || (() => {});
     } catch (error) {
       console.error(`Nexora ${id} error:`, error);
-      area.innerHTML = '<p class="nx-result">The game could not start. Tap Restart to try again.</p>';
-      setMessage('Game initialization failed.');
+      area.innerHTML = '<p class="nx-result">Game initialization failed.</p>';
+      setMessage('Failed to start.');
     }
 
     updatePadDisplay();
@@ -2009,4 +1991,3 @@
   addStyles();
   showHome();
 })();
-
