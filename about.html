@@ -1,1 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b19" id="themeColor">
+  <meta name="description" content="Discover RexWeb Nexora, a digital platform offering useful online tools, converters, calculators, coding utilities, and browser-based games.">
 
+  <title>About Us | RexWeb Nexora</title>
+
+  <style>
+    :root {
+      --bg: #050b19;
+      --card: #0d172b;
+      --text: #e8eefc;
+      --muted: #9baac5;
+      --accent: #6c8cff;
+      --border: rgba(148, 163, 184, 0.18);
+      --soft: rgba(108, 140, 255, 0.1);
+      --shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    html[data-theme="light"] {
+      --bg: #f4f7fc;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #647089;
+      --accent: #345de7;
+      --border: rgba(31, 41, 55, 0.12);
+      --soft: rgba(52, 93, 231, 0.07);
+      --shadow: 0 15px 40px rgba(30, 41, 59, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1150px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .header-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 85px 20px 75px;
+      text-align: center;
+      background:
+        radial-gradient(
+          ellipse at 50% 0%,
+          rgba(108, 140, 255, 0.22),
+          transparent 65%
+        );
+    }
+
+    .hero-inner {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      line-height: 1.12;
+      letter-spacing: -2px;
+      margin: 22px 0;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 11px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 30px 20px 75px;
+    }
+
+    .section {
+      margin-bottom: 65px;
+      scroll-margin-top: 100px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section-heading span {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      letter-spacing: -0.8px;
+      line-height: 1.25;
+      margin: 10px 0;
+    }
+
+    .section-heading p {
+      max-width: 650px;
+      margin: auto;
+      color: var(--muted);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      border-radius: 13px;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .mission-panel {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 35px;
+      text-align: center;
+    }
+
+    .mission-panel h2 {
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      margin: 0 0 15px;
+    }
+
+    .mission-panel p {
+      max-width: 780px;
+      margin: 0 auto;
+      color: var(--muted);
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .value-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .value-card h3 {
+      font-size: 1rem;
+      margin: 0 0 8px;
+    }
+
+    .value-card p {
+      font-size: 0.93rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .tool-item .icon {
+      font-size: 1.4rem;
+    }
+
+    .tool-item h3 {
+      font-size: 0.98rem;
+      margin: 0 0 4px;
+    }
+
+    .tool-item p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    .commitment {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .commitment h2 {
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      line-height: 1.25;
+      margin: 0 0 15px;
+    }
+
+    .commitment p {
+      color: var(--muted);
+    }
+
+    .commitment-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0 0;
+    }
+
+    .commitment-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .commitment-list li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 900;
+      margin-right: 10px;
+    }
+
+    .highlight-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .highlight-box h3 {
+      margin-top: 0;
+    }
+
+    .highlight-box p {
+      color: var(--muted);
+    }
+
+    .cta {
+      padding: 38px 25px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background:
+        radial-gradient(
+          ellipse at top right,
+          rgba(108, 140, 255, 0.15),
+          transparent 60%
+        ),
+        var(--card);
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      margin: 0 0 12px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto 22px;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 800px) {
+      .values-grid,
+      .tools-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .commitment {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 65px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .intro-grid,
+      .values-grid,
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        padding: 12px;
+      }
+
+      .brand {
+        font-size: 1rem;
+      }
+
+      .header-btn {
+        padding: 7px 9px;
+        font-size: 0.78rem;
+      }
+
+      .hero {
+        padding: 55px 17px 50px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1.3px;
+      }
+
+      .container {
+        padding: 25px 14px 50px;
+      }
+
+      .card {
+        padding: 21px;
+      }
+
+      .mission-panel {
+        padding: 27px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="RexWeb Nexora home">
+        RexWeb <span>Nexora</span>
+      </a>
+
+      <div class="header-actions">
+        <button
+          class="header-btn"
+          id="themeToggle"
+          type="button"
+          aria-label="Toggle color theme">
+          ☀️ / 🌙
+        </button>
+
+        <a class="header-btn" href="index.html">
+          Home
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="badge">ABOUT REXWEB NEXORA</span>
+
+      <h1>
+        One Platform.<br>
+        <span>Endless Possibilities.</span>
+      </h1>
+
+      <p>
+        RexWeb Nexora is a digital platform designed to bring
+        useful online tools, creative utilities, coding resources,
+        converters, and browser-based games together in one place.
+        Our goal is to make everyday digital tasks simpler,
+        more accessible, and more enjoyable.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="index.html">
+          Explore Our Platform →
+        </a>
+
+        <a class="btn btn-secondary" href="#our-mission">
+          Discover Our Mission
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <section class="section" id="who-we-are">
+      <div class="section-heading">
+        <span>Who We Are</span>
+        <h2>Welcome to RexWeb Nexora</h2>
+        <p>
+          A digital space built around usefulness, creativity,
+          simplicity, and the possibilities of the web.
+        </p>
+      </div>
+
+      <div class="intro-grid">
+
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">🌐</div>
+          <h3>Our Platform</h3>
+          <p>
+            RexWeb Nexora brings a growing collection of digital
+            utilities and interactive experiences together.
+            Instead of visiting multiple websites for everyday
+            tasks, users can explore different tools from one
+            convenient platform.
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">💡</div>
+          <h3>Our Approach</h3>
+          <p>
+            We believe useful technology should be approachable.
+            We focus on building features with clear interfaces,
+            practical functionality, responsive layouts, and an
+            experience that works across different screen sizes.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" id="our-mission">
+      <div class="mission-panel">
+        <div class="card-icon" aria-hidden="true" style="margin: 0 auto 18px;">
+          🚀
+        </div>
+
+        <h2>Our Mission</h2>
+
+        <p>
+          Our mission is to create a convenient digital environment
+          where people can access helpful tools, experiment with
+          ideas, complete everyday tasks, and enjoy interactive
+          experiences without unnecessary complexity.
+          We aim to continually improve the platform through
+          thoughtful design, useful features, and a commitment
+          to a better user experience.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="what-we-offer">
+      <div class="section-heading">
+        <span>What We Offer</span>
+        <h2>Tools for Different Needs</h2>
+        <p>
+          Explore our collection of tools and features, with
+          availability depending on the current version of the website.
+        </p>
+      </div>
+
+      <div class="tools-grid">
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🧮</span>
+          <div>
+            <h3>Calculators</h3>
+            <p>Practical calculation tools for everyday tasks.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">⏱️</span>
+          <div>
+            <h3>Time Utilities</h3>
+            <p>Helpful utilities for time-related tasks.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">📝</span>
+          <div>
+            <h3>Text Tools</h3>
+            <p>Utilities for editing, formatting, and working with text.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🔄</span>
+          <div>
+            <h3>Converters</h3>
+            <p>Tools for supported units, values, and file formats.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🖼️</span>
+          <div>
+            <h3>Image Tools</h3>
+            <p>Utilities for supported image-processing tasks.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">💻</span>
+          <div>
+            <h3>Coding Utilities</h3>
+            <p>Convenient tools for working with code and web development.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🔐</span>
+          <div>
+            <h3>Security Utilities</h3>
+            <p>Selected utilities for security-related tasks.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🎨</span>
+          <div>
+            <h3>Design Tools</h3>
+            <p>Creative utilities for supported design tasks.</p>
+          </div>
+        </article>
+
+        <article class="tool-item">
+          <span class="icon" aria-hidden="true">🎮</span>
+          <div>
+            <h3>Browser Games</h3>
+            <p>Interactive games for a little entertainment and fun.</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" id="our-values">
+      <div class="section-heading">
+        <span>Our Values</span>
+        <h2>What Guides Us</h2>
+        <p>
+          The principles that shape how we approach our platform
+          and the experiences we want to provide.
+        </p>
+      </div>
+
+      <div class="values-grid">
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">✨</div>
+          <h3>Simplicity</h3>
+          <p>
+            We aim to make tools understandable and convenient
+            without adding unnecessary complexity.
+          </p>
+        </article>
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">⚙️</div>
+          <h3>Practical Innovation</h3>
+          <p>
+            We explore ideas and develop features that can
+            help users accomplish real digital tasks.
+          </p>
+        </article>
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">📱</div>
+          <h3>Accessibility</h3>
+          <p>
+            We aim to create responsive experiences that are
+            usable on mobile phones, tablets, and computers.
+          </p>
+        </article>
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">🔒</div>
+          <h3>Privacy Awareness</h3>
+          <p>
+            We recognize the importance of responsible information
+            handling and encourage users to review our privacy policy.
+          </p>
+        </article>
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">🧩</div>
+          <h3>Continuous Improvement</h3>
+          <p>
+            We seek opportunities to improve functionality,
+            reliability, and the overall user experience.
+          </p>
+        </article>
+
+        <article class="value-card">
+          <div class="card-icon" aria-hidden="true">🤝</div>
+          <h3>Responsible Use</h3>
+          <p>
+            We encourage lawful, respectful, and responsible
+            use of our tools and digital resources.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" id="our-commitment">
+      <div class="commitment">
+
+        <div>
+          <span class="badge">OUR COMMITMENT</span>
+
+          <h2>
+            Building a Better Digital Experience
+          </h2>
+
+          <p>
+            A useful platform should do more than simply offer
+            features. It should make those features easy to discover,
+            straightforward to use, and accessible across devices.
+          </p>
+
+          <p>
+            We aim to develop RexWeb Nexora with these goals in mind
+            while recognizing that improvements and new features
+            take time.
+          </p>
+
+          <ul class="commitment-list">
+            <li>Clear and approachable interfaces.</li>
+            <li>Responsive layouts for different devices.</li>
+            <li>Useful features for everyday digital tasks.</li>
+            <li>Ongoing improvements where possible.</li>
+            <li>Clear information about our website policies.</li>
+          </ul>
+        </div>
+
+        <div class="highlight-box">
+          <div class="card-icon" aria-hidden="true">🌟</div>
+
+          <h3>Designed for Everyday Use</h3>
+
+          <p>
+            Whether you need a calculator, a converter, a text
+            utility, a coding helper, or a quick browser game,
+            RexWeb Nexora aims to provide a convenient starting point.
+          </p>
+
+          <p>
+            Our collection may evolve over time as existing tools
+            improve and new ideas become part of the platform.
+          </p>
+
+          <a class="btn btn-primary" href="index.html">
+            Start Exploring →
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="privacy-and-trust">
+      <div class="section-heading">
+        <span>Transparency</span>
+        <h2>Your Experience Matters</h2>
+        <p>
+          We believe visitors should be able to understand the
+          basic rules and privacy practices associated with our website.
+        </p>
+      </div>
+
+      <div class="intro-grid">
+
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">🛡️</div>
+
+          <h3>Privacy Policy</h3>
+
+          <p>
+            Learn how information may be collected, used, stored,
+            and handled when you interact with RexWeb Nexora.
+          </p>
+
+          <p style="margin-top: 18px;">
+            <a href="privacy.html">Read our Privacy Policy →</a>
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">📋</div>
+
+          <h3>Terms of Service</h3>
+
+          <p>
+            Understand the rules and responsibilities that apply
+            when using our website, digital tools, and games.
+          </p>
+
+          <p style="margin-top: 18px;">
+            <a href="terms.html">Read our Terms of Service →</a>
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" id="contact-us">
+      <div class="cta">
+        <span class="badge">LET'S CONNECT</span>
+
+        <h2>Have a Question or Suggestion?</h2>
+
+        <p>
+          Your feedback can help us identify opportunities to improve
+          RexWeb Nexora. If you have a question, discover a problem,
+          or have an idea for a future feature, we welcome you to
+          reach out through our official contact channel.
+        </p>
+
+        <a class="btn btn-primary" href="contact.html">
+          Contact Us →
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      &copy; <span id="currentYear">2026</span>
+      RexWeb Nexora. All rights reserved.
+    </p>
+
+    <p>Useful tools. Creative possibilities. One digital platform.</p>
+
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html" aria-current="page">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const html = document.documentElement;
+      const themeButton = document.getElementById('themeToggle');
+      const themeColor = document.getElementById('themeColor');
+
+      let initialTheme = html.getAttribute('data-theme');
+
+      if (initialTheme !== 'dark' && initialTheme !== 'light') {
+        try {
+          initialTheme = localStorage.getItem('rexweb-theme') || 'dark';
+        } catch (error) {
+          initialTheme = 'dark';
+        }
+      }
+
+      function applyTheme(theme) {
+        const validTheme = theme === 'light' ? 'light' : 'dark';
+
+        html.setAttribute('data-theme', validTheme);
+
+        if (themeColor) {
+          themeColor.setAttribute(
+            'content',
+            validTheme === 'light' ? '#f4f7fc' : '#050b19'
+          );
+        }
+
+        if (themeButton) {
+          themeButton.setAttribute(
+            'aria-label',
+            validTheme === 'dark'
+              ? 'Switch to light mode'
+              : 'Switch to dark mode'
+          );
+        }
+      }
+
+      applyTheme(initialTheme);
+
+      if (themeButton) {
+        themeButton.addEventListener('click', () => {
+          const currentTheme = html.getAttribute('data-theme');
+          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+          applyTheme(nextTheme);
+
+          try {
+            localStorage.setItem('rexweb-theme', nextTheme);
+          } catch (error) {
+            // Theme switching remains available for this page.
+          }
+        });
+      }
+
+      document.getElementById('currentYear').textContent =
+        new Date().getFullYear();
+    })();
+  </script>
+
+</body>
+</html>
