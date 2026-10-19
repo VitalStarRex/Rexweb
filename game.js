@@ -15,9 +15,9 @@ const games=[
 {id:'snake',name:'Snake',icon:'🐍',description:'Eat, grow, and avoid your tail.'},
 {id:'ttt',name:'Tic-Tac-Toe',icon:'⭕',description:'Challenge the computer.'},
 {id:'pong',name:'Pong',icon:'🏓',description:'Keep the ball in play.'},
-{id:'breakout',name:'Brick Breaker',icon:'🧱',description:'Destroy every brick.'},
+{id:'breakout',name:'Brick Breaker',icon:'🧱',description:'Destroy every brick. Three chances to miss.'},
 {id:'runner',name:'Endless Runner',icon:'🏃',description:'Jump over obstacles.'},
-{id:'shooter',name:'Nexora Jet Strike',icon:'🚀',description:'Pilot your rocket and destroy enemies.'},
+{id:'shooter',name:'Nexora Jet Strike',icon:'🚀',description:'Survive for one minute and launch your jet to victory.'},
 {id:'math',name:'Math Challenge',icon:'🧠',description:'Solve as many questions as possible.'},
 {id:'rps',name:'Rock Paper Scissors',icon:'✊',description:'Choose your move.'},
 {id:'hangman',name:'Hangman',icon:'🔤',description:'Guess the hidden word.'},
@@ -96,9 +96,14 @@ function addStyles(){
 #nexora-games .nx-clock-track{height:5px;background:#1a2940;border-radius:9px;overflow:hidden;margin-top:8px}
 #nexora-games .nx-clock-bar{height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .25s linear}
 #nexora-games .nx-clock-bar.nx-urgent{background:#ff5379}
+#nexora-games .nx-lives{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:8px auto;padding:8px 12px;max-width:380px;border:1px solid #285078;border-radius:10px;background:#07182c;font-size:13px;font-weight:800}
+#nexora-games .nx-life-icon{font-size:18px;letter-spacing:3px}
+#nexora-games .nx-victory{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#020817e8;z-index:5;border-radius:10px;padding:18px}
+#nexora-games .nx-victory h3{font-size:clamp(23px,6vw,36px);color:var(--cyan);margin:0 0 10px;text-shadow:0 0 18px #35e8ff88}
+#nexora-games .nx-victory p{font-size:14px;color:#eafcff;margin:0}
+#nexora-games .nx-canvas-wrap{position:relative;width:100%;max-width:400px;margin:auto}
 @keyframes nx-pulse{to{opacity:.55}}
 #nexora-games .nx-game-area{padding:8px;min-height:150px}
-#nexora-games .nx-canvas-wrap{width:100%;max-width:400px;margin:auto}
 #nexora-games canvas{display:block;width:100%;height:auto;max-height:65vh;border-radius:10px;background:#030914;border:1px solid #1b3854;touch-action:none}
 #nexora-games .nx-message{text-align:center;min-height:18px;padding:3px 8px 6px;color:var(--cyan);font-size:11px}
 #nexora-games .nx-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;padding:8px}
@@ -119,6 +124,7 @@ function addStyles(){
  document.head.appendChild(s);
 }
 
+/* Dark/light mode is controlled entirely by index.html. */
 function stopCurrent(){
  generation++;
  try{cleanupCurrent();}catch(e){console.warn('Arcade cleanup:',e);}
@@ -181,7 +187,7 @@ function openGame(id){
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   canvas.setAttribute('aria-label',game.name+' game area');
   wrap.appendChild(canvas);area.appendChild(wrap);
-  return{canvas,ctx:canvas.getContext('2d')};
+  return{canvas,ctx:canvas.getContext('2d'),wrap};
  }
 
  const controller={x:0,y:0,active:false,fire:false,jump:false,left:false,right:false,up:false,down:false,tap:false,jumpQueued:false,tapQueued:false,fireQueued:false,keys:new Set()};
@@ -496,6 +502,7 @@ function openGame(id){
   return()=>{boardTapHandler=null;};
  }
 
+ /* UPDATE 1: Pong computer speed is reduced slightly, not dramatically. */
  function gamePong(){
   setInstructions('Drag up/down or use W/S to move');
   const{ctx}=makeCanvas(400,240);
@@ -520,9 +527,13 @@ function openGame(id){
    if(controller.active)playerY=(controller.y+1)/2*(240-ph);
    else{if(controller.up)playerY-=300*dt;if(controller.down)playerY+=300*dt;}
    playerY=Math.max(0,Math.min(240-ph,playerY));
+
+   /* Slightly slower reaction and movement gives the player a fair chance. */
    const target=ball.y-ph/2;
-   enemyY+=Math.sign(target-enemyY)*Math.min(Math.abs(target-enemyY),190*dt);
+   const aiSpeed=155;
+   enemyY+=Math.sign(target-enemyY)*Math.min(Math.abs(target-enemyY),aiSpeed*dt);
    enemyY=Math.max(0,Math.min(240-ph,enemyY));
+
    ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
    if(ball.y<ball.r||ball.y>240-ball.r)ball.vy*=-1;
    if(ball.vx<0&&ball.x-ball.r<22&&ball.y>=playerY&&ball.y<=playerY+ph){
@@ -542,50 +553,99 @@ function openGame(id){
   return()=>stop();
  }
 
+ /* UPDATE 2: Brick Breaker gives the player three misses. */
  function gameBreakout(){
   setInstructions('Drag left/right or use A/D');
-  const{ctx}=makeCanvas(380,300);
+  const{ctx,wrap}=makeCanvas(380,300);
   const cols=8,rows=4,bw=40,bh=14,gap=4;
   let paddleX=150,bricks=[],ball={x:190,y:220,vx:170,vy:-210,r:6},alive=true;
   const pw=72,ph=10;
+  let misses=0;
+  const maxMisses=3;
+  let livesDisplay=document.createElement('div');
+  livesDisplay.className='nx-lives';
+  livesDisplay.innerHTML=`<span>CHANCES LEFT</span><span class="nx-life-icon" data-lives>❤️❤️❤️</span>`;
+  wrap.before(livesDisplay);
+  const livesLabel=$('[data-lives]',livesDisplay);
+
+  function updateLives(){
+   const remaining=maxMisses-misses;
+   livesLabel.textContent='❤️'.repeat(remaining)+'🖤'.repeat(misses);
+   livesDisplay.setAttribute('aria-label',`${remaining} chances remaining`);
+  }
+
+  function resetBall(){
+   ball={x:paddleX+pw/2,y:258,vx:(Math.random()<.5?-1:1)*(145+Math.random()*30),vy:-205,r:6};
+  }
 
   function resetBricks(){
    bricks=[];
    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)bricks.push({x:18+c*(bw+gap),y:30+r*(bh+gap),w:bw,h:bh,alive:true,color:['#35e8ff','#9b6cff','#43f5a5','#ffbe55'][r]});
   }
+
   function draw(){
    ctx.fillStyle='#030914';ctx.fillRect(0,0,380,300);
    bricks.forEach(b=>{if(!b.alive)return;ctx.fillStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=6;ctx.fillRect(b.x,b.y,b.w,b.h);});
    ctx.shadowColor='#35e8ff';ctx.shadowBlur=10;ctx.fillStyle='#35e8ff';ctx.fillRect(paddleX,274,pw,ph);
    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+   ctx.fillStyle='#eafcff';ctx.font='bold 11px system-ui';ctx.textAlign='left';
+   ctx.fillText(`MISSES ${misses}/${maxMisses}`,10,290);
   }
+
   resetBricks();
+  resetBall();
+  updateLives();
+
   const stop=frame(dt=>{
    if(!alive){draw();return;}
    if(controller.active)paddleX=(controller.x+1)/2*(380-pw);
    else{if(controller.left)paddleX-=330*dt;if(controller.right)paddleX+=330*dt;}
    paddleX=Math.max(0,Math.min(380-pw,paddleX));
-   ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
-   if(ball.x<ball.r||ball.x>380-ball.r)ball.vx*=-1;
-   if(ball.y<ball.r)ball.vy=Math.abs(ball.vy);
+
+   ball.x+=ball.vx*dt;
+   ball.y+=ball.vy*dt;
+
+   if(ball.x<ball.r){ball.x=ball.r;ball.vx=Math.abs(ball.vx);}
+   if(ball.x>380-ball.r){ball.x=380-ball.r;ball.vx=-Math.abs(ball.vx);}
+   if(ball.y<ball.r){ball.y=ball.r;ball.vy=Math.abs(ball.vy);}
+
    if(ball.vy>0&&ball.y+ball.r>=274&&ball.y<=284&&ball.x>=paddleX&&ball.x<=paddleX+pw){
     ball.vy=-Math.abs(ball.vy);
     ball.vx+=(ball.x-(paddleX+pw/2))/(pw/2)*90;
     ball.y=268;
    }
+
    for(const b of bricks){
     if(b.alive&&ball.x+ball.r>b.x&&ball.x-ball.r<b.x+b.w&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+b.h){
-     b.alive=false;ball.vy*=-1;addScore(10);break;
+     b.alive=false;
+     ball.vy*=-1;
+     addScore(10);
+     break;
     }
    }
-   if(bricks.every(b=>!b.alive)){alive=false;setMessage('Cleared all bricks!');}
-   else if(ball.y>315){alive=false;setMessage('Ball lost! Tap Restart.');}
+
+   if(bricks.every(b=>!b.alive)){
+    alive=false;
+    setMessage('🏆 BRILLIANT! You destroyed every brick!');
+   }else if(ball.y>305){
+    misses++;
+    updateLives();
+
+    if(misses>=maxMisses){
+     alive=false;
+     setMessage(`GAME OVER! You used all 3 chances. Final score: ${score}. Tap Restart to try again.`);
+    }else{
+     setMessage(`Miss ${misses} of ${maxMisses}. ${maxMisses-misses} chance${maxMisses-misses===1?'':'s'} remaining!`);
+     resetBall();
+    }
+   }
+
    draw();
   });
   return()=>{alive=false;stop();};
  }
 
- /* UPDATED: Chrome Dino-style Endless Runner */
+ /* Chrome Dino-style Endless Runner */
  function gameRunner(){
   setInstructions('Tap to jump or press SPACE / ↑');
   const{canvas,ctx}=makeCanvas(400,220),ground=180;
@@ -602,174 +662,104 @@ function openGame(id){
   function drawDino(){
    const x=player.x,y=player.y;
    ctx.save();
-   ctx.fillStyle='#e8eef7';
-   ctx.shadowColor='#35e8ff';
-   ctx.shadowBlur=4;
-
-   // Chrome-style pixel dinosaur body and head.
+   ctx.fillStyle='#e8eef7';ctx.shadowColor='#35e8ff';ctx.shadowBlur=4;
    ctx.fillRect(x+4,y+15,22,20);
    ctx.fillRect(x+17,y+3,17,17);
    ctx.fillRect(x+26,y+12,9,7);
    ctx.fillRect(x,y+20,8,8);
-
-   // Eye.
-   ctx.fillStyle='#030914';
-   ctx.fillRect(x+27,y+7,3,3);
-
-   // Legs animate as the dinosaur runs.
+   ctx.fillStyle='#030914';ctx.fillRect(x+27,y+7,3,3);
    ctx.fillStyle='#e8eef7';
-   if(player.jumping){
-    ctx.fillRect(x+7,y+33,7,9);
-    ctx.fillRect(x+20,y+33,7,9);
-   }else if(Math.floor(elapsed*12)%2===0){
-    ctx.fillRect(x+7,y+33,7,9);
-    ctx.fillRect(x+21,y+33,7,5);
-    ctx.fillRect(x+18,y+38,10,4);
-   }else{
-    ctx.fillRect(x+7,y+33,7,5);
-    ctx.fillRect(x+4,y+38,10,4);
-    ctx.fillRect(x+21,y+33,7,9);
-   }
+   if(player.jumping){ctx.fillRect(x+7,y+33,7,9);ctx.fillRect(x+20,y+33,7,9);}
+   else if(Math.floor(elapsed*12)%2===0){ctx.fillRect(x+7,y+33,7,9);ctx.fillRect(x+21,y+33,7,5);ctx.fillRect(x+18,y+38,10,4);}
+   else{ctx.fillRect(x+7,y+33,7,5);ctx.fillRect(x+4,y+38,10,4);ctx.fillRect(x+21,y+33,7,9);}
    ctx.restore();
   }
 
   function drawCactus(o){
-   ctx.save();
-   ctx.fillStyle='#43f5a5';
-   ctx.shadowColor='#43f5a5';
-   ctx.shadowBlur=3;
-
-   // Main cactus stem.
+   ctx.save();ctx.fillStyle='#43f5a5';ctx.shadowColor='#43f5a5';ctx.shadowBlur=3;
    ctx.fillRect(o.x+6,o.y,o.w-12,o.h);
-
-   // Cactus arms.
-   if(o.w>18){
-    ctx.fillRect(o.x,o.y+o.h*.38,7,6);
-    ctx.fillRect(o.x,o.y+o.h*.25,6,o.h*.25);
-    ctx.fillRect(o.x+o.w-7,o.y+o.h*.55,7,6);
-    ctx.fillRect(o.x+o.w-6,o.y+o.h*.4,6,o.h*.2);
-   }
+   if(o.w>18){ctx.fillRect(o.x,o.y+o.h*.38,7,6);ctx.fillRect(o.x,o.y+o.h*.25,6,o.h*.25);ctx.fillRect(o.x+o.w-7,o.y+o.h*.55,7,6);ctx.fillRect(o.x+o.w-6,o.y+o.h*.4,6,o.h*.2);}
    ctx.restore();
   }
 
   function draw(){
-   ctx.fillStyle='#030914';
-   ctx.fillRect(0,0,400,220);
-
-   // Minimal Chrome Dino-style sky and ground.
+   ctx.fillStyle='#030914';ctx.fillRect(0,0,400,220);
    ctx.fillStyle='#a7b6c9';
-   for(let i=0;i<35;i++){
-    const x=(i*67)%400;
-    const y=25+(i*31)%95;
-    ctx.fillRect(x,y,2,2);
-   }
-
-   ctx.strokeStyle='#dce5f1';
-   ctx.lineWidth=1.5;
-   ctx.beginPath();
-   ctx.moveTo(0,ground);
-   ctx.lineTo(400,ground);
-   ctx.stroke();
-
-   // Moving ground marks.
+   for(let i=0;i<35;i++)ctx.fillRect((i*67)%400,25+(i*31)%95,2,2);
+   ctx.strokeStyle='#dce5f1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,ground);ctx.lineTo(400,ground);ctx.stroke();
    ctx.fillStyle='#73849a';
-   for(let i=0;i<18;i++){
-    const x=((i*31-groundOffset)%420+420)%420;
-    ctx.fillRect(x,ground+8+(i%3)*3,12+(i%4)*3,1.5);
-   }
-
-   obstacles.forEach(drawCactus);
-   drawDino();
-
-   ctx.fillStyle='#e8eef7';
-   ctx.font='bold 11px monospace';
-   ctx.textAlign='right';
+   for(let i=0;i<18;i++){const x=((i*31-groundOffset)%420+420)%420;ctx.fillRect(x,ground+8+(i%3)*3,12+(i%4)*3,1.5);}
+   obstacles.forEach(drawCactus);drawDino();
+   ctx.fillStyle='#e8eef7';ctx.font='bold 11px monospace';ctx.textAlign='right';
    ctx.fillText(`HI ${String(Math.floor(distance)).padStart(5,'0')}`,390,18);
    ctx.fillText(`SCORE ${String(Math.floor(distance)).padStart(5,'0')}`,390,33);
    ctx.textAlign='left';
-
-   if(!alive){
-    ctx.fillStyle='#e8eef7';
-    ctx.font='bold 18px monospace';
-    ctx.textAlign='center';
-    ctx.fillText('GAME OVER',200,90);
-    ctx.font='11px monospace';
-    ctx.fillText('TAP RESTART TO RUN AGAIN',200,108);
-    ctx.textAlign='left';
-   }
+   if(!alive){ctx.fillStyle='#e8eef7';ctx.font='bold 18px monospace';ctx.textAlign='center';ctx.fillText('GAME OVER',200,90);ctx.font='11px monospace';ctx.fillText('TAP RESTART TO RUN AGAIN',200,108);ctx.textAlign='left';}
   }
 
-  listen(canvas,'pointerdown',e=>{
-   e.preventDefault();
-   jump();
-  });
-
+  listen(canvas,'pointerdown',e=>{e.preventDefault();jump();});
   const stop=frame(dt=>{
    if(!alive){draw();return;}
-
-   elapsed+=dt;
-   distance+=dt*10;
-   groundOffset=(groundOffset+dt*250)%420;
-
+   elapsed+=dt;distance+=dt*10;groundOffset=(groundOffset+dt*250)%420;
    const speed=Math.min(430,260+elapsed*4.2);
    setScore(Math.floor(distance));
-
-   if(controller.jumpQueued||controller.tapQueued||controller.jump||controller.tap){
-    jump();
-    controller.jump=controller.tap=false;
-    controller.jumpQueued=controller.tapQueued=false;
-   }
-
-   if(player.jumping){
-    player.vy+=1150*dt;
-    player.y+=player.vy*dt;
-
-    if(player.y>=ground-player.h){
-     player.y=ground-player.h;
-     player.vy=0;
-     player.jumping=false;
-    }
-   }
-
+   if(controller.jumpQueued||controller.tapQueued||controller.jump||controller.tap){jump();controller.jump=controller.tap=false;controller.jumpQueued=controller.tapQueued=false;}
+   if(player.jumping){player.vy+=1150*dt;player.y+=player.vy*dt;if(player.y>=ground-player.h){player.y=ground-player.h;player.vy=0;player.jumping=false;}}
    spawn-=dt;
-   if(spawn<=0){
-    const h=23+Math.random()*19;
-    const w=16+Math.random()*13;
-    obstacles.push({x:410,y:ground-h,w,h});
-    spawn=Math.max(.52,1.05-Math.min(.38,elapsed*.009))+Math.random()*.38;
-   }
-
-   obstacles.forEach(o=>o.x-=speed*dt);
-   obstacles=obstacles.filter(o=>o.x+o.w>-5);
-
+   if(spawn<=0){const h=23+Math.random()*19,w=16+Math.random()*13;obstacles.push({x:410,y:ground-h,w,h});spawn=Math.max(.52,1.05-Math.min(.38,elapsed*.009))+Math.random()*.38;}
+   obstacles.forEach(o=>o.x-=speed*dt);obstacles=obstacles.filter(o=>o.x+o.w>-5);
    for(const o of obstacles){
     const hitX=player.x+player.w-5>o.x+2&&player.x+5<o.x+o.w-2;
     const hitY=player.y+player.h-4>o.y+3;
-
-    if(hitX&&hitY){
-     alive=false;
-     setMessage(`Game over! Distance: ${Math.floor(distance)}`);
-     break;
-    }
+    if(hitX&&hitY){alive=false;setMessage(`Game over! Distance: ${Math.floor(distance)}`);break;}
    }
-
    draw();
   });
-
   draw();
   return()=>{alive=false;stop();};
  }
 
+ /* UPDATE 3: Nexora Jet uses a 60-second countdown and zooms away on victory. */
  function gameShooter(){
   setInstructions('Drag to steer; tap or hold to fire');
-  const{canvas,ctx}=makeCanvas(380,260);
+  const{canvas,ctx,wrap}=makeCanvas(380,260);
   const ship={x:190,y:220};
   let bullets=[],enemies=[],particles=[],spawn=0,fireTimer=0,elapsed=0,hull=3,alive=true;
+  let timeLeft=60,jetWon=false,jetX=-80,jetY=120,jetScale=1;
+  let countdownLabel=document.createElement('div');
+  countdownLabel.className='nx-lives';
+  countdownLabel.innerHTML='<span>MISSION TIME</span><strong data-jet-time>01:00</strong>';
+  wrap.before(countdownLabel);
+  const timerText=$('[data-jet-time]',countdownLabel);
 
-  function fire(){if(!alive||fireTimer>0)return;bullets.push({x:ship.x,y:ship.y-14,vy:-430});fireTimer=.085;}
+  function updateTimer(){
+   const t=Math.max(0,Math.ceil(timeLeft));
+   timerText.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+   timerText.style.color=t<=10?'#ff718f':'#43f5a5';
+  }
+
+  function fire(){
+   if(!alive||jetWon||fireTimer>0)return;
+   bullets.push({x:ship.x,y:ship.y-14,vy:-430});
+   fireTimer=.085;
+  }
   function explode(x,y,color){
    for(let i=0;i<7;i++)particles.push({x,y,vx:(Math.random()-.5)*170,vy:(Math.random()-.5)*170,life:.25+Math.random()*.3,color});
   }
+
+  function drawVictoryJet(){
+   ctx.save();
+   ctx.translate(jetX,jetY);
+   ctx.scale(jetScale,jetScale);
+   ctx.shadowColor='#35e8ff';ctx.shadowBlur=18;
+   ctx.fillStyle='#35e8ff';
+   ctx.beginPath();
+   ctx.moveTo(35,0);ctx.lineTo(-18,-13);ctx.lineTo(-8,-3);ctx.lineTo(-25,5);ctx.lineTo(-7,7);ctx.lineTo(-18,15);ctx.lineTo(35,0);ctx.fill();
+   ctx.fillStyle='#eafcff';ctx.fillRect(-8,-4,19,3);
+   ctx.fillStyle='#ffb347';ctx.beginPath();ctx.moveTo(-20,-4);ctx.lineTo(-39,0);ctx.lineTo(-20,4);ctx.closePath();ctx.fill();
+   ctx.restore();
+  }
+
   function draw(){
    ctx.fillStyle='#030914';ctx.fillRect(0,0,380,260);
    for(let i=0;i<55;i++){
@@ -777,52 +767,72 @@ function openGame(id){
     ctx.fillStyle=i%4===0?'#35e8ff':'#546a8c';ctx.fillRect(x,y,1.5,1.5);
    }
 
-   ctx.save();
-   ctx.translate(ship.x,ship.y);
-   ctx.rotate(0);
-   ctx.shadowColor='#35e8ff';ctx.shadowBlur=12;
-   ctx.fillStyle='#35e8ff';
-   ctx.beginPath();
-   ctx.moveTo(0,-19);
-   ctx.lineTo(12,12);
-   ctx.lineTo(5,8);
-   ctx.lineTo(0,13);
-   ctx.lineTo(-5,8);
-   ctx.lineTo(-12,12);
-   ctx.closePath();
-   ctx.fill();
-   ctx.fillStyle='#eafcff';
-   ctx.beginPath();ctx.ellipse(0,-4,4,7,0,0,Math.PI*2);ctx.fill();
-   ctx.fillStyle='#ffb347';
-   ctx.beginPath();ctx.moveTo(-4,12);ctx.lineTo(0,22+Math.random()*3);ctx.lineTo(4,12);ctx.closePath();ctx.fill();
+   if(jetWon){
+    drawVictoryJet();
+    ctx.save();ctx.textAlign='center';
+    ctx.fillStyle='#35e8ff';ctx.shadowColor='#35e8ff';ctx.shadowBlur=14;
+    ctx.font='bold 23px system-ui';ctx.fillText('MISSION COMPLETE!',190,45);
+    ctx.shadowBlur=0;ctx.fillStyle='#eafcff';ctx.font='13px system-ui';
+    ctx.fillText('SURVIVED FOR ONE MINUTE',190,66);
+    ctx.fillText('YOUR NEXORA JET IS TAKING OFF!',190,88);
+    ctx.restore();
+    particles.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);});
+    return;
+   }
+
+   ctx.save();ctx.translate(ship.x,ship.y);
+   ctx.shadowColor='#35e8ff';ctx.shadowBlur=12;ctx.fillStyle='#35e8ff';
+   ctx.beginPath();ctx.moveTo(0,-19);ctx.lineTo(12,12);ctx.lineTo(5,8);ctx.lineTo(0,13);ctx.lineTo(-5,8);ctx.lineTo(-12,12);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#eafcff';ctx.beginPath();ctx.ellipse(0,-4,4,7,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#ffb347';ctx.beginPath();ctx.moveTo(-4,12);ctx.lineTo(0,22+Math.random()*3);ctx.lineTo(4,12);ctx.closePath();ctx.fill();
    ctx.restore();
 
    ctx.fillStyle='#f6fdff';ctx.shadowColor='#35e8ff';ctx.shadowBlur=8;
    bullets.forEach(b=>ctx.fillRect(b.x-2,b.y-7,4,12));
-
    enemies.forEach(e=>{
-    ctx.save();
-    ctx.translate(e.x,e.y);
-    ctx.rotate(Math.PI);
-    ctx.shadowColor='#ff4f8b';ctx.shadowBlur=8;
-    ctx.fillStyle='#ff4f8b';
-    ctx.beginPath();
-    ctx.moveTo(0,-15);ctx.lineTo(10,10);ctx.lineTo(4,7);
-    ctx.lineTo(0,11);ctx.lineTo(-4,7);ctx.lineTo(-10,10);
-    ctx.closePath();ctx.fill();
-    ctx.fillStyle='#fff0f5';ctx.beginPath();ctx.ellipse(0,-3,3,5,0,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.PI);
+    ctx.shadowColor='#ff4f8b';ctx.shadowBlur=8;ctx.fillStyle='#ff4f8b';
+    ctx.beginPath();ctx.moveTo(0,-15);ctx.lineTo(10,10);ctx.lineTo(4,7);ctx.lineTo(0,11);ctx.lineTo(-4,7);ctx.lineTo(-10,10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#fff0f5';ctx.beginPath();ctx.ellipse(0,-3,3,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
    });
-
    particles.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3);});
    ctx.shadowBlur=0;ctx.fillStyle='#e6efff';ctx.font='bold 12px system-ui';
    ctx.fillText(`HULL ${'♥'.repeat(Math.max(0,hull))}`,10,18);
    ctx.fillText(`SCORE ${score}`,10,34);
   }
 
+  function victory(){
+   if(jetWon)return;
+   jetWon=true;
+   alive=false;
+   bullets=[];enemies=[];
+   setScore(score+100);
+   setMessage('🏆 YOU WIN! You survived for one minute. Watch your Nexora jet zoom off!');
+   controller.fire=false;
+   controller.fireQueued=false;
+   countdownLabel.innerHTML='<span>MISSION STATUS</span><strong style="color:#35e8ff">VICTORY!</strong>';
+   let launchStart=null;
+   function launch(time){
+    if(gen!==generation||activeGame!==id||!jetWon)return;
+    if(launchStart===null)launchStart=time;
+    const t=Math.min(1,(time-launchStart)/1800);
+    jetX=-35+t*470;
+    jetY=150-t*100;
+    jetScale=1+t*.8;
+    draw();
+    if(t<1)requestAnimationFrame(launch);
+    else setMessage('🚀 NEXORA JET LAUNCHED! Mission accomplished. Tap Restart to play again.');
+   }
+   requestAnimationFrame(launch);
+  }
+
   const stop=frame(dt=>{
    elapsed+=dt;
+   if(jetWon){draw();return;}
    if(!alive){draw();return;}
+
+   timeLeft=Math.max(0,timeLeft-dt);
+   updateTimer();
 
    if(controller.active){
     ship.x=14+(controller.x+1)/2*(380-28);
@@ -851,21 +861,18 @@ function openGame(id){
 
    enemies.forEach(e=>{
     e.y+=e.vy*dt;
-
     if(!e.dead&&Math.abs(e.x-ship.x)<20&&Math.abs(e.y-ship.y)<21){
      e.dead=true;hull--;explode(e.x,e.y,'#ff6d9a');
-     if(hull<=0){alive=false;setMessage(`Rocket destroyed! Score: ${score}`);}
+     if(hull<=0){alive=false;setMessage(`Rocket destroyed! Score: ${score}. Try again!`);}
     }
-
     bullets.forEach(b=>{
      if(!b.dead&&!e.dead&&Math.abs(b.x-e.x)<16&&Math.abs(b.y-e.y)<17){
       b.dead=true;e.dead=true;addScore(10);explode(e.x,e.y,'#35e8ff');
      }
     });
-
     if(e.y>275&&!e.dead){
      e.dead=true;hull--;
-     if(hull<=0){alive=false;setMessage(`Enemies broke through! Score: ${score}`);}
+     if(hull<=0){alive=false;setMessage(`Enemies broke through! Score: ${score}. Try again!`);}
     }
    });
 
@@ -873,9 +880,12 @@ function openGame(id){
    enemies=enemies.filter(e=>!e.dead);
    particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});
    particles=particles.filter(p=>p.life>0);
+
+   if(timeLeft<=0&&alive){victory();return;}
    draw();
   });
 
+  updateTimer();
   return()=>{alive=false;stop();};
  }
 
@@ -889,7 +899,6 @@ function openGame(id){
   let answer=0,correctStreak=0,locked=false,choices=[];
 
   function newQuestion(){
-   if(matchEnded)return;
    locked=false;status.textContent='Choose the correct answer.';
    const op=Math.floor(Math.random()*4);
    let a=1+Math.floor(Math.random()*15),b=1+Math.floor(Math.random()*15),symbol='+';
@@ -899,7 +908,7 @@ function openGame(id){
    else{b=1+Math.floor(Math.random()*9);answer=1+Math.floor(Math.random()*10);a=b*answer;symbol='÷';}
    question.textContent=`${a} ${symbol} ${b} = ?`;
    const opts=new Set([answer]);
-   while(opts.size<4){opts.add(Math.max(0,answer+Math.floor(Math.random()*11)-5));}
+   while(opts.size<4)opts.add(Math.max(0,answer+Math.floor(Math.random()*11)-5));
    choices=[...opts].sort(()=>Math.random()-.5);
    answers.innerHTML=choices.map((v,i)=>`<button class="nx-answer" data-answer="${v}">${i+1}. ${v}</button>`).join('');
   }
@@ -912,14 +921,8 @@ function openGame(id){
    $$('[data-answer]',answers).forEach(b=>b.disabled=true);
    timeout(newQuestion,650);
   }
-  listen(answers,'click',e=>{
-   const b=e.target.closest('[data-answer]');
-   if(b)chooseAnswer(choices.indexOf(Number(b.dataset.answer)));
-  });
-  mathTapHandler=e=>{
-   const r=pad.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
-   chooseAnswer(Math.min(3,Math.max(0,Math.floor(y*2)*2+Math.floor(x*2))));
-  };
+  listen(answers,'click',e=>{const b=e.target.closest('[data-answer]');if(b)chooseAnswer(choices.indexOf(Number(b.dataset.answer)));});
+  mathTapHandler=e=>{const r=pad.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;chooseAnswer(Math.min(3,Math.max(0,Math.floor(y*2)*2+Math.floor(x*2))));};
   mathKeyHandler=k=>chooseAnswer(Number(k)-1);
   newQuestion();
   return()=>{mathTapHandler=null;mathKeyHandler=null;};
@@ -935,29 +938,20 @@ function openGame(id){
   area.append(status,buttons,result,tally);
   const moves=['rock','paper','scissors'],icons={rock:'✊',paper:'✋',scissors:'✌️'};
   let wins=0,draws=0,losses=0;
-
   function play(move){
    if(matchEnded)return;
    const computer=moves[Math.floor(Math.random()*3)];
    let msg;
    if(move===computer){draws++;matchAPI.addMatchResult('draw');msg='Draw!';}
-   else if((move==='rock'&&computer==='scissors')||(move==='paper'&&computer==='rock')||(move==='scissors'&&computer==='paper')){
-    wins++;matchAPI.addMatchResult('you');addScore(1);msg='You win!';
-   }else{losses++;matchAPI.addMatchResult('computer');msg='Computer wins!';}
+   else if((move==='rock'&&computer==='scissors')||(move==='paper'&&computer==='rock')||(move==='scissors'&&computer==='paper')){wins++;matchAPI.addMatchResult('you');addScore(1);msg='You win!';}
+   else{losses++;matchAPI.addMatchResult('computer');msg='Computer wins!';}
    result.textContent=`${icons[move]} vs ${icons[computer]}`;
    status.textContent=msg;
    tally.textContent=`YOU ${wins} : ${losses} COMPUTER · Draws: ${draws}`;
   }
   listen(buttons,'click',e=>{const b=e.target.closest('[data-rps]');if(b)play(b.dataset.rps);});
-  rpsTapHandler=e=>{
-   const x=(e.clientX-pad.getBoundingClientRect().left)/pad.getBoundingClientRect().width;
-   play(x<1/3?'rock':x<2/3?'paper':'scissors');
-  };
-  rpsKeyHandler=key=>{
-   if(key==='r')play('rock');
-   if(key==='p')play('paper');
-   if(key==='s')play('scissors');
-  };
+  rpsTapHandler=e=>{const x=(e.clientX-pad.getBoundingClientRect().left)/pad.getBoundingClientRect().width;play(x<1/3?'rock':x<2/3?'paper':'scissors');};
+  rpsKeyHandler=key=>{if(key==='r')play('rock');if(key==='p')play('paper');if(key==='s')play('scissors');};
   return()=>{rpsTapHandler=null;rpsKeyHandler=null;};
  }
 
@@ -971,183 +965,64 @@ function openGame(id){
   const letters=document.createElement('div');letters.className='nx-letter-grid';
   letters.innerHTML='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l=>`<button class="nx-letter" data-letter="${l}">${l}</button>`).join('');
   area.append(status,drawing,display,letters);
-
   function render(){
    display.textContent=word.split('').map(l=>guessed.has(l)?l:'_').join(' ');
    drawing.textContent=['○','◔','◑','◕','◉','☠','✖'][mistakes];
    $$('[data-letter]',letters).forEach(b=>b.disabled=ended||guessed.has(b.dataset.letter));
   }
   function reset(){
-   word=words[Math.floor(Math.random()*words.length)];
-   guessed=new Set();mistakes=0;ended=false;
-   status.textContent='Guess the hidden word.';
-   render();
+   word=words[Math.floor(Math.random()*words.length)];guessed=new Set();mistakes=0;ended=false;
+   status.textContent='Guess the hidden word.';render();
   }
   function guess(letter){
    if(ended||guessed.has(letter)||!/^[A-Z]$/.test(letter))return;
    guessed.add(letter);
    if(!word.includes(letter))mistakes++;
-   if(word.split('').every(l=>guessed.has(l))){
-    ended=true;addScore(10);status.textContent=`Solved! Word: ${word}`;timeout(reset,1100);
-   }else if(mistakes>=6){
-    ended=true;status.textContent=`Game over! Word: ${word}`;timeout(reset,1400);
-   }else status.textContent=`Mistakes: ${mistakes}/6`;
+   if(word.split('').every(l=>guessed.has(l))){ended=true;addScore(10);status.textContent=`Solved! Word: ${word}`;timeout(reset,1100);}
+   else if(mistakes>=6){ended=true;status.textContent=`Game over! Word: ${word}`;timeout(reset,1400);}
+   else status.textContent=`Mistakes: ${mistakes}/6`;
    render();
   }
   listen(letters,'click',e=>{const b=e.target.closest('[data-letter]');if(b)guess(b.dataset.letter);});
-  hangmanTapHandler=e=>{
-   const r=pad.getBoundingClientRect();
-   const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
-   const i=Math.floor(y*4)*7+Math.floor(x*7);
-   if(i>=0&&i<26)guess('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]);
-  };
+  hangmanTapHandler=e=>{const r=pad.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height,i=Math.floor(y*4)*7+Math.floor(x*7);if(i>=0&&i<26)guess('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]);};
   hangmanKeyHandler=guess;
   reset();
   return()=>{hangmanTapHandler=null;hangmanKeyHandler=null;};
  }
 
- /* UPDATED: Mirrored dove facing right, with increased flight speed. */
+ /* Mirrored dove facing right. */
  function gameDove(){
   setInstructions('Drag the pad to guide the dove up, down, left, and right');
   const{ctx}=makeCanvas(300,380);
   const dove={x:75,y:185,r:12};
   let obstacles=[],stars=[],elapsed=0,spawn=0,starSpawn=0,alive=true,started=false,passed=0,collected=0;
   const gap=140,pw=36,baseSpeed=225;
-
   function draw(){
    const sky=ctx.createLinearGradient(0,0,0,380);
    sky.addColorStop(0,'#071a3b');sky.addColorStop(.6,'#14518a');sky.addColorStop(1,'#77c7ee');
    ctx.fillStyle=sky;ctx.fillRect(0,0,300,380);
-
-   for(let i=0;i<24;i++){
-    ctx.fillStyle='#ffffff88';
-    ctx.fillRect(31*i%300,59*i%190,2,2);
-   }
-
-   for(let i=0;i<4;i++){
-    const x=((i*100-elapsed*12)%380+380)%380-35,y=55+i*48;
-    ctx.fillStyle='#ffffff30';
-    ctx.beginPath();
-    ctx.arc(x,y,17,0,7);
-    ctx.arc(x+18,y-8,20,0,7);
-    ctx.arc(x+37,y,15,0,7);
-    ctx.fill();
-   }
-
-   obstacles.forEach(o=>{
-    ctx.fillStyle='#43f5a5';
-    ctx.shadowColor='#43f5a5';
-    ctx.shadowBlur=8;
-    ctx.fillRect(o.x,0,pw,o.top);
-    ctx.fillRect(o.x,o.top+gap,pw,380-o.top-gap);
-    ctx.fillStyle='#20c98f';
-    ctx.fillRect(o.x-3,o.top-7,pw+6,7);
-    ctx.fillRect(o.x-3,o.top+gap,pw+6,7);
-   });
-
+   for(let i=0;i<24;i++){ctx.fillStyle='#ffffff88';ctx.fillRect(31*i%300,59*i%190,2,2);}
+   for(let i=0;i<4;i++){const x=((i*100-elapsed*12)%380+380)%380-35,y=55+i*48;ctx.fillStyle='#ffffff30';ctx.beginPath();ctx.arc(x,y,17,0,7);ctx.arc(x+18,y-8,20,0,7);ctx.arc(x+37,y,15,0,7);ctx.fill();}
+   obstacles.forEach(o=>{ctx.fillStyle='#43f5a5';ctx.shadowColor='#43f5a5';ctx.shadowBlur=8;ctx.fillRect(o.x,0,pw,o.top);ctx.fillRect(o.x,o.top+gap,pw,380-o.top-gap);ctx.fillStyle='#20c98f';ctx.fillRect(o.x-3,o.top-7,pw+6,7);ctx.fillRect(o.x-3,o.top+gap,pw+6,7);});
    ctx.shadowBlur=0;
-
-   stars.forEach(s=>{
-    ctx.save();
-    ctx.translate(s.x,s.y);
-    ctx.rotate(elapsed*2);
-    ctx.fillStyle='#ffe66d';
-    ctx.shadowColor='#ffe66d';
-    ctx.shadowBlur=12;
-    ctx.font='21px sans-serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText('★',0,0);
-    ctx.restore();
-   });
-
-   // Mirror the dove horizontally so it faces right.
-   ctx.save();
-   ctx.translate(dove.x,dove.y);
-   ctx.scale(-1,1);
-   ctx.textAlign='center';
-   ctx.textBaseline='middle';
-   ctx.font='30px sans-serif';
-   ctx.shadowColor='#fff';
-   ctx.shadowBlur=10;
-   ctx.fillText('🕊️',0,0);
-   ctx.restore();
-
-   ctx.fillStyle='#fff';
-   ctx.font='bold 12px system-ui';
-   ctx.fillText(`SCORE ${passed*10+collected*5}`,10,20);
-   ctx.fillText(`STARS ${collected}`,10,37);
-
-   if(!started&&alive){
-    ctx.textAlign='center';
-    ctx.fillText('DRAG THE PAD TO FLY',150,325);
-    ctx.textAlign='start';
-   }
+   stars.forEach(s=>{ctx.save();ctx.translate(s.x,s.y);ctx.rotate(elapsed*2);ctx.fillStyle='#ffe66d';ctx.shadowColor='#ffe66d';ctx.shadowBlur=12;ctx.font='21px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',0,0);ctx.restore();});
+   ctx.save();ctx.translate(dove.x,dove.y);ctx.scale(-1,1);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='30px sans-serif';ctx.shadowColor='#fff';ctx.shadowBlur=10;ctx.fillText('🕊️',0,0);ctx.restore();
+   ctx.fillStyle='#fff';ctx.font='bold 12px system-ui';ctx.fillText(`SCORE ${passed*10+collected*5}`,10,20);ctx.fillText(`STARS ${collected}`,10,37);
+   if(!started&&alive){ctx.textAlign='center';ctx.fillText('DRAG THE PAD TO FLY',150,325);ctx.textAlign='start';}
   }
-
   const stop=frame(dt=>{
-   elapsed+=dt;
-   if(!alive){draw();return;}
-
-   if(controller.active){
-    started=true;
-    dove.x=40+(controller.x+1)/2*145;
-    dove.y=25+(controller.y+1)/2*330;
-   }
-
-   // Speed gradually increases, making the game more challenging.
+   elapsed+=dt;if(!alive){draw();return;}
+   if(controller.active){started=true;dove.x=40+(controller.x+1)/2*145;dove.y=25+(controller.y+1)/2*330;}
    const speed=Math.min(360,baseSpeed+elapsed*2.5);
-
-   spawn-=dt;
-   starSpawn-=dt;
-
-   if(started&&spawn<=0){
-    const max=380-gap-42;
-    obstacles.push({x:310,top:42+Math.random()*(max-42),scored:false});
-    spawn=Math.max(.72,1.15-elapsed*.004);
-   }
-
-   if(started&&starSpawn<=0){
-    stars.push({x:310,y:40+Math.random()*300});
-    starSpawn=.65+Math.random()*.5;
-   }
-
-   obstacles.forEach(o=>{
-    o.x-=speed*dt;
-
-    if(!o.scored&&o.x+pw<dove.x){
-     o.scored=true;
-     passed++;
-     setScore(passed*10+collected*5);
-    }
-
-    if(dove.x+dove.r>o.x&&dove.x-dove.r<o.x+pw&&(dove.y-dove.r<o.top||dove.y+dove.r>o.top+gap)){
-     alive=false;
-     setMessage(`Dove Flight over! Score: ${score}`);
-    }
-   });
-
-   stars.forEach(s=>{
-    s.x-=speed*dt;
-
-    if(!s.collected&&Math.abs(s.x-dove.x)<22&&Math.abs(s.y-dove.y)<24){
-     s.collected=true;
-     collected++;
-     addScore(5);
-    }
-   });
-
-   obstacles=obstacles.filter(o=>o.x+pw>-5);
-   stars=stars.filter(s=>s.x>-25&&!s.collected);
-
-   if(dove.y<dove.r||dove.y>380-dove.r||dove.x<dove.r||dove.x>300-dove.r){
-    alive=false;
-    setMessage(`Flight ended! Score: ${score}`);
-   }
-
+   spawn-=dt;starSpawn-=dt;
+   if(started&&spawn<=0){const max=380-gap-42;obstacles.push({x:310,top:42+Math.random()*(max-42),scored:false});spawn=Math.max(.72,1.15-elapsed*.004);}
+   if(started&&starSpawn<=0){stars.push({x:310,y:40+Math.random()*300});starSpawn=.65+Math.random()*.5;}
+   obstacles.forEach(o=>{o.x-=speed*dt;if(!o.scored&&o.x+pw<dove.x){o.scored=true;passed++;setScore(passed*10+collected*5);}if(dove.x+dove.r>o.x&&dove.x-dove.r<o.x+pw&&(dove.y-dove.r<o.top||dove.y+dove.r>o.top+gap)){alive=false;setMessage(`Dove Flight over! Score: ${score}`);}});
+   stars.forEach(s=>{s.x-=speed*dt;if(!s.collected&&Math.abs(s.x-dove.x)<22&&Math.abs(s.y-dove.y)<24){s.collected=true;collected++;addScore(5);}});
+   obstacles=obstacles.filter(o=>o.x+pw>-5);stars=stars.filter(s=>s.x>-25&&!s.collected);
+   if(dove.y<dove.r||dove.y>380-dove.r||dove.x<dove.r||dove.x>300-dove.r){alive=false;setMessage(`Flight ended! Score: ${score}`);}
    draw();
   });
-
   draw();
   return()=>{alive=false;stop();};
  }
