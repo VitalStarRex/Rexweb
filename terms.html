@@ -1,1 +1,1188 @@
 
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b19" id="themeColor">
+  <meta name="description" content="Read the RexWeb Nexora Terms of Service to understand the rules, responsibilities, and conditions for using our website, digital tools, and games.">
+
+  <title>Terms of Service | RexWeb Nexora</title>
+
+  <style>
+    :root {
+      --bg: #050b19;
+      --card: #0d172b;
+      --text: #e8eefc;
+      --muted: #9baac5;
+      --accent: #6c8cff;
+      --border: rgba(148, 163, 184, 0.18);
+      --soft: rgba(108, 140, 255, 0.1);
+      --shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    html[data-theme="light"] {
+      --bg: #f4f7fc;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #647089;
+      --accent: #345de7;
+      --border: rgba(31, 41, 55, 0.12);
+      --soft: rgba(52, 93, 231, 0.07);
+      --shadow: 0 15px 40px rgba(30, 41, 59, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1150px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .header-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .hero {
+      padding: 65px 20px 45px;
+      text-align: center;
+      background:
+        radial-gradient(
+          ellipse at top,
+          rgba(108, 140, 255, 0.14),
+          transparent 65%
+        );
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      line-height: 1.2;
+      letter-spacing: -1.5px;
+      margin: 20px 0 12px;
+    }
+
+    .hero p {
+      max-width: 680px;
+      margin: 0 auto;
+      color: var(--muted);
+    }
+
+    .updated {
+      margin-top: 18px !important;
+      font-size: 0.85rem;
+    }
+
+    .layout {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 25px 20px 70px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 90px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h2 {
+      font-size: 0.95rem;
+      margin: 0 0 12px;
+    }
+
+    .sidebar nav {
+      display: grid;
+      gap: 5px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.87rem;
+      color: var(--muted);
+    }
+
+    .sidebar nav a:hover {
+      background: var(--soft);
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .notice {
+      padding: 17px 20px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      margin-bottom: 22px;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .terms-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 90px;
+    }
+
+    .terms-section h2 {
+      font-size: 1.25rem;
+      line-height: 1.4;
+      margin: 0 0 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .terms-section h3 {
+      font-size: 1rem;
+      margin: 20px 0 7px;
+    }
+
+    .terms-section p {
+      margin: 10px 0;
+    }
+
+    .terms-section ul,
+    .terms-section ol {
+      padding-left: 22px;
+    }
+
+    .terms-section li {
+      margin: 7px 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .contact-card {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 15px;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .sidebar nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        padding-top: 45px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner {
+        padding: 12px;
+      }
+
+      .brand {
+        font-size: 1rem;
+      }
+
+      .header-btn {
+        padding: 7px 9px;
+        font-size: 0.78rem;
+      }
+
+      .layout {
+        padding: 18px 12px 45px;
+        gap: 18px;
+      }
+
+      .terms-section {
+        padding: 19px;
+      }
+
+      .sidebar {
+        padding: 16px;
+      }
+    }
+
+    @media print {
+      :root,
+      html[data-theme="light"],
+      html[data-theme="dark"] {
+        --bg: #ffffff;
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #555555;
+        --accent: #234bc4;
+        --border: #dddddd;
+        --soft: #f5f5f5;
+        --shadow: none;
+      }
+
+      .site-header,
+      .sidebar,
+      .header-actions,
+      .footer-links {
+        display: none !important;
+      }
+
+      .layout {
+        display: block;
+        max-width: 100%;
+      }
+
+      .terms-section {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      .hero {
+        padding-top: 10px;
+      }
+
+      body {
+        background: #ffffff;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="RexWeb Nexora home">
+        RexWeb <span>Nexora</span>
+      </a>
+
+      <div class="header-actions">
+        <button
+          class="header-btn"
+          id="themeToggle"
+          type="button"
+          aria-label="Toggle color theme">
+          ☀️ / 🌙
+        </button>
+
+        <button
+          class="header-btn"
+          type="button"
+          onclick="window.print()">
+          Print / PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <span class="badge">TERMS & CONDITIONS</span>
+
+    <h1>Terms of Service</h1>
+
+    <p>
+      Welcome to RexWeb Nexora. These terms explain the rules,
+      responsibilities, and conditions that apply when you access
+      our website, digital tools, games, and other services.
+    </p>
+
+    <p class="updated">
+      Effective date: October 19, 2026
+    </p>
+  </section>
+
+  <main class="layout">
+
+    <aside class="sidebar">
+      <h2>On this page</h2>
+
+      <nav aria-label="Terms of service sections">
+        <a href="#acceptance">Acceptance of Terms</a>
+        <a href="#eligibility">Eligibility</a>
+        <a href="#services">Our Services</a>
+        <a href="#acceptable-use">Acceptable Use</a>
+        <a href="#tools">Digital Tools</a>
+        <a href="#games">Games</a>
+        <a href="#intellectual-property">Intellectual Property</a>
+        <a href="#user-content">User Content</a>
+        <a href="#third-party">Third-Party Services</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#availability">Availability</a>
+        <a href="#disclaimers">Disclaimers</a>
+        <a href="#liability">Limitation of Liability</a>
+        <a href="#indemnification">Responsibility for Misuse</a>
+        <a href="#termination">Termination</a>
+        <a href="#changes">Changes to Terms</a>
+        <a href="#law">Governing Law</a>
+        <a href="#contact">Contact Us</a>
+      </nav>
+    </aside>
+
+    <div class="content">
+
+      <div class="notice">
+        <strong>Please read these terms carefully.</strong>
+        By accessing or using RexWeb Nexora, you agree to comply
+        with these Terms of Service and applicable laws. If you
+        do not agree, please discontinue using the website.
+      </div>
+
+      <section class="terms-section" id="acceptance">
+        <h2>1. Acceptance of Terms</h2>
+
+        <p>
+          These Terms of Service ("Terms") govern your access to
+          and use of RexWeb Nexora, referred to as "RexWeb,"
+          "Nexora," "we," "our," or "us."
+        </p>
+
+        <p>
+          These Terms apply to visitors and users of our website,
+          including people who use our calculators, converters,
+          text utilities, coding tools, image tools, games, and
+          other available features.
+        </p>
+
+        <p>
+          By accessing or using our services, you agree to these
+          Terms. If you do not agree with any part of these Terms,
+          you must stop using the affected services.
+        </p>
+
+        <p>
+          Additional terms may apply to specific features. Where
+          additional terms are presented, you must comply with
+          those terms when using the relevant feature.
+        </p>
+      </section>
+
+      <section class="terms-section" id="eligibility">
+        <h2>2. Eligibility</h2>
+
+        <p>
+          You may use RexWeb Nexora only if you are legally permitted
+          to do so under the laws applicable to you.
+        </p>
+
+        <p>
+          If you are under the age at which you can legally agree
+          to particular terms in your jurisdiction, you should
+          review these Terms with a parent or legal guardian where
+          required by law.
+        </p>
+
+        <p>
+          You are responsible for ensuring that your use of the
+          website complies with applicable laws and regulations.
+        </p>
+      </section>
+
+      <section class="terms-section" id="services">
+        <h2>3. Our Services</h2>
+
+        <p>
+          RexWeb Nexora is a digital platform that may provide
+          browser-based utilities, interactive experiences, games,
+          and other web services.
+        </p>
+
+        <p>Our services may include:</p>
+
+        <ul>
+          <li>Calculators and mathematical utilities.</li>
+          <li>Time-related tools and utilities.</li>
+          <li>Text editing, formatting, and text analysis tools.</li>
+          <li>Unit and file format converters.</li>
+          <li>Image-related tools and utilities.</li>
+          <li>Coding utilities and code formatting tools.</li>
+          <li>Security-related educational utilities.</li>
+          <li>Design tools and general-purpose utilities.</li>
+          <li>Browser-based games and entertainment features.</li>
+        </ul>
+
+        <p>
+          Features may be added, modified, suspended, or removed
+          as the website develops. We do not guarantee that every
+          feature will remain available indefinitely.
+        </p>
+      </section>
+
+      <section class="terms-section" id="acceptable-use">
+        <h2>4. Acceptable Use</h2>
+
+        <p>
+          You agree to use RexWeb Nexora responsibly, lawfully,
+          and in a manner that does not harm other users or
+          interfere with the operation of our website.
+        </p>
+
+        <p>You must not:</p>
+
+        <ul>
+          <li>
+            Use the website to engage in unlawful activities or
+            violate another person's rights.
+          </li>
+
+          <li>
+            Attempt to gain unauthorized access to our systems,
+            accounts, servers, or infrastructure.
+          </li>
+
+          <li>
+            Distribute malware or use the website to facilitate
+            unauthorized access, fraud, or other harmful activity.
+          </li>
+
+          <li>
+            Interfere with the normal operation, availability,
+            or security of our website.
+          </li>
+
+          <li>
+            Attempt to overload our services or bypass reasonable
+            technical restrictions.
+          </li>
+
+          <li>
+            Use automated systems to access the website in a way
+            that causes unreasonable disruption or violates
+            applicable restrictions.
+          </li>
+
+          <li>
+            Copy, modify, redistribute, or exploit protected website
+            content except as permitted by law or with the required
+            authorization.
+          </li>
+
+          <li>
+            Misrepresent your identity or use our services to
+            deceive or harm others.
+          </li>
+        </ul>
+
+        <p>
+          We may take reasonable steps to investigate suspected
+          misuse and protect the website, its users, and its services.
+        </p>
+      </section>
+
+      <section class="terms-section" id="tools">
+        <h2>5. Digital Tools and Converters</h2>
+
+        <p>
+          Our digital tools are provided to help users complete
+          everyday calculations, conversions, formatting tasks,
+          and other supported activities.
+        </p>
+
+        <h3>5.1 Accuracy</h3>
+
+        <p>
+          We aim to make our tools useful and reliable, but we do
+          not guarantee that every calculation, conversion, output,
+          or result will always be accurate, complete, or suitable
+          for every purpose.
+        </p>
+
+        <p>
+          You are responsible for reviewing results before relying
+          on them, particularly where errors could cause financial,
+          professional, technical, or other significant consequences.
+        </p>
+
+        <h3>5.2 File and Image Conversion</h3>
+
+        <p>
+          File conversion tools may support only certain formats,
+          file sizes, browsers, or processing methods.
+        </p>
+
+        <p>
+          You are responsible for ensuring that you have the right
+          to use and process any file you submit. You should keep
+          a separate copy of important files before converting them.
+        </p>
+
+        <p>
+          We do not guarantee that converted files will preserve
+          every feature, metadata field, color profile, animation,
+          transparency setting, or quality characteristic of the
+          original file.
+        </p>
+
+        <h3>5.3 Security Tools</h3>
+
+        <p>
+          Security-related utilities, where available, are provided
+          for lawful and authorized purposes. They are not a
+          substitute for professional security testing, expert
+          advice, or comprehensive security controls.
+        </p>
+
+        <h3>5.4 No Professional Advice</h3>
+
+        <p>
+          Unless a feature expressly states otherwise, our tools
+          are not intended to provide professional legal, medical,
+          financial, cybersecurity, or other regulated advice.
+        </p>
+      </section>
+
+      <section class="terms-section" id="games">
+        <h2>6. Games and Entertainment</h2>
+
+        <p>
+          RexWeb Nexora may provide games and interactive entertainment
+          features for personal enjoyment.
+        </p>
+
+        <ul>
+          <li>
+            Game scores and progress may be stored locally in your
+            browser or through other supported storage mechanisms.
+          </li>
+
+          <li>
+            Clearing browser data may remove locally saved scores
+            or progress.
+          </li>
+
+          <li>
+            We do not guarantee that game progress, scores, or
+            saved settings will always be preserved.
+          </li>
+
+          <li>
+            Games may be updated, reset, or discontinued without
+            a guarantee of continued access to previous progress.
+          </li>
+        </ul>
+
+        <p>
+          You agree not to manipulate, exploit, or disrupt game
+          features in ways that compromise the service or negatively
+          affect other users.
+        </p>
+      </section>
+
+      <section class="terms-section" id="intellectual-property">
+        <h2>7. Intellectual Property</h2>
+
+        <p>
+          Unless otherwise indicated, the website's original
+          branding, design, layouts, graphics, text, and software
+          are owned by RexWeb Nexora or used under applicable
+          authorization or licenses.
+        </p>
+
+        <p>
+          These Terms do not transfer ownership of our intellectual
+          property to you.
+        </p>
+
+        <p>
+          You may access and use the website for lawful personal
+          or other permitted purposes. You must not reproduce,
+          redistribute, sell, publicly republish, or create
+          unauthorized derivative works from protected materials
+          except as permitted by applicable law or with the
+          relevant rights holder's permission.
+        </p>
+
+        <p>
+          Third-party trademarks, logos, libraries, and other
+          materials remain the property of their respective owners.
+          Their appearance on our website does not necessarily
+          imply endorsement or affiliation.
+        </p>
+      </section>
+
+      <section class="terms-section" id="user-content">
+        <h2>8. User Content and Submitted Files</h2>
+
+        <p>
+          Certain features may allow you to enter text, provide
+          feedback, submit files, or otherwise provide content.
+        </p>
+
+        <p>
+          You retain any rights you already hold in content you
+          submit, subject to applicable law and any separate terms
+          that apply to a particular service.
+        </p>
+
+        <p>You are responsible for ensuring that:</p>
+
+        <ul>
+          <li>You have the necessary rights to submit and use the content.</li>
+          <li>Your content does not unlawfully infringe another person's rights.</li>
+          <li>Your use of our services complies with applicable laws.</li>
+          <li>You do not knowingly submit malicious files or harmful content.</li>
+        </ul>
+
+        <p>
+          Submitting content does not automatically transfer
+          ownership of that content to RexWeb Nexora.
+        </p>
+
+        <p>
+          Where a feature requires us to process submitted content
+          to provide the requested service, you authorize that
+          processing to the extent reasonably necessary and legally
+          permitted for that purpose.
+        </p>
+
+        <p>
+          Do not submit confidential or sensitive material unless
+          the relevant feature is appropriate for that information.
+        </p>
+      </section>
+
+      <section class="terms-section" id="third-party">
+        <h2>9. Third-Party Services and Links</h2>
+
+        <p>
+          Our website may contain links to external websites,
+          embedded content, third-party libraries, or services
+          operated by other organizations.
+        </p>
+
+        <p>
+          We do not control every external service and are not
+          responsible for its independent content, availability,
+          security, policies, or practices.
+        </p>
+
+        <p>
+          Your use of third-party services may be subject to
+          additional terms and privacy policies provided by
+          those services.
+        </p>
+
+        <p>
+          A link to an external website does not necessarily mean
+          that RexWeb Nexora endorses that website or its operator.
+        </p>
+      </section>
+
+      <section class="terms-section" id="privacy">
+        <h2>10. Privacy</h2>
+
+        <p>
+          Your use of RexWeb Nexora is also subject to our
+          Privacy Policy, which explains how information may
+          be handled when you use our website.
+        </p>
+
+        <p>
+          Please review the Privacy Policy to understand our
+          information practices, including browser storage,
+          technical data, and any third-party services that
+          may be used.
+        </p>
+
+        <p>
+          <a href="privacy.html">Read our Privacy Policy</a>
+        </p>
+      </section>
+
+      <section class="terms-section" id="availability">
+        <h2>11. Website Availability and Changes</h2>
+
+        <p>
+          We aim to keep RexWeb Nexora accessible and functioning
+          properly, but we cannot guarantee uninterrupted or
+          error-free operation.
+        </p>
+
+        <p>
+          Access may occasionally be affected by maintenance,
+          technical issues, hosting problems, network interruptions,
+          security incidents, or circumstances beyond our control.
+        </p>
+
+        <p>
+          We may update, modify, suspend, or discontinue features
+          where reasonably necessary, subject to applicable law
+          and any obligations we have to users.
+        </p>
+
+        <p>
+          We do not guarantee that the website will be compatible
+          with every device, operating system, browser, or software
+          configuration.
+        </p>
+      </section>
+
+      <section class="terms-section" id="disclaimers">
+        <h2>12. Disclaimers</h2>
+
+        <p>
+          To the extent permitted by applicable law, RexWeb Nexora
+          and its services are provided on an "as available" basis.
+        </p>
+
+        <p>
+          We make no general guarantee that the website will always
+          be available, secure, uninterrupted, free of errors, or
+          suitable for every user's particular requirements.
+        </p>
+
+        <p>
+          We do not guarantee that all information published on
+          the website is complete, current, or free from mistakes.
+        </p>
+
+        <p>
+          You are responsible for determining whether a tool,
+          service, or result is appropriate for your intended use.
+        </p>
+
+        <p>
+          Nothing in these Terms excludes a warranty, right, or
+          protection that cannot lawfully be excluded or limited.
+        </p>
+      </section>
+
+      <section class="terms-section" id="liability">
+        <h2>13. Limitation of Liability</h2>
+
+        <p>
+          To the extent permitted by applicable law, RexWeb Nexora
+          will not be responsible for losses arising from circumstances
+          such as:
+        </p>
+
+        <ul>
+          <li>
+            Reliance on inaccurate or incomplete tool results.
+          </li>
+
+          <li>
+            Loss of files, settings, game progress, or locally
+            stored data.
+          </li>
+
+          <li>
+            Temporary website interruptions or technical errors.
+          </li>
+
+          <li>
+            Problems caused by third-party websites or services.
+          </li>
+
+          <li>
+            Unauthorized use of your device or account resulting
+            from circumstances outside our reasonable control.
+          </li>
+
+          <li>
+            Use of our services in a way that is inconsistent
+            with these Terms or the relevant feature's instructions.
+          </li>
+        </ul>
+
+        <p>
+          To the extent permitted by law, we will not be liable
+          for indirect, incidental, special, or consequential
+          losses arising from your use of the website.
+        </p>
+
+        <p>
+          This section does not exclude or restrict liability
+          where doing so would be unlawful, including any
+          liability that applicable law does not permit us
+          to disclaim.
+        </p>
+      </section>
+
+      <section class="terms-section" id="indemnification">
+        <h2>14. Responsibility for Misuse</h2>
+
+        <p>
+          You are responsible for your unlawful or unauthorized
+          use of RexWeb Nexora and for complying with these Terms.
+        </p>
+
+        <p>
+          To the extent permitted by applicable law, you may be
+          responsible for reasonable losses or costs directly
+          arising from your unlawful misuse of our services or
+          infringement of another person's rights.
+        </p>
+
+        <p>
+          Nothing in this section requires you to accept
+          responsibility for losses caused by our own unlawful
+          conduct or removes any rights that cannot legally
+          be waived.
+        </p>
+      </section>
+
+      <section class="terms-section" id="termination">
+        <h2>15. Suspension and Termination</h2>
+
+        <p>
+          We may restrict or suspend access to all or part of
+          the website where reasonably necessary to:
+        </p>
+
+        <ul>
+          <li>Protect the security and stability of our services.</li>
+          <li>Investigate suspected abuse or unlawful activity.</li>
+          <li>Address serious or repeated violations of these Terms.</li>
+          <li>Comply with legal obligations.</li>
+          <li>Perform necessary maintenance or discontinue a feature.</li>
+        </ul>
+
+        <p>
+          Where appropriate and legally required, we will take
+          reasonable steps to provide notice or an opportunity
+          to address a problem.
+        </p>
+
+        <p>
+          You may stop using the website at any time.
+        </p>
+      </section>
+
+      <section class="terms-section" id="changes">
+        <h2>16. Changes to These Terms</h2>
+
+        <p>
+          We may revise these Terms to reflect changes to our
+          services, website functionality, security practices,
+          or legal obligations.
+        </p>
+
+        <p>
+          When changes are made, we will update the effective
+          date displayed at the top of this page.
+        </p>
+
+        <p>
+          Where applicable law requires additional notice or
+          consent, we will follow those requirements.
+        </p>
+
+        <p>
+          Your continued use of the website after revised Terms
+          become effective may indicate acceptance where
+          permitted by applicable law. If you do not agree
+          to revised Terms, you should discontinue using
+          the affected services.
+        </p>
+      </section>
+
+      <section class="terms-section" id="law">
+        <h2>17. Governing Law and Disputes</h2>
+
+        <p>
+          These Terms are subject to the laws applicable to
+          RexWeb Nexora and its users, taking into account
+          any mandatory legal protections that apply to you.
+        </p>
+
+        <p>
+          We encourage users to contact us first so that we
+          can attempt to resolve concerns informally.
+        </p>
+
+        <p>
+          If a dispute cannot be resolved informally, it may
+          be handled through the appropriate legal process
+          under applicable law.
+        </p>
+
+        <p>
+          Nothing in this section removes any non-waivable
+          consumer rights or statutory protections.
+        </p>
+      </section>
+
+      <section class="terms-section" id="severability">
+        <h2>18. Severability</h2>
+
+        <p>
+          If any provision of these Terms is found to be
+          unlawful, invalid, or unenforceable, that provision
+          will be applied to the maximum extent permitted
+          by law or separated where necessary.
+        </p>
+
+        <p>
+          The remaining provisions will continue to apply
+          to the extent they remain legally effective.
+        </p>
+      </section>
+
+      <section class="terms-section" id="entire-agreement">
+        <h2>19. Entire Agreement</h2>
+
+        <p>
+          These Terms, together with our Privacy Policy and
+          any additional terms presented for specific features,
+          form the terms governing your use of RexWeb Nexora,
+          subject to any separate agreements that may apply.
+        </p>
+
+        <p>
+          If a specific feature has additional terms that conflict
+          with these Terms, the specific terms will govern that
+          feature to the extent of the conflict, unless applicable
+          law requires otherwise.
+        </p>
+      </section>
+
+      <section class="terms-section" id="contact">
+        <h2>20. Contact Us</h2>
+
+        <p>
+          If you have questions about these Terms, need help
+          understanding a website feature, or wish to report
+          suspected misuse, please contact RexWeb Nexora.
+        </p>
+
+        <div class="contact-card">
+          <strong>RexWeb Nexora — Terms Enquiries</strong>
+
+          <p>
+            Website:
+            <a href="index.html">RexWeb Nexora</a>
+          </p>
+
+          <p class="muted">
+            Contact email: Add your official support email address
+            or a functioning contact form before publishing.
+          </p>
+
+          <p class="muted">
+            Do not publish a placeholder as a working email address.
+            Ensure that users have a real way to contact you.
+          </p>
+        </div>
+      </section>
+
+      <section class="terms-section">
+        <h2>Final Notice</h2>
+
+        <p>
+          These Terms provide a general starting point for a
+          digital tools and games website. They should be reviewed
+          and adapted to match your actual business, website
+          features, hosting arrangements, and legal obligations.
+        </p>
+
+        <p>
+          Before publishing, confirm that the contact details,
+          available services, and operational practices described
+          here are accurate. Consider obtaining legal advice
+          appropriate to your jurisdiction.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      &copy; <span id="currentYear">2026</span>
+      RexWeb Nexora. All rights reserved.
+    </p>
+
+    <p>Clear rules. Responsible use. Better digital experiences.</p>
+
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html" aria-current="page">Terms of Service</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const html = document.documentElement;
+      const themeButton = document.getElementById('themeToggle');
+      const themeColor = document.getElementById('themeColor');
+
+      let initialTheme = html.getAttribute('data-theme');
+
+      if (initialTheme !== 'dark' && initialTheme !== 'light') {
+        try {
+          initialTheme = localStorage.getItem('rexweb-theme') || 'dark';
+        } catch (error) {
+          initialTheme = 'dark';
+        }
+      }
+
+      function applyTheme(theme) {
+        const validTheme = theme === 'light' ? 'light' : 'dark';
+
+        html.setAttribute('data-theme', validTheme);
+
+        if (themeColor) {
+          themeColor.setAttribute(
+            'content',
+            validTheme === 'light' ? '#f4f7fc' : '#050b19'
+          );
+        }
+
+        if (themeButton) {
+          themeButton.setAttribute(
+            'aria-label',
+            validTheme === 'dark'
+              ? 'Switch to light mode'
+              : 'Switch to dark mode'
+          );
+        }
+      }
+
+      applyTheme(initialTheme);
+
+      if (themeButton) {
+        themeButton.addEventListener('click', () => {
+          const currentTheme = html.getAttribute('data-theme');
+          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+          applyTheme(nextTheme);
+
+          try {
+            localStorage.setItem('rexweb-theme', nextTheme);
+          } catch (error) {
+            // Theme switching still works for the current page.
+          }
+        });
+      }
+
+      document.getElementById('currentYear').textContent =
+        new Date().getFullYear();
+    })();
+  </script>
+
+</body>
+</html>
