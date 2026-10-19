@@ -113,21 +113,6 @@ function addStyles(){
 #nexora-games .nx-pad:before{content:"";position:absolute;inset:6px;border:1px solid #42caff22;border-radius:8px;pointer-events:none}
 #nexora-games .nx-pad.nx-pad-active{border-color:var(--cyan);box-shadow:0 0 15px #00cfff55,inset 0 0 15px #00cfff24}
 #nexora-games .nx-pad-knob{position:absolute;left:50%;top:50%;width:36px;height:36px;border:2px solid #25e7ff;border-radius:50%;background:radial-gradient(circle,#35e8ff 0 22%,#087fa7 27%,#063554 70%);box-shadow:0 0 0 6px #00d9ff19,0 0 12px #00d9ff88;transform:translate(-50%,-50%);pointer-events:none}
-#nexora-games .nx-board{display:grid;gap:6px;max-width:260px;margin:6px auto}
-#nexora-games .nx-ttt-board{grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,250px)}
-#nexora-games .nx-cell{aspect-ratio:1;border:1px solid #2a415e;border-radius:10px;background:#0c192a;color:var(--cyan);font-size:clamp(22px,6vw,36px);font-weight:900;cursor:pointer}
-#nexora-games .nx-cell.nx-o{color:var(--purple)}
-#nexora-games .nx-result{text-align:center;color:var(--muted);font-size:11px;min-height:18px}
-#nexora-games .nx-question{text-align:center;font-size:clamp(20px,6vw,32px);font-weight:900;margin:10px 0;color:var(--cyan)}
-#nexora-games .nx-answer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:380px;margin:10px auto}
-#nexora-games .nx-answer{padding:11px 8px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#0c192a;font-weight:800;cursor:pointer}
-#nexora-games .nx-answer:disabled{opacity:.5}
-#nexora-games .nx-rps-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:10px auto}
-#nexora-games .nx-word{text-align:center;font-size:clamp(18px,5vw,26px);letter-spacing:5px;margin:10px 0;font-weight:900;overflow-wrap:anywhere}
-#nexora-games .nx-letter-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:360px;margin:8px auto}
-#nexora-games .nx-letter{min-height:36px;border:1px solid var(--line);border-radius:6px;background:#0d192b;color:var(--text);cursor:pointer;font-weight:800;font-size:11px}
-#nexora-games .nx-letter:disabled{opacity:.3;cursor:default}
-#nexora-games .nx-footer{text-align:center;color:#60758f;font-size:10px;padding:8px 0 2px}
 @media(max-width:480px){#nexora-games .nx-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#nexora-games .nx-controller-layout{grid-template-columns:1fr;gap:6px}#nexora-games .nx-instructions{text-align:center;padding:4px 8px}#nexora-games .nx-instructions .nx-hand{display:inline;margin-right:6px;font-size:14px}#nexora-games .nx-pad-status{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px}#nexora-games .nx-pad-status strong{margin:0}#nexora-games .nx-pad{height:105px}#nexora-games .nx-match-score{gap:10px}}
 @media(prefers-reduced-motion:reduce){#nexora-games *{animation:none!important;transition:none!important}}
 `;
@@ -206,7 +191,7 @@ function openGame(id){
  let paused=false,gameCleanup=()=>{};
  let countdownInterval=null,matchTimeLeft=60,matchActive=['ttt','pong','rps'].includes(id);
  let matchYou=0,matchComputer=0,matchDraws=0,matchEnded=false;
- let clockLabel=null,clockBar=null,matchScoreLabel=null,matchFinishHandler=null;
+ let clockLabel=null,clockBar=null,matchScoreLabel=null;
  let mathKeyHandler=null,rpsKeyHandler=null,hangmanKeyHandler=null;
  let matchAPI=null;
 
@@ -454,7 +439,7 @@ function openGame(id){
   board.innerHTML=Array.from({length:9},(_,i)=>`<button class="nx-cell" data-cell="${i}" aria-label="Square ${i+1}"></button>`).join('');
   area.append(status,board);
   const cells=$$('.nx-cell',board),wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  let state=Array(9).fill(''),ended=false,computerTimer=null;
+  let state=Array(9).fill(''),ended=false;
 
   function winner(){
    for(const line of wins){const[a,b,c]=line;if(state[a]&&state[a]===state[b]&&state[a]===state[c])return state[a];}
@@ -508,7 +493,7 @@ function openGame(id){
    const row=Math.min(2,Math.max(0,Math.floor((e.clientY-r.top)/r.height*3)));
    play(row*3+col);
   };
-  return()=>{if(computerTimer)clearTimeout(computerTimer);boardTapHandler=null;};
+  return()=>{boardTapHandler=null;};
  }
 
  function gamePong(){
@@ -600,48 +585,178 @@ function openGame(id){
   return()=>{alive=false;stop();};
  }
 
+ /* UPDATED: Chrome Dino-style Endless Runner */
  function gameRunner(){
-  setInstructions('Tap game or press SPACE to jump');
+  setInstructions('Tap to jump or press SPACE / ↑');
   const{canvas,ctx}=makeCanvas(400,220),ground=180;
-  const player={x:50,y:152,w:22,h:28,vy:0,jumping:false};
-  let obstacles=[],alive=true,elapsed=0,spawn=0,distance=0;
-  function jump(){if(alive&&!player.jumping){player.vy=-340;player.jumping=true;}}
-  function draw(){
-   ctx.fillStyle='#030914';ctx.fillRect(0,0,400,220);ctx.strokeStyle='#152b43';
-   for(let i=0;i<10;i++){const x=((i*45-elapsed*100)%400+400)%400;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,ground);ctx.stroke();}
-   ctx.strokeStyle='#35e8ff';ctx.beginPath();ctx.moveTo(0,ground);ctx.lineTo(400,ground);ctx.stroke();
-   ctx.fillStyle='#43f5a5';ctx.shadowColor='#43f5a5';ctx.shadowBlur=8;ctx.fillRect(player.x,player.y,player.w,player.h);
-   ctx.fillStyle='#ff6d9a';ctx.shadowColor='#ff6d9a';obstacles.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));ctx.shadowBlur=0;
-   ctx.fillStyle='#d9e8ff';ctx.font='11px system-ui';ctx.fillText(`DIST ${Math.floor(distance)}`,10,18);
+  const player={x:48,y:ground-42,w:34,h:42,vy:0,jumping:false};
+  let obstacles=[],alive=true,elapsed=0,spawn=0,distance=0,groundOffset=0;
+
+  function jump(){
+   if(alive&&!player.jumping){
+    player.vy=-430;
+    player.jumping=true;
+   }
   }
-  listen(canvas,'pointerdown',e=>{e.preventDefault();jump();});
+
+  function drawDino(){
+   const x=player.x,y=player.y;
+   ctx.save();
+   ctx.fillStyle='#e8eef7';
+   ctx.shadowColor='#35e8ff';
+   ctx.shadowBlur=4;
+
+   // Chrome-style pixel dinosaur body and head.
+   ctx.fillRect(x+4,y+15,22,20);
+   ctx.fillRect(x+17,y+3,17,17);
+   ctx.fillRect(x+26,y+12,9,7);
+   ctx.fillRect(x,y+20,8,8);
+
+   // Eye.
+   ctx.fillStyle='#030914';
+   ctx.fillRect(x+27,y+7,3,3);
+
+   // Legs animate as the dinosaur runs.
+   ctx.fillStyle='#e8eef7';
+   if(player.jumping){
+    ctx.fillRect(x+7,y+33,7,9);
+    ctx.fillRect(x+20,y+33,7,9);
+   }else if(Math.floor(elapsed*12)%2===0){
+    ctx.fillRect(x+7,y+33,7,9);
+    ctx.fillRect(x+21,y+33,7,5);
+    ctx.fillRect(x+18,y+38,10,4);
+   }else{
+    ctx.fillRect(x+7,y+33,7,5);
+    ctx.fillRect(x+4,y+38,10,4);
+    ctx.fillRect(x+21,y+33,7,9);
+   }
+   ctx.restore();
+  }
+
+  function drawCactus(o){
+   ctx.save();
+   ctx.fillStyle='#43f5a5';
+   ctx.shadowColor='#43f5a5';
+   ctx.shadowBlur=3;
+
+   // Main cactus stem.
+   ctx.fillRect(o.x+6,o.y,o.w-12,o.h);
+
+   // Cactus arms.
+   if(o.w>18){
+    ctx.fillRect(o.x,o.y+o.h*.38,7,6);
+    ctx.fillRect(o.x,o.y+o.h*.25,6,o.h*.25);
+    ctx.fillRect(o.x+o.w-7,o.y+o.h*.55,7,6);
+    ctx.fillRect(o.x+o.w-6,o.y+o.h*.4,6,o.h*.2);
+   }
+   ctx.restore();
+  }
+
+  function draw(){
+   ctx.fillStyle='#030914';
+   ctx.fillRect(0,0,400,220);
+
+   // Minimal Chrome Dino-style sky and ground.
+   ctx.fillStyle='#a7b6c9';
+   for(let i=0;i<35;i++){
+    const x=(i*67)%400;
+    const y=25+(i*31)%95;
+    ctx.fillRect(x,y,2,2);
+   }
+
+   ctx.strokeStyle='#dce5f1';
+   ctx.lineWidth=1.5;
+   ctx.beginPath();
+   ctx.moveTo(0,ground);
+   ctx.lineTo(400,ground);
+   ctx.stroke();
+
+   // Moving ground marks.
+   ctx.fillStyle='#73849a';
+   for(let i=0;i<18;i++){
+    const x=((i*31-groundOffset)%420+420)%420;
+    ctx.fillRect(x,ground+8+(i%3)*3,12+(i%4)*3,1.5);
+   }
+
+   obstacles.forEach(drawCactus);
+   drawDino();
+
+   ctx.fillStyle='#e8eef7';
+   ctx.font='bold 11px monospace';
+   ctx.textAlign='right';
+   ctx.fillText(`HI ${String(Math.floor(distance)).padStart(5,'0')}`,390,18);
+   ctx.fillText(`SCORE ${String(Math.floor(distance)).padStart(5,'0')}`,390,33);
+   ctx.textAlign='left';
+
+   if(!alive){
+    ctx.fillStyle='#e8eef7';
+    ctx.font='bold 18px monospace';
+    ctx.textAlign='center';
+    ctx.fillText('GAME OVER',200,90);
+    ctx.font='11px monospace';
+    ctx.fillText('TAP RESTART TO RUN AGAIN',200,108);
+    ctx.textAlign='left';
+   }
+  }
+
+  listen(canvas,'pointerdown',e=>{
+   e.preventDefault();
+   jump();
+  });
+
   const stop=frame(dt=>{
    if(!alive){draw();return;}
-   elapsed+=dt;distance+=dt*10;
-   const speed=Math.min(360,235+elapsed*3.2);
+
+   elapsed+=dt;
+   distance+=dt*10;
+   groundOffset=(groundOffset+dt*250)%420;
+
+   const speed=Math.min(430,260+elapsed*4.2);
    setScore(Math.floor(distance));
+
    if(controller.jumpQueued||controller.tapQueued||controller.jump||controller.tap){
-    jump();controller.jump=controller.tap=false;controller.jumpQueued=controller.tapQueued=false;
+    jump();
+    controller.jump=controller.tap=false;
+    controller.jumpQueued=controller.tapQueued=false;
    }
+
    if(player.jumping){
-    player.vy+=900*dt;player.y+=player.vy*dt;
-    if(player.y>=ground-player.h){player.y=ground-player.h;player.vy=0;player.jumping=false;}
-   }
-   spawn-=dt;
-   if(spawn<=0){
-    const h=18+Math.random()*20;
-    obstacles.push({x:410,y:ground-h,w:14+Math.random()*10,h});
-    spawn=Math.max(.48, .85-Math.min(.3,elapsed*.008))+Math.random()*.5;
-   }
-   obstacles.forEach(o=>o.x-=speed*dt);
-   obstacles=obstacles.filter(o=>o.x+o.w>-5);
-   for(const o of obstacles){
-    if(player.x+player.w-3>o.x&&player.x+3<o.x+o.w&&player.y+player.h-2>o.y){
-     alive=false;setMessage(`Game over! Distance: ${Math.floor(distance)}`);break;
+    player.vy+=1150*dt;
+    player.y+=player.vy*dt;
+
+    if(player.y>=ground-player.h){
+     player.y=ground-player.h;
+     player.vy=0;
+     player.jumping=false;
     }
    }
+
+   spawn-=dt;
+   if(spawn<=0){
+    const h=23+Math.random()*19;
+    const w=16+Math.random()*13;
+    obstacles.push({x:410,y:ground-h,w,h});
+    spawn=Math.max(.52,1.05-Math.min(.38,elapsed*.009))+Math.random()*.38;
+   }
+
+   obstacles.forEach(o=>o.x-=speed*dt);
+   obstacles=obstacles.filter(o=>o.x+o.w>-5);
+
+   for(const o of obstacles){
+    const hitX=player.x+player.w-5>o.x+2&&player.x+5<o.x+o.w-2;
+    const hitY=player.y+player.h-4>o.y+3;
+
+    if(hitX&&hitY){
+     alive=false;
+     setMessage(`Game over! Distance: ${Math.floor(distance)}`);
+     break;
+    }
+   }
+
    draw();
   });
+
+  draw();
   return()=>{alive=false;stop();};
  }
 
@@ -662,7 +777,6 @@ function openGame(id){
     ctx.fillStyle=i%4===0?'#35e8ff':'#546a8c';ctx.fillRect(x,y,1.5,1.5);
    }
 
-   // Player rocket faces upward toward incoming enemies.
    ctx.save();
    ctx.translate(ship.x,ship.y);
    ctx.rotate(0);
@@ -689,7 +803,7 @@ function openGame(id){
    enemies.forEach(e=>{
     ctx.save();
     ctx.translate(e.x,e.y);
-    ctx.rotate(Math.PI); // Enemy rockets face downward toward the player.
+    ctx.rotate(Math.PI);
     ctx.shadowColor='#ff4f8b';ctx.shadowBlur=8;
     ctx.fillStyle='#ff4f8b';
     ctx.beginPath();
@@ -892,76 +1006,149 @@ function openGame(id){
   return()=>{hangmanTapHandler=null;hangmanKeyHandler=null;};
  }
 
+ /* UPDATED: Mirrored dove facing right, with increased flight speed. */
  function gameDove(){
   setInstructions('Drag the pad to guide the dove up, down, left, and right');
   const{ctx}=makeCanvas(300,380);
   const dove={x:75,y:185,r:12};
   let obstacles=[],stars=[],elapsed=0,spawn=0,starSpawn=0,alive=true,started=false,passed=0,collected=0;
-  const gap=140,pw=36,speed=145;
+  const gap=140,pw=36,baseSpeed=225;
 
   function draw(){
    const sky=ctx.createLinearGradient(0,0,0,380);
    sky.addColorStop(0,'#071a3b');sky.addColorStop(.6,'#14518a');sky.addColorStop(1,'#77c7ee');
    ctx.fillStyle=sky;ctx.fillRect(0,0,300,380);
-   for(let i=0;i<24;i++){ctx.fillStyle='#ffffff88';ctx.fillRect(31*i%300,59*i%190,2,2);}
+
+   for(let i=0;i<24;i++){
+    ctx.fillStyle='#ffffff88';
+    ctx.fillRect(31*i%300,59*i%190,2,2);
+   }
+
    for(let i=0;i<4;i++){
     const x=((i*100-elapsed*12)%380+380)%380-35,y=55+i*48;
-    ctx.fillStyle='#ffffff30';ctx.beginPath();ctx.arc(x,y,17,0,7);ctx.arc(x+18,y-8,20,0,7);ctx.arc(x+37,y,15,0,7);ctx.fill();
+    ctx.fillStyle='#ffffff30';
+    ctx.beginPath();
+    ctx.arc(x,y,17,0,7);
+    ctx.arc(x+18,y-8,20,0,7);
+    ctx.arc(x+37,y,15,0,7);
+    ctx.fill();
    }
+
    obstacles.forEach(o=>{
-    ctx.fillStyle='#43f5a5';ctx.shadowColor='#43f5a5';ctx.shadowBlur=8;
-    ctx.fillRect(o.x,0,pw,o.top);ctx.fillRect(o.x,o.top+gap,pw,380-o.top-gap);
+    ctx.fillStyle='#43f5a5';
+    ctx.shadowColor='#43f5a5';
+    ctx.shadowBlur=8;
+    ctx.fillRect(o.x,0,pw,o.top);
+    ctx.fillRect(o.x,o.top+gap,pw,380-o.top-gap);
     ctx.fillStyle='#20c98f';
-    ctx.fillRect(o.x-3,o.top-7,pw+6,7);ctx.fillRect(o.x-3,o.top+gap,pw+6,7);
+    ctx.fillRect(o.x-3,o.top-7,pw+6,7);
+    ctx.fillRect(o.x-3,o.top+gap,pw+6,7);
    });
+
    ctx.shadowBlur=0;
+
    stars.forEach(s=>{
-    ctx.save();ctx.translate(s.x,s.y);ctx.rotate(elapsed*2);ctx.fillStyle='#ffe66d';ctx.shadowColor='#ffe66d';ctx.shadowBlur=12;
-    ctx.font='21px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',0,0);ctx.restore();
+    ctx.save();
+    ctx.translate(s.x,s.y);
+    ctx.rotate(elapsed*2);
+    ctx.fillStyle='#ffe66d';
+    ctx.shadowColor='#ffe66d';
+    ctx.shadowBlur=12;
+    ctx.font='21px sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('★',0,0);
+    ctx.restore();
    });
-   ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='30px sans-serif';ctx.shadowColor='#fff';ctx.shadowBlur=10;ctx.fillText('🕊️',dove.x,dove.y);ctx.restore();
-   ctx.fillStyle='#fff';ctx.font='bold 12px system-ui';ctx.fillText(`SCORE ${passed*10+collected*5}`,10,20);ctx.fillText(`STARS ${collected}`,10,37);
-   if(!started&&alive){ctx.textAlign='center';ctx.fillText('DRAG THE PAD TO FLY',150,325);ctx.textAlign='start';}
+
+   // Mirror the dove horizontally so it faces right.
+   ctx.save();
+   ctx.translate(dove.x,dove.y);
+   ctx.scale(-1,1);
+   ctx.textAlign='center';
+   ctx.textBaseline='middle';
+   ctx.font='30px sans-serif';
+   ctx.shadowColor='#fff';
+   ctx.shadowBlur=10;
+   ctx.fillText('🕊️',0,0);
+   ctx.restore();
+
+   ctx.fillStyle='#fff';
+   ctx.font='bold 12px system-ui';
+   ctx.fillText(`SCORE ${passed*10+collected*5}`,10,20);
+   ctx.fillText(`STARS ${collected}`,10,37);
+
+   if(!started&&alive){
+    ctx.textAlign='center';
+    ctx.fillText('DRAG THE PAD TO FLY',150,325);
+    ctx.textAlign='start';
+   }
   }
 
   const stop=frame(dt=>{
    elapsed+=dt;
    if(!alive){draw();return;}
+
    if(controller.active){
     started=true;
     dove.x=40+(controller.x+1)/2*145;
     dove.y=25+(controller.y+1)/2*330;
    }
-   spawn-=dt;starSpawn-=dt;
+
+   // Speed gradually increases, making the game more challenging.
+   const speed=Math.min(360,baseSpeed+elapsed*2.5);
+
+   spawn-=dt;
+   starSpawn-=dt;
+
    if(started&&spawn<=0){
     const max=380-gap-42;
     obstacles.push({x:310,top:42+Math.random()*(max-42),scored:false});
-    spawn=Math.max(.95,1.35-elapsed*.003);
+    spawn=Math.max(.72,1.15-elapsed*.004);
    }
+
    if(started&&starSpawn<=0){
     stars.push({x:310,y:40+Math.random()*300});
-    starSpawn=.8+Math.random()*.65;
+    starSpawn=.65+Math.random()*.5;
    }
+
    obstacles.forEach(o=>{
     o.x-=speed*dt;
-    if(!o.scored&&o.x+pw<dove.x){o.scored=true;passed++;setScore(passed*10+collected*5);}
+
+    if(!o.scored&&o.x+pw<dove.x){
+     o.scored=true;
+     passed++;
+     setScore(passed*10+collected*5);
+    }
+
     if(dove.x+dove.r>o.x&&dove.x-dove.r<o.x+pw&&(dove.y-dove.r<o.top||dove.y+dove.r>o.top+gap)){
-     alive=false;setMessage(`Dove Flight over! Score: ${score}`);
+     alive=false;
+     setMessage(`Dove Flight over! Score: ${score}`);
     }
    });
+
    stars.forEach(s=>{
     s.x-=speed*dt;
+
     if(!s.collected&&Math.abs(s.x-dove.x)<22&&Math.abs(s.y-dove.y)<24){
-     s.collected=true;collected++;addScore(5);
+     s.collected=true;
+     collected++;
+     addScore(5);
     }
    });
+
    obstacles=obstacles.filter(o=>o.x+pw>-5);
    stars=stars.filter(s=>s.x>-25&&!s.collected);
+
    if(dove.y<dove.r||dove.y>380-dove.r||dove.x<dove.r||dove.x>300-dove.r){
-    alive=false;setMessage(`Flight ended! Score: ${score}`);
+    alive=false;
+    setMessage(`Flight ended! Score: ${score}`);
    }
+
    draw();
   });
+
+  draw();
   return()=>{alive=false;stop();};
  }
 
