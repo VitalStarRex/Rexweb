@@ -157,217 +157,144 @@ header {
   border-color: var(--blue);
 }
 
-.header-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
+/* SEARCH */
 
-.header-nav a {
-  padding: 8px 12px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: bold;
-  white-space: nowrap;
-  border-radius: 8px;
-  border: 1px solid transparent;
-}
-
-.header-nav a:hover {
-  color: var(--blue);
-}
-
-.header-nav a.active {
-  color: var(--blue);
-  background: var(--card);
-  border-color: var(--border);
-  box-shadow: 0 4px 12px rgba(0,200,255,0.1);
-}
-
-/* SECOND NAVIGATION ROW */
-
-.category-nav {
-  border-top: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-  width: 100%;
-}
-
-.category-nav::-webkit-scrollbar {
+.search-box {
   display: none;
+  padding: 0 0 10px;
 }
 
-.category-row {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  min-width: max-content;
+.search-box.open {
+  display: block;
 }
 
-.category-link {
-  width: 145px;
-  min-height: 65px;
+.search-box input {
+  width: 100%;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  background: var(--card);
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: bold;
-  transition: .25s;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
 }
 
-.category-link.active-cat {
-  background: var(--surface);
+.search-box input:focus {
   border-color: var(--blue);
-  box-shadow: 0 4px 12px rgba(0,200,255,0.1);
 }
 
-.category-link .icon {
-  font-size: 22px;
-}
+/* HERO QUOTE */
 
-.category-link:hover {
-  transform: translateY(-2px);
-  border-color: var(--blue);
-  box-shadow: 0 5px 20px #00c8ff17;
-}
-
-/* HERO */
-
-.hero {
-  min-height: 355px;
-  display: flex;
-  align-items: center;
+.quote-hero {
   position: relative;
   isolation: isolate;
+  min-height: 370px;
+  margin: 24px auto 8px;
+  padding: 55px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
+  border: 1px solid rgba(100, 160, 255, .25);
+  border-radius: 22px;
   background:
-    linear-gradient(90deg, #030918 0%, #030918ed 34%, #03091845 75%),
-    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=85")
-    center 48% / cover no-repeat;
+    linear-gradient(
+      115deg,
+      rgba(3, 9, 28, .91),
+      rgba(9, 20, 55, .72) 55%,
+      rgba(28, 10, 67, .76)
+    ),
+    url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85")
+    center/cover no-repeat;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
 }
 
-html[data-theme="light"] .hero {
-  background:
-    linear-gradient(90deg, #f2f6ff 0%, #f2f6ffe8 34%, #f2f6ff35 100%),
-    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1800&q=85")
-    center 48% / cover no-repeat;
+.quote-hero::before,
+.quote-hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  filter: blur(75px);
+  pointer-events: none;
 }
 
-.hero-content {
-  padding: 45px 0;
-  max-width: 570px;
+.quote-hero::before {
+  top: -125px;
+  left: -65px;
+  background: rgba(0, 200, 255, .36);
 }
 
-.eyebrow {
-  display: inline-block;
-  border: 1px solid var(--blue);
+.quote-hero::after {
+  right: -80px;
+  bottom: -145px;
+  background: rgba(134, 80, 255, .4);
+}
+
+.quote-content {
+  width: 100%;
+  max-width: 800px;
+}
+
+.quote-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 15px;
+  margin-bottom: 22px;
+  color: #b8eaff;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(160, 210, 255, .3);
   border-radius: 30px;
-  padding: 6px 12px;
-  color: var(--blue);
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 1.5px;
-  margin-bottom: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
 }
 
-.hero h1 {
-  font-size: clamp(32px, 5vw, 50px);
-  line-height: 1.08;
+.quote-content h1 {
+  color: #fff;
+  font-size: clamp(35px, 6vw, 64px);
   font-weight: 900;
+  line-height: 1.1;
   letter-spacing: -2px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
+  text-shadow: 0 4px 25px rgba(0, 0, 0, .28);
 }
 
-.gradient-text {
-  background: linear-gradient(90deg, #00c8ff, #a45bff, #ff43c6);
+.quote-content h1 span {
+  display: inline-block;
+  background: linear-gradient(90deg, #65e0ff, #b5a2ff, #ffb7ec);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.hero p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.7;
-  max-width: 470px;
+.quote-content p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, .86);
+  font-size: clamp(14px, 2vw, 17px);
+  line-height: 1.8;
 }
 
-.hero-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 800;
-  transition: .25s;
-}
-
-.btn-primary {
-  color: white;
-  border: none;
-  background: linear-gradient(110deg, #008dff, #7545ff);
-  box-shadow: 0 6px 18px #4c51ff28;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.12);
-}
-
-/* SECTION HEADINGS */
+/* SECTION */
 
 .section {
-  padding: 38px 0 12px;
+  padding: 30px 0 12px;
 }
 
-.section-heading {
-  margin-bottom: 23px;
-}
-
-.section-label {
-  color: var(--blue);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  margin-bottom: 9px;
-}
-
-.section-heading h2 {
-  font-size: clamp(25px, 4vw, 34px);
-  margin-bottom: 8px;
-  letter-spacing: -.7px;
-}
-
-.section-heading p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-/* FEATURE CARDS */
+/* FEATURE CARDS — FOUR COLUMNS, TWO ROWS FOR EIGHT CARDS */
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+  align-items: stretch;
 }
 
 .feature-card {
@@ -409,6 +336,7 @@ html[data-theme="light"] .hero {
   position: absolute;
   inset: 45% 0 0;
   background: linear-gradient(transparent, rgba(3,9,24,.85));
+  pointer-events: none;
 }
 
 .card-icon {
@@ -505,6 +433,28 @@ html[data-theme="light"] .hero {
 .stat span {
   font-size: 11px;
   color: var(--muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 17px;
+  border: 1px solid var(--blue);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: .2s;
+}
+
+.btn-primary {
+  color: #03111f;
+  background: linear-gradient(135deg, #00c8ff, #65e0ff);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 200, 255, .25);
 }
 
 /* FOOTER */
@@ -628,60 +578,155 @@ body.menu-open {
   overflow: hidden;
 }
 
-/* SEARCH */
-
-.search-box {
-  display: none;
-  padding: 0 0 10px;
-}
-
-.search-box.open {
-  display: block;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-  color: var(--text);
-  outline: none;
-}
-
-.search-box input:focus {
-  border-color: var(--blue);
-}
-
-/* RESPONSIVE */
+/* RESPONSIVE — KEEP FOUR COLUMNS ON TABLETS AND DESKTOP */
 
 @media (max-width: 1000px) {
-  .header-nav {
-    gap: 12px;
-  }
-
   .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 650px) {
-  .topbar {
-    min-height: 60px;
-  }
-
-  .cards-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
   }
 
   .card-image {
     height: 120px;
   }
+
+  .card-body {
+    padding: 11px;
+  }
+
+  .card-body h3 {
+    font-size: 14px;
+  }
+
+  .card-body p {
+    font-size: 11px;
+  }
+}
+
+/* MOBILE — TWO CARDS PER ROW */
+
+@media (max-width: 650px) {
+  .topbar {
+    min-height: 60px;
+  }
+
+  .brand-name {
+    font-size: 21px;
+  }
+
+  .header-actions {
+    gap: 7px;
+  }
+
+  .theme-btn,
+  .menu-btn,
+  .search-btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .quote-hero {
+    min-height: 310px;
+    margin: 16px auto 4px;
+    padding: 42px 18px;
+    border-radius: 17px;
+  }
+
+  .quote-content h1 {
+    letter-spacing: -1px;
+    margin-bottom: 15px;
+  }
+
+  .quote-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+  }
+
+  .quote-content p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .section {
+    padding-top: 22px;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .card-image {
+    height: 120px;
+  }
+
+  .card-body {
+    padding: 11px;
+  }
+
+  .card-body h3 {
+    font-size: 14px;
+  }
+
+  .card-body p {
+    font-size: 11px;
+  }
+
+  .cta-banner {
+    padding: 16px;
+  }
+
+  .rocket {
+    font-size: 32px;
+  }
+
+  .stats {
+    gap: 16px;
+  }
+}
+
+/* SMALL PHONES — STILL TWO CARDS PER ROW */
+
+@media (max-width: 360px) {
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-name {
+    font-size: 18px;
+  }
+
+  .brand small {
+    font-size: 9px;
+  }
+
+  .header-actions {
+    gap: 5px;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .card-image {
+    height: 110px;
+  }
+
+  .card-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
+  }
 }
 </style>
 </head>
 
 <body>
+
+<!-- HEADER -->
 
 <header>
   <div class="container topbar">
@@ -693,7 +738,6 @@ body.menu-open {
         <small>Explore · Create · Grow</small>
       </div>
     </a>
-
 
     <div class="header-actions">
       <button class="theme-btn" id="themeToggle"
@@ -712,81 +756,34 @@ body.menu-open {
       placeholder="Search digital tools, games, templates..."
       aria-label="Search RexWeb Nexora">
   </div>
-
-  <div class="category-nav">
-    <div class="container category-row">
-      <a class="category-link active-cat" href="index.html">
-        <span class="icon">⌂</span>Home
-      </a>
-
-      <a class="category-link" href="tools.html">
-        <span class="icon">🛠️</span>Tools
-      </a>
-
-      <a class="category-link" href="video-editor/index.html">
-        <span class="icon">🎬</span>Video Editor
-      </a>
-
-      <a class="category-link" href="ebooks.html">
-        <span class="icon">📚</span>Ebooks
-      </a>
-
-      <a class="category-link" href="games.html">
-        <span class="icon">🎮</span>Games
-      </a>
-
-      <a class="category-link" href="marketplace.html">
-        <span class="icon">🛍️</span>Marketplace
-      </a>
-
-      <a class="category-link" href="templates.html">
-        <span class="icon">💻</span>Web Templates
-      </a>
-    </div>
-  </div>
 </header>
 
-<!-- HERO -->
+<!-- HERO QUOTE WITH BACKGROUND IMAGE -->
 
-<section class="hero">
-  <div class="container">
-    <div class="hero-content">
-      <div class="eyebrow">WELCOME TO REXWEB NEXORA</div>
+<section class="quote-hero container" aria-label="Welcome to RexWeb Nexora">
+  <div class="quote-content">
+    <div class="quote-label">✦ Welcome to RexWeb Nexora ✦</div>
 
-      <h1>
-        YOUR DIGITAL WORLD.<br>
-        <span class="gradient-text">WITHOUT LIMITS.</span>
-      </h1>
+    <h1>
+      Dream Bigger.<br>
+      <span>Build Beyond Limits.</span>
+    </h1>
 
-      <p>
-        Discover powerful tools, stunning themes, digital ebooks,
-        exciting games, website templates, and creative resources
-        —all in one destination. Welcome to RexWeb Nexora.
-      </p>
-
-      <div class="hero-buttons">
-        <a class="btn btn-primary" href="#explore">
-          Explore Now <span>↗</span>
-        </a>
-
-        <a class="btn" href="https://vitalstar.web.app/">
-          ⭐ Enter VitalStar
-        </a>
-      </div>
-    </div>
+    <p>
+      Your ideas deserve a world of possibilities.
+      Discover the tools, creativity, and digital experiences
+      to turn your next big idea into reality.
+    </p>
   </div>
 </section>
 
-<!-- EXPLORE CATEGORIES -->
+<!-- FEATURE CARDS — EIGHT CARDS IN TWO ROWS ON DESKTOP -->
 
 <section class="section container" id="explore">
-  <div class="section-heading">
-    <div class="section-label">EXPLORE THE PLATFORM</div>
-    <h2>Discover Your Universe</h2>
-    <p>Your favourite digital experiences, organized in one place.</p>
-  </div>
 
   <div class="cards-grid" id="featureGrid">
+
+    <!-- DIGITAL TOOLS -->
 
     <article class="feature-card" style="--accent:#00c8ff">
       <a href="tools.html">
@@ -806,6 +803,8 @@ body.menu-open {
       </a>
     </article>
 
+    <!-- WEB TEMPLATES -->
+
     <article class="feature-card" style="--accent:#a56aff">
       <a href="templates.html">
         <div class="card-image">
@@ -823,6 +822,8 @@ body.menu-open {
         </div>
       </a>
     </article>
+
+    <!-- VIDEO EDITOR -->
 
     <article class="feature-card" style="--accent:#ff5555">
       <a href="video-editor/index.html">
@@ -842,6 +843,8 @@ body.menu-open {
       </a>
     </article>
 
+    <!-- DIGITAL EBOOKS -->
+
     <article class="feature-card" style="--accent:#00e7b0">
       <a href="ebooks.html">
         <div class="card-image">
@@ -859,6 +862,8 @@ body.menu-open {
         </div>
       </a>
     </article>
+
+    <!-- GAMING ZONE -->
 
     <article class="feature-card" style="--accent:#ff9b43">
       <a href="games.html">
@@ -878,6 +883,8 @@ body.menu-open {
       </a>
     </article>
 
+    <!-- MARKETPLACE -->
+
     <article class="feature-card" style="--accent:#00c8ff">
       <a href="marketplace.html">
         <div class="card-image">
@@ -896,6 +903,8 @@ body.menu-open {
       </a>
     </article>
 
+    <!-- VITALSTAR -->
+
     <article class="feature-card" style="--accent:#8a5bff">
       <a href="https://vitalstar.web.app/">
         <div class="card-image">
@@ -913,6 +922,8 @@ body.menu-open {
         </div>
       </a>
     </article>
+
+    <!-- COMMUNITY -->
 
     <article class="feature-card" style="--accent:#ff43c6">
       <a href="https://vitalstar.web.app/">
@@ -939,6 +950,7 @@ body.menu-open {
 
 <div class="container">
   <section class="cta-banner">
+
     <div class="cta-main">
       <div class="rocket">🚀</div>
       <div>
@@ -962,6 +974,7 @@ body.menu-open {
     <a class="btn btn-primary" href="#explore">
       Explore Now →
     </a>
+
   </section>
 </div>
 
@@ -969,6 +982,7 @@ body.menu-open {
 
 <footer>
   <div class="container footer-inner">
+
     <div>
       <a href="index.html" class="brand">
         <div class="brand-logo">R</div>
@@ -990,6 +1004,7 @@ body.menu-open {
       <a href="terms.html">Terms &amp; Conditions</a>
       <a href="https://vitalstar.web.app/">VitalStar</a>
     </nav>
+
   </div>
 </footer>
 
@@ -1025,6 +1040,7 @@ body.menu-open {
   <a href="register.html">👤 Register</a>
   <a href="privacy.html">🔒 Privacy Policy</a>
   <a href="terms.html">📄 Terms &amp; Conditions</a>
+
 </aside>
 
 <script>
@@ -1036,11 +1052,14 @@ const themeColor = document.getElementById("themeColor");
 
 function applyTheme(theme) {
   root.setAttribute("data-theme", theme);
+
   themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+
   themeToggle.setAttribute(
     "aria-label",
     theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
   );
+
   themeColor.content = theme === "dark" ? "#050b19" : "#f2f6ff";
 
   try {
@@ -1049,6 +1068,7 @@ function applyTheme(theme) {
 }
 
 let savedTheme = "dark";
+
 try {
   savedTheme = localStorage.getItem("rexweb-theme") || "dark";
 } catch (error) {}
@@ -1057,6 +1077,7 @@ applyTheme(savedTheme);
 
 themeToggle.addEventListener("click", () => {
   const currentTheme = root.getAttribute("data-theme");
+
   applyTheme(currentTheme === "dark" ? "light" : "dark");
 });
 
@@ -1070,18 +1091,23 @@ const menuOverlay = document.getElementById("menuOverlay");
 function openMenu() {
   sideMenu.classList.add("open");
   menuOverlay.classList.add("open");
+
   sideMenu.setAttribute("aria-hidden", "false");
   sideMenu.inert = false;
+
   menuToggle.setAttribute("aria-expanded", "true");
   document.body.classList.add("menu-open");
+
   closeMenu.focus();
 }
 
 function hideMenu() {
   sideMenu.classList.remove("open");
   menuOverlay.classList.remove("open");
+
   sideMenu.setAttribute("aria-hidden", "true");
   sideMenu.inert = true;
+
   menuToggle.setAttribute("aria-expanded", "false");
   document.body.classList.remove("menu-open");
 }
@@ -1095,7 +1121,9 @@ sideMenu.querySelectorAll("a").forEach(link => {
 });
 
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape") hideMenu();
+  if (event.key === "Escape") {
+    hideMenu();
+  }
 });
 
 /* SEARCH */
@@ -1121,6 +1149,7 @@ function filterCards(query) {
 
   cards.forEach(card => {
     const text = card.textContent.toLowerCase();
+
     card.style.display = text.includes(normalizedQuery) ? "" : "none";
   });
 }
