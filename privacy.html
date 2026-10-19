@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b19">
+  <meta name="description" content="Read the RexWeb Nexora Privacy Policy to understand how we collect, use, protect, and manage your information.">
+  <title>Privacy Policy | RexWeb Nexora</title>
+
+  <style>
+    :root {
+      --bg: #050b19;
+      --card: #0d172b;
+      --text: #e8eefc;
+      --muted: #9baac5;
+      --accent: #6c8cff;
+      --border: rgba(148, 163, 184, 0.18);
+      --soft: rgba(108, 140, 255, 0.1);
+      --shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    html[data-theme="light"] {
+      --bg: #f4f7fc;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #647089;
+      --accent: #345de7;
+      --border: rgba(31, 41, 55, 0.12);
+      --soft: rgba(52, 93, 231, 0.07);
+      --shadow: 0 15px 40px rgba(30, 41, 59, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .privacy-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1150px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .header-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .header-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .hero {
+      padding: 65px 20px 45px;
+      text-align: center;
+      background:
+        radial-gradient(
+          ellipse at top,
+          rgba(108, 140, 255, 0.14),
+          transparent 65%
+        );
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      line-height: 1.2;
+      letter-spacing: -1.5px;
+      margin: 20px 0 12px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .updated {
+      margin-top: 18px !important;
+      font-size: 0.85rem;
+    }
+
+    .layout {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 25px 20px 70px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 90px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h2 {
+      font-size: 0.95rem;
+      margin: 0 0 12px;
+    }
+
+    .sidebar nav {
+      display: grid;
+      gap: 5px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.87rem;
+      color: var(--muted);
+    }
+
+    .sidebar nav a:hover {
+      background: var(--soft);
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .notice {
+      padding: 17px 20px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      margin-bottom: 22px;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .policy-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 90px;
+    }
+
+    .policy-section h2 {
+      font-size: 1.25rem;
+      line-height: 1.4;
+      margin: 0 0 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .policy-section h3 {
+      font-size: 1rem;
+      margin: 20px 0 7px;
+    }
+
+    .policy-section p {
+      margin: 10px 0;
+    }
+
+    .policy-section ul {
+      padding-left: 22px;
+    }
+
+    .policy-section li {
+      margin: 7px 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .contact-card {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 15px;
+    }
+
+    .privacy-footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .sidebar nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        padding-top: 45px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner {
+        padding: 12px;
+      }
+
+      .brand {
+        font-size: 1rem;
+      }
+
+      .header-btn {
+        padding: 7px 9px;
+        font-size: 0.78rem;
+      }
+
+      .layout {
+        padding: 18px 12px 45px;
+        gap: 18px;
+      }
+
+      .policy-section {
+        padding: 19px;
+      }
+
+      .sidebar {
+        padding: 16px;
+      }
+    }
+
+    @media print {
+      :root,
+      html[data-theme="light"],
+      html[data-theme="dark"] {
+        --bg: #ffffff;
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #555555;
+        --accent: #234bc4;
+        --border: #dddddd;
+        --soft: #f5f5f5;
+        --shadow: none;
+      }
+
+      .privacy-header,
+      .sidebar,
+      .header-actions,
+      .footer-links {
+        display: none !important;
+      }
+
+      .layout {
+        display: block;
+        max-width: 100%;
+      }
+
+      .policy-section {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      .hero {
+        padding-top: 10px;
+      }
+
+      body {
+        background: #ffffff;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="privacy-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="RexWeb Nexora home">
+        RexWeb <span>Nexora</span>
+      </a>
+
+      <div class="header-actions">
+        <button
+          class="header-btn"
+          id="themeToggle"
+          type="button"
+          aria-label="Toggle color theme">
+          ☀️ / 🌙
+        </button>
+
+        <button
+          class="header-btn"
+          type="button"
+          onclick="window.print()">
+          Print / PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <span class="badge">YOUR PRIVACY MATTERS</span>
+    <h1>Privacy Policy</h1>
+
+    <p>
+      Learn how RexWeb Nexora handles information when you visit
+      our website, use our digital tools, explore our games,
+      or interact with our services.
+    </p>
+
+    <p class="updated">
+      Effective date: October 19, 2026
+    </p>
+  </section>
+
+  <main class="layout">
+
+    <aside class="sidebar">
+      <h2>On this page</h2>
+
+      <nav aria-label="Privacy policy sections">
+        <a href="#introduction">Introduction</a>
+        <a href="#information">Information We Collect</a>
+        <a href="#usage">How We Use Information</a>
+        <a href="#cookies">Cookies & Storage</a>
+        <a href="#tools">Digital Tools & Games</a>
+        <a href="#third-party">Third-Party Services</a>
+        <a href="#sharing">Information Sharing</a>
+        <a href="#security">Data Security</a>
+        <a href="#retention">Data Retention</a>
+        <a href="#rights">Your Privacy Rights</a>
+        <a href="#children">Children's Privacy</a>
+        <a href="#international">International Visitors</a>
+        <a href="#changes">Policy Changes</a>
+        <a href="#contact">Contact Us</a>
+      </nav>
+    </aside>
+
+    <div class="content">
+
+      <div class="notice">
+        <strong>Privacy at a glance</strong>
+        RexWeb Nexora aims to collect only information that is
+        reasonably necessary to operate, maintain, and improve
+        its website and services. The information actually collected
+        depends on the features you use and the technologies enabled
+        on the website.
+      </div>
+
+      <section class="policy-section" id="introduction">
+        <h2>1. Introduction</h2>
+
+        <p>
+          Welcome to RexWeb Nexora, referred to in this policy as
+          "RexWeb," "Nexora," "we," "our," or "us."
+        </p>
+
+        <p>
+          This Privacy Policy explains how information may be
+          collected, used, stored, and disclosed when you visit
+          or interact with our website and its features.
+        </p>
+
+        <p>
+          By using our website, you acknowledge that you have had
+          the opportunity to read this policy. Where consent is
+          legally required, we will seek it separately.
+        </p>
+
+        <p>
+          This policy should be read alongside any notices presented
+          when you use a particular feature or service.
+        </p>
+      </section>
+
+      <section class="policy-section" id="information">
+        <h2>2. Information We Collect</h2>
+
+        <p>
+          The information we handle depends on how the website is
+          configured and how you use it. Potential categories include:
+        </p>
+
+        <h3>2.1 Information You Provide</h3>
+
+        <p>
+          If we offer contact forms, feedback forms, account
+          registration, or similar features, we may receive information
+          you choose to submit, such as:
+        </p>
+
+        <ul>
+          <li>Your name or chosen display name.</li>
+          <li>Your email address or other contact details.</li>
+          <li>Messages, feedback, questions, or support requests.</li>
+          <li>Information you voluntarily submit through a website feature.</li>
+        </ul>
+
+        <p>
+          You should not submit passwords, financial account details,
+          government identification numbers, or other highly sensitive
+          information through a general contact form.
+        </p>
+
+        <h3>2.2 Technical Information</h3>
+
+        <p>
+          Depending on our hosting provider and website configuration,
+          technical information may be processed, including:
+        </p>
+
+        <ul>
+          <li>Browser type and version.</li>
+          <li>Device type and operating system.</li>
+          <li>Pages visited and approximate visit timestamps.</li>
+          <li>Referring pages and basic diagnostic information.</li>
+          <li>IP addresses and server access logs, where recorded.</li>
+        </ul>
+
+        <h3>2.3 Information We Do Not Intentionally Request</h3>
+
+        <p>
+          Unless a specific feature clearly explains otherwise,
+          we do not intentionally request sensitive personal
+          information merely to let you browse our website.
+        </p>
+
+        <p>
+          Do not assume that information is never processed simply
+          because a page does not ask you to enter it. Hosting
+          providers, embedded services, and other technologies may
+          process technical data according to their own configurations
+          and policies.
+        </p>
+      </section>
+
+      <section class="policy-section" id="usage">
+        <h2>3. How We Use Information</h2>
+
+        <p>
+          Where information is available to us and its use is
+          appropriate and lawful, it may be used to:
+        </p>
+
+        <ul>
+          <li>Operate and maintain the website.</li>
+          <li>Provide requested tools, games, and other features.</li>
+          <li>Respond to messages and support requests.</li>
+          <li>Diagnose technical problems and improve reliability.</li>
+          <li>Understand general website usage, where analytics are enabled.</li>
+          <li>Detect abuse, spam, fraud, and security threats.</li>
+          <li>Protect our website, users, and services.</li>
+          <li>Comply with applicable legal obligations.</li>
+        </ul>
+
+        <p>
+          We aim to use information only for purposes that are
+          compatible with the reason it was collected or otherwise
+          permitted by applicable law.
+        </p>
+      </section>
+
+      <section class="policy-section" id="cookies">
+        <h2>4. Cookies and Local Storage</h2>
+
+        <p>
+          Cookies are small data files that websites can store
+          in your browser. Browser storage technologies, including
+          localStorage and sessionStorage, can also save information
+          on your device.
+        </p>
+
+        <p>
+          Depending on the features implemented, RexWeb Nexora may
+          use browser storage to:
+        </p>
+
+        <ul>
+          <li>Remember your preferred light or dark theme.</li>
+          <li>Save game scores, settings, or progress on your device.</li>
+          <li>Remember certain interface preferences.</li>
+          <li>Support essential website functionality.</li>
+        </ul>
+
+        <p>
+          Data saved in local browser storage generally remains on
+          your device unless it is transmitted elsewhere by a
+          feature or script. Clearing your browser data may remove
+          saved preferences and progress.
+        </p>
+
+        <p>
+          If analytics, advertising, or other third-party technologies
+          are enabled, they may use cookies or similar technologies
+          under their own settings and policies. Where required,
+          consent will be requested before using non-essential
+          technologies.
+        </p>
+
+        <p>
+          You can manage cookies through your browser settings.
+          Blocking certain storage technologies may affect some
+          website features.
+        </p>
+      </section>
+
+      <section class="policy-section" id="tools">
+        <h2>5. Digital Tools, Converters, and Games</h2>
+
+        <p>
+          RexWeb Nexora may provide calculators, text utilities,
+          converters, image tools, coding utilities, security tools,
+          design tools, and browser-based games.
+        </p>
+
+        <h3>5.1 Browser-Based Processing</h3>
+
+        <p>
+          Some tools may process information directly in your browser.
+          For example, a calculator can perform calculations locally,
+          and a game can store a score in browser storage.
+        </p>
+
+        <p>
+          Where a tool operates entirely on your device, the data
+          entered into that tool is not necessarily sent to our
+          servers. However, this cannot be guaranteed for every tool
+          without verifying its actual implementation and any
+          connected third-party scripts.
+        </p>
+
+        <h3>5.2 File and Image Tools</h3>
+
+        <p>
+          If you use an image converter or another file-processing
+          feature, the selected file may be processed in your browser
+          or uploaded to a server, depending on how that feature
+          has been implemented.
+        </p>
+
+        <p>
+          Before processing confidential or sensitive files, check
+          the instructions shown by the specific tool. Do not assume
+          that every file-processing feature works exclusively offline.
+        </p>
+
+        <h3>5.3 Coding and Text Tools</h3>
+
+        <p>
+          Text or code entered into a tool may remain in your browser
+          when processing is local. If a feature connects to an
+          external API, server, or third-party service, the submitted
+          content may be transmitted to that service.
+        </p>
+
+        <p>
+          Avoid entering passwords, private keys, confidential source
+          code, or sensitive personal information into tools unless
+          the feature has been specifically designed and verified
+          for that purpose.
+        </p>
+      </section>
+
+      <section class="policy-section" id="third-party">
+        <h2>6. Third-Party Services</h2>
+
+        <p>
+          Our website may use third-party services to provide hosting,
+          security, analytics, fonts, embedded content, advertising,
+          or other functionality.
+        </p>
+
+        <p>
+          These services may process certain technical information,
+          such as browser details, IP addresses, or requests needed
+          to deliver their features.
+        </p>
+
+        <p>
+          Third-party services operate under their own privacy policies
+          and terms. We encourage you to review those policies when
+          using an externally provided feature.
+        </p>
+
+        <p>
+          The presence of a third-party service depends on the
+          website's actual configuration. This policy does not mean
+          that any particular analytics, advertising, or tracking
+          service is currently installed.
+        </p>
+      </section>
+
+      <section class="policy-section" id="sharing">
+        <h2>7. How We Share Information</h2>
+
+        <p>
+          We do not intend to sell your personal information.
+          Information may be disclosed in limited circumstances,
+          where applicable and lawful, including:
+        </p>
+
+        <ul>
+          <li>
+            <strong>Service providers:</strong>
+            To providers that help host, maintain, secure, or operate
+            the website.
+          </li>
+
+          <li>
+            <strong>Legal obligations:</strong>
+            Where disclosure is required by applicable law or a
+            valid legal process.
+          </li>
+
+          <li>
+            <strong>Security and protection:</strong>
+            Where reasonably necessary to investigate abuse, protect
+            users, or safeguard our rights and systems.
+          </li>
+
+          <li>
+            <strong>Business changes:</strong>
+            If a transfer or restructuring of the website occurs,
+            subject to applicable legal requirements.
+          </li>
+
+          <li>
+            <strong>With your direction:</strong>
+            When you ask us to share information or authorize a
+            particular disclosure.
+          </li>
+        </ul>
+
+        <p>
+          We aim to limit disclosures to what is reasonably necessary
+          for the relevant purpose.
+        </p>
+      </section>
+
+      <section class="policy-section" id="security">
+        <h2>8. Data Security</h2>
+
+        <p>
+          We take reasonable steps appropriate to our website and
+          available resources to protect information against
+          unauthorized access, misuse, loss, or disclosure.
+        </p>
+
+        <p>
+          Security measures may include secure connections, access
+          controls, software updates, and appropriate hosting
+          configurations where implemented.
+        </p>
+
+        <p>
+          However, no website, network, storage system, or method
+          of electronic transmission can be guaranteed to be
+          completely secure.
+        </p>
+
+        <p>
+          You should keep your browser and device updated and avoid
+          submitting confidential information through features that
+          are not designed to handle it securely.
+        </p>
+      </section>
+
+      <section class="policy-section" id="retention">
+        <h2>9. Data Retention</h2>
+
+        <p>
+          We aim to retain personal information only for as long as
+          reasonably necessary for the purpose for which it was
+          collected, unless a longer period is required or permitted
+          by law.
+        </p>
+
+        <p>
+          Retention periods may depend on the type of information,
+          the purpose of processing, security needs, and applicable
+          legal requirements.
+        </p>
+
+        <p>
+          Information stored locally on your device may remain there
+          until you clear your browser storage, uninstall or reset
+          the relevant application, or otherwise remove it.
+        </p>
+
+        <p>
+          Server logs and information held by third-party providers
+          may be subject to their own retention schedules.
+        </p>
+      </section>
+
+      <section class="policy-section" id="rights">
+        <h2>10. Your Privacy Rights and Choices</h2>
+
+        <p>
+          Depending on your location and applicable law, you may have
+          rights concerning your personal information. These may
+          include the right to:
+        </p>
+
+        <ul>
+          <li>Request access to personal information we hold about you.</li>
+          <li>Request correction of inaccurate information.</li>
+          <li>Request deletion of eligible personal information.</li>
+          <li>Object to or request restrictions on certain processing.</li>
+          <li>Withdraw consent where processing relies on consent.</li>
+          <li>Request a copy of certain information in a portable format.</li>
+          <li>Complain to an appropriate data protection authority.</li>
+        </ul>
+
+        <p>
+          These rights are subject to applicable legal conditions
+          and exceptions. We may need to verify your identity before
+          responding to a request.
+        </p>
+
+        <h3>Managing Information on Your Device</h3>
+
+        <p>
+          You can clear cookies and browser storage through your
+          browser settings. Doing so may remove saved preferences,
+          game scores, or other locally stored information.
+        </p>
+
+        <p>
+          If you wish to make a privacy request, use the contact
+          information in the section below.
+        </p>
+      </section>
+
+      <section class="policy-section" id="children">
+        <h2>11. Children's Privacy</h2>
+
+        <p>
+          RexWeb Nexora aims to make its website suitable for a
+          general audience. We do not intentionally request
+          unnecessary personal information from children.
+        </p>
+
+        <p>
+          Where applicable law requires parental consent or additional
+          protections for children, those requirements must be followed.
+        </p>
+
+        <p>
+          If you believe a child has provided personal information
+          through our website in circumstances where it should not
+          have been collected, please contact us so that the matter
+          can be reviewed and appropriate action considered.
+        </p>
+      </section>
+
+      <section class="policy-section" id="international">
+        <h2>12. International Visitors</h2>
+
+        <p>
+          Visitors may access RexWeb Nexora from different countries.
+          Depending on our hosting arrangements and the third-party
+          services used, information may be processed in locations
+          other than the country where a visitor lives.
+        </p>
+
+        <p>
+          Where applicable law requires safeguards for international
+          data transfers, appropriate measures should be implemented.
+        </p>
+
+        <h3>Visitors in Nigeria</h3>
+
+        <p>
+          Where applicable, we aim to handle personal information
+          consistently with the Nigeria Data Protection Act 2023
+          and other relevant Nigerian data protection requirements.
+        </p>
+
+        <p>
+          Your specific rights and the obligations applicable to
+          RexWeb Nexora depend on the circumstances and relevant law.
+        </p>
+      </section>
+
+      <section class="policy-section" id="changes">
+        <h2>13. Changes to This Privacy Policy</h2>
+
+        <p>
+          We may update this Privacy Policy to reflect changes in
+          our website, tools, service providers, legal requirements,
+          or privacy practices.
+        </p>
+
+        <p>
+          When changes are made, we will update the effective date
+          displayed at the top of this page. Where legally required,
+          we will provide additional notice or request consent.
+        </p>
+
+        <p>
+          We encourage visitors to review this page periodically
+          to stay informed about our privacy practices.
+        </p>
+      </section>
+
+      <section class="policy-section" id="contact">
+        <h2>14. Contact RexWeb Nexora</h2>
+
+        <p>
+          If you have questions about this Privacy Policy, want to
+          raise a privacy concern, or wish to submit a request
+          concerning your personal information, contact us through
+          our official contact channel.
+        </p>
+
+        <div class="contact-card">
+          <strong>RexWeb Nexora — Privacy Enquiries</strong>
+
+          <p>
+            Website:
+            <a href="index.html">RexWeb Nexora</a>
+          </p>
+
+          <p class="muted">
+            Contact email: Add your official support or privacy email
+            address here before publishing this page.
+          </p>
+
+          <p class="muted">
+            Please do not publish a placeholder as if it were a
+            working contact address. Add a monitored email address
+            or a functioning contact form before making this policy live.
+          </p>
+        </div>
+      </section>
+
+      <section class="policy-section">
+        <h2>15. Important Notice</h2>
+
+        <p>
+          This Privacy Policy is a general template intended to
+          explain common privacy practices for a digital tools website.
+          It is not a guarantee that every statement describes your
+          website's current technical configuration.
+        </p>
+
+        <p>
+          Before publishing, verify that the policy accurately reflects
+          your actual data collection, hosting, cookies, file processing,
+          analytics, advertising, and third-party integrations.
+          Remove or revise statements that do not apply.
+        </p>
+
+        <p>
+          This document is not legal advice. Consider obtaining
+          appropriate legal guidance to ensure compliance with the
+          laws applicable to your website and its users.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="privacy-footer">
+    <p>
+      &copy; <span id="currentYear">2026</span>
+      RexWeb Nexora. All rights reserved.
+    </p>
+
+    <p>
+      Built with respect for your privacy.
+    </p>
+
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html" aria-current="page">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const html = document.documentElement;
+      const themeButton = document.getElementById('themeToggle');
+      const themeColor = document.querySelector(
+        'meta[name="theme-color"]'
+      );
+
+      // Use the existing website theme when available.
+      // Otherwise, restore a saved preference or use dark mode.
+      let initialTheme = html.getAttribute('data-theme');
+
+      if (initialTheme !== 'dark' && initialTheme !== 'light') {
+        try {
+          initialTheme = localStorage.getItem('rexweb-theme') || 'dark';
+        } catch (error) {
+          initialTheme = 'dark';
+        }
+      }
+
+      function applyTheme(theme) {
+        const validTheme = theme === 'light' ? 'light' : 'dark';
+
+        html.setAttribute('data-theme', validTheme);
+
+        if (themeColor) {
+          themeColor.setAttribute(
+            'content',
+            validTheme === 'light' ? '#f4f7fc' : '#050b19'
+          );
+        }
+
+        if (themeButton) {
+          themeButton.setAttribute(
+            'aria-label',
+            validTheme === 'dark'
+              ? 'Switch to light mode'
+              : 'Switch to dark mode'
+          );
+        }
+      }
+
+      applyTheme(initialTheme);
+
+      if (themeButton) {
+        themeButton.addEventListener('click', () => {
+          const currentTheme = html.getAttribute('data-theme');
+          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+          applyTheme(nextTheme);
+
+          try {
+            localStorage.setItem('rexweb-theme', nextTheme);
+          } catch (error) {
+            // The theme still works for this page if storage is unavailable.
+          }
+        });
+      }
+
+      document.getElementById('currentYear').textContent =
+        new Date().getFullYear();
+    })();
+  </script>
+
+</body>
+</html>
