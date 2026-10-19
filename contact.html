@@ -1,1 +1,108 @@
 
+<section class="contact-section" id="contact">
+  <h2>Get in Touch</h2>
+  <p>Have questions, suggestions, or feedback? Contact RexWeb Nexora using any of the options below.</p>
+
+  <div class="contact-buttons">
+    <a
+      href="https://wa.me/2349132204427"
+      class="contact-btn whatsapp-btn"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Contact RexWeb Nexora on WhatsApp"
+    >
+      <span>💬</span> Chat on WhatsApp
+    </a>
+
+    <a
+      href="mailto:amehchristianc@gmail.com"
+      class="contact-btn email-btn"
+      aria-label="Email RexWeb Nexora"
+    >
+      <span>✉️</span> Send an Email
+    </a>
+  </div>
+</section>
+
+<style>
+.contact-section {
+  text-align: center;
+  padding: 35px 20px;
+  margin: 25px auto;
+  max-width: 750px;
+  border-radius: 18px;
+  background: var(--card-bg, #111827);
+  color: var(--text-color, #f9fafb);
+  border: 1px solid var(--border-color, #263244);
+}
+
+.contact-section h2 {
+  font-size: 28px;
+  margin: 0 0 12px;
+}
+
+.contact-section p {
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 auto 25px;
+  max-width: 550px;
+  opacity: 0.85;
+}
+
+.contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 180px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.contact-btn:hover {
+  transform: translateY(-3px);
+  opacity: 0.9;
+}
+
+.contact-btn:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+
+.whatsapp-btn {
+  background: #25D366;
+  color: #062b16;
+}
+
+.email-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.contact-btn span {
+  font-size: 19px;
+}
+
+@media (max-width: 480px) {
+  .contact-buttons {
+    flex-direction: column;
+  }
+
+  .contact-btn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+</style>
