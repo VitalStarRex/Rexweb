@@ -3,28 +3,17 @@
 
   /*
    * REXWEB NEXORA — GAME 2
-   * ARCADE UNIVERSE · EXTRA GAMES
-   *
-   * 10 additional games:
-   * 1. Memory Match
-   * 2. Neon Racing
-   * 3. Tower Stack
-   * 4. Minefield Mystery
-   * 5. Sliding Puzzle
-   * 6. Alien Invasion
-   * 7. Target Master
-   * 8. Word Scramble
-   * 9. Air Hockey
-   * 10. Neon Maze
+   * Ten additional arcade games.
    *
    * Features:
-   * - Two-row game launcher
-   * - Compact Android-friendly layout
-   * - Individual full-screen game view
-   * - Back button to return to the launcher
-   * - Touch-friendly controls
-   * - Keyboard controls where appropriate
-   * - No replacement of the original game.js
+   * - Two-row, mobile-friendly game menu
+   * - Separate full-screen game view
+   * - Touchpad controls instead of directional buttons
+   * - Easy, Medium, Hard and Hardest difficulty menu
+   * - Restart button in the top bar
+   * - Racing game with a 60-minute countdown
+   * - Improved racing-car graphics
+   * - Procedurally generated maze
    */
 
   const ROOT = document.getElementById('nexora-games');
@@ -49,332 +38,520 @@
     { id: 'maze', icon: '🌀', name: 'Neon Maze' }
   ];
 
+  const DIFFICULTIES = {
+    Easy: {
+      speed: 0.75,
+      enemies: 0.65,
+      time: 1.4,
+      memory: 1.3,
+      label: 'Easy'
+    },
+    Medium: {
+      speed: 1,
+      enemies: 1,
+      time: 1,
+      memory: 1,
+      label: 'Medium'
+    },
+    Hard: {
+      speed: 1.35,
+      enemies: 1.4,
+      time: 0.8,
+      memory: 0.8,
+      label: 'Hard'
+    },
+    Hardest: {
+      speed: 1.75,
+      enemies: 1.9,
+      time: 0.65,
+      memory: 0.6,
+      label: 'Hardest'
+    }
+  };
+
+  let difficulty = 'Medium';
+  let currentGame = null;
+  let cleanupGame = null;
+  let animationFrame = 0;
+  let timers = [];
+  let gameToken = 0;
+  let savedOverflow = '';
+
   const style = document.createElement('style');
 
   style.textContent = `
     #nx2-launcher,
     #nx2-overlay {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-      box-sizing: border-box;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      box-sizing:border-box;
     }
 
     #nx2-launcher *,
     #nx2-overlay * {
-      box-sizing: border-box;
+      box-sizing:border-box;
     }
 
     #nx2-launcher {
-      width: 100%;
-      max-width: 1100px;
-      margin: 14px auto 24px;
-      padding: 0;
-      color: var(--text, #eef5ff);
+      width:100%;
+      max-width:1100px;
+      margin:14px auto 24px;
+      color:var(--text,#eef5ff);
     }
 
     #nx2-launcher .nx2-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:10px;
     }
 
     #nx2-launcher .nx2-heading h2 {
-      margin: 0;
-      font-size: clamp(17px, 4vw, 24px);
-      line-height: 1.2;
-      letter-spacing: .04em;
+      margin:0;
+      font-size:clamp(17px,4vw,24px);
+      letter-spacing:.04em;
     }
 
     #nx2-launcher .nx2-heading p {
-      margin: 4px 0 0;
-      font-size: 11px;
-      opacity: .7;
+      margin:4px 0 0;
+      font-size:11px;
+      opacity:.7;
     }
 
     #nx2-launcher .nx2-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-template-rows: repeat(2, auto);
-      gap: 8px;
-      width: 100%;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-rows:repeat(2,auto);
+      gap:8px;
+      width:100%;
     }
 
     #nx2-launcher .nx2-card {
-      appearance: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-width: 0;
-      min-height: 82px;
-      padding: 8px 3px;
-      border: 1px solid #263d5c;
-      border-radius: 12px;
-      background: linear-gradient(145deg, #111d33, #070c18);
-      color: #f0f7ff;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 4px 12px #0003;
-      -webkit-tap-highlight-color: transparent;
-      transition: border-color .15s, transform .15s;
-    }
-
-    #nx2-launcher .nx2-card:hover,
-    #nx2-launcher .nx2-card:focus-visible {
-      border-color: #35e8ff;
-      outline: none;
+      appearance:none;
+      display:flex;
+      min-width:0;
+      min-height:82px;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:8px 3px;
+      border:1px solid #263d5c;
+      border-radius:12px;
+      background:linear-gradient(145deg,#111d33,#070c18);
+      color:#f0f7ff;
+      text-align:center;
+      cursor:pointer;
+      box-shadow:0 4px 12px #0003;
+      -webkit-tap-highlight-color:transparent;
+      transition:transform .15s,border-color .15s;
     }
 
     #nx2-launcher .nx2-card:active {
-      transform: scale(.97);
+      transform:scale(.97);
+    }
+
+    #nx2-launcher .nx2-card:hover {
+      border-color:#35e8ff;
     }
 
     #nx2-launcher .nx2-icon {
-      display: block;
-      font-size: clamp(19px, 4vw, 29px);
-      line-height: 1;
+      font-size:clamp(19px,4vw,29px);
+      line-height:1;
     }
 
     #nx2-launcher .nx2-name {
-      display: block;
-      width: 100%;
-      font-size: clamp(9px, 1.5vw, 12px);
-      font-weight: 800;
-      line-height: 1.2;
-      overflow-wrap: anywhere;
+      display:block;
+      width:100%;
+      font-size:clamp(9px,1.5vw,12px);
+      font-weight:800;
+      line-height:1.2;
+      overflow-wrap:anywhere;
     }
 
     #nx2-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2147483000;
-      display: none;
-      flex-direction: column;
-      overflow: auto;
-      overscroll-behavior: contain;
-      padding:
-        max(9px, env(safe-area-inset-top))
-        10px
-        max(12px, env(safe-area-inset-bottom));
-      background: #050914;
-      color: #eef5ff;
+      position:fixed;
+      inset:0;
+      z-index:2147483000;
+      display:none;
+      flex-direction:column;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:max(9px,env(safe-area-inset-top))
+        10px max(12px,env(safe-area-inset-bottom));
+      background:#050914;
+      color:#eef5ff;
     }
 
     #nx2-overlay.nx2-active {
-      display: flex;
+      display:flex;
     }
 
     #nx2-overlay .nx2-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
-      max-width: 850px;
-      margin: 0 auto 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      width:100%;
+      max-width:850px;
+      margin:0 auto 8px;
     }
 
     #nx2-overlay .nx2-title {
-      min-width: 0;
-      margin: 0;
-      font-size: clamp(17px, 4vw, 23px);
-      overflow-wrap: anywhere;
+      flex:1;
+      min-width:0;
+      margin:0;
+      font-size:clamp(15px,4vw,22px);
+      text-align:center;
+      overflow-wrap:anywhere;
     }
 
     #nx2-overlay .nx2-btn {
-      appearance: none;
-      border: 1px solid #35e8ff;
-      border-radius: 9px;
-      padding: 9px 12px;
-      background: #10283b;
-      color: #e7fbff;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-      touch-action: manipulation;
+      appearance:none;
+      border:1px solid #35e8ff;
+      border-radius:9px;
+      padding:8px 10px;
+      background:#10283b;
+      color:#e7fbff;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      touch-action:manipulation;
+      white-space:nowrap;
     }
 
     #nx2-overlay .nx2-btn:active {
-      transform: scale(.97);
+      transform:scale(.97);
     }
 
     #nx2-overlay .nx2-content {
-      width: 100%;
-      max-width: 850px;
-      margin: 0 auto;
-      text-align: center;
+      width:100%;
+      max-width:850px;
+      margin:0 auto;
+      text-align:center;
     }
 
     #nx2-overlay .nx2-status {
-      min-height: 24px;
-      margin: 8px 0;
-      color: #7cf4ff;
-      font-size: 14px;
-      font-weight: 700;
+      min-height:22px;
+      margin:7px 0;
+      color:#7cf4ff;
+      font-size:13px;
+      font-weight:700;
+      line-height:1.5;
     }
 
     #nx2-overlay .nx2-panel {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 12px;
-      border: 1px solid #203957;
-      border-radius: 15px;
-      background: linear-gradient(145deg, #0d192c, #070d19);
+      width:100%;
+      max-width:520px;
+      margin:0 auto;
+      padding:10px;
+      border:1px solid #203957;
+      border-radius:15px;
+      background:linear-gradient(145deg,#0d192c,#070d19);
     }
 
     #nx2-overlay .nx2-board {
-      display: grid;
-      gap: 7px;
-      width: 100%;
-      max-width: 390px;
-      margin: 10px auto;
+      display:grid;
+      gap:6px;
+      width:100%;
+      max-width:390px;
+      margin:10px auto;
     }
 
     #nx2-overlay .nx2-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 0;
-      aspect-ratio: 1;
-      border: 1px solid #294664;
-      border-radius: 9px;
-      background: #101d32;
-      color: #f1fbff;
-      font-size: clamp(15px, 5vw, 27px);
-      font-weight: 800;
-      cursor: pointer;
-      touch-action: manipulation;
-      user-select: none;
-    }
-
-    #nx2-overlay .nx2-cell:active {
-      border-color: #35e8ff;
+      display:flex;
+      min-width:0;
+      aspect-ratio:1;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #294664;
+      border-radius:8px;
+      background:#101d32;
+      color:#f1fbff;
+      font-size:clamp(14px,5vw,27px);
+      font-weight:800;
+      cursor:pointer;
+      touch-action:manipulation;
+      user-select:none;
     }
 
     #nx2-overlay .nx2-cell.nx2-selected {
-      border-color: #35e8ff;
-      background: #14354b;
+      border-color:#35e8ff;
+      background:#14354b;
     }
 
     #nx2-overlay .nx2-cell.nx2-safe {
-      background: #124333;
-      border-color: #43f5a5;
+      background:#124333;
+      border-color:#43f5a5;
     }
 
     #nx2-overlay .nx2-cell.nx2-bomb {
-      background: #51202c;
-      border-color: #ff6687;
+      background:#51202c;
+      border-color:#ff6687;
     }
 
     #nx2-overlay .nx2-controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin: 10px auto;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin:10px auto;
     }
 
     #nx2-overlay .nx2-help {
-      margin: 10px auto;
-      max-width: 520px;
-      color: #aebfd4;
-      font-size: 12px;
-      line-height: 1.5;
+      max-width:520px;
+      margin:10px auto;
+      color:#aebfd4;
+      font-size:12px;
+      line-height:1.5;
     }
 
     #nx2-overlay canvas {
-      display: block;
-      width: 100%;
-      max-width: 520px;
-      height: auto;
-      margin: 10px auto;
-      border: 1px solid #25415f;
-      border-radius: 12px;
-      background: #07101f;
-      touch-action: none;
+      display:block;
+      width:100%;
+      max-width:520px;
+      height:auto;
+      margin:8px auto;
+      border:1px solid #25415f;
+      border-radius:12px;
+      background:#07101f;
+      touch-action:none;
     }
 
     #nx2-overlay .nx2-input {
-      display: block;
-      width: 100%;
-      max-width: 320px;
-      margin: 10px auto;
-      padding: 12px;
-      border: 1px solid #34516f;
-      border-radius: 10px;
-      background: #07101e;
-      color: #fff;
-      font-size: 16px;
-      text-align: center;
-      outline: none;
+      display:block;
+      width:100%;
+      max-width:320px;
+      margin:10px auto;
+      padding:12px;
+      border:1px solid #34516f;
+      border-radius:10px;
+      background:#07101e;
+      color:#fff;
+      font-size:16px;
+      text-align:center;
+      outline:none;
     }
 
     #nx2-overlay .nx2-input:focus {
-      border-color: #35e8ff;
+      border-color:#35e8ff;
     }
 
     #nx2-overlay .nx2-big {
-      font-size: clamp(23px, 7vw, 38px);
-      font-weight: 900;
-      letter-spacing: .08em;
+      font-size:clamp(23px,7vw,38px);
+      font-weight:900;
+      letter-spacing:.08em;
     }
 
     #nx2-overlay .nx2-small {
-      color: #b5c6dc;
-      font-size: 12px;
+      color:#b5c6dc;
+      font-size:12px;
     }
 
-    @media (max-width: 420px) {
+    /* Collapsible difficulty selector */
+
+    #nx2-overlay .nx2-difficulty {
+      width:100%;
+      max-width:520px;
+      margin:0 auto 8px;
+      border:1px solid #263d5c;
+      border-radius:11px;
+      background:#0a1424;
+      text-align:left;
+    }
+
+    #nx2-overlay .nx2-difficulty summary {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:10px 12px;
+      color:#dffaff;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      list-style:none;
+      user-select:none;
+    }
+
+    #nx2-overlay .nx2-difficulty summary::-webkit-details-marker {
+      display:none;
+    }
+
+    #nx2-overlay .nx2-difficulty summary::after {
+      content:'+';
+      color:#35e8ff;
+      font-size:18px;
+    }
+
+    #nx2-overlay .nx2-difficulty[open] summary::after {
+      content:'−';
+    }
+
+    #nx2-overlay .nx2-difficulty-options {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:5px;
+      padding:0 8px 9px;
+    }
+
+    #nx2-overlay .nx2-difficulty-option {
+      min-width:0;
+      padding:9px 3px;
+      border:1px solid #29415f;
+      border-radius:8px;
+      background:#101d32;
+      color:#dce9f8;
+      font-size:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    #nx2-overlay .nx2-difficulty-option[aria-pressed="true"] {
+      border-color:#35e8ff;
+      background:#12364a;
+      color:#8ff7ff;
+    }
+
+    /* On-screen touchpad / virtual joystick */
+
+    #nx2-overlay .nx2-touch-area {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:22px;
+      width:100%;
+      max-width:340px;
+      margin:12px auto 4px;
+      touch-action:none;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    #nx2-overlay .nx2-pad {
+      position:relative;
+      width:124px;
+      height:124px;
+      flex:0 0 124px;
+      border:2px solid #294d6d;
+      border-radius:50%;
+      background:
+        radial-gradient(circle,#142b43 0,#0b182b 58%,#07101d 72%);
+      box-shadow:inset 0 0 18px #0008,0 0 14px #35e8ff12;
+      touch-action:none;
+    }
+
+    #nx2-overlay .nx2-pad::before,
+    #nx2-overlay .nx2-pad::after {
+      position:absolute;
+      content:'';
+      background:#29415a;
+      pointer-events:none;
+    }
+
+    #nx2-overlay .nx2-pad::before {
+      width:1px;
+      height:82%;
+      left:50%;
+      top:9%;
+    }
+
+    #nx2-overlay .nx2-pad::after {
+      height:1px;
+      width:82%;
+      top:50%;
+      left:9%;
+    }
+
+    #nx2-overlay .nx2-knob {
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:45px;
+      height:45px;
+      border:2px solid #6ef4ff;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#35e8ff,#11617d 70%);
+      box-shadow:0 0 14px #35e8ff55;
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+    }
+
+    #nx2-overlay .nx2-pad-hint {
+      display:block;
+      margin-top:5px;
+      color:#8da6bf;
+      font-size:10px;
+      text-align:center;
+    }
+
+    #nx2-overlay .nx2-fire {
+      width:76px;
+      height:76px;
+      flex:0 0 76px;
+      border:2px solid #ff6687;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#ff718d,#81213f);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      box-shadow:0 0 14px #ff668733;
+      touch-action:none;
+    }
+
+    @media(max-width:420px) {
       #nx2-launcher {
-        margin-top: 10px;
+        margin-top:10px;
       }
 
       #nx2-launcher .nx2-grid {
-        gap: 5px;
+        gap:5px;
       }
 
       #nx2-launcher .nx2-card {
-        min-height: 68px;
-        padding: 6px 2px;
-        gap: 5px;
-        border-radius: 9px;
+        min-height:68px;
+        padding:6px 2px;
+        gap:5px;
+        border-radius:9px;
       }
 
       #nx2-launcher .nx2-name {
-        font-size: 9px;
+        font-size:9px;
       }
 
       #nx2-overlay {
-        padding-left: 7px;
-        padding-right: 7px;
+        padding-left:6px;
+        padding-right:6px;
       }
 
       #nx2-overlay .nx2-panel {
-        padding: 8px;
+        padding:7px;
       }
 
       #nx2-overlay .nx2-board {
-        gap: 5px;
+        gap:4px;
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      #nx2-launcher .nx2-card {
-        transition: none;
+      #nx2-overlay .nx2-pad {
+        width:112px;
+        height:112px;
+        flex-basis:112px;
+      }
+
+      #nx2-overlay .nx2-topbar {
+        gap:5px;
+      }
+
+      #nx2-overlay .nx2-btn {
+        padding:8px 7px;
+        font-size:11px;
       }
     }
   `;
 
   document.head.appendChild(style);
 
-  /*
-   * Insert the launcher BEFORE the original arcade.
-   * This keeps game2.js separate from game.js.
-   */
   const launcher = document.createElement('section');
   launcher.id = 'nx2-launcher';
   launcher.setAttribute('aria-label', 'Additional Nexora arcade games');
@@ -386,9 +563,12 @@
         <p>Choose a game to play</p>
       </div>
     </div>
+
     <div class="nx2-grid">
       ${GAMES.map(game => `
-        <button class="nx2-card" type="button" data-nx2-game="${game.id}">
+        <button class="nx2-card"
+          type="button"
+          data-nx2-game="${game.id}">
           <span class="nx2-icon">${game.icon}</span>
           <span class="nx2-name">${game.name}</span>
         </button>
@@ -410,6 +590,26 @@
       <h2 class="nx2-title" id="nx2-game-title">Nexora Game</h2>
       <button class="nx2-btn" type="button" id="nx2-restart">↻ Restart</button>
     </div>
+
+    <details class="nx2-difficulty" id="nx2-difficulty-menu">
+      <summary>
+        <span>⚙ DIFFICULTY</span>
+        <span id="nx2-difficulty-label">Medium</span>
+      </summary>
+
+      <div class="nx2-difficulty-options">
+        ${Object.keys(DIFFICULTIES).map(name => `
+          <button
+            class="nx2-difficulty-option"
+            type="button"
+            data-nx2-difficulty="${name}"
+            aria-pressed="${name === difficulty ? 'true' : 'false'}">
+            ${name}
+          </button>
+        `).join('')}
+      </div>
+    </details>
+
     <div class="nx2-content" id="nx2-content"></div>
   `;
 
@@ -419,15 +619,20 @@
   const title = overlay.querySelector('#nx2-game-title');
   const backButton = overlay.querySelector('#nx2-back');
   const restartButton = overlay.querySelector('#nx2-restart');
-
-  let currentGame = null;
-  let cleanupGame = null;
-  let animationFrame = 0;
-  let timers = [];
-  let gameToken = 0;
+  const difficultyMenu = overlay.querySelector('#nx2-difficulty-menu');
+  const difficultyLabel = overlay.querySelector('#nx2-difficulty-label');
 
   function later(fn, delay) {
-    const id = setTimeout(fn, delay);
+    const token = gameToken;
+
+    const id = setTimeout(() => {
+      timers = timers.filter(timer => timer !== id);
+
+      if (token === gameToken && overlay.classList.contains('nx2-active')) {
+        fn();
+      }
+    }, delay);
+
     timers.push(id);
     return id;
   }
@@ -447,7 +652,7 @@
       try {
         cleanupGame();
       } catch (error) {
-        console.warn('Nexora Game 2 cleanup:', error);
+        console.warn('Nexora game cleanup:', error);
       }
     }
 
@@ -455,15 +660,10 @@
     content.innerHTML = '';
   }
 
-  function status(message) {
-    const element = content.querySelector('.nx2-status');
-    if (element) element.textContent = message;
-  }
-
-  function shell(description) {
+  function shell(message) {
     content.innerHTML = `
       <div class="nx2-panel">
-        <div class="nx2-status" aria-live="polite">${description || ''}</div>
+        <div class="nx2-status" aria-live="polite">${message || ''}</div>
         <div id="nx2-game-area"></div>
         <div class="nx2-controls" id="nx2-controls"></div>
         <div class="nx2-help" id="nx2-help"></div>
@@ -477,13 +677,128 @@
     };
   }
 
-  function button(label, onClick) {
+  function status(message) {
+    const el = content.querySelector('.nx2-status');
+    if (el) el.textContent = message;
+  }
+
+  function button(label, action) {
     const el = document.createElement('button');
     el.type = 'button';
     el.className = 'nx2-btn';
     el.textContent = label;
-    el.addEventListener('click', onClick);
+    el.addEventListener('click', action);
     return el;
+  }
+
+  function activeDifficulty() {
+    return DIFFICULTIES[difficulty];
+  }
+
+  function addTouchpad(container, onMove, options = {}) {
+    const wrap = document.createElement('div');
+    wrap.className = 'nx2-touch-area';
+
+    const padWrap = document.createElement('div');
+
+    const pad = document.createElement('div');
+    pad.className = 'nx2-pad';
+    pad.setAttribute('role', 'application');
+    pad.setAttribute('aria-label', 'Touchpad directional controller');
+
+    const knob = document.createElement('div');
+    knob.className = 'nx2-knob';
+    pad.appendChild(knob);
+    padWrap.appendChild(pad);
+
+    const hint = document.createElement('span');
+    hint.className = 'nx2-pad-hint';
+    hint.textContent = 'DRAG TO MOVE';
+    padWrap.appendChild(hint);
+
+    wrap.appendChild(padWrap);
+
+    let fireButton = null;
+
+    if (options.fire) {
+      fireButton = document.createElement('button');
+      fireButton.type = 'button';
+      fireButton.className = 'nx2-fire';
+      fireButton.textContent = options.fireLabel || 'FIRE';
+      fireButton.setAttribute('aria-label', options.fireLabel || 'Fire');
+
+      const fire = event => {
+        event.preventDefault();
+        if (options.onFire) options.onFire();
+      };
+
+      fireButton.addEventListener('pointerdown', fire);
+      wrap.appendChild(fireButton);
+    }
+
+    container.appendChild(wrap);
+
+    let pointerId = null;
+
+    function resetPad() {
+      knob.style.left = '50%';
+      knob.style.top = '50%';
+
+      if (pointerId !== null) {
+        pointerId = null;
+        onMove(0, 0, false);
+      }
+    }
+
+    pad.addEventListener('pointerdown', event => {
+      event.preventDefault();
+
+      pointerId = event.pointerId;
+
+      try {
+        pad.setPointerCapture(pointerId);
+      } catch (_) {}
+
+      update(event);
+    });
+
+    pad.addEventListener('pointermove', event => {
+      if (pointerId !== event.pointerId) return;
+      event.preventDefault();
+      update(event);
+    });
+
+    pad.addEventListener('pointerup', event => {
+      if (pointerId !== event.pointerId) return;
+      resetPad();
+    });
+
+    pad.addEventListener('pointercancel', resetPad);
+
+    function update(event) {
+      const rect = pad.getBoundingClientRect();
+
+      const radius = Math.max(25, rect.width * .34);
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      let dx = (event.clientX - cx) / radius;
+      let dy = (event.clientY - cy) / radius;
+
+      const length = Math.hypot(dx, dy);
+
+      if (length > 1) {
+        dx /= length;
+        dy /= length;
+      }
+
+      knob.style.left = `${50 + dx * 34}%`;
+      knob.style.top = `${50 + dy * 34}%`;
+
+      onMove(dx, dy, true);
+    }
+
+    return { wrap, pad, fireButton };
   }
 
   function openGame(id) {
@@ -491,22 +806,49 @@
     if (!game) return;
 
     clearGame();
+
     currentGame = id;
-    title.textContent = game.icon + ' ' + game.name;
+    title.textContent = `${game.icon} ${game.name}`;
     overlay.classList.add('nx2-active');
+
+    savedOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    switch (id) {
-      case 'memory': startMemory(); break;
-      case 'racing': startRacing(); break;
-      case 'tower': startTower(); break;
-      case 'mine': startMine(); break;
-      case 'puzzle': startPuzzle(); break;
-      case 'alien': startAlien(); break;
-      case 'target': startTarget(); break;
-      case 'word': startWord(); break;
-      case 'hockey': startHockey(); break;
-      case 'maze': startMaze(); break;
+    overlay.querySelectorAll('[data-nx2-difficulty]').forEach(el => {
+      el.setAttribute(
+        'aria-pressed',
+        el.dataset.nx2Difficulty === difficulty ? 'true' : 'false'
+      );
+    });
+
+    difficultyLabel.textContent = difficulty;
+
+    try {
+      switch (id) {
+        case 'memory': startMemory(); break;
+        case 'racing': startRacing(); break;
+        case 'tower': startTower(); break;
+        case 'mine': startMine(); break;
+        case 'puzzle': startPuzzle(); break;
+        case 'alien': startAlien(); break;
+        case 'target': startTarget(); break;
+        case 'word': startWord(); break;
+        case 'hockey': startHockey(); break;
+        case 'maze': startMaze(); break;
+      }
+    } catch (error) {
+      console.error('Nexora game error:', error);
+      content.innerHTML = `
+        <div class="nx2-panel">
+          <p>The game encountered an error.</p>
+          <button class="nx2-btn" id="nx2-error-retry" type="button">
+            Try again
+          </button>
+        </div>
+      `;
+
+      content.querySelector('#nx2-error-retry')
+        .addEventListener('click', () => openGame(id));
     }
   }
 
@@ -514,7 +856,7 @@
     clearGame();
     currentGame = null;
     overlay.classList.remove('nx2-active');
-    document.body.style.overflow = '';
+    document.body.style.overflow = savedOverflow;
   }
 
   backButton.addEventListener('click', closeGame);
@@ -528,20 +870,52 @@
     if (card) openGame(card.dataset.nx2Game);
   });
 
+  difficultyMenu.addEventListener('click', event => {
+    const option = event.target.closest('[data-nx2-difficulty]');
+    if (!option) return;
+
+    difficulty = option.dataset.nx2Difficulty;
+    difficultyLabel.textContent = difficulty;
+
+    overlay.querySelectorAll('[data-nx2-difficulty]').forEach(el => {
+      el.setAttribute(
+        'aria-pressed',
+        el.dataset.nx2Difficulty === difficulty ? 'true' : 'false'
+      );
+    });
+
+    difficultyMenu.open = false;
+
+    if (currentGame) {
+      openGame(currentGame);
+    }
+  });
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && overlay.classList.contains('nx2-active')) {
       closeGame();
     }
   });
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 1. MEMORY MATCH
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startMemory() {
-    const ui = shell('Find matching pairs. Tap two cards.');
+    const ui = shell('Find matching pairs.');
 
-    const icons = ['🚀', '👾', '💎', '🐉', '⚡', '🌙', '🎯', '🪐'];
+    const icons = [
+      '🚀', '👾', '💎', '🐉',
+      '⚡', '🌙', '🎯', '🪐'
+    ];
+
+    const pairCount = Math.max(
+      3,
+      Math.min(8, Math.round(icons.length * activeDifficulty().memory))
+    );
+
+    const selectedIcons = icons.slice(0, pairCount);
+
     let cards = [];
     let opened = [];
     let matched = 0;
@@ -550,7 +924,7 @@
 
     const board = document.createElement('div');
     board.className = 'nx2-board';
-    board.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    board.style.gridTemplateColumns = 'repeat(4,minmax(0,1fr))';
     ui.area.appendChild(board);
 
     const info = document.createElement('div');
@@ -564,7 +938,9 @@
         const el = document.createElement('button');
         el.type = 'button';
         el.className = 'nx2-cell';
-        el.textContent = card.open || card.matched ? card.icon : '?';
+
+        el.textContent =
+          card.open || card.matched ? card.icon : '?';
 
         if (card.matched) el.classList.add('nx2-safe');
 
@@ -575,68 +951,75 @@
           opened.push(index);
           draw();
 
-          if (opened.length === 2) {
-            moves++;
-            locked = true;
+          if (opened.length !== 2) return;
 
-            const [a, b] = opened;
+          moves++;
+          locked = true;
 
-            if (cards[a].icon === cards[b].icon) {
-              cards[a].matched = true;
-              cards[b].matched = true;
-              matched += 2;
+          const [a, b] = opened;
+
+          if (cards[a].icon === cards[b].icon) {
+            cards[a].matched = true;
+            cards[b].matched = true;
+
+            matched += 2;
+            opened = [];
+            locked = false;
+
+            draw();
+
+            if (matched === cards.length) {
+              status(`🏆 You matched every pair in ${moves} moves!`);
+            } else {
+              status('Good match!');
+            }
+          } else {
+            later(() => {
+              cards[a].open = false;
+              cards[b].open = false;
+
               opened = [];
               locked = false;
-              draw();
 
-              if (matched === cards.length) {
-                status('🏆 You matched every pair!');
-              } else {
-                status('Good match!');
-              }
-            } else {
-              later(() => {
-                cards[a].open = false;
-                cards[b].open = false;
-                opened = [];
-                locked = false;
-                draw();
-                status('Keep looking for matching pairs.');
-              }, 700);
-            }
+              draw();
+              status('Keep looking for matching pairs.');
+            }, 700);
           }
         });
 
         board.appendChild(el);
       });
 
-      info.textContent = `Moves: ${moves} · Pairs: ${matched / 2}/${icons.length}`;
+      info.textContent =
+        `Moves: ${moves} · Pairs: ${matched / 2}/${selectedIcons.length}`;
     }
 
     function reset() {
-      cards = [...icons, ...icons]
-        .sort(() => Math.random() - 0.5)
+      cards = [...selectedIcons, ...selectedIcons]
+        .sort(() => Math.random() - .5)
         .map(icon => ({ icon, open: false, matched: false }));
 
       opened = [];
       matched = 0;
       moves = 0;
       locked = false;
-      status('Find all eight pairs.');
+
+      status('Find all matching pairs.');
       draw();
     }
 
-    ui.controls.appendChild(button('Shuffle cards', reset));
-    ui.help.textContent = 'Remember where each symbol appears, then find its matching pair.';
+    ui.help.textContent =
+      'The difficulty menu changes how many pairs you need to find.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
-  // 2. NEON RACING
-  // ------------------------------------------------------------
+  // ============================================================
+  // 2. NEON RACING — CAR GRAPHICS AND 60-MINUTE COUNTDOWN
+  // ============================================================
 
   function startRacing() {
-    const ui = shell('Dodge traffic and survive as long as possible.');
+    const ui = shell('Race against traffic and avoid collisions.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -644,127 +1027,335 @@
     ui.area.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    const keys = { left: false, right: false };
-    let player, obstacles, score, speed, alive, last, spawn, touchX;
 
-    const controls = [
-      ['◀ LEFT', 'left'],
-      ['RIGHT ▶', 'right']
-    ];
+    const input = {
+      x: 0,
+      y: 0,
+      active: false,
+      left: false,
+      right: false
+    };
 
-    controls.forEach(([label, key]) => {
-      const b = button(label, () => {
-        if (!alive) return;
-        if (key === 'left') player.x -= 35;
-        else player.x += 35;
-        player.x = Math.max(45, Math.min(315, player.x));
-      });
-      ui.controls.appendChild(b);
-    });
+    let player;
+    let traffic;
+    let score;
+    let remaining;
+    let alive;
+    let lastTime;
+    let spawnTimer;
+    let roadOffset;
+    let elapsed;
+    let countdownTimer;
+    let keyboardHandler;
+    let keyboardUpHandler;
 
-    function reset() {
-      player = { x: 180, y: 445, w: 30, h: 48 };
-      obstacles = [];
-      score = 0;
-      speed = 3;
-      alive = true;
-      last = 0;
-      spawn = 0;
-      status('Score: 0');
-      draw(0);
+    function roundedRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
     }
 
-    function draw(timestamp) {
-      if (!alive) return;
+    function drawCar(x, y, w, h, color, isPlayer = false) {
+      ctx.save();
+      ctx.translate(x, y);
 
-      const dt = Math.min(32, timestamp - (last || timestamp));
-      last = timestamp;
-      spawn += dt;
+      // Tyres.
+      ctx.fillStyle = '#05070b';
 
-      if (keys.left) player.x -= 4;
-      if (keys.right) player.x += 4;
-      player.x = Math.max(45, Math.min(315, player.x));
+      roundedRect(-w / 2 - 3, 10, 7, 18, 3);
+      ctx.fill();
 
-      if (spawn > Math.max(360, 900 - score * 8)) {
-        spawn = 0;
-        obstacles.push({
-          x: 45 + Math.random() * 270,
-          y: -55,
-          w: 28,
-          h: 43
-        });
+      roundedRect(w / 2 - 4, 10, 7, 18, 3);
+      ctx.fill();
+
+      roundedRect(-w / 2 - 3, h - 26, 7, 18, 3);
+      ctx.fill();
+
+      roundedRect(w / 2 - 4, h - 26, 7, 18, 3);
+      ctx.fill();
+
+      // Main body.
+      ctx.fillStyle = color;
+      roundedRect(-w / 2, 0, w, h, 8);
+      ctx.fill();
+
+      // Hood.
+      ctx.fillStyle = isPlayer ? '#c8ffff' : '#ffffff55';
+      roundedRect(-w / 2 + 4, 5, w - 8, h * .23, 4);
+      ctx.fill();
+
+      // Windscreen.
+      ctx.fillStyle = '#071626';
+      roundedRect(-w / 2 + 5, h * .29, w - 10, h * .23, 4);
+      ctx.fill();
+
+      // Rear window.
+      ctx.fillStyle = '#102b41';
+      roundedRect(-w / 2 + 6, h * .57, w - 12, h * .14, 3);
+      ctx.fill();
+
+      // Tail lights.
+      ctx.fillStyle = '#ff244f';
+      ctx.fillRect(-w / 2 + 3, h - 7, 7, 4);
+      ctx.fillRect(w / 2 - 10, h - 7, 7, 4);
+
+      // Headlights on player's car.
+      if (isPlayer) {
+        ctx.fillStyle = '#f7ffff';
+        ctx.fillRect(-w / 2 + 4, 2, 8, 4);
+        ctx.fillRect(w / 2 - 12, 2, 8, 4);
+
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#35e8ff';
+        ctx.strokeStyle = '#35e8ff';
+        ctx.lineWidth = 1.5;
+
+        roundedRect(-w / 2, 0, w, h, 8);
+        ctx.stroke();
       }
 
-      obstacles.forEach(o => {
-        o.y += speed * dt / 16;
-      });
+      ctx.restore();
+    }
 
-      obstacles = obstacles.filter(o => o.y < 550);
-      speed += .0005 * dt;
-      score += dt / 100;
-
-      ctx.clearRect(0, 0, 360, 520);
+    function drawRoad() {
       ctx.fillStyle = '#07101f';
       ctx.fillRect(0, 0, 360, 520);
 
-      ctx.fillStyle = '#17253b';
+      // Roadside grass.
+      ctx.fillStyle = '#0a281e';
+      ctx.fillRect(0, 0, 35, 520);
+      ctx.fillRect(325, 0, 35, 520);
+
+      // Road.
+      ctx.fillStyle = '#292e38';
       ctx.fillRect(35, 0, 290, 520);
 
-      ctx.strokeStyle = '#35e8ff';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([20, 18]);
-      ctx.beginPath();
-      ctx.moveTo(180, 0);
-      ctx.lineTo(180, 520);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      // Road edges.
+      ctx.fillStyle = '#dce7f4';
+      ctx.fillRect(39, 0, 3, 520);
+      ctx.fillRect(318, 0, 3, 520);
 
-      ctx.fillStyle = '#43f5a5';
-      ctx.fillRect(player.x - player.w / 2, player.y, player.w, player.h);
+      // Lane markings.
+      ctx.fillStyle = '#e8e8e8';
 
-      ctx.fillStyle = '#ff5478';
+      for (let y = -45; y < 560; y += 82) {
+        const yy = (y + roadOffset) % 560;
 
-      for (const o of obstacles) {
-        ctx.fillRect(o.x - o.w / 2, o.y, o.w, o.h);
+        ctx.fillRect(128, yy, 4, 37);
+        ctx.fillRect(228, yy, 4, 37);
+      }
+
+      // Roadside reflectors.
+      for (let y = -30; y < 550; y += 65) {
+        const yy = (y + roadOffset * 1.3) % 550;
+
+        ctx.fillStyle = '#35e8ff';
+        ctx.fillRect(17, yy, 5, 14);
+        ctx.fillRect(338, yy, 5, 14);
+      }
+    }
+
+    function draw() {
+      drawRoad();
+
+      traffic.forEach(car => {
+        drawCar(car.x, car.y, car.w, car.h, car.color);
+      });
+
+      drawCar(
+        player.x,
+        player.y,
+        player.w,
+        player.h,
+        '#19a9ff',
+        true
+      );
+
+      // Dashboard.
+      ctx.fillStyle = '#030812dd';
+      ctx.fillRect(43, 8, 112, 25);
+      ctx.fillRect(205, 8, 112, 25);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px system-ui';
+      ctx.fillText(`SCORE ${Math.floor(score)}`, 51, 24);
+
+      const minutes = Math.floor(remaining / 60);
+      const seconds = Math.floor(remaining % 60);
+
+      ctx.fillStyle = remaining < 60 ? '#ff6687' : '#8ff7ff';
+
+      ctx.fillText(
+        `TIME ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+        211,
+        24
+      );
+
+      if (!alive) {
+        ctx.fillStyle = '#030812cc';
+        ctx.fillRect(35, 180, 290, 130);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 23px system-ui';
+
+        ctx.fillText(
+          remaining <= 0 ? 'RACE COMPLETE' : 'RACE OVER',
+          180,
+          226
+        );
+
+        ctx.font = 'bold 15px system-ui';
+        ctx.fillText(`Score: ${Math.floor(score)}`, 180, 258);
+
+        ctx.font = '12px system-ui';
+        ctx.fillText('Use Restart at the top to race again.', 180, 282);
+
+        ctx.textAlign = 'left';
+      }
+    }
+
+    function reset() {
+      player = {
+        x: 180,
+        y: 410,
+        w: 35,
+        h: 64
+      };
+
+      traffic = [];
+      score = 0;
+      remaining = 3600;
+      alive = true;
+      lastTime = 0;
+      spawnTimer = 0;
+      roadOffset = 0;
+      elapsed = 0;
+
+      input.x = 0;
+      input.y = 0;
+      input.active = false;
+
+      clearInterval(countdownTimer);
+
+      status('Time remaining: 60:00 · Avoid the other cars.');
+
+      draw();
+      animationFrame = requestAnimationFrame(tick);
+    }
+
+    function tick(time) {
+      if (!alive) return;
+
+      const dt = Math.min(40, lastTime ? time - lastTime : 16.7);
+      lastTime = time;
+
+      const d = activeDifficulty();
+
+      elapsed += dt;
+      remaining = Math.max(0, 3600 - elapsed / 1000);
+
+      const speed = 2.5 * d.speed;
+
+      roadOffset = (roadOffset + speed * dt / 16.7) % 82;
+
+      const steering =
+        input.active
+          ? input.x
+          : (input.left ? -1 : 0) + (input.right ? 1 : 0);
+
+      player.x += steering * 4.5 * d.speed * dt / 16.7;
+      player.x = Math.max(62, Math.min(298, player.x));
+
+      spawnTimer += dt;
+
+      const spawnEvery = Math.max(
+        340,
+        1050 / d.enemies
+      );
+
+      if (spawnTimer >= spawnEvery) {
+        spawnTimer = 0;
+
+        const lanes = [80, 180, 280];
+        const lane = lanes[Math.floor(Math.random() * lanes.length)];
+
+        traffic.push({
+          x: lane + (Math.random() * 12 - 6),
+          y: -90,
+          w: 31,
+          h: 57,
+          speed: (1.5 + Math.random() * 1.8) * d.speed,
+          color: ['#e63946', '#e8b339', '#9b6cff', '#43a4ff', '#e8edf5'][
+            Math.floor(Math.random() * 5)
+          ]
+        });
+      }
+
+      traffic.forEach(car => {
+        car.y += (speed + car.speed) * dt / 16.7;
 
         const hit =
-          Math.abs(player.x - o.x) < (player.w + o.w) / 2 &&
-          player.y < o.y + o.h &&
-          player.y + player.h > o.y;
+          Math.abs(player.x - car.x) < (player.w + car.w) * .43 &&
+          player.y < car.y + car.h - 8 &&
+          player.y + player.h - 8 > car.y + 8;
 
         if (hit) {
           alive = false;
-          status(`Crash! Final score: ${Math.floor(score)}. Restart to race again.`);
+          status(`Collision! Final score: ${Math.floor(score)}.`);
         }
+      });
+
+      traffic = traffic.filter(car => car.y < 560);
+
+      score += dt * .018 * d.speed;
+
+      if (remaining <= 0) {
+        remaining = 0;
+        alive = false;
+        status(`🏁 You completed the 60-minute race! Score: ${Math.floor(score)}.`);
       }
 
+      draw();
+
       if (alive) {
-        status(`Score: ${Math.floor(score)} · Speed: ${speed.toFixed(1)}`);
-        animationFrame = requestAnimationFrame(draw);
+        const mins = Math.floor(remaining / 60);
+        const secs = Math.floor(remaining % 60);
+
+        status(
+          `Score: ${Math.floor(score)} · Time: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+        );
+
+        animationFrame = requestAnimationFrame(tick);
       }
     }
 
     function onKeyDown(e) {
-      if (!overlay.classList.contains('nx2-active') || currentGame !== 'racing') return;
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+      if (currentGame !== 'racing') return;
+
+      if (
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)
+      ) {
+        e.preventDefault();
+      }
+
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
+        input.left = true;
+      }
+
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
+        input.right = true;
+      }
     }
 
     function onKeyUp(e) {
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
-    }
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
+        input.left = false;
+      }
 
-    function onTouch(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width * canvas.width;
-      player.x = Math.max(45, Math.min(315, x));
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
+        input.right = false;
+      }
     }
-
-    canvas.addEventListener('pointerdown', onTouch);
-    canvas.addEventListener('pointermove', e => {
-      if (e.buttons) onTouch(e);
-    });
 
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
@@ -772,19 +1363,27 @@
     cleanupGame = () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      clearInterval(countdownTimer);
     };
 
-    ui.controls.appendChild(button('Start again', reset));
-    ui.help.textContent = 'Use the arrow keys, A/D keys, buttons, or drag your finger across the track.';
+    addTouchpad(ui.controls, (x, y, active) => {
+      input.x = x;
+      input.y = y;
+      input.active = active;
+    });
+
+    ui.help.textContent =
+      'Drag the touchpad left or right to steer. Use a keyboard arrow key on computers. The race timer starts at 60:00.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 3. TOWER STACK
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startTower() {
-    const ui = shell('Tap when the moving block lines up with the tower.');
+    const ui = shell('Drag the touchpad to position the moving block, then tap DROP.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -792,24 +1391,21 @@
     ui.area.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    let blocks, moving, score, direction, running, speed;
 
-    function reset() {
-      blocks = [{ x: 70, w: 220, y: 400 }];
-      moving = { x: 0, w: 220, y: 365 };
-      score = 0;
-      direction = 1;
-      running = true;
-      speed = 2.5;
-      draw();
-      status('Blocks stacked: 0');
-    }
+    let blocks;
+    let moving;
+    let score;
+    let direction;
+    let running;
+    let speed;
+    let controlX = 0;
 
     function draw() {
       ctx.fillStyle = '#07101f';
       ctx.fillRect(0, 0, 360, 450);
 
       ctx.strokeStyle = '#15324d';
+
       for (let y = 0; y < 450; y += 30) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -817,9 +1413,9 @@
         ctx.stroke();
       }
 
-      blocks.forEach((b, i) => {
+      blocks.forEach((block, i) => {
         ctx.fillStyle = i % 2 ? '#9b6cff' : '#35e8ff';
-        ctx.fillRect(b.x, b.y, b.w, 28);
+        ctx.fillRect(block.x, block.y, block.w, 28);
       });
 
       if (running) {
@@ -838,17 +1434,21 @@
 
       if (width <= 0) {
         running = false;
-        status(`Tower fell! Final height: ${score}. Restart to try again.`);
+        status(`Tower fell! Height: ${score}.`);
         draw();
         return;
       }
 
       blocks.push({ x: left, w: width, y: moving.y });
       score++;
-      speed += .18;
+
+      speed = 2.2 * activeDifficulty().speed + score * .08;
 
       if (moving.y < 45) {
-        blocks.forEach(b => b.y += 28);
+        blocks.forEach(block => {
+          block.y += 28;
+        });
+
         moving.y += 28;
       }
 
@@ -859,8 +1459,24 @@
       };
 
       direction *= -1;
+
       status(`Blocks stacked: ${score}`);
       draw();
+    }
+
+    function reset() {
+      blocks = [{ x: 70, w: 220, y: 400 }];
+      moving = { x: 0, w: 220, y: 365 };
+      score = 0;
+      direction = 1;
+      running = true;
+      speed = 2.2 * activeDifficulty().speed;
+      controlX = 0;
+
+      status('Stack as many blocks as you can.');
+      draw();
+
+      animationFrame = requestAnimationFrame(tick);
     }
 
     function tick() {
@@ -882,32 +1498,57 @@
       animationFrame = requestAnimationFrame(tick);
     }
 
-    function start() {
-      reset();
-      animationFrame = requestAnimationFrame(tick);
+    function onKeyDown(e) {
+      if (currentGame !== 'tower') return;
+
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        drop();
+      }
     }
 
-    canvas.addEventListener('pointerdown', drop);
+    window.addEventListener('keydown', onKeyDown);
+
+    cleanupGame = () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+
     ui.controls.appendChild(button('DROP BLOCK', drop));
-    ui.controls.appendChild(button('Restart tower', start));
-    ui.help.textContent = 'Time each drop carefully. Each successful level makes the tower narrower and faster.';
-    start();
+
+    addTouchpad(ui.controls, (x, y, active) => {
+      if (!active || !running) return;
+
+      moving.x = Math.max(
+        0,
+        Math.min(360 - moving.w, moving.x + x * 2)
+      );
+    });
+
+    ui.help.textContent =
+      'Drop blocks carefully to build a tower. Higher difficulty increases the movement speed.';
+
+    reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 4. MINEFIELD MYSTERY
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startMine() {
-    const ui = shell('Reveal safe tiles. Avoid the hidden mines.');
+    const ui = shell('Reveal safe tiles and avoid the hidden mines.');
 
-    let size = 6;
-    let mineCount = 7;
-    let mines, revealed, finished, safeCount;
+    const size = 6;
     const board = document.createElement('div');
+
     board.className = 'nx2-board';
-    board.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+    board.style.gridTemplateColumns = `repeat(${size},minmax(0,1fr))`;
     ui.area.appendChild(board);
+
+    let mineCount;
+    let mines;
+    let revealed;
+    let finished;
+    let safeCount;
 
     function neighbors(index) {
       const row = Math.floor(index / size);
@@ -918,6 +1559,7 @@
         for (let c = col - 1; c <= col + 1; c++) {
           if (r < 0 || c < 0 || r >= size || c >= size) continue;
           if (r === row && c === col) continue;
+
           list.push(r * size + c);
         }
       }
@@ -932,7 +1574,7 @@
 
       if (mines.has(index)) {
         finished = true;
-        status('💥 Mine found! Restart to play again.');
+        status('💥 Mine found! Restart to try again.');
         draw(true);
         return;
       }
@@ -980,6 +1622,13 @@
     }
 
     function reset() {
+      const d = activeDifficulty();
+
+      mineCount = Math.max(
+        4,
+        Math.min(25, Math.round(7 * d.enemies))
+      );
+
       mines = new Set();
       revealed = new Set();
       finished = false;
@@ -993,44 +1642,46 @@
       draw();
     }
 
-    ui.controls.appendChild(button('New minefield', reset));
-    ui.help.textContent = 'Tap a tile to reveal it. Numbers show how many mines are touching that tile.';
+    ui.help.textContent =
+      'Difficulty changes the number of hidden mines. Numbers show how many mines touch a tile.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 5. SLIDING PUZZLE
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startPuzzle() {
-    const ui = shell('Arrange the numbers in order. The empty space allows movement.');
+    const ui = shell('Arrange the numbers in order using the empty space.');
 
     let tiles = [];
     let moves = 0;
 
     const board = document.createElement('div');
     board.className = 'nx2-board';
-    board.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    board.style.gridTemplateColumns = 'repeat(4,minmax(0,1fr))';
     ui.area.appendChild(board);
 
     function solved() {
-      return tiles.slice(0, 15).every((n, i) => n === i + 1) && tiles[15] === 0;
+      return tiles.slice(0, 15).every((n, i) => n === i + 1) &&
+        tiles[15] === 0;
     }
 
     function draw() {
       board.innerHTML = '';
 
-      tiles.forEach((n, i) => {
+      tiles.forEach((number, index) => {
         const cell = document.createElement('button');
         cell.type = 'button';
         cell.className = 'nx2-cell';
-        cell.textContent = n || '';
+        cell.textContent = number || '';
 
-        if (!n) {
+        if (!number) {
           cell.style.visibility = 'hidden';
         }
 
-        cell.addEventListener('click', () => move(i));
+        cell.addEventListener('click', () => move(index));
         board.appendChild(cell);
       });
 
@@ -1039,24 +1690,29 @@
 
     function move(index) {
       const empty = tiles.indexOf(0);
+
       const row = Math.floor(index / 4);
       const col = index % 4;
-      const erow = Math.floor(empty / 4);
-      const ecol = empty % 4;
 
-      if (Math.abs(row - erow) + Math.abs(col - ecol) !== 1) return;
+      const emptyRow = Math.floor(empty / 4);
+      const emptyCol = empty % 4;
+
+      if (Math.abs(row - emptyRow) + Math.abs(col - emptyCol) !== 1) {
+        return;
+      }
 
       [tiles[index], tiles[empty]] = [tiles[empty], tiles[index]];
+
       moves++;
       draw();
     }
 
     function reset() {
       tiles = Array.from({ length: 16 }, (_, i) => (i + 1) % 16);
-      moves = 0;
 
-      // Make a solvable scramble by performing valid random moves.
-      for (let i = 0; i < 180; i++) {
+      const scrambleMoves = Math.round(180 * activeDifficulty().speed);
+
+      for (let i = 0; i < scrambleMoves; i++) {
         const empty = tiles.indexOf(0);
         const row = Math.floor(empty / 4);
         const col = empty % 4;
@@ -1068,6 +1724,7 @@
         if (col < 3) options.push(empty + 1);
 
         const next = options[Math.floor(Math.random() * options.length)];
+
         [tiles[empty], tiles[next]] = [tiles[next], tiles[empty]];
       }
 
@@ -1075,17 +1732,18 @@
       draw();
     }
 
-    ui.controls.appendChild(button('Shuffle puzzle', reset));
-    ui.help.textContent = 'Tap a number next to the empty space to move it. Put 1–15 in order.';
+    ui.help.textContent =
+      'Tap a tile next to the empty space to move it. Harder levels scramble the puzzle more.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 6. ALIEN INVASION
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startAlien() {
-    const ui = shell('Move your ship and shoot the invading aliens.');
+    const ui = shell('Use the touchpad to move and FIRE to shoot.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -1093,57 +1751,88 @@
     ui.area.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    let player, aliens, shots, score, alive, left, right, lastShot;
+
+    let player;
+    let aliens;
+    let shots;
+    let score;
+    let alive;
+    let lastShot;
+    let lastTime;
+    let movementX = 0;
 
     function reset() {
       player = { x: 180, y: 430 };
       aliens = [];
-
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 7; c++) {
-          aliens.push({ x: 35 + c * 45, y: 45 + r * 35, alive: true });
-        }
-      }
-
       shots = [];
       score = 0;
       alive = true;
-      left = false;
-      right = false;
       lastShot = 0;
+      lastTime = 0;
+      movementX = 0;
+
+      const rows = difficulty === 'Easy' ? 2 : 3;
+      const columns = difficulty === 'Hardest' ? 9 : 7;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < columns; col++) {
+          aliens.push({
+            x: 25 + col * (310 / Math.max(1, columns - 1)),
+            y: 45 + row * 35,
+            alive: true
+          });
+        }
+      }
+
       status('Score: 0');
+
       animationFrame = requestAnimationFrame(tick);
+    }
+
+    function fire() {
+      if (!alive) return;
+      shots.push({ x: player.x, y: player.y - 15 });
     }
 
     function tick(time) {
       if (!alive) return;
 
-      if (left) player.x -= 4;
-      if (right) player.x += 4;
+      const dt = Math.min(40, lastTime ? time - lastTime : 16.7);
+      lastTime = time;
+
+      const d = activeDifficulty();
+
+      player.x += movementX * 4 * d.speed * dt / 16.7;
       player.x = Math.max(15, Math.min(345, player.x));
 
-      if (time - lastShot > 320) {
-        shots.push({ x: player.x, y: player.y - 15 });
+      if (time - lastShot > 360 / d.speed) {
+        fire();
         lastShot = time;
       }
 
-      shots.forEach(s => s.y -= 6);
-      shots = shots.filter(s => s.y > 0);
+      shots.forEach(shot => {
+        shot.y -= 6 * d.speed * dt / 16.7;
+      });
 
-      aliens.forEach(a => {
-        if (!a.alive) return;
+      shots = shots.filter(shot => shot.y > 0);
 
-        a.x += Math.sin(time / 500) * .7;
+      aliens.forEach(alien => {
+        if (!alien.alive) return;
 
-        shots.forEach(s => {
-          if (Math.abs(s.x - a.x) < 15 && Math.abs(s.y - a.y) < 15) {
-            a.alive = false;
-            s.y = -100;
+        alien.x += Math.sin(time / (500 / d.speed)) * .7;
+
+        shots.forEach(shot => {
+          if (
+            Math.abs(shot.x - alien.x) < 15 &&
+            Math.abs(shot.y - alien.y) < 15
+          ) {
+            alien.alive = false;
+            shot.y = -100;
             score += 10;
           }
         });
 
-        if (a.y > 395) alive = false;
+        if (alien.y > 395) alive = false;
       });
 
       ctx.fillStyle = '#07101f';
@@ -1158,58 +1847,61 @@
       ctx.fill();
 
       ctx.fillStyle = '#ff6687';
-      aliens.forEach(a => {
-        if (!a.alive) return;
-        ctx.fillRect(a.x - 10, a.y - 8, 20, 16);
+
+      aliens.forEach(alien => {
+        if (!alien.alive) return;
+
+        ctx.fillRect(alien.x - 10, alien.y - 8, 20, 16);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(alien.x - 5, alien.y - 3, 3, 3);
+        ctx.fillRect(alien.x + 2, alien.y - 3, 3, 3);
+        ctx.fillStyle = '#ff6687';
       });
 
       ctx.fillStyle = '#35e8ff';
-      shots.forEach(s => ctx.fillRect(s.x - 2, s.y, 4, 10));
 
-      status(`Score: ${score} · Aliens remaining: ${aliens.filter(a => a.alive).length}`);
+      shots.forEach(shot => {
+        ctx.fillRect(shot.x - 2, shot.y, 4, 10);
+      });
 
-      if (aliens.every(a => !a.alive)) {
+      status(
+        `Score: ${score} · Aliens remaining: ${aliens.filter(a => a.alive).length}`
+      );
+
+      if (aliens.every(alien => !alien.alive)) {
         alive = false;
         status(`🏆 Earth is safe! Final score: ${score}`);
       } else if (!alive) {
-        status(`The aliens reached your ship! Score: ${score}. Restart to try again.`);
+        status(`The aliens reached your ship! Score: ${score}.`);
       } else {
         animationFrame = requestAnimationFrame(tick);
       }
     }
 
-    function setPlayerFromPointer(e) {
-      const rect = canvas.getBoundingClientRect();
-      player.x = (e.clientX - rect.left) / rect.width * canvas.width;
-      player.x = Math.max(15, Math.min(345, player.x));
-    }
-
-    canvas.addEventListener('pointerdown', setPlayerFromPointer);
-    canvas.addEventListener('pointermove', e => {
-      if (e.buttons) setPlayerFromPointer(e);
-    });
-
-    const leftBtn = button('◀ LEFT', () => {
-      player.x = Math.max(15, player.x - 25);
-    });
-
-    const rightBtn = button('RIGHT ▶', () => {
-      player.x = Math.min(345, player.x + 25);
-    });
-
-    ui.controls.append(leftBtn, rightBtn, button('FIRE', () => {
-      if (alive) shots.push({ x: player.x, y: player.y - 15 });
-    }));
-
     function onKeyDown(e) {
       if (currentGame !== 'alien') return;
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') left = true;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') right = true;
+
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
+        movementX = -1;
+      }
+
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
+        movementX = 1;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        fire();
+      }
     }
 
     function onKeyUp(e) {
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') left = false;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') right = false;
+      if (
+        ['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(e.key) ||
+        e.code === 'Space'
+      ) {
+        movementX = 0;
+      }
     }
 
     window.addEventListener('keydown', onKeyDown);
@@ -1220,17 +1912,26 @@
       window.removeEventListener('keyup', onKeyUp);
     };
 
-    ui.controls.appendChild(button('Restart invasion', reset));
-    ui.help.textContent = 'Move with the arrow keys, A/D, the buttons, or by dragging on the game area.';
+    addTouchpad(ui.controls, x => {
+      movementX = x;
+    }, {
+      fire: true,
+      fireLabel: 'FIRE',
+      onFire: fire
+    });
+
+    ui.help.textContent =
+      'Drag the touchpad to steer your ship. Hold FIRE or use Space to shoot.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 7. TARGET MASTER
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startTarget() {
-    const ui = shell('Tap the targets before the timer runs out.');
+    const ui = shell('Use the touchpad to aim and tap the target to score.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -1238,13 +1939,18 @@
     ui.area.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    let target, score, remaining, active, interval;
+
+    let target;
+    let score;
+    let remaining;
+    let active;
+    let interval;
 
     function placeTarget() {
       target = {
         x: 25 + Math.random() * 310,
         y: 25 + Math.random() * 370,
-        r: 12 + Math.random() * 9
+        r: Math.max(8, 19 / activeDifficulty().speed)
       };
     }
 
@@ -1273,9 +1979,9 @@
       ctx.strokeStyle = '#35e8ff';
       ctx.lineWidth = 3;
 
-      [target.r, target.r * .65, target.r * .3].forEach(r => {
+      [target.r, target.r * .65, target.r * .3].forEach(radius => {
         ctx.beginPath();
-        ctx.arc(target.x, target.y, r, 0, Math.PI * 2);
+        ctx.arc(target.x, target.y, radius, 0, Math.PI * 2);
         ctx.stroke();
       });
 
@@ -1287,19 +1993,25 @@
 
     function reset() {
       clearInterval(interval);
+
       score = 0;
-      remaining = 30;
+      remaining = Math.round(30 * activeDifficulty().time);
       active = true;
+
       placeTarget();
       draw();
-      status('Score: 0 · Time: 30s');
+
+      status(`Score: 0 · Time: ${remaining}s`);
 
       interval = setInterval(() => {
         remaining--;
 
         if (remaining <= 0) {
+          remaining = 0;
           active = false;
+
           clearInterval(interval);
+
           status(`Time's up! Your score: ${score}`);
           draw();
           return;
@@ -1309,17 +2021,18 @@
       }, 1000);
     }
 
-    canvas.addEventListener('pointerdown', e => {
+    canvas.addEventListener('pointerdown', event => {
       if (!active) return;
 
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width * canvas.width;
-      const y = (e.clientY - rect.top) / rect.height * canvas.height;
-      const distance = Math.hypot(x - target.x, y - target.y);
 
-      if (distance <= target.r + 7) {
+      const x = (event.clientX - rect.left) / rect.width * canvas.width;
+      const y = (event.clientY - rect.top) / rect.height * canvas.height;
+
+      if (Math.hypot(x - target.x, y - target.y) <= target.r + 7) {
         score++;
         placeTarget();
+
         status(`Nice shot! Score: ${score} · Time: ${remaining}s`);
         draw();
       }
@@ -1327,17 +2040,18 @@
 
     cleanupGame = () => clearInterval(interval);
 
-    ui.controls.appendChild(button('Play again', reset));
-    ui.help.textContent = 'You have 30 seconds. Tap the target circles to earn points.';
+    ui.help.textContent =
+      'Hit the targets before time runs out. Higher difficulty makes the targets smaller and reduces your time.';
+
     reset();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 8. WORD SCRAMBLE
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startWord() {
-    const ui = shell('Unscramble the letters to find the hidden word.');
+    const ui = shell('Unscramble the letters to discover the hidden word.');
 
     const words = [
       'PLANET', 'ROCKET', 'GALAXY', 'PUZZLE', 'ARCADE',
@@ -1368,6 +2082,7 @@
 
     function nextWord() {
       answer = words[Math.floor(Math.random() * words.length)];
+
       let mixed = answer;
 
       while (mixed === answer && answer.length > 1) {
@@ -1376,8 +2091,8 @@
 
       scrambled.textContent = mixed;
       input.value = '';
-      input.focus();
       round++;
+
       result.textContent = `Round ${round}`;
       status(`Score: ${score}`);
     }
@@ -1389,14 +2104,15 @@
         score += 10;
         result.textContent = 'Correct! +10 points';
         status(`Score: ${score}`);
+
         later(nextWord, 650);
       } else {
         result.textContent = 'Not quite. Try again!';
       }
     }
 
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') check();
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') check();
     });
 
     ui.controls.append(
@@ -1404,16 +2120,18 @@
       button('Skip word', nextWord)
     );
 
-    ui.help.textContent = 'Each correct answer earns 10 points. Type your answer and press Enter or Check answer.';
+    ui.help.textContent =
+      'Each correct answer earns 10 points. The difficulty setting changes the scoring challenge.';
+
     nextWord();
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // 9. AIR HOCKEY
-  // ------------------------------------------------------------
+  // ============================================================
 
   function startHockey() {
-    const ui = shell('Move your paddle to hit the puck into the computer goal.');
+    const ui = shell('Move your paddle with the touchpad and score goals.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -1422,8 +2140,13 @@
 
     const ctx = canvas.getContext('2d');
 
-    let player, cpu, puck, playerScore, cpuScore, running, last;
-    let pointerActive = false;
+    let player;
+    let cpu;
+    let puck;
+    let playerScore;
+    let cpuScore;
+    let running;
+    let last;
 
     function resetPuck(direction = 1) {
       puck = {
@@ -1438,28 +2161,39 @@
     function reset() {
       player = { x: 180, y: 420, r: 22 };
       cpu = { x: 180, y: 80, r: 22 };
+
       playerScore = 0;
       cpuScore = 0;
       running = true;
       last = 0;
+
       resetPuck(1);
+
       status('You: 0 · Computer: 0');
+
       animationFrame = requestAnimationFrame(tick);
     }
 
     function tick(timestamp) {
       if (!running) return;
 
-      const dt = Math.min(32, timestamp - (last || timestamp));
+      const dt = Math.min(40, last ? timestamp - last : 16.7);
       last = timestamp;
 
-      cpu.x += Math.sign(puck.x - cpu.x) * Math.min(2.1, dt * .08);
+      const d = activeDifficulty();
+
+      cpu.x +=
+        Math.sign(puck.x - cpu.x) *
+        Math.min(2.1 * d.speed, dt * .08 * d.speed);
+
       cpu.x = Math.max(cpu.r, Math.min(360 - cpu.r, cpu.x));
 
-      puck.x += puck.vx * dt / 16;
-      puck.y += puck.vy * dt / 16;
+      puck.x += puck.vx * dt / 16.7;
+      puck.y += puck.vy * dt / 16.7;
 
-      if (puck.x < puck.r || puck.x > 360 - puck.r) puck.vx *= -1;
+      if (puck.x < puck.r || puck.x > 360 - puck.r) {
+        puck.vx *= -1;
+      }
 
       function collide(paddle) {
         const dx = puck.x - paddle.x;
@@ -1469,10 +2203,12 @@
         if (distance < puck.r + paddle.r && distance > 0) {
           const nx = dx / distance;
           const ny = dy / distance;
+
           puck.x = paddle.x + nx * (puck.r + paddle.r);
           puck.y = paddle.y + ny * (puck.r + paddle.r);
-          puck.vx = nx * 4;
-          puck.vy = ny * 4;
+
+          puck.vx = nx * 4 * d.speed;
+          puck.vy = ny * 4 * d.speed;
         }
       }
 
@@ -1524,65 +2260,41 @@
 
       if (playerScore >= 5 || cpuScore >= 5) {
         running = false;
-        status(playerScore >= 5 ? '🏆 You won the match!' : 'Computer won. Try again!');
+
+        status(
+          playerScore >= 5
+            ? '🏆 You won the match!'
+            : 'Computer won. Try again!'
+        );
+
         return;
       }
 
       animationFrame = requestAnimationFrame(tick);
     }
 
-    function movePlayer(e) {
-      const rect = canvas.getBoundingClientRect();
-      player.x = (e.clientX - rect.left) / rect.width * canvas.width;
-      player.y = (e.clientY - rect.top) / rect.height * canvas.height;
+    addTouchpad(ui.controls, (x, y, active) => {
+      if (!active || !player) return;
+
+      player.x += x * 5 * activeDifficulty().speed;
+      player.y += y * 5 * activeDifficulty().speed;
+
       player.x = Math.max(player.r, Math.min(360 - player.r, player.x));
       player.y = Math.max(275, Math.min(500 - player.r, player.y));
-    }
-
-    canvas.addEventListener('pointerdown', e => {
-      pointerActive = true;
-      movePlayer(e);
     });
 
-    canvas.addEventListener('pointermove', e => {
-      if (pointerActive) movePlayer(e);
-    });
+    ui.help.textContent =
+      'Drag the touchpad in any direction to move your paddle. First to five goals wins.';
 
-    canvas.addEventListener('pointerup', () => {
-      pointerActive = false;
-    });
-
-    canvas.addEventListener('pointercancel', () => {
-      pointerActive = false;
-    });
-
-    ui.controls.appendChild(button('Restart match', reset));
-    ui.help.textContent = 'Drag your finger in the lower half of the rink to move your paddle. First to five goals wins.';
     reset();
   }
 
-  // ------------------------------------------------------------
-  // 10. NEON MAZE
-  // ------------------------------------------------------------
+  // ============================================================
+  // 10. NEON MAZE — RANDOMLY GENERATED MAZE
+  // ============================================================
 
   function startMaze() {
-    const ui = shell('Reach the green exit. Use the arrow buttons to move.');
-
-    const size = 9;
-    const maze = [
-      '111111111',
-      '100000001',
-      '101110101',
-      '100010001',
-      '111010101',
-      '100000101',
-      '101110101',
-      '100000001',
-      '111111111'
-    ];
-
-    let player = { x: 1, y: 1 };
-    const exit = { x: 7, y: 7 };
+    const ui = shell('Navigate through the maze to reach the green exit.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -1591,67 +2303,198 @@
 
     const ctx = canvas.getContext('2d');
 
-    function draw() {
-      const cell = 40;
+    let size;
+    let grid;
+    let player;
+    let exit;
+    let cell;
+    let steps;
+    let finished;
 
-      ctx.fillStyle = '#07101f';
+    const directions = [
+      { dx: 0, dy: -1, wall: 0, opposite: 2 },
+      { dx: 1, dy: 0, wall: 1, opposite: 3 },
+      { dx: 0, dy: 1, wall: 2, opposite: 0 },
+      { dx: -1, dy: 0, wall: 3, opposite: 1 }
+    ];
+
+    function generateMaze() {
+      size = difficulty === 'Easy' ? 9 :
+        difficulty === 'Medium' ? 13 :
+        difficulty === 'Hard' ? 17 : 21;
+
+      cell = 360 / size;
+
+      grid = Array.from({ length: size }, () =>
+        Array.from({ length: size }, () => ({
+          visited: false,
+          walls: [true, true, true, true]
+        }))
+      );
+
+      const stack = [{ x: 0, y: 0 }];
+
+      grid[0][0].visited = true;
+
+      while (stack.length) {
+        const current = stack[stack.length - 1];
+
+        const available = directions.filter(direction => {
+          const nx = current.x + direction.dx;
+          const ny = current.y + direction.dy;
+
+          return nx >= 0 &&
+            ny >= 0 &&
+            nx < size &&
+            ny < size &&
+            !grid[ny][nx].visited;
+        });
+
+        if (!available.length) {
+          stack.pop();
+          continue;
+        }
+
+        const direction =
+          available[Math.floor(Math.random() * available.length)];
+
+        const nx = current.x + direction.dx;
+        const ny = current.y + direction.dy;
+
+        grid[current.y][current.x].walls[direction.wall] = false;
+        grid[ny][nx].walls[direction.opposite] = false;
+
+        grid[ny][nx].visited = true;
+
+        stack.push({ x: nx, y: ny });
+      }
+
+      player = { x: 0, y: 0 };
+      exit = { x: size - 1, y: size - 1 };
+      steps = 0;
+      finished = false;
+    }
+
+    function draw() {
+      ctx.fillStyle = '#040a14';
       ctx.fillRect(0, 0, 360, 360);
 
+      // Draw every maze cell and its walls.
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
-          ctx.fillStyle = maze[y][x] === '1' ? '#1b2c45' : '#091524';
-          ctx.fillRect(x * cell, y * cell, cell - 1, cell - 1);
+          const c = grid[y][x];
+          const px = x * cell;
+          const py = y * cell;
 
-          if (x === exit.x && y === exit.y) {
-            ctx.fillStyle = '#43f5a5';
-            ctx.fillRect(x * cell + 6, y * cell + 6, cell - 13, cell - 13);
+          ctx.fillStyle = '#0b1829';
+          ctx.fillRect(px, py, cell, cell);
+
+          ctx.strokeStyle = '#35e8ff';
+          ctx.lineWidth = Math.max(1.2, 3 - size / 12);
+          ctx.lineCap = 'square';
+
+          if (c.walls[0]) {
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px + cell, py);
+            ctx.stroke();
+          }
+
+          if (c.walls[1]) {
+            ctx.beginPath();
+            ctx.moveTo(px + cell, py);
+            ctx.lineTo(px + cell, py + cell);
+            ctx.stroke();
+          }
+
+          if (c.walls[2]) {
+            ctx.beginPath();
+            ctx.moveTo(px, py + cell);
+            ctx.lineTo(px + cell, py + cell);
+            ctx.stroke();
+          }
+
+          if (c.walls[3]) {
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px, py + cell);
+            ctx.stroke();
           }
         }
       }
 
-      ctx.fillStyle = '#35e8ff';
+      // Exit.
+      ctx.fillStyle = '#43f5a5';
+      ctx.fillRect(
+        exit.x * cell + cell * .2,
+        exit.y * cell + cell * .2,
+        cell * .6,
+        cell * .6
+      );
+
+      // Player.
+      ctx.fillStyle = '#ff6687';
       ctx.beginPath();
-      ctx.arc(player.x * cell + cell / 2, player.y * cell + cell / 2, 12, 0, Math.PI * 2);
+
+      ctx.arc(
+        player.x * cell + cell / 2,
+        player.y * cell + cell / 2,
+        Math.max(3, cell * .27),
+        0,
+        Math.PI * 2
+      );
+
       ctx.fill();
     }
 
     function move(dx, dy) {
-      const x = player.x + dx;
-      const y = player.y + dy;
+      if (finished) return;
 
-      if (x < 0 || y < 0 || x >= size || y >= size) return;
-      if (maze[y][x] === '1') return;
+      let directionIndex;
 
-      player = { x, y };
-      draw();
+      if (dx === 0 && dy === -1) directionIndex = 0;
+      else if (dx === 1 && dy === 0) directionIndex = 1;
+      else if (dx === 0 && dy === 1) directionIndex = 2;
+      else if (dx === -1 && dy === 0) directionIndex = 3;
+      else return;
+
+      const current = grid[player.y][player.x];
+
+      if (current.walls[directionIndex]) return;
+
+      player.x += dx;
+      player.y += dy;
+      steps++;
 
       if (player.x === exit.x && player.y === exit.y) {
-        status('🏆 You escaped the maze!');
+        finished = true;
+        status(`🏆 You escaped the maze in ${steps} moves!`);
       } else {
-        status('Find the green exit.');
+        status(`Moves: ${steps} · Find the green exit.`);
       }
-    }
 
-    ui.controls.append(
-      button('▲', () => move(0, -1)),
-      button('◀', () => move(-1, 0)),
-      button('▼', () => move(0, 1)),
-      button('▶', () => move(1, 0))
-    );
+      draw();
+    }
 
     function onKeyDown(e) {
       if (currentGame !== 'maze') return;
 
       const map = {
         ArrowUp: [0, -1],
+        ArrowRight: [1, 0],
         ArrowDown: [0, 1],
         ArrowLeft: [-1, 0],
-        ArrowRight: [1, 0]
+        w: [0, -1],
+        d: [1, 0],
+        s: [0, 1],
+        a: [-1, 0]
       };
 
-      if (map[e.key]) {
+      const direction = map[e.key];
+
+      if (direction) {
         e.preventDefault();
-        move(...map[e.key]);
+        move(direction[0], direction[1]);
       }
     }
 
@@ -1661,13 +2504,31 @@
       window.removeEventListener('keydown', onKeyDown);
     };
 
-    ui.controls.appendChild(button('Restart maze', () => {
-      player = { x: 1, y: 1 };
-      status('Find the green exit.');
-      draw();
-    }));
+    addTouchpad(ui.controls, (x, y, active) => {
+      if (!active || finished) return;
 
-    ui.help.textContent = 'Use the arrow keys or touch controls to move through the maze without crossing walls.';
+      // Move one cell per deliberate drag.
+      const now = performance.now();
+
+      if (addTouchpad.lastMove && now - addTouchpad.lastMove < 160) {
+        return;
+      }
+
+      if (Math.abs(x) < .42 && Math.abs(y) < .42) return;
+
+      addTouchpad.lastMove = now;
+
+      if (Math.abs(x) > Math.abs(y)) {
+        move(x > 0 ? 1 : -1, 0);
+      } else {
+        move(0, y > 0 ? 1 : -1);
+      }
+    });
+
+    ui.help.textContent =
+      'Every new maze is generated with a different layout. Drag the touchpad in the direction you want to travel. Higher difficulty creates a larger maze.';
+
+    generateMaze();
     draw();
   }
 
