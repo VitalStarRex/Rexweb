@@ -5,15 +5,17 @@
    * REXWEB NEXORA — GAME 2
    * Ten additional arcade games.
    *
-   * Features:
-   * - Two-row, mobile-friendly game menu
-   * - Separate full-screen game view
-   * - Touchpad controls instead of directional buttons
-   * - Easy, Medium, Hard and Hardest difficulty menu
-   * - Restart button in the top bar
-   * - Racing game with a 60-minute countdown
-   * - Improved racing-car graphics
-   * - Procedurally generated maze
+   * Updates:
+   * - Two-row, mobile-friendly game menu.
+   * - Separate full-screen game view.
+   * - Responsive touchpads and faster controls.
+   * - Easy, Medium, Hard and Hardest difficulty settings.
+   * - Restart button in the top bar.
+   * - Realistic racing cars and 60-minute countdown.
+   * - Detailed jet fighter for Alien Invasion.
+   * - Continuous firing while holding FIRE.
+   * - Improved maze movement without skipped cells.
+   * - Preserve existing games and gameplay.
    */
 
   const ROOT = document.getElementById('nexora-games');
@@ -349,8 +351,6 @@
       font-size:12px;
     }
 
-    /* Collapsible difficulty selector */
-
     #nx2-overlay .nx2-difficulty {
       width:100%;
       max-width:520px;
@@ -414,30 +414,34 @@
       color:#8ff7ff;
     }
 
-    /* On-screen touchpad / virtual joystick */
+    /* Responsive virtual joystick */
 
     #nx2-overlay .nx2-touch-area {
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:22px;
+      gap:clamp(12px,5vw,24px);
       width:100%;
-      max-width:340px;
-      margin:12px auto 4px;
+      max-width:420px;
+      margin:14px auto 5px;
       touch-action:none;
       user-select:none;
       -webkit-user-select:none;
     }
 
+    #nx2-overlay .nx2-pad-wrap {
+      flex:0 1 auto;
+      min-width:0;
+    }
+
     #nx2-overlay .nx2-pad {
       position:relative;
-      width:124px;
-      height:124px;
-      flex:0 0 124px;
+      width:clamp(112px,34vw,150px);
+      height:clamp(112px,34vw,150px);
+      flex:0 0 auto;
       border:2px solid #294d6d;
       border-radius:50%;
-      background:
-        radial-gradient(circle,#142b43 0,#0b182b 58%,#07101d 72%);
+      background:radial-gradient(circle,#142b43 0,#0b182b 58%,#07101d 72%);
       box-shadow:inset 0 0 18px #0008,0 0 14px #35e8ff12;
       touch-action:none;
     }
@@ -468,8 +472,8 @@
       position:absolute;
       left:50%;
       top:50%;
-      width:45px;
-      height:45px;
+      width:clamp(39px,12vw,49px);
+      height:clamp(39px,12vw,49px);
       border:2px solid #6ef4ff;
       border-radius:50%;
       background:radial-gradient(circle at 35% 30%,#35e8ff,#11617d 70%);
@@ -487,9 +491,9 @@
     }
 
     #nx2-overlay .nx2-fire {
-      width:76px;
-      height:76px;
-      flex:0 0 76px;
+      width:clamp(70px,22vw,88px);
+      height:clamp(70px,22vw,88px);
+      flex:0 0 auto;
       border:2px solid #ff6687;
       border-radius:50%;
       background:radial-gradient(circle at 35% 30%,#ff718d,#81213f);
@@ -498,6 +502,14 @@
       font-weight:900;
       box-shadow:0 0 14px #ff668733;
       touch-action:none;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    #nx2-overlay .nx2-fire.nx2-firing {
+      transform:scale(.94);
+      box-shadow:0 0 24px #ff6687aa;
+      background:radial-gradient(circle at 35% 30%,#ffb3c2,#a71943);
     }
 
     @media(max-width:420px) {
@@ -533,12 +545,6 @@
         gap:4px;
       }
 
-      #nx2-overlay .nx2-pad {
-        width:112px;
-        height:112px;
-        flex-basis:112px;
-      }
-
       #nx2-overlay .nx2-topbar {
         gap:5px;
       }
@@ -546,6 +552,23 @@
       #nx2-overlay .nx2-btn {
         padding:8px 7px;
         font-size:11px;
+      }
+    }
+
+    @media(max-width:340px) {
+      #nx2-overlay .nx2-touch-area {
+        gap:10px;
+      }
+
+      #nx2-overlay .nx2-pad {
+        width:104px;
+        height:104px;
+      }
+
+      #nx2-overlay .nx2-fire {
+        width:65px;
+        height:65px;
+        font-size:10px;
       }
     }
   `;
@@ -695,11 +718,18 @@
     return DIFFICULTIES[difficulty];
   }
 
+  /*
+   * Responsive virtual joystick.
+   * Movement is updated immediately and normalized.
+   * Fire buttons support both tapping and holding.
+   */
+
   function addTouchpad(container, onMove, options = {}) {
     const wrap = document.createElement('div');
     wrap.className = 'nx2-touch-area';
 
     const padWrap = document.createElement('div');
+    padWrap.className = 'nx2-pad-wrap';
 
     const pad = document.createElement('div');
     pad.className = 'nx2-pad';
@@ -719,6 +749,18 @@
     wrap.appendChild(padWrap);
 
     let fireButton = null;
+    let fireInterval = 0;
+
+    function stopFiring() {
+      if (fireInterval) {
+        clearInterval(fireInterval);
+        fireInterval = 0;
+      }
+
+      if (fireButton) {
+        fireButton.classList.remove('nx2-firing');
+      }
+    }
 
     if (options.fire) {
       fireButton = document.createElement('button');
@@ -727,12 +769,27 @@
       fireButton.textContent = options.fireLabel || 'FIRE';
       fireButton.setAttribute('aria-label', options.fireLabel || 'Fire');
 
-      const fire = event => {
+      const startFiring = event => {
         event.preventDefault();
+
+        if (fireInterval) return;
+
+        fireButton.classList.add('nx2-firing');
+
         if (options.onFire) options.onFire();
+
+        fireInterval = setInterval(() => {
+          if (options.onFire) options.onFire();
+        }, options.fireRate || 150);
       };
 
-      fireButton.addEventListener('pointerdown', fire);
+      fireButton.addEventListener('pointerdown', startFiring);
+
+      fireButton.addEventListener('pointerup', stopFiring);
+      fireButton.addEventListener('pointercancel', stopFiring);
+      fireButton.addEventListener('lostpointercapture', stopFiring);
+      fireButton.addEventListener('contextmenu', event => event.preventDefault());
+
       wrap.appendChild(fireButton);
     }
 
@@ -764,6 +821,7 @@
 
     pad.addEventListener('pointermove', event => {
       if (pointerId !== event.pointerId) return;
+
       event.preventDefault();
       update(event);
     });
@@ -774,6 +832,7 @@
     });
 
     pad.addEventListener('pointercancel', resetPad);
+    pad.addEventListener('lostpointercapture', resetPad);
 
     function update(event) {
       const rect = pad.getBoundingClientRect();
@@ -792,13 +851,24 @@
         dy /= length;
       }
 
+      // Dead zone prevents accidental movement from tiny finger shifts.
+      const deadZone = .08;
+
+      if (Math.abs(dx) < deadZone) dx = 0;
+      if (Math.abs(dy) < deadZone) dy = 0;
+
       knob.style.left = `${50 + dx * 34}%`;
       knob.style.top = `${50 + dy * 34}%`;
 
       onMove(dx, dy, true);
     }
 
-    return { wrap, pad, fireButton };
+    return {
+      wrap,
+      pad,
+      fireButton,
+      stopFiring
+    };
   }
 
   function openGame(id) {
@@ -838,6 +908,7 @@
       }
     } catch (error) {
       console.error('Nexora game error:', error);
+
       content.innerHTML = `
         <div class="nx2-panel">
           <p>The game encountered an error.</p>
@@ -886,9 +957,7 @@
 
     difficultyMenu.open = false;
 
-    if (currentGame) {
-      openGame(currentGame);
-    }
+    if (currentGame) openGame(currentGame);
   });
 
   document.addEventListener('keydown', event => {
@@ -1015,7 +1084,7 @@
   }
 
   // ============================================================
-  // 2. NEON RACING — CAR GRAPHICS AND 60-MINUTE COUNTDOWN
+  // 2. NEON RACING
   // ============================================================
 
   function startRacing() {
@@ -1045,7 +1114,6 @@
     let spawnTimer;
     let roadOffset;
     let elapsed;
-    let countdownTimer;
     let keyboardHandler;
     let keyboardUpHandler;
 
@@ -1058,7 +1126,7 @@
       ctx.save();
       ctx.translate(x, y);
 
-      // Tyres.
+      // Four realistic tyres.
       ctx.fillStyle = '#05070b';
 
       roundedRect(-w / 2 - 3, 10, 7, 18, 3);
@@ -1073,12 +1141,12 @@
       roundedRect(w / 2 - 4, h - 26, 7, 18, 3);
       ctx.fill();
 
-      // Main body.
+      // Car body.
       ctx.fillStyle = color;
       roundedRect(-w / 2, 0, w, h, 8);
       ctx.fill();
 
-      // Hood.
+      // Bonnet.
       ctx.fillStyle = isPlayer ? '#c8ffff' : '#ffffff55';
       roundedRect(-w / 2 + 4, 5, w - 8, h * .23, 4);
       ctx.fill();
@@ -1093,13 +1161,13 @@
       roundedRect(-w / 2 + 6, h * .57, w - 12, h * .14, 3);
       ctx.fill();
 
-      // Tail lights.
+      // Rear lights.
       ctx.fillStyle = '#ff244f';
       ctx.fillRect(-w / 2 + 3, h - 7, 7, 4);
       ctx.fillRect(w / 2 - 10, h - 7, 7, 4);
 
-      // Headlights on player's car.
       if (isPlayer) {
+        // Headlights and glowing outline.
         ctx.fillStyle = '#f7ffff';
         ctx.fillRect(-w / 2 + 4, 2, 8, 4);
         ctx.fillRect(w / 2 - 12, 2, 8, 4);
@@ -1111,6 +1179,12 @@
 
         roundedRect(-w / 2, 0, w, h, 8);
         ctx.stroke();
+
+        // Racing stripes.
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-2, 8, 4, 12);
+        ctx.fillRect(-2, h - 20, 4, 10);
       }
 
       ctx.restore();
@@ -1120,31 +1194,25 @@
       ctx.fillStyle = '#07101f';
       ctx.fillRect(0, 0, 360, 520);
 
-      // Roadside grass.
       ctx.fillStyle = '#0a281e';
       ctx.fillRect(0, 0, 35, 520);
       ctx.fillRect(325, 0, 35, 520);
 
-      // Road.
       ctx.fillStyle = '#292e38';
       ctx.fillRect(35, 0, 290, 520);
 
-      // Road edges.
       ctx.fillStyle = '#dce7f4';
       ctx.fillRect(39, 0, 3, 520);
       ctx.fillRect(318, 0, 3, 520);
 
-      // Lane markings.
       ctx.fillStyle = '#e8e8e8';
 
       for (let y = -45; y < 560; y += 82) {
         const yy = (y + roadOffset) % 560;
-
         ctx.fillRect(128, yy, 4, 37);
         ctx.fillRect(228, yy, 4, 37);
       }
 
-      // Roadside reflectors.
       for (let y = -30; y < 550; y += 65) {
         const yy = (y + roadOffset * 1.3) % 550;
 
@@ -1161,16 +1229,8 @@
         drawCar(car.x, car.y, car.w, car.h, car.color);
       });
 
-      drawCar(
-        player.x,
-        player.y,
-        player.w,
-        player.h,
-        '#19a9ff',
-        true
-      );
+      drawCar(player.x, player.y, player.w, player.h, '#19a9ff', true);
 
-      // Dashboard.
       ctx.fillStyle = '#030812dd';
       ctx.fillRect(43, 8, 112, 25);
       ctx.fillRect(205, 8, 112, 25);
@@ -1234,8 +1294,8 @@
       input.x = 0;
       input.y = 0;
       input.active = false;
-
-      clearInterval(countdownTimer);
+      input.left = false;
+      input.right = false;
 
       status('Time remaining: 60:00 · Avoid the other cars.');
 
@@ -1254,24 +1314,25 @@
       elapsed += dt;
       remaining = Math.max(0, 3600 - elapsed / 1000);
 
-      const speed = 2.5 * d.speed;
+      /*
+       * Difficulty affects traffic, not the player's steering speed.
+       * The player's movement remains consistent at every difficulty.
+       */
+      const roadSpeed = 2.5;
 
-      roadOffset = (roadOffset + speed * dt / 16.7) % 82;
+      roadOffset = (roadOffset + roadSpeed * dt / 16.7) % 82;
 
       const steering =
         input.active
           ? input.x
           : (input.left ? -1 : 0) + (input.right ? 1 : 0);
 
-      player.x += steering * 4.5 * d.speed * dt / 16.7;
+      player.x += steering * 5.5 * dt / 16.7;
       player.x = Math.max(62, Math.min(298, player.x));
 
       spawnTimer += dt;
 
-      const spawnEvery = Math.max(
-        340,
-        1050 / d.enemies
-      );
+      const spawnEvery = Math.max(340, 1050 / d.enemies);
 
       if (spawnTimer >= spawnEvery) {
         spawnTimer = 0;
@@ -1292,7 +1353,7 @@
       }
 
       traffic.forEach(car => {
-        car.y += (speed + car.speed) * dt / 16.7;
+        car.y += (roadSpeed + car.speed) * dt / 16.7;
 
         const hit =
           Math.abs(player.x - car.x) < (player.w + car.w) * .43 &&
@@ -1307,7 +1368,7 @@
 
       traffic = traffic.filter(car => car.y < 560);
 
-      score += dt * .018 * d.speed;
+      score += dt * .018;
 
       if (remaining <= 0) {
         remaining = 0;
@@ -1363,7 +1424,6 @@
     cleanupGame = () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
-      clearInterval(countdownTimer);
     };
 
     addTouchpad(ui.controls, (x, y, active) => {
@@ -1373,7 +1433,7 @@
     });
 
     ui.help.textContent =
-      'Drag the touchpad left or right to steer. Use a keyboard arrow key on computers. The race timer starts at 60:00.';
+      'Drag the touchpad left or right to steer. Player steering stays consistent at every difficulty. Higher difficulties increase traffic speed and frequency. The race timer starts at 60:00.';
 
     reset();
   }
@@ -1398,7 +1458,6 @@
     let direction;
     let running;
     let speed;
-    let controlX = 0;
 
     function draw() {
       ctx.fillStyle = '#07101f';
@@ -1471,7 +1530,6 @@
       direction = 1;
       running = true;
       speed = 2.2 * activeDifficulty().speed;
-      controlX = 0;
 
       status('Stack as many blocks as you can.');
       draw();
@@ -1520,7 +1578,7 @@
 
       moving.x = Math.max(
         0,
-        Math.min(360 - moving.w, moving.x + x * 2)
+        Math.min(360 - moving.w, moving.x + x * 3.5)
       );
     });
 
@@ -1677,9 +1735,7 @@
         cell.className = 'nx2-cell';
         cell.textContent = number || '';
 
-        if (!number) {
-          cell.style.visibility = 'hidden';
-        }
+        if (!number) cell.style.visibility = 'hidden';
 
         cell.addEventListener('click', () => move(index));
         board.appendChild(cell);
@@ -1693,7 +1749,6 @@
 
       const row = Math.floor(index / 4);
       const col = index % 4;
-
       const emptyRow = Math.floor(empty / 4);
       const emptyCol = empty % 4;
 
@@ -1739,11 +1794,11 @@
   }
 
   // ============================================================
-  // 6. ALIEN INVASION
+  // 6. ALIEN INVASION — DETAILED JET FIGHTER
   // ============================================================
 
   function startAlien() {
-    const ui = shell('Use the touchpad to move and FIRE to shoot.');
+    const ui = shell('Use the touchpad to pilot your jet and hold FIRE to shoot.');
 
     const canvas = document.createElement('canvas');
     canvas.width = 360;
@@ -1760,9 +1815,154 @@
     let lastShot;
     let lastTime;
     let movementX = 0;
+    let movementY = 0;
+    let firing = false;
+    let stars = [];
+
+    function drawJet(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Engine glow.
+      ctx.save();
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = '#35e8ff';
+      ctx.fillStyle = '#35e8ff';
+      ctx.beginPath();
+      ctx.moveTo(-5, 13);
+      ctx.lineTo(0, 31 + Math.random() * 5);
+      ctx.lineTo(5, 13);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Main wings.
+      ctx.fillStyle = '#536c88';
+      ctx.strokeStyle = '#b8d8ef';
+      ctx.lineWidth = 1.2;
+
+      ctx.beginPath();
+      ctx.moveTo(-5, -2);
+      ctx.lineTo(-30, 12);
+      ctx.lineTo(-25, 19);
+      ctx.lineTo(-7, 14);
+      ctx.lineTo(7, 14);
+      ctx.lineTo(25, 19);
+      ctx.lineTo(30, 12);
+      ctx.lineTo(5, -2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Tail fins.
+      ctx.fillStyle = '#233d59';
+
+      ctx.beginPath();
+      ctx.moveTo(-7, 9);
+      ctx.lineTo(-17, 18);
+      ctx.lineTo(-9, 17);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(7, 9);
+      ctx.lineTo(17, 18);
+      ctx.lineTo(9, 17);
+      ctx.closePath();
+      ctx.fill();
+
+      // Fuselage.
+      ctx.fillStyle = '#b8c9dc';
+      ctx.strokeStyle = '#f0fbff';
+
+      ctx.beginPath();
+      ctx.moveTo(0, -25);
+      ctx.lineTo(5, -13);
+      ctx.lineTo(7, 7);
+      ctx.lineTo(4, 17);
+      ctx.lineTo(0, 20);
+      ctx.lineTo(-4, 17);
+      ctx.lineTo(-7, 7);
+      ctx.lineTo(-5, -13);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Cockpit.
+      ctx.fillStyle = '#07384d';
+      ctx.strokeStyle = '#35e8ff';
+
+      ctx.beginPath();
+      ctx.moveTo(0, -17);
+      ctx.lineTo(3, -10);
+      ctx.lineTo(2.5, -1);
+      ctx.lineTo(0, 2);
+      ctx.lineTo(-2.5, -1);
+      ctx.lineTo(-3, -10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Wing markings.
+      ctx.fillStyle = '#35e8ff';
+      ctx.fillRect(-23, 12, 9, 2);
+      ctx.fillRect(14, 12, 9, 2);
+
+      // Nose light.
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, -21, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawAlien(alien) {
+      ctx.save();
+      ctx.translate(alien.x, alien.y);
+
+      ctx.shadowBlur = 9;
+      ctx.shadowColor = '#ff6687';
+      ctx.fillStyle = '#d82e64';
+
+      ctx.beginPath();
+      ctx.moveTo(-12, -5);
+      ctx.lineTo(-8, -11);
+      ctx.lineTo(-3, -7);
+      ctx.lineTo(3, -7);
+      ctx.lineTo(8, -11);
+      ctx.lineTo(12, -5);
+      ctx.lineTo(10, 5);
+      ctx.lineTo(5, 9);
+      ctx.lineTo(-5, 9);
+      ctx.lineTo(-10, 5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-6, -3, 3, 4);
+      ctx.fillRect(3, -3, 3, 4);
+
+      ctx.fillStyle = '#07101f';
+      ctx.fillRect(-5, -2, 1, 2);
+      ctx.fillRect(4, -2, 1, 2);
+
+      ctx.strokeStyle = '#ff6687';
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.moveTo(-7, 8);
+      ctx.lineTo(-10, 13);
+      ctx.moveTo(7, 8);
+      ctx.lineTo(10, 13);
+      ctx.stroke();
+
+      ctx.restore();
+    }
 
     function reset() {
-      player = { x: 180, y: 430 };
+      player = { x: 180, y: 420 };
       aliens = [];
       shots = [];
       score = 0;
@@ -1770,6 +1970,15 @@
       lastShot = 0;
       lastTime = 0;
       movementX = 0;
+      movementY = 0;
+      firing = false;
+
+      stars = Array.from({ length: 65 }, () => ({
+        x: Math.random() * 360,
+        y: Math.random() * 480,
+        size: .5 + Math.random() * 1.5,
+        speed: .4 + Math.random() * 1.5
+      }));
 
       const rows = difficulty === 'Easy' ? 2 : 3;
       const columns = difficulty === 'Hardest' ? 9 : 7;
@@ -1779,19 +1988,26 @@
           aliens.push({
             x: 25 + col * (310 / Math.max(1, columns - 1)),
             y: 45 + row * 35,
+            startX: 25 + col * (310 / Math.max(1, columns - 1)),
+            row,
             alive: true
           });
         }
       }
 
-      status('Score: 0');
+      status('Score: 0 · Defend your ship!');
 
       animationFrame = requestAnimationFrame(tick);
     }
 
     function fire() {
       if (!alive) return;
-      shots.push({ x: player.x, y: player.y - 15 });
+
+      shots.push({
+        x: player.x,
+        y: player.y - 22,
+        speed: 8
+      });
     }
 
     function tick(time) {
@@ -1802,28 +2018,36 @@
 
       const d = activeDifficulty();
 
-      player.x += movementX * 4 * d.speed * dt / 16.7;
-      player.x = Math.max(15, Math.min(345, player.x));
+      // Player movement is deliberately independent of difficulty.
+      player.x += movementX * 4.8 * dt / 16.7;
+      player.y += movementY * 4.0 * dt / 16.7;
 
-      if (time - lastShot > 360 / d.speed) {
+      player.x = Math.max(24, Math.min(336, player.x));
+      player.y = Math.max(285, Math.min(450, player.y));
+
+      // Automatic fire while FIRE is held, with a moderate firing rate.
+      if (firing && time - lastShot >= 170) {
         fire();
         lastShot = time;
       }
 
       shots.forEach(shot => {
-        shot.y -= 6 * d.speed * dt / 16.7;
+        shot.y -= shot.speed * dt / 16.7;
       });
 
-      shots = shots.filter(shot => shot.y > 0);
+      shots = shots.filter(shot => shot.y > -10);
 
       aliens.forEach(alien => {
         if (!alien.alive) return;
 
-        alien.x += Math.sin(time / (500 / d.speed)) * .7;
+        // Higher difficulty increases enemy movement.
+        alien.x = alien.startX +
+          Math.sin(time / (600 / d.enemies) + alien.row) *
+          (10 * d.enemies);
 
         shots.forEach(shot => {
           if (
-            Math.abs(shot.x - alien.x) < 15 &&
+            Math.abs(shot.x - alien.x) < 16 &&
             Math.abs(shot.y - alien.y) < 15
           ) {
             alien.alive = false;
@@ -1832,37 +2056,46 @@
           }
         });
 
-        if (alien.y > 395) alive = false;
+        // Enemies advance faster at higher difficulties.
+        alien.y += .008 * d.enemies * dt / 16.7;
+
+        if (alien.y > player.y - 28) alive = false;
       });
 
       ctx.fillStyle = '#07101f';
       ctx.fillRect(0, 0, 360, 480);
 
-      ctx.fillStyle = '#43f5a5';
-      ctx.beginPath();
-      ctx.moveTo(player.x, player.y - 16);
-      ctx.lineTo(player.x - 13, player.y + 12);
-      ctx.lineTo(player.x + 13, player.y + 12);
-      ctx.closePath();
-      ctx.fill();
+      // Animated starfield.
+      stars.forEach(star => {
+        star.y += star.speed * dt / 16.7;
 
-      ctx.fillStyle = '#ff6687';
+        if (star.y > 480) {
+          star.y = 0;
+          star.x = Math.random() * 360;
+        }
+
+        ctx.fillStyle = '#9dbedc';
+        ctx.globalAlpha = .35 + star.size * .25;
+        ctx.fillRect(star.x, star.y, star.size, star.size);
+      });
+
+      ctx.globalAlpha = 1;
 
       aliens.forEach(alien => {
-        if (!alien.alive) return;
-
-        ctx.fillRect(alien.x - 10, alien.y - 8, 20, 16);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(alien.x - 5, alien.y - 3, 3, 3);
-        ctx.fillRect(alien.x + 2, alien.y - 3, 3, 3);
-        ctx.fillStyle = '#ff6687';
+        if (alien.alive) drawAlien(alien);
       });
 
       ctx.fillStyle = '#35e8ff';
 
       shots.forEach(shot => {
-        ctx.fillRect(shot.x - 2, shot.y, 4, 10);
+        ctx.save();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#35e8ff';
+        ctx.fillRect(shot.x - 2, shot.y, 4, 12);
+        ctx.restore();
       });
+
+      drawJet(player.x, player.y);
 
       status(
         `Score: ${score} · Aliens remaining: ${aliens.filter(a => a.alive).length}`
@@ -1881,27 +2114,38 @@
     function onKeyDown(e) {
       if (currentGame !== 'alien') return;
 
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
-        movementX = -1;
-      }
-
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
-        movementX = 1;
-      }
-
-      if (e.code === 'Space') {
+      if (
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)
+      ) {
         e.preventDefault();
-        fire();
       }
+
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') movementX = -1;
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') movementX = 1;
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') movementY = -1;
+      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') movementY = 1;
+
+      if (e.code === 'Space') firing = true;
     }
 
     function onKeyUp(e) {
-      if (
-        ['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(e.key) ||
-        e.code === 'Space'
-      ) {
-        movementX = 0;
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
+        if (movementX < 0) movementX = 0;
       }
+
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
+        if (movementX > 0) movementX = 0;
+      }
+
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+        if (movementY < 0) movementY = 0;
+      }
+
+      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+        if (movementY > 0) movementY = 0;
+      }
+
+      if (e.code === 'Space') firing = false;
     }
 
     window.addEventListener('keydown', onKeyDown);
@@ -1910,18 +2154,45 @@
     cleanupGame = () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      firing = false;
     };
 
-    addTouchpad(ui.controls, x => {
+    addTouchpad(ui.controls, (x, y) => {
       movementX = x;
+      movementY = y;
     }, {
       fire: true,
       fireLabel: 'FIRE',
-      onFire: fire
+      fireRate: 170,
+      onFire: () => {
+        if (!firing) {
+          firing = true;
+          fire();
+          lastShot = performance.now();
+        }
+      }
     });
 
+    /*
+     * Override the normal hold handling with a dedicated hold-state
+     * using the actual pointer events, avoiding dependence on repeat taps.
+     */
+    const fireButton = ui.controls.querySelector('.nx2-fire');
+
+    if (fireButton) {
+      fireButton.addEventListener('pointerdown', () => {
+        firing = true;
+      });
+
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(name => {
+        fireButton.addEventListener(name, () => {
+          firing = false;
+        });
+      });
+    }
+
     ui.help.textContent =
-      'Drag the touchpad to steer your ship. Hold FIRE or use Space to shoot.';
+      'Drag the touchpad in any direction to pilot your detailed jet fighter. Hold FIRE for continuous shooting. Keyboard: arrows or WASD to move, Space to shoot. Higher difficulties increase enemy pressure without making your jet faster.';
 
     reset();
   }
@@ -2290,7 +2561,7 @@
   }
 
   // ============================================================
-  // 10. NEON MAZE — RANDOMLY GENERATED MAZE
+  // 10. NEON MAZE — RESPONSIVE MOVEMENT
   // ============================================================
 
   function startMaze() {
@@ -2310,6 +2581,9 @@
     let cell;
     let steps;
     let finished;
+    let lastMove = 0;
+    let queuedDirection = null;
+    let moveTimer = 0;
 
     const directions = [
       { dx: 0, dy: -1, wall: 0, opposite: 2 },
@@ -2373,13 +2647,14 @@
       exit = { x: size - 1, y: size - 1 };
       steps = 0;
       finished = false;
+      lastMove = 0;
+      queuedDirection = null;
     }
 
     function draw() {
       ctx.fillStyle = '#040a14';
       ctx.fillRect(0, 0, 360, 360);
 
-      // Draw every maze cell and its walls.
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
           const c = grid[y][x];
@@ -2423,7 +2698,6 @@
         }
       }
 
-      // Exit.
       ctx.fillStyle = '#43f5a5';
       ctx.fillRect(
         exit.x * cell + cell * .2,
@@ -2432,7 +2706,7 @@
         cell * .6
       );
 
-      // Player.
+      // Player marker.
       ctx.fillStyle = '#ff6687';
       ctx.beginPath();
 
@@ -2445,10 +2719,23 @@
       );
 
       ctx.fill();
+
+      // Highlight the current position.
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(
+        player.x * cell + cell / 2,
+        player.y * cell + cell / 2,
+        Math.max(4, cell * .36),
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
     }
 
     function move(dx, dy) {
-      if (finished) return;
+      if (finished) return false;
 
       let directionIndex;
 
@@ -2456,11 +2743,11 @@
       else if (dx === 1 && dy === 0) directionIndex = 1;
       else if (dx === 0 && dy === 1) directionIndex = 2;
       else if (dx === -1 && dy === 0) directionIndex = 3;
-      else return;
+      else return false;
 
       const current = grid[player.y][player.x];
 
-      if (current.walls[directionIndex]) return;
+      if (current.walls[directionIndex]) return false;
 
       player.x += dx;
       player.y += dy;
@@ -2474,6 +2761,29 @@
       }
 
       draw();
+      return true;
+    }
+
+    /*
+     * The joystick selects one direction at a time.
+     * A short movement cooldown prevents one drag from skipping cells.
+     * Repeated movement is supported while the joystick is held.
+     */
+
+    function requestMove(dx, dy) {
+      if (finished) return;
+
+      const now = performance.now();
+
+      if (now - lastMove < 105) {
+        queuedDirection = { dx, dy };
+        return;
+      }
+
+      lastMove = now;
+      queuedDirection = null;
+
+      move(dx, dy);
     }
 
     function onKeyDown(e) {
@@ -2494,7 +2804,7 @@
 
       if (direction) {
         e.preventDefault();
-        move(direction[0], direction[1]);
+        requestMove(direction[0], direction[1]);
       }
     }
 
@@ -2502,31 +2812,42 @@
 
     cleanupGame = () => {
       window.removeEventListener('keydown', onKeyDown);
+      if (moveTimer) clearInterval(moveTimer);
     };
 
     addTouchpad(ui.controls, (x, y, active) => {
-      if (!active || finished) return;
-
-      // Move one cell per deliberate drag.
-      const now = performance.now();
-
-      if (addTouchpad.lastMove && now - addTouchpad.lastMove < 160) {
+      if (!active || finished) {
+        queuedDirection = null;
         return;
       }
 
-      if (Math.abs(x) < .42 && Math.abs(y) < .42) return;
-
-      addTouchpad.lastMove = now;
+      if (Math.abs(x) < .3 && Math.abs(y) < .3) return;
 
       if (Math.abs(x) > Math.abs(y)) {
-        move(x > 0 ? 1 : -1, 0);
+        requestMove(x > 0 ? 1 : -1, 0);
       } else {
-        move(0, y > 0 ? 1 : -1);
+        requestMove(0, y > 0 ? 1 : -1);
       }
     });
 
+    /*
+     * Drain a queued movement only after the previous movement cooldown.
+     * This keeps directional input responsive without jumping multiple cells.
+     */
+    moveTimer = setInterval(() => {
+      if (!queuedDirection || finished) return;
+
+      const now = performance.now();
+
+      if (now - lastMove >= 105) {
+        const direction = queuedDirection;
+        queuedDirection = null;
+        requestMove(direction.dx, direction.dy);
+      }
+    }, 35);
+
     ui.help.textContent =
-      'Every new maze is generated with a different layout. Drag the touchpad in the direction you want to travel. Higher difficulty creates a larger maze.';
+      'Drag the touchpad in the direction you want to travel. Movement responds quickly while preventing accidental jumps across several cells. Every maze is randomly generated. Higher difficulty creates a larger maze.';
 
     generateMaze();
     draw();
