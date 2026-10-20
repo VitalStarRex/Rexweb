@@ -1234,8 +1234,7 @@ function openGame(id){
     let candidate=randomInt(0,Math.max(20,answer+20));
     if(candidate!==answer)options.add(candidate);
    }
-
-   choices=[...options].sort(()=>Math.random()-.5);
+ choices=[...options].sort(()=>Math.random()-.5);
    answers.innerHTML=choices.map((v,i)=>`
     <button type="button" class="nx-answer" data-answer="${v}" aria-label="Option ${i+1}: ${v}">
      <span>${i+1}.</span> ${v}
@@ -1485,7 +1484,6 @@ function openGame(id){
     hintButton.textContent=hintShown?'💡 Hint Revealed':'💡 Reveal Hint';
    }
   }
-
   function reset(){
    roundToken++;
    const available=words.filter(w=>w.word!==previousWord);
@@ -1540,7 +1538,6 @@ function openGame(id){
     render();
    }
   }
-
   listen(letters,'click',e=>{
    const b=e.target.closest('[data-letter]');
    if(b)guess(b.dataset.letter);
@@ -1554,7 +1551,6 @@ function openGame(id){
     render();
    }
   });
-
   hangmanTapHandler=e=>{
    const r=pad.getBoundingClientRect();
    const x=(e.clientX-r.left)/r.width;
@@ -1574,7 +1570,6 @@ function openGame(id){
    hangmanKeyHandler=null;
   };
  }
-
  /* Mirrored dove facing right. */
  function gameDove(){
   setInstructions('Drag the pad to guide the dove up, down, left, and right');
