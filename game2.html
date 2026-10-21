@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050914">
+  <meta name="description" content="Play ten additional arcade games in RexWeb Nexora Extra Arcade.">
+  <title>Extra Arcade | RexWeb Nexora</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #050914;
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #050914;
+      color: #f4f7ff;
+      font-family: system-ui, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    a, button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page-header {
+      padding: 22px 12px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at top, rgba(55,182,255,.14), transparent 65%),
+        #080e1d;
+      border-bottom: 1px solid #233451;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: clamp(25px, 5vw, 38px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #fff, #37b6ff, #a78bfa);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .page-header p {
+      margin: 9px 0 17px;
+      color: #9eabc5;
+      font-size: 12px;
+      letter-spacing: 1.2px;
+      line-height: 1.7;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 15px;
+      border: 1px solid #344765;
+      border-radius: 10px;
+      background: #17243c;
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .nav-link:hover {
+      border-color: #37b6ff;
+      background: #223654;
+    }
+
+    .section-heading {
+      padding: 22px 12px 12px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 8px;
+      font-size: clamp(20px, 4vw, 28px);
+      color: #37b6ff;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: #9eabc5;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #nexora-games {
+      width: 100%;
+      min-height: 65vh;
+      padding-bottom: 24px;
+    }
+
+    #loading-error {
+      width: calc(100% - 28px);
+      max-width: 520px;
+      margin: 24px auto;
+      padding: 17px;
+      border: 1px solid #344765;
+      border-radius: 12px;
+      background: #101d34;
+      color: #c7d9f7;
+      text-align: center;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    #loading-error.error {
+      color: #ffb4c4;
+      border-color: #713149;
+      background: #24101b;
+    }
+
+    .page-footer {
+      padding: 20px 12px;
+      text-align: center;
+      border-top: 1px solid #233451;
+      background: #080e1d;
+      color: #8494b2;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .page-footer strong {
+      color: #37b6ff;
+    }
+
+    @media (max-width: 480px) {
+      .page-header {
+        padding: 20px 10px;
+      }
+
+      .page-header p {
+        font-size: 11px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="page-header">
+    <h1>REXWEB NEXORA</h1>
+    <p>EXTRA ARCADE • PLAY WITHOUT LIMITS</p>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a class="nav-link" href="index.html">← Home</a>
+      <a class="nav-link" href="games.html">🎮 Original Arcade</a>
+    </nav>
+  </header>
+
+  <section class="section-heading">
+    <h2>EXTRA ARCADE</h2>
+    <p>Ten additional games. New challenges. More fun.</p>
+  </section>
+
+  <main id="nexora-games">
+    <div id="loading-error" role="status" aria-live="polite">
+      Loading Extra Arcade...
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <strong>REXWEB NEXORA</strong>
+    <br>
+    Your arcade universe. Play, challenge yourself, and have fun.
+    <br>
+    &copy; <span id="current-year"></span> RexWeb Nexora.
+  </footer>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const root = document.getElementById("nexora-games");
+      const loadingBox = document.getElementById("loading-error");
+
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+      let started = false;
+
+      function showError(message) {
+        if (!loadingBox || !loadingBox.isConnected) return;
+        loadingBox.classList.add("error");
+        loadingBox.textContent = message;
+      }
+
+      window.addEventListener("error", function (event) {
+        if (event.target && event.target !== window) {
+          const source = event.target.src || "";
+
+          if (source.includes("game2.js")) {
+            showError(
+              "Could not load game2.js. Make sure the file is saved beside game2.html."
+            );
+          }
+
+          return;
+        }
+
+        console.error("Extra Arcade error:", event.message);
+      }, true);
+
+      function checkArcade() {
+        if (!root) return;
+
+        const hasContent = Array.from(root.children).some(
+          element => element.id !== "loading-error"
+        );
+
+        if (hasContent) {
+          started = true;
+
+          if (loadingBox && loadingBox.isConnected) {
+            loadingBox.remove();
+          }
+        }
+      }
+
+      const observer = new MutationObserver(checkArcade);
+
+      observer.observe(root, {
+        childList: true,
+        subtree: true
+      });
+
+      setTimeout(function () {
+        checkArcade();
+
+        if (!started) {
+          showError(
+            "Extra Arcade has not started. Check game2.js and make sure it supports the #nexora-games container."
+          );
+        }
+      }, 5000);
+    })();
+  </script>
+
+  <!-- Load ONLY Game 2. -->
+  <script src="./game2.js"></script>
+
+</body>
+</html>
