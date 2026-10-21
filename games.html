@@ -114,12 +114,6 @@
       background: #24101b;
     }
 
-    #loading-error.success {
-      color: #a7f3d0;
-      border-color: #176b51;
-      background: #09251d;
-    }
-
     .page-footer {
       padding: 20px 14px;
       text-align: center;
@@ -201,23 +195,13 @@
         new Date().getFullYear();
 
       let arcadeStarted = false;
-      let startupError = false;
 
       function showError(message) {
         if (!loadingBox) return;
 
         loadingBox.hidden = false;
-        loadingBox.classList.remove("success");
         loadingBox.classList.add("error");
         loadingBox.textContent = message;
-      }
-
-      function showSuccess() {
-        if (!loadingBox) return;
-
-        loadingBox.classList.remove("error");
-        loadingBox.classList.add("success");
-        loadingBox.textContent = "Nexora Arcade is ready!";
       }
 
       window.addEventListener("error", function (event) {
@@ -225,30 +209,19 @@
           const failedSource = event.target.src || "";
 
           if (failedSource.includes("game.js")) {
-            startupError = true;
             showError(
               "Could not load game.js. Check that the file exists beside games.html."
-            );
-          } else if (failedSource.includes("game2.js")) {
-            showError(
-              "Could not load game2.js. The original arcade may still work, but the additional games are unavailable."
             );
           }
 
           return;
         }
 
-        if (arcadeStarted && !startupError) {
-          console.error(
-            "A JavaScript error occurred in the arcade:",
-            event.message
-          );
-        }
+        console.error(
+          "Arcade JavaScript error:",
+          event.message
+        );
       }, true);
-
-      window.addEventListener("unhandledrejection", function (event) {
-        console.error("Arcade promise error:", event.reason);
-      });
 
       function checkArcade() {
         if (!arcadeRoot) return;
@@ -260,11 +233,7 @@
         if (hasGames) {
           arcadeStarted = true;
 
-          if (!startupError && loadingBox && loadingBox.parentNode) {
-            /*
-             * Remove the initial loading message once the arcade UI exists.
-             * Do not remove the games or their controls.
-             */
+          if (loadingBox && loadingBox.parentNode) {
             loadingBox.remove();
           }
         }
@@ -280,20 +249,17 @@
       setTimeout(function () {
         checkArcade();
 
-        if (!arcadeStarted && !startupError) {
+        if (!arcadeStarted && loadingBox && loadingBox.parentNode) {
           showError(
-            "The arcade has not started. Check game.js and game2.js, and make sure both files are saved beside games.html."
+            "The arcade has not started. Check that game.js is saved beside games.html."
           );
         }
       }, 5000);
     })();
   </script>
 
-  <!-- Load the original arcade first. -->
+  <!-- Load ONLY the original arcade. -->
   <script src="./game.js"></script>
-
-  <!-- Load the additional games after the original arcade. -->
-  <script src="./game2.js"></script>
 
 </body>
 </html>
