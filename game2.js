@@ -3,8 +3,16 @@
   'use strict';
 
   function initNexoraExtraArcade() {
-    const ROOT = document.getElementById('nexora-games');
-    if (!ROOT || document.getElementById('nx2-launcher')) return;
+    if (document.getElementById('nx2-launcher')) return;
+
+    let ROOT = document.getElementById('nexora-games');
+
+    // FIX: Create the required container if it does not exist.
+    if (!ROOT) {
+      ROOT = document.createElement('div');
+      ROOT.id = 'nexora-games';
+      document.body.appendChild(ROOT);
+    }
 
     const GAMES = [
       { id:'memory', icon:'🧠', name:'Memory Match', image:'photo-1516321318423-f06f85e504b3' },
@@ -257,8 +265,14 @@
       function car(x,y,w,h,color,player=false){
         ctx.save();ctx.translate(x,y);ctx.fillStyle='#05070b';
         for(const tx of [-w/2-3,w/2-4]){ctx.fillRect(tx,10,7,18);ctx.fillRect(tx,h-26,7,18);}
-        ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(-w/2,0,w,h,8);ctx.fill();
-        ctx.fillStyle='#071626';ctx.beginPath();ctx.roundRect(-w/2+5,h*.29,w-10,h*.23,4);ctx.fill();
+        ctx.fillStyle=color;ctx.beginPath();
+        if(ctx.roundRect)ctx.roundRect(-w/2,0,w,h,8);
+        else{ctx.moveTo(-w/2+8,0);ctx.lineTo(w/2-8,0);ctx.lineTo(w/2,h);ctx.lineTo(-w/2,h);ctx.closePath();}
+        ctx.fill();
+        ctx.fillStyle='#071626';ctx.beginPath();
+        if(ctx.roundRect)ctx.roundRect(-w/2+5,h*.29,w-10,h*.23,4);
+        else ctx.rect(-w/2+5,h*.29,w-10,h*.23);
+        ctx.fill();
         ctx.fillStyle='#102b41';ctx.fillRect(-w/2+6,h*.57,w-12,h*.14);
         ctx.fillStyle='#ff244f';ctx.fillRect(-w/2+3,h-7,7,4);ctx.fillRect(w/2-10,h-7,7,4);
         if(player){ctx.shadowBlur=12;ctx.shadowColor='#35e8ff';ctx.strokeStyle='#35e8ff';ctx.strokeRect(-w/2,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(-2,8,4,12);}
