@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,9 +8,7 @@
   <title>Extra Arcade | RexWeb Nexora</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html {
       background: #050914;
@@ -107,11 +105,11 @@
     #nexora-games {
       width: 100%;
       min-height: 65vh;
-      padding-bottom: 24px;
+      padding: 12px 8px 24px;
     }
 
     #loading-error {
-      width: calc(100% - 28px);
+      width: calc(100% - 12px);
       max-width: 520px;
       margin: 24px auto;
       padding: 17px;
@@ -122,6 +120,7 @@
       text-align: center;
       line-height: 1.6;
       overflow-wrap: anywhere;
+      white-space: pre-wrap;
     }
 
     #loading-error.error {
@@ -145,20 +144,12 @@
     }
 
     @media (max-width: 480px) {
-      .page-header {
-        padding: 20px 10px;
-      }
-
-      .page-header p {
-        font-size: 11px;
-      }
+      .page-header { padding: 20px 10px; }
+      .page-header p { font-size: 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-
+      html { scroll-behavior: auto; }
       *, *::before, *::after {
         animation-duration: .01ms !important;
         transition-duration: .01ms !important;
@@ -168,7 +159,6 @@
 </head>
 
 <body>
-
   <header class="page-header">
     <h1>REXWEB NEXORA</h1>
     <p>EXTRA ARCADE • PLAY WITHOUT LIMITS</p>
@@ -204,72 +194,108 @@
 
       const root = document.getElementById("nexora-games");
       const loadingBox = document.getElementById("loading-error");
-
       document.getElementById("current-year").textContent =
         new Date().getFullYear();
 
       let started = false;
+      let scriptLoaded = false;
 
       function showError(message) {
-        if (!loadingBox || !loadingBox.isConnected) return;
+        if (!loadingBox || !loadingBox.isConnected) {
+          const box = document.createElement("div");
+          box.id = "loading-error";
+          box.className = "error";
+          box.setAttribute("role", "alert");
+          root.prepend(box);
+          box.textContent = message;
+          return;
+        }
+
         loadingBox.classList.add("error");
         loadingBox.textContent = message;
       }
 
-      window.addEventListener("error", function (event) {
-        if (event.target && event.target !== window) {
-          const source = event.target.src || "";
-
-          if (source.includes("game2.js")) {
-            showError(
-              "Could not load game2.js. Make sure the file is saved beside game2.html."
-            );
-          }
-
-          return;
-        }
-
-        console.error("Extra Arcade error:", event.message);
-      }, true);
-
       function checkArcade() {
-        if (!root) return;
+        const launcher = document.getElementById("nx2-launcher");
 
-        const hasContent = Array.from(root.children).some(
-          element => element.id !== "loading-error"
-        );
-
-        if (hasContent) {
+        if (launcher) {
           started = true;
-
           if (loadingBox && loadingBox.isConnected) {
             loadingBox.remove();
           }
+          return true;
         }
+
+        return false;
       }
 
-      const observer = new MutationObserver(checkArcade);
+      window.addEventListener("error", event => {
+        if (event.target && event.target.tagName === "SCRIPT") {
+          showError(
+            "JavaScript file failed to load:\n" +
+            (event.target.src || "Unknown script") +
+            "\nCheck the file location and filename."
+          );
+          return;
+        }
 
-      observer.observe(root, {
-        childList: true,
-        subtree: true
+        if (event.message) {
+          showError(
+            "JavaScript error:\n" + event.message +
+            "\nLine: " + (event.lineno || "unknown") +
+            "\nFile: " + (event.filename || "unknown")
+          );
+        }
+      }, true);
+
+      window.addEventListener("unhandledrejection", event => {
+        const reason = event.reason;
+        showError(
+          "Script error:\n" +
+          (reason && reason.message ? reason.message : String(reason))
+        );
       });
 
-      setTimeout(function () {
-        checkArcade();
+      const observer = new MutationObserver(checkArcade);
+      observer.observe(root, { childList: true, subtree: true });
 
-        if (!started) {
+      const script = document.createElement("script");
+      script.src = "./game2.js";
+      script.onload = () => {
+        scriptLoaded = true;
+
+        setTimeout(() => {
+          if (!checkArcade()) {
+            showError(
+              "game2.js loaded, but Extra Arcade did not initialize.\n" +
+              "The file may contain an initialization error or may not " +
+              "contain the expected Extra Arcade code."
+            );
+          }
+        }, 1000);
+      };
+
+      script.onerror = () => {
+        showError(
+          "Could not load ./game2.js.\n" +
+          "Make sure game2.js exists in the same folder as this HTML file. " +
+          "Check the filename, spelling, capitalization and upload status."
+        );
+      };
+
+      document.body.appendChild(script);
+
+      setTimeout(() => {
+        if (!started && !scriptLoaded) {
           showError(
-            "Extra Arcade has not started. Check game2.js and make sure it supports the #nexora-games container."
+            "game2.js has not loaded yet.\n" +
+            "Check your hosting connection and the file path."
           );
+        } else if (!started) {
+          checkArcade();
         }
       }, 5000);
     })();
   </script>
-
-  <!-- Load ONLY Game 2. -->
-  <script src="./game2.js"></script>
-
 </body>
-
 </html>
