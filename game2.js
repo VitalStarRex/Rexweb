@@ -1,11 +1,10 @@
-```javascript
 (() => {
   'use strict';
 
   /*
    * REXWEB NEXORA — EXTRA ARCADE
-   * Compatible with #nexora-games.
-   * Loads independently and creates its launcher if needed.
+   * Supports #nexora-games and standalone HTML pages.
+   * Includes visible initialization errors for easier debugging.
    */
 
   function initNexoraExtraArcade() {
@@ -231,6 +230,8 @@
           line-height:1.5;
           text-align:center;
           max-width:700px;
+          padding:0 12px 16px;
+          margin:0 auto;
         }
         #nx2-overlay .nx2-touch-area {
           width:100%;
@@ -277,9 +278,7 @@
           font-weight:800;
           touch-action:none;
         }
-        #nx2-overlay .nx2-action:active {
-          background:#18364a;
-        }
+        #nx2-overlay .nx2-action:active {background:#18364a}
         @media(max-width:420px) {
           #nx2-launcher .nx2-grid {gap:5px}
           #nx2-launcher .nx2-card {border-radius:7px;padding:4px 1px}
@@ -294,25 +293,6 @@
       <p class="nx2-subtitle">Ten more games. Choose your next challenge.</p>
       <div class="nx2-grid" id="nx2-grid"></div>
     `;
-
-    GAMES.forEach(game => {
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'nx2-card';
-      card.dataset.game = game.id;
-      card.style.setProperty(
-        '--nx2-bg',
-        `url("https://images.unsplash.com/${game.image}?auto=format&fit=crop&w=400&q=75")`
-      );
-      card.innerHTML = `
-        <span class="nx2-card-content">
-          <span class="nx2-icon">${game.icon}</span>
-          <span class="nx2-name">${game.name}</span>
-        </span>
-      `;
-      card.addEventListener('click', () => openGame(game.id));
-      launcher.querySelector('#nx2-grid').appendChild(card);
-    });
 
     const overlay = document.createElement('div');
     overlay.id = 'nx2-overlay';
@@ -340,7 +320,13 @@
       <div id="nx2-help"></div>
     `;
 
-    ROOT.parentNode.insertBefore(launcher, ROOT);
+    /*
+     * Insert the launcher before building game handlers.
+     * This ensures the page visibly initializes even if a game
+     * implementation later throws an error.
+     */
+    const host = ROOT.parentNode || document.body;
+    host.insertBefore(launcher, ROOT);
     document.body.appendChild(overlay);
 
     const area = overlay.querySelector('#nx2-game-area');
@@ -363,12 +349,11 @@
 
     function later(fn, delay) {
       const token = gameToken;
-      const id = setTimeout(() => {
+      return setTimeout(() => {
         if (token === gameToken && overlay.classList.contains('nx2-visible')) {
           fn();
         }
       }, delay);
-      return id;
     }
 
     function clearGame() {
@@ -399,7 +384,7 @@
       help.textContent = text || '';
     }
 
-    function shell(game, width=360, height=480) {
+    function shell(name, width=360, height=480) {
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -407,6 +392,7 @@
       canvas.style.maxHeight = '65vh';
       canvas.style.objectFit = 'contain';
       const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas is not supported by this browser.');
       area.appendChild(canvas);
       return { canvas, ctx, wrap:area };
     }
@@ -435,7 +421,6 @@
       controls.appendChild(touchArea);
 
       let active = false;
-      let last = { x:0, y:0 };
       const deadzone = options.deadzone || .12;
 
       function move(event) {
@@ -444,18 +429,15 @@
           ((event.clientX - rect.left) / rect.width - .5) * 2));
         const y = Math.max(-1, Math.min(1,
           ((event.clientY - rect.top) / rect.height - .5) * 2));
-        last = {
-          x:Math.abs(x) < deadzone ? 0 : x,
-          y:Math.abs(y) < deadzone ? 0 : y
-        };
+        const dx = Math.abs(x) < deadzone ? 0 : x;
+        const dy = Math.abs(y) < deadzone ? 0 : y;
         knob.style.left = (50 + x * 35) + '%';
         knob.style.top = (50 + y * 28) + '%';
-        onMove(last.x, last.y);
+        onMove(dx, dy);
       }
 
       function release() {
         active = false;
-        last = { x:0, y:0 };
         knob.style.left = '50%';
         knob.style.top = '50%';
         onMove(0, 0);
@@ -463,7 +445,7 @@
 
       pad.addEventListener('pointerdown', event => {
         active = true;
-        pad.setPointerCapture(event.pointerId);
+        try { pad.setPointerCapture(event.pointerId); } catch (_) {}
         move(event);
       });
       pad.addEventListener('pointermove', event => {
@@ -507,7 +489,7 @@
         startGame(id);
       } catch (error) {
         console.error('Extra Arcade game failed:', id, error);
-        area.textContent = 'This game encountered an error. Tap Restart to try again.';
+        area.textContent = 'This game encountered an error: ' + error.message;
       }
     }
 
@@ -721,7 +703,7 @@
             if(xx>=0&&xx<n&&yy>=0&&yy<n)reveal(yy*n+xx);
           }
         }
-        if(revealed.size===total-mineCount){ended=true;}
+        if(revealed.size===total-mineCount)ended=true;
         render();
       }
       function render(){
@@ -736,7 +718,8 @@
             else if(count(i))drawText(ctx,String(count(i)),x+18,y+26,16,'#35e8ff');
           }else if(flags.has(i))drawText(ctx,'🚩',x+18,y+26,18);
         }
-        if(ended)finishMessage(ctx,340,390,mines.size&&[...revealed].some(i=>mines.has(i))?'BOOM!':'CLEARED!');
+        if(ended)finishMessage(ctx,340,390,
+          [...revealed].some(i=>mines.has(i))?'BOOM!':'CLEARED!');
       }
       canvas.addEventListener('click',e=>{
         const r=canvas.getBoundingClientRect();
@@ -762,7 +745,6 @@
     function startPuzzle() {
       const {canvas,ctx}=shell('puzzle',340,390);
       let tiles=[],moves=0,solved=false;
-      const size=3;
       function reset(){
         tiles=[1,2,3,4,5,6,7,8,0];
         for(let i=0;i<1000;i++){
@@ -823,8 +805,8 @@
         makeCanvasBackground(ctx,340,480);
         ctx.fillStyle='#35e8ff';ctx.fillRect(player-14,425,28,30);
         ctx.fillStyle='#9b6cff';shots.forEach(s=>ctx.fillRect(s.x-2,s.y,4,10));
-        ctx.fillStyle='#ff5577';aliens.forEach(a=>drawText(ctx,'👾',a.x,a.y,22));
-        ctx.fillStyle='#ff5577';enemyShots.forEach(s=>ctx.fillRect(s.x-2,s.y,4,10));
+        aliens.forEach(a=>drawText(ctx,'👾',a.x,a.y,22));
+        enemyShots.forEach(s=>ctx.fillRect(s.x-2,s.y,4,10));
         drawText(ctx,`Score ${score}   Lives ${lives}`,170,22,14);
         if(!alive)finishMessage(ctx,340,480,`GAME OVER · ${score}`);
       }
@@ -846,7 +828,10 @@
           if(hit>=0){shots.splice(hit,1);aliens.splice(i,1);score+=10;continue;}
           if(a.y>480){aliens.splice(i,1);lives--;}
         }
-        if(enemyShots.some(s=>s.y>420&&Math.abs(s.x-player)<18)){lives--;enemyShots=enemyShots.filter(s=>s.y<420||Math.abs(s.x-player)>=18);}
+        if(enemyShots.some(s=>s.y>420&&Math.abs(s.x-player)<18)){
+          lives--;
+          enemyShots=enemyShots.filter(s=>s.y<420||Math.abs(s.x-player)>=18);
+        }
         shots=shots.filter(s=>s.y>-10);enemyShots=enemyShots.filter(s=>s.y<490);
         if(lives<=0)alive=false;
         render();requestAnimationFrame(frame);
@@ -859,7 +844,11 @@
       fire.addEventListener('pointerup',up);
       fire.addEventListener('pointerleave',up);
       fire.addEventListener('pointercancel',up);
-      const keydown=e=>{if(e.key==='ArrowLeft')player=Math.max(18,player-12);if(e.key==='ArrowRight')player=Math.min(322,player+12);if(e.code==='Space'){e.preventDefault();shoot();}};
+      const keydown=e=>{
+        if(e.key==='ArrowLeft')player=Math.max(18,player-12);
+        if(e.key==='ArrowRight')player=Math.min(322,player+12);
+        if(e.code==='Space'){e.preventDefault();shoot();}
+      };
       window.addEventListener('keydown',keydown);
       setHelp('Move with the touchpad. Hold FIRE to shoot the incoming aliens.');
       reset();requestAnimationFrame(frame);
@@ -904,7 +893,6 @@
         zombies.forEach(z=>{
           const dx=player.x-z.x,dy=player.y-z.y,d=Math.hypot(dx,dy)||1;
           z.x+=dx/d*dt*.035*factor;z.y+=dy/d*dt*.035*factor;
-          if(d<24){z.x-=dx/d*dt*.025;z.y-=dy/d*dt*.025;}
         });
         zombies=zombies.filter(z=>{
           if(Math.hypot(z.x-player.x,z.y-player.y)<22){lives--;return false;}
@@ -927,7 +915,7 @@
     function startWord() {
       const {canvas,ctx}=shell('word',340,390);
       const words=['PLANET','GALAXY','ROCKET','ARCADE','JUNGLE','PUZZLE','NEBULA','DRAGON','SHIELD','COSMOS'];
-      let word='',scrambled='',answer='',score=0,round=0;
+      let word='',scrambled='',score=0,round=0;
       const input=document.createElement('input');
       input.type='text';input.autocomplete='off';input.placeholder='Type your answer';
       input.maxLength=16;
@@ -938,7 +926,8 @@
         word=words[Math.floor(Math.random()*words.length)];
         scrambled=word.split('').sort(()=>Math.random()-.5).join('');
         if(scrambled===word)scrambled=word.slice(1)+word[0];
-        answer='';input.value='';input.disabled=false;render();input.focus();
+        input.value='';input.disabled=false;render();
+        input.focus();
       }
       function render(){
         makeCanvasBackground(ctx,340,390);
@@ -1071,6 +1060,25 @@
       cleanup=()=>window.removeEventListener('keydown',keydown);
     }
 
+    GAMES.forEach(game => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'nx2-card';
+      card.dataset.game = game.id;
+      card.style.setProperty(
+        '--nx2-bg',
+        `url("https://images.unsplash.com/${game.image}?auto=format&fit=crop&w=400&q=75")`
+      );
+      card.innerHTML = `
+        <span class="nx2-card-content">
+          <span class="nx2-icon">${game.icon}</span>
+          <span class="nx2-name">${game.name}</span>
+        </span>
+      `;
+      card.addEventListener('click', () => openGame(game.id));
+      launcher.querySelector('#nx2-grid').appendChild(card);
+    });
+
     overlay.querySelector('#nx2-back').addEventListener('click', closeGame);
     overlay.querySelector('#nx2-restart').addEventListener('click', () => {
       if(currentGame)openGame(currentGame);
@@ -1091,11 +1099,33 @@
     console.info('RexWeb Nexora Extra Arcade initialized successfully.');
   }
 
+  function showInitError(error) {
+    console.error('Extra Arcade initialization failed:', error);
+
+    const message = 'Extra Arcade initialization error: ' +
+      (error && error.message ? error.message : String(error));
+
+    let box = document.getElementById('loading-error');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'loading-error';
+      (document.getElementById('nexora-games') || document.body).appendChild(box);
+    }
+
+    box.className = 'error';
+    box.setAttribute('role', 'alert');
+    box.style.cssText =
+      'display:block;margin:16px auto;padding:14px;max-width:600px;' +
+      'color:#ffb4c4;background:#24101b;border:1px solid #713149;' +
+      'border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;';
+    box.textContent = message;
+  }
+
   function boot() {
     try {
       initNexoraExtraArcade();
     } catch (error) {
-      console.error('Extra Arcade initialization failed:', error);
+      showInitError(error);
     }
   }
 
@@ -1105,4 +1135,3 @@
     boot();
   }
 })();
-```
