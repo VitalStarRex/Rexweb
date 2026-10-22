@@ -82,6 +82,14 @@ canvas{display:block;width:min(100%,360px);height:auto;aspect-ratio:3/4;backgrou
   <div id="play-area"></div>
 </section>
 
-<script src="./game2.js" defer></script>
+<script>
+window.addEventListener('error', function (e) {
+  const grid = document.getElementById('game-grid');
+  if (grid && grid.querySelector('p')) {
+    grid.innerHTML = '<p style="color:#ff5577">Arcade failed to start. Check game2.js.</p>';
+  }
+});
+</script>
+<script src="./game2.js"></script>
 </body>
 </html>
