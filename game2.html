@@ -1,57 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050914">
-<title>REXWEB NEXORA — Extra Arcade</title>
+<title>Extra Arcade | RexWeb Nexora</title>
 <style>
-:root{color-scheme:dark;--bg:#050914;--panel:#0b1222;--card:#101b30;--cyan:#35e8ff;--purple:#9b6cff;--green:#43f5a5;--muted:#9eafc9;--line:#24415b}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#15294a 0,transparent 48%),var(--bg);color:#eef7ff;font:15px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif;min-height:100vh}
-button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}
-header{max-width:1100px;margin:auto;padding:25px 16px 14px;display:flex;align-items:center;gap:14px;justify-content:space-between}
-.brand{font-weight:950;letter-spacing:.12em;color:var(--cyan);font-size:clamp(18px,4vw,28px);text-shadow:0 0 18px #35e8ff50}.tag{color:var(--muted);font-size:12px;letter-spacing:.1em}
-main{max-width:1100px;margin:auto;padding:0 16px 36px}.hero{border:1px solid #35e8ff55;border-radius:20px;padding:clamp(18px,4vw,30px);background:linear-gradient(120deg,#102541e8,#11152be8);box-shadow:0 12px 40px #0005;position:relative;overflow:hidden}
-.hero:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #35e8ff30;border-radius:50%;right:-55px;top:-100px;box-shadow:0 0 0 22px #35e8ff08,0 0 0 48px #35e8ff06;pointer-events:none}
-.hero h1{margin:0 0 7px;font-size:clamp(26px,5vw,43px);line-height:1.1}.hero h1 span{color:var(--cyan)}.hero p{color:var(--muted);margin:0;max-width:650px}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:25px 0 12px}.section-head h2{margin:0;font-size:20px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-.game-card{position:relative;min-width:0;min-height:145px;aspect-ratio:1/1.12;overflow:hidden;border:1px solid #35e8ff65;border-radius:14px;background:linear-gradient(145deg,#142943,#090e1b);color:white;text-align:left;padding:12px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 18px #0003;transition:transform .16s,border-color .16s,box-shadow .16s}
-.game-card:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 0 22px #35e8ff20}.game-card:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
-.game-art{position:absolute;inset:0;opacity:.72;background:radial-gradient(circle at 75% 22%,var(--glow,#35e8ff) 0,transparent 26%),linear-gradient(145deg,#142943,#080d1a 72%);pointer-events:none}
-.game-art:before,.game-art:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 45%,#35e8ff13 45.5%,transparent 46.5%),linear-gradient(45deg,transparent 65%,#9b6cff20 65.5%,transparent 66.5%)}
-.game-art:after{background:linear-gradient(0deg,#050914 0,transparent 75%)}
-.game-icon,.game-name,.game-type{position:relative;z-index:1}.game-icon{font-size:clamp(27px,4vw,42px);filter:drop-shadow(0 3px 9px #000)}.game-name{font-weight:850;font-size:clamp(11px,1.5vw,15px);line-height:1.15;text-shadow:0 2px 8px #000}.game-type{font-size:10px;color:#c1d4e9;margin-top:5px}
-.pill{border:1px solid #35e8ff60;background:#101d31;color:var(--cyan);border-radius:9px;padding:9px 12px;font-weight:800;font-size:12px}
-footer{color:#71839f;text-align:center;padding:22px 12px;font-size:12px}
-#game-screen{display:none;position:fixed;inset:0;z-index:1000;background:#050914;color:#eef7ff;overflow:auto;overscroll-behavior:contain}
-#game-screen.open{display:flex;flex-direction:column}
-.gamebar{position:sticky;top:0;z-index:5;background:#0b1222;border-bottom:1px solid #35e8ff45;padding:9px max(10px,env(safe-area-inset-left));display:flex;align-items:center;gap:8px}
-.gamebar h2{font-size:14px;text-align:center;flex:1;min-width:0;margin:0}.gamebar button,.gamebar select{border:1px solid #35e8ff70;background:#101b30;color:var(--cyan);border-radius:8px;padding:9px 10px;font-weight:800;font-size:12px}
-.play-area{width:100%;max-width:760px;margin:0 auto;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px;flex:1}
-.hud{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;width:100%;color:var(--muted);font-size:12px}.hud span{border:1px solid #263e59;background:#0b1425;padding:6px 10px;border-radius:8px}
-canvas{display:block;max-width:100%;height:auto;max-height:58vh;object-fit:contain;border:1px solid #35e8ff60;border-radius:12px;background:#070d1c;touch-action:none}
-.controls{width:100%;max-width:520px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding:5px}
-.control-btn{min-width:58px;min-height:44px;padding:10px 14px;border:1px solid #35e8ff;background:#101b30;color:var(--cyan);border-radius:10px;font-weight:900;touch-action:none}
-.control-btn:active{background:#1b4055}.help{max-width:700px;margin:0 auto;padding:0 14px 20px;text-align:center;color:var(--muted);font-size:12px}
-#answer-input{width:min(100%,320px);padding:12px;border-radius:9px;background:#101b30;color:white;border:1px solid var(--cyan);font-size:16px}
-#result-toast{font-weight:800;color:var(--green);min-height:20px;text-align:center}
-@media(max-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.game-card{min-height:125px;padding:9px;border-radius:11px}.game-type{font-size:9px}header{padding-top:18px}}
-@media(max-width:390px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card{min-height:135px}.gamebar{gap:4px}.gamebar button,.gamebar select{padding:8px 6px;font-size:11px}.gamebar h2{font-size:12px}}
+:root{color-scheme:dark;--bg:#050914;--panel:#0b1425;--cyan:#35e8ff;--purple:#9b6cff;--green:#43f5a5;--pink:#ff4fd8;--text:#eef7ff;--muted:#91a6c4}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#10223b,var(--bg) 65%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+header{padding:22px 14px 15px;text-align:center}
+.brand{color:var(--cyan);font-size:12px;letter-spacing:4px;font-weight:900}
+h1{font-size:clamp(25px,6vw,42px);margin:8px 0;text-shadow:0 0 22px #35e8ff55}
+header p{color:var(--muted);margin:5px 0}
+main{width:min(100%,900px);margin:auto;padding:0 12px 30px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px}
+.section-head h2{font-size:18px;margin:0}
+.count{font-size:11px;color:var(--cyan);border:1px solid #35e8ff66;padding:5px 9px;border-radius:20px}
+#game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.game-card{position:relative;overflow:hidden;min-height:130px;padding:13px;text-align:left;color:var(--text);background:linear-gradient(135deg,#101c31,#09101f);border:1px solid #35e8ff66;border-radius:16px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;isolation:isolate;box-shadow:inset 0 0 24px #35e8ff08;transition:transform .15s,border-color .15s}
+.game-card:active{transform:scale(.97)}
+.game-card:focus-visible{outline:2px solid white;outline-offset:2px}
+.game-card:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 90% 10%,var(--glow,#35e8ff)33,transparent 65%);opacity:.22}
+.game-icon{font-size:30px;line-height:1}
+.game-name{display:block;font-size:14px;font-weight:850}
+.game-type{display:block;font-size:9px;letter-spacing:1.1px;color:var(--muted);margin-top:4px}
+.game-art{position:absolute;right:10px;top:12px;width:42px;height:42px;border-radius:50%;border:1px solid var(--glow);opacity:.3;box-shadow:0 0 22px var(--glow)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:22px 8px}
+#game-screen{display:none;position:fixed;inset:0;z-index:10;background:#050914;overflow-y:auto;padding:env(safe-area-inset-top) 10px env(safe-area-inset-bottom)}
+#game-screen.open{display:block}
+.game-top{position:sticky;top:0;z-index:2;background:#050914ee;backdrop-filter:blur(12px);display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #243550}
+.game-top h2{font-size:16px;flex:1;min-width:0;margin:0;text-align:center}
+.ui-btn,.control-btn{border:1px solid #35e8ff88;background:#0c1b2d;color:var(--text);border-radius:10px;padding:10px 12px;font-weight:750;font-size:12px}
+.ui-btn:active,.control-btn:active{background:#17364a}
+#difficulty{max-width:100px;background:#101c30;color:white;border:1px solid #35e8ff88;border-radius:9px;padding:9px;font-size:12px}
+#game-help{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;margin:12px auto;max-width:520px}
+#play-area{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:520px;margin:0 auto;padding-bottom:22px}
+.hud{width:100%;display:flex;justify-content:space-around;gap:5px;flex-wrap:wrap;background:#0b1425;border:1px solid #233c58;border-radius:10px;padding:10px;font-size:12px;font-weight:800}
+canvas{display:block;width:min(100%,360px);height:auto;aspect-ratio:3/4;background:#070d1c;border:1px solid #35e8ff66;border-radius:12px;touch-action:none}
+.controls{width:100%;display:flex;justify-content:center;align-items:stretch;gap:8px;flex-wrap:wrap}
+.control-btn{min-width:64px;min-height:43px;flex:1}
+#result-toast{font-size:14px;font-weight:850;color:var(--green);text-align:center;min-height:20px}
+@media(min-width:560px){#game-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.game-card{min-height:155px}.game-icon{font-size:34px}}
+@media(max-width:350px){#game-grid{gap:7px}.game-card{padding:10px;min-height:120px}.game-name{font-size:12px}.game-type{font-size:8px}.ui-btn{padding:9px 8px;font-size:11px}}
 </style>
 </head>
 <body>
-<header><div><div class="brand">REXWEB NEXORA</div><div class="tag">EXTRA ARCADE · PLAY WITHOUT LIMITS</div></div><button class="pill" id="sound-note" type="button" aria-label="Sound note">ARCADE MODE</button></header>
+<header>
+  <div class="brand">REXWEB NEXORA</div>
+  <h1>EXTRA ARCADE</h1>
+  <p>Ten fresh challenges. One arcade universe.</p>
+</header>
+
 <main>
-<section class="hero"><h1>Enter the <span>Extra Arcade</span></h1><p>Ten fresh challenges. Smooth controls, glowing worlds, score chasing, and mobile-friendly gameplay. Pick a game to start.</p></section>
-<div class="section-head"><div><h2>Choose Your Game</h2><p>Tap a card to play. Difficulty can be changed in-game.</p></div><div class="tag">10 GAMES</div></div>
-<section class="grid" id="game-grid" aria-label="Arcade games"></section>
+  <div class="section-head">
+    <h2>Choose Your Game</h2>
+    <span class="count">10 GAMES</span>
+  </div>
+  <div id="game-grid" aria-label="Arcade games">
+    <p style="color:#91a6c4">Loading games…</p>
+  </div>
 </main>
-<footer>REXWEB NEXORA · Built for modern browsers · No account required</footer>
-<section id="game-screen" role="dialog" aria-modal="true" aria-label="Arcade game">
-<div class="gamebar"><button id="back-button" type="button">← Games</button><h2 id="game-title">Game</h2><select id="difficulty" aria-label="Difficulty"><option>Easy</option><option selected>Medium</option><option>Hard</option><option>Hardest</option></select><button id="restart-button" type="button">↻ Restart</button></div>
-<div class="play-area" id="play-area"></div><div class="help" id="game-help"></div>
+
+<footer>REXWEB NEXORA · PLAY WITHOUT LIMITS</footer>
+
+<section id="game-screen" aria-label="Game screen" aria-hidden="true">
+  <div class="game-top">
+    <button id="back-button" class="ui-btn" type="button">← Games</button>
+    <h2 id="game-title">Game</h2>
+    <select id="difficulty" aria-label="Difficulty">
+      <option>Easy</option>
+      <option selected>Medium</option>
+      <option>Hard</option>
+      <option>Hardest</option>
+    </select>
+    <button id="restart-button" class="ui-btn" type="button">↻</button>
+  </div>
+  <p id="game-help">Choose a game to begin.</p>
+  <div id="play-area"></div>
 </section>
-<script src="game2.js" defer></script>
+
+<script src="./game2.js" defer></script>
 </body>
 </html>
