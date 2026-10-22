@@ -1,301 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#050914">
-  <meta name="description" content="Play ten additional arcade games in RexWeb Nexora Extra Arcade.">
-  <title>Extra Arcade | RexWeb Nexora</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    html {
-      background: #050914;
-      color-scheme: dark;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #050914;
-      color: #f4f7ff;
-      font-family: system-ui, Arial, sans-serif;
-      overflow-x: hidden;
-    }
-
-    a, button {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .page-header {
-      padding: 22px 12px;
-      text-align: center;
-      background:
-        radial-gradient(ellipse at top, rgba(55,182,255,.14), transparent 65%),
-        #080e1d;
-      border-bottom: 1px solid #233451;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      font-size: clamp(25px, 5vw, 38px);
-      font-weight: 900;
-      letter-spacing: 1px;
-      background: linear-gradient(90deg, #fff, #37b6ff, #a78bfa);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .page-header p {
-      margin: 9px 0 17px;
-      color: #9eabc5;
-      font-size: 12px;
-      letter-spacing: 1.2px;
-      line-height: 1.7;
-    }
-
-    .nav-links {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 9px;
-    }
-
-    .nav-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      padding: 9px 15px;
-      border: 1px solid #344765;
-      border-radius: 10px;
-      background: #17243c;
-      color: #fff;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .nav-link:hover {
-      border-color: #37b6ff;
-      background: #223654;
-    }
-
-    .section-heading {
-      padding: 22px 12px 12px;
-      text-align: center;
-    }
-
-    .section-heading h2 {
-      margin: 0 0 8px;
-      font-size: clamp(20px, 4vw, 28px);
-      color: #37b6ff;
-    }
-
-    .section-heading p {
-      margin: 0;
-      color: #9eabc5;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    #nexora-games {
-      width: 100%;
-      min-height: 65vh;
-      padding: 12px 8px 24px;
-    }
-
-    #loading-error {
-      width: calc(100% - 12px);
-      max-width: 520px;
-      margin: 24px auto;
-      padding: 17px;
-      border: 1px solid #344765;
-      border-radius: 12px;
-      background: #101d34;
-      color: #c7d9f7;
-      text-align: center;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-    }
-
-    #loading-error.error {
-      color: #ffb4c4;
-      border-color: #713149;
-      background: #24101b;
-    }
-
-    .page-footer {
-      padding: 20px 12px;
-      text-align: center;
-      border-top: 1px solid #233451;
-      background: #080e1d;
-      color: #8494b2;
-      font-size: 12px;
-      line-height: 1.8;
-    }
-
-    .page-footer strong {
-      color: #37b6ff;
-    }
-
-    @media (max-width: 480px) {
-      .page-header { padding: 20px 10px; }
-      .page-header p { font-size: 11px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after {
-        animation-duration: .01ms !important;
-        transition-duration: .01ms !important;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050914">
+<title>REXWEB NEXORA — Extra Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#050914;--panel:#0b1222;--card:#101b30;--cyan:#35e8ff;--purple:#9b6cff;--green:#43f5a5;--muted:#9eafc9;--line:#24415b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#15294a 0,transparent 48%),var(--bg);color:#eef7ff;font:15px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}
+header{max-width:1100px;margin:auto;padding:25px 16px 14px;display:flex;align-items:center;gap:14px;justify-content:space-between}
+.brand{font-weight:950;letter-spacing:.12em;color:var(--cyan);font-size:clamp(18px,4vw,28px);text-shadow:0 0 18px #35e8ff50}.tag{color:var(--muted);font-size:12px;letter-spacing:.1em}
+main{max-width:1100px;margin:auto;padding:0 16px 36px}.hero{border:1px solid #35e8ff55;border-radius:20px;padding:clamp(18px,4vw,30px);background:linear-gradient(120deg,#102541e8,#11152be8);box-shadow:0 12px 40px #0005;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:220px;height:220px;border:1px solid #35e8ff30;border-radius:50%;right:-55px;top:-100px;box-shadow:0 0 0 22px #35e8ff08,0 0 0 48px #35e8ff06;pointer-events:none}
+.hero h1{margin:0 0 7px;font-size:clamp(26px,5vw,43px);line-height:1.1}.hero h1 span{color:var(--cyan)}.hero p{color:var(--muted);margin:0;max-width:650px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:25px 0 12px}.section-head h2{margin:0;font-size:20px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.game-card{position:relative;min-width:0;min-height:145px;aspect-ratio:1/1.12;overflow:hidden;border:1px solid #35e8ff65;border-radius:14px;background:linear-gradient(145deg,#142943,#090e1b);color:white;text-align:left;padding:12px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 18px #0003;transition:transform .16s,border-color .16s,box-shadow .16s}
+.game-card:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 0 22px #35e8ff20}.game-card:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+.game-art{position:absolute;inset:0;opacity:.72;background:radial-gradient(circle at 75% 22%,var(--glow,#35e8ff) 0,transparent 26%),linear-gradient(145deg,#142943,#080d1a 72%);pointer-events:none}
+.game-art:before,.game-art:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 45%,#35e8ff13 45.5%,transparent 46.5%),linear-gradient(45deg,transparent 65%,#9b6cff20 65.5%,transparent 66.5%)}
+.game-art:after{background:linear-gradient(0deg,#050914 0,transparent 75%)}
+.game-icon,.game-name,.game-type{position:relative;z-index:1}.game-icon{font-size:clamp(27px,4vw,42px);filter:drop-shadow(0 3px 9px #000)}.game-name{font-weight:850;font-size:clamp(11px,1.5vw,15px);line-height:1.15;text-shadow:0 2px 8px #000}.game-type{font-size:10px;color:#c1d4e9;margin-top:5px}
+.pill{border:1px solid #35e8ff60;background:#101d31;color:var(--cyan);border-radius:9px;padding:9px 12px;font-weight:800;font-size:12px}
+footer{color:#71839f;text-align:center;padding:22px 12px;font-size:12px}
+#game-screen{display:none;position:fixed;inset:0;z-index:1000;background:#050914;color:#eef7ff;overflow:auto;overscroll-behavior:contain}
+#game-screen.open{display:flex;flex-direction:column}
+.gamebar{position:sticky;top:0;z-index:5;background:#0b1222;border-bottom:1px solid #35e8ff45;padding:9px max(10px,env(safe-area-inset-left));display:flex;align-items:center;gap:8px}
+.gamebar h2{font-size:14px;text-align:center;flex:1;min-width:0;margin:0}.gamebar button,.gamebar select{border:1px solid #35e8ff70;background:#101b30;color:var(--cyan);border-radius:8px;padding:9px 10px;font-weight:800;font-size:12px}
+.play-area{width:100%;max-width:760px;margin:0 auto;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px;flex:1}
+.hud{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;width:100%;color:var(--muted);font-size:12px}.hud span{border:1px solid #263e59;background:#0b1425;padding:6px 10px;border-radius:8px}
+canvas{display:block;max-width:100%;height:auto;max-height:58vh;object-fit:contain;border:1px solid #35e8ff60;border-radius:12px;background:#070d1c;touch-action:none}
+.controls{width:100%;max-width:520px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding:5px}
+.control-btn{min-width:58px;min-height:44px;padding:10px 14px;border:1px solid #35e8ff;background:#101b30;color:var(--cyan);border-radius:10px;font-weight:900;touch-action:none}
+.control-btn:active{background:#1b4055}.help{max-width:700px;margin:0 auto;padding:0 14px 20px;text-align:center;color:var(--muted);font-size:12px}
+#answer-input{width:min(100%,320px);padding:12px;border-radius:9px;background:#101b30;color:white;border:1px solid var(--cyan);font-size:16px}
+#result-toast{font-weight:800;color:var(--green);min-height:20px;text-align:center}
+@media(max-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.game-card{min-height:125px;padding:9px;border-radius:11px}.game-type{font-size:9px}header{padding-top:18px}}
+@media(max-width:390px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card{min-height:135px}.gamebar{gap:4px}.gamebar button,.gamebar select{padding:8px 6px;font-size:11px}.gamebar h2{font-size:12px}}
+</style>
 </head>
-
 <body>
-  <header class="page-header">
-    <h1>REXWEB NEXORA</h1>
-    <p>EXTRA ARCADE • PLAY WITHOUT LIMITS</p>
-
-    <nav class="nav-links" aria-label="Main navigation">
-      <a class="nav-link" href="index.html">← Home</a>
-      <a class="nav-link" href="games.html">🎮 Original Arcade</a>
-    </nav>
-  </header>
-
-  <section class="section-heading">
-    <h2>EXTRA ARCADE</h2>
-    <p>Ten additional games. New challenges. More fun.</p>
-  </section>
-
-  <main id="nexora-games">
-    <div id="loading-error" role="status" aria-live="polite">
-      Loading Extra Arcade...
-    </div>
-  </main>
-
-  <footer class="page-footer">
-    <strong>REXWEB NEXORA</strong>
-    <br>
-    Your arcade universe. Play, challenge yourself, and have fun.
-    <br>
-    &copy; <span id="current-year"></span> RexWeb Nexora.
-  </footer>
-
-  <script>
-    (() => {
-      "use strict";
-
-      const root = document.getElementById("nexora-games");
-      const loadingBox = document.getElementById("loading-error");
-      document.getElementById("current-year").textContent =
-        new Date().getFullYear();
-
-      let started = false;
-      let scriptLoaded = false;
-
-      function showError(message) {
-        if (!loadingBox || !loadingBox.isConnected) {
-          const box = document.createElement("div");
-          box.id = "loading-error";
-          box.className = "error";
-          box.setAttribute("role", "alert");
-          root.prepend(box);
-          box.textContent = message;
-          return;
-        }
-
-        loadingBox.classList.add("error");
-        loadingBox.textContent = message;
-      }
-
-      function checkArcade() {
-        const launcher = document.getElementById("nx2-launcher");
-
-        if (launcher) {
-          started = true;
-          if (loadingBox && loadingBox.isConnected) {
-            loadingBox.remove();
-          }
-          return true;
-        }
-
-        return false;
-      }
-
-      window.addEventListener("error", event => {
-        if (event.target && event.target.tagName === "SCRIPT") {
-          showError(
-            "JavaScript file failed to load:\n" +
-            (event.target.src || "Unknown script") +
-            "\nCheck the file location and filename."
-          );
-          return;
-        }
-
-        if (event.message) {
-          showError(
-            "JavaScript error:\n" + event.message +
-            "\nLine: " + (event.lineno || "unknown") +
-            "\nFile: " + (event.filename || "unknown")
-          );
-        }
-      }, true);
-
-      window.addEventListener("unhandledrejection", event => {
-        const reason = event.reason;
-        showError(
-          "Script error:\n" +
-          (reason && reason.message ? reason.message : String(reason))
-        );
-      });
-
-      const observer = new MutationObserver(checkArcade);
-      observer.observe(root, { childList: true, subtree: true });
-
-      const script = document.createElement("script");
-      script.src = "./game2.js";
-      script.onload = () => {
-        scriptLoaded = true;
-
-        setTimeout(() => {
-          if (!checkArcade()) {
-            showError(
-              "game2.js loaded, but Extra Arcade did not initialize.\n" +
-              "The file may contain an initialization error or may not " +
-              "contain the expected Extra Arcade code."
-            );
-          }
-        }, 1000);
-      };
-
-      script.onerror = () => {
-        showError(
-          "Could not load ./game2.js.\n" +
-          "Make sure game2.js exists in the same folder as this HTML file. " +
-          "Check the filename, spelling, capitalization and upload status."
-        );
-      };
-
-      document.body.appendChild(script);
-
-      setTimeout(() => {
-        if (!started && !scriptLoaded) {
-          showError(
-            "game2.js has not loaded yet.\n" +
-            "Check your hosting connection and the file path."
-          );
-        } else if (!started) {
-          checkArcade();
-        }
-      }, 5000);
-    })();
-  </script>
+<header><div><div class="brand">REXWEB NEXORA</div><div class="tag">EXTRA ARCADE · PLAY WITHOUT LIMITS</div></div><button class="pill" id="sound-note" type="button" aria-label="Sound note">ARCADE MODE</button></header>
+<main>
+<section class="hero"><h1>Enter the <span>Extra Arcade</span></h1><p>Ten fresh challenges. Smooth controls, glowing worlds, score chasing, and mobile-friendly gameplay. Pick a game to start.</p></section>
+<div class="section-head"><div><h2>Choose Your Game</h2><p>Tap a card to play. Difficulty can be changed in-game.</p></div><div class="tag">10 GAMES</div></div>
+<section class="grid" id="game-grid" aria-label="Arcade games"></section>
+</main>
+<footer>REXWEB NEXORA · Built for modern browsers · No account required</footer>
+<section id="game-screen" role="dialog" aria-modal="true" aria-label="Arcade game">
+<div class="gamebar"><button id="back-button" type="button">← Games</button><h2 id="game-title">Game</h2><select id="difficulty" aria-label="Difficulty"><option>Easy</option><option selected>Medium</option><option>Hard</option><option>Hardest</option></select><button id="restart-button" type="button">↻ Restart</button></div>
+<div class="play-area" id="play-area"></div><div class="help" id="game-help"></div>
+</section>
+<script src="game2.js" defer></script>
 </body>
 </html>
