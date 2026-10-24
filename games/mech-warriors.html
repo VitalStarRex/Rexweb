@@ -13,7 +13,7 @@ body{display:flex;flex-direction:column}
 .brand{font-weight:900;letter-spacing:1px;font-size:clamp(12px,2.5vw,18px);color:var(--cyan)}
 .sub{font-size:10px;color:#9cb7d2;letter-spacing:2px}
 .topright{display:flex;gap:6px;align-items:center}
-button,select{font:inherit;color:var(--text);background:#111f34;border:1px solid #31516c;border-radius:9px;padding:7px 10px;font-weight:750}
+button,select{font:inherit;color:var(--text);background:#111f34;border:1px solid #31516c;border-radius:9px;padding:7px 10px;font-weight:750;cursor:pointer}
 button:active{transform:scale(.97)}
 button.primary{border-color:var(--cyan);color:var(--cyan)}
 #healthWrap{position:absolute;top:5px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;padding:4px 8px;background:#071426cc;border:1px solid #29425d;border-radius:8px;color:#eaf7ff;font-size:11px;font-weight:800;z-index:2;pointer-events:none}
@@ -69,6 +69,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 <header class="top">
  <div><div class="brand">REXWEB NEXORA</div><div class="sub">MECH WARRIORS · NEON SIEGE</div></div>
  <div class="topright">
+  <button id="soundBtn">🔊 SOUND ON</button>
   <button id="pauseBtn">Ⅱ Pause</button>
   <button id="restartBtn">↻</button>
  </div>
@@ -114,6 +115,49 @@ let level=1,armor=10,credits=0,score=0,kills=0,player,bullets=[],enemyBullets=[]
 let mouse={x:400,y:200,down:false},stick={x:0,y:0,active:false},fireHeld=false,lastShot=0,lastEnemySpawn=0,levelKills=0,needKills=10;
 let bossSpawned=false,dashUntil=0,empReady=0,invulnUntil=0,levelTransition=false;
 const LEVEL_QUOTAS=[0,10,20,30,40,50],BOSS_HITS=[0,25,30,40,45,80];
+
+let audioCtx=null,masterGain=null,soundMuted=false;
+
+function initAudio(){
+if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return}
+const AC=window.AudioContext||window.webkitAudioContext;
+if(!AC)return;
+audioCtx=new AC();
+masterGain=audioCtx.createGain();
+masterGain.gain.value=soundMuted?0:.85;
+masterGain.connect(audioCtx.destination);
+}
+
+function playTone(freq=440,duration=.12,type='square',volume=.35,slide=0){
+if(soundMuted)return;
+initAudio();
+if(!audioCtx)return;
+if(audioCtx.state==='suspended')audioCtx.resume();
+const now=audioCtx.currentTime;
+const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+osc.type=type;
+osc.frequency.setValueAtTime(freq,now);
+if(slide)osc.frequency.exponentialRampToValueAtTime(Math.max(25,freq+slide),now+duration);
+gain.gain.setValueAtTime(volume,now);
+gain.gain.exponentialRampToValueAtTime(.001,now+duration);
+osc.connect(gain);gain.connect(masterGain);
+osc.start(now);osc.stop(now+duration+.02);
+}
+
+const SFX={
+fire(){playTone(720,.08,'square',.24,-400)},
+hit(){playTone(130,.18,'sawtooth',.4,-60)},
+explosion(){playTone(90,.3,'sawtooth',.45,-50)},
+dash(){playTone(280,.16,'triangle',.35,400)},
+emp(){playTone(220,.35,'sawtooth',.42,600)},
+win(){
+playTone(440,.22,'triangle',.45,100);
+setTimeout(()=>playTone(660,.22,'triangle',.45,120),180);
+setTimeout(()=>playTone(880,.48,'triangle',.5,100),360);
+},
+lose(){playTone(250,.5,'sawtooth',.45,-200)}
+};
+
 const settings={
  easy:{enemyHP:.55,enemySpeed:.65,shotInterval:2.1,damage:.5,spawnRate:.55,aimSpread:1.05,projectileSpeed:.7,maxEnemies:3,bossDamage:.75},
  normal:{enemyHP:1,enemySpeed:1,shotInterval:1,damage:1,spawnRate:1,aimSpread:.45,projectileSpeed:1,maxEnemies:6,bossDamage:1},
@@ -134,7 +178,7 @@ function reset(){level=1;armor=10;credits=0;score=0;kills=0;bullets=[];enemyBull
 function updateUI(){ui.level.textContent=level;ui.armor.textContent=Math.max(0,Math.ceil(armor));ui.healthFill.style.width=(Math.max(0,armor)/10*100)+'%';ui.healthText.textContent=Math.max(0,Math.ceil(armor))+'/10';ui.credits.textContent=credits;ui.score.textContent=score;ui.kills.textContent=kills;ui.enemyProgress.textContent=Math.min(levelKills,needKills)+'/'+needKills;ui.boss.textContent=bossSpawned?'BOSS ACTIVE':(levelKills>=needKills?'BOSS INCOMING':'NOT ARRIVED')}
 function showBanner(title,sub=''){ui.banner.querySelector('strong').textContent=title;ui.banner.querySelector('span').textContent=sub;ui.banner.style.display='block';clearTimeout(showBanner.t);showBanner.t=setTimeout(()=>ui.banner.style.display='none',1900)}
 function openDialog(title,body,buttons){ui.overlay.classList.remove('hidden');ui.dialog.classList.remove('you-won-popup');ui.dialog.innerHTML=`<h1${title==='YOU WON'?' class="you-won-text"':''}>${title}</h1>${body}<div class="row" id="dialogButtons"></div>`;if(title==='YOU WON')ui.dialog.classList.add('you-won-popup');const row=$('dialogButtons');buttons.forEach(b=>{const el=document.createElement('button');el.textContent=b.label;if(b.primary)el.className='primary big';el.onclick=b.onClick;row.appendChild(el)})}
-function start(){reset();running=true;ui.overlay.classList.add('hidden');last=performance.now();showBanner('MISSION START',difficultyNames[$('difficulty').value]+': clear '+needKills+' enemies, then defeat the boss');requestAnimationFrame(loop)}
+function start(){reset();running=true;ui.overlay.classList.add('hidden');last=performance.now();showBanner('MISSION START',difficultyNames[$('difficulty').value]+': clear '+needKills+' enemies, then defeat the boss');initAudio();requestAnimationFrame(loop)}
 function pause(){if(!running||over)return;paused=!paused;ui.pauseTag.style.display=paused?'block':'none';$('pauseBtn').textContent=paused?'▶ Resume':'Ⅱ Pause';if(!paused){last=performance.now();requestAnimationFrame(loop)}}
 function spawnEnemy(boss=false){
  const side=Math.floor(Math.random()*4);let x=side===0?-25:side===1?W+25:Math.random()*W,y=side===2?-25:side===3?H+25:Math.random()*H*.55;
@@ -144,27 +188,26 @@ function spawnEnemy(boss=false){
  if(boss){bossSpawned=true;showBanner(final?'OVERLORD TITAN':'LEVEL '+level+' BOSS',final?'Defeat the giant boss! It takes 80 hits!':'Boss requires '+required+' hits')}
  updateUI()
 }
-function shootPlayer(now){const rate=155/Math.max(1,player.rapid);if(now-lastShot<rate)return;lastShot=now;let target=null,best=Infinity;for(const e of enemies){const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;target=e}}const a=target?Math.atan2(target.y-player.y,target.x-player.x):Math.atan2(mouse.y-player.y,mouse.x-player.x),n=player.cannon>=3?3:player.cannon===2?2:1;for(let i=0;i<n;i++){const ang=a+(i-(n-1)/2)*.13;bullets.push({x:player.x+Math.cos(ang)*18,y:player.y+Math.sin(ang)*18,vx:Math.cos(ang)*520,vy:Math.sin(ang)*520,r:4,damage:13+player.cannon*3})}}
+function shootPlayer(now){const rate=155/Math.max(1,player.rapid);if(now-lastShot<rate)return;lastShot=now;let target=null,best=Infinity;for(const e of enemies){const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;target=e}}const a=target?Math.atan2(target.y-player.y,target.x-player.x):Math.atan2(mouse.y-player.y,mouse.x-player.x),n=player.cannon>=3?3:player.cannon===2?2:1;for(let i=0;i<n;i++){const ang=a+(i-(n-1)/2)*.13;bullets.push({x:player.x+Math.cos(ang)*18,y:player.y+Math.sin(ang)*18,vx:Math.cos(ang)*520,vy:Math.sin(ang)*520,r:4,damage:13+player.cannon*3})}SFX.fire()}
 function enemyShoot(e,now){const c=cfg(),a=Math.atan2(player.y-e.y,player.x-e.x)+(Math.random()-.5)*c.aimSpread,n=e.final?5:e.boss?3:1;for(let i=0;i<n;i++){const spread=e.boss?.30:c.aimSpread,angle=a+(i-(n-1)/2)*spread,speed=(e.final?190:e.boss?165:135)*c.projectileSpeed;enemyBullets.push({x:e.x+Math.cos(angle)*(e.r+3),y:e.y+Math.sin(angle)*(e.r+3),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:e.final?5:4,damage:e.boss?3:1,color:e.final?'#ff554f':'#ff9c63'})}}
 function burst(x,y,color,n=12){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=30+Math.random()*190;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.25+Math.random()*.55,max:.8,r:1+Math.random()*3,color})}}
-function damageEnemy(e,d){if(e.boss){const required=BOSS_HITS[level];e.finalHits=Math.min(required,(e.finalHits||0)+1);e.hp=required-e.finalHits}else e.hp-=1;burst(e.x,e.y,e.color,2);if(e.hp<=0){const i=enemies.indexOf(e);if(i<0)return;enemies.splice(i,1);burst(e.x,e.y,e.final?'#ff4b45':e.color,e.boss?35:12);score+=e.boss?600:100+level*10;credits+=e.boss?100:8+Math.floor(Math.random()*8);kills++;if(!e.boss)levelKills++;if(Math.random()<.14&&!e.boss)pickups.push({x:e.x,y:e.y,r:8,type:'repair'});if(e.boss){if(e.final){winGame();return}showBanner('BOSS DEFEATED','Sector boss destroyed · Bonus credits +100');updateUI();completeLevel();return}updateUI();if(levelKills>=needKills&&!enemies.some(enemy=>!enemy.boss)&&!bossSpawned)spawnEnemy(true)}}
+function damageEnemy(e,d){if(e.boss){const required=BOSS_HITS[level];e.finalHits=Math.min(required,(e.finalHits||0)+1);e.hp=required-e.finalHits}else e.hp-=1;burst(e.x,e.y,e.color,2);SFX.hit();if(e.hp<=0){const i=enemies.indexOf(e);if(i<0)return;enemies.splice(i,1);burst(e.x,e.y,e.final?'#ff4b45':e.color,e.boss?35:12);SFX.explosion();score+=e.boss?600:100+level*10;credits+=e.boss?100:8+Math.floor(Math.random()*8);kills++;if(!e.boss)levelKills++;if(Math.random()<.14&&!e.boss)pickups.push({x:e.x,y:e.y,r:8,type:'repair'});if(e.boss){if(e.final){winGame();return}showBanner('BOSS DEFEATED','Sector boss destroyed · Bonus credits +100');updateUI();completeLevel();return}updateUI();if(levelKills>=needKills&&!enemies.some(enemy=>!enemy.boss)&&!bossSpawned)spawnEnemy(true)}}
 function completeLevel(){if(levelTransition||over)return;levelTransition=true;running=false;nextLevel()}
 function nextLevel(){if(level>=5){winGame();return}level++;levelKills=0;needKills=LEVEL_QUOTAS[level];bossSpawned=false;enemies=[];enemyBullets=[];bullets=[];armor=Math.min(10,armor+1);player.hp=armor;levelTransition=false;running=true;ui.overlay.classList.add('hidden');showBanner('LEVEL '+level,'Defeat '+needKills+' regular enemies, then the boss');lastEnemySpawn=performance.now();last=performance.now();updateUI();requestAnimationFrame(loop)}
-function winGame(){over=true;running=false;victory=true;burst(W/2,H/2,'#ff5b4d',80);renderThroneVictory();updateUI();openDialog('YOU WON',`<div class="throne-scene"><div class="throne-crown">♛</div><div class="throne-seat">👑</div><div class="throne-mech">🤖</div><div class="throne-caption">THE CITY'S CHAMPION</div></div><p style="font-size:18px;color:var(--green);font-weight:900">VICTORY — THE OVERLORD TITAN IS DEFEATED!</p><p>Your mech takes the throne. You saved the neon city.</p><p>Final score: <b style="color:var(--cyan)">${score}</b><br>Robots destroyed: <b>${kills}</b><br>Credits earned: <b>${credits}</b></p>`,[{label:'PLAY AGAIN',primary:true,onClick:start}])}
+function winGame(){over=true;running=false;victory=true;burst(W/2,H/2,'#ff5b4d',80);SFX.win();renderThroneVictory();updateUI();openDialog('YOU WON',`<div class="throne-scene"><div class="throne-crown">♛</div><div class="throne-seat">👑</div><div class="throne-mech">🤖</div><div class="throne-caption">THE CITY'S CHAMPION</div></div><p style="font-size:18px;color:var(--green);font-weight:900">VICTORY — THE OVERLORD TITAN IS DEFEATED!</p><p>Your mech takes the throne. You saved the neon city.</p><p>Final score: <b style="color:var(--cyan)">${score}</b><br>Robots destroyed: <b>${kills}</b><br>Credits earned: <b>${credits}</b></p>`,[{label:'PLAY AGAIN',primary:true,onClick:start}])}
 function renderThroneVictory(){drawCity();ctx.save();const x=W/2,y=H*.48;ctx.shadowBlur=25;ctx.shadowColor='#9b6cff';ctx.fillStyle='#40247c';ctx.beginPath();ctx.moveTo(x-75,y+45);ctx.lineTo(x-62,y-55);ctx.lineTo(x-34,y-28);ctx.lineTo(x,y-72);ctx.lineTo(x+34,y-28);ctx.lineTo(x+62,y-55);ctx.lineTo(x+75,y+45);ctx.closePath();ctx.fill();ctx.strokeStyle='#d3b2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#f6d36b';ctx.fillRect(x-48,y+18,96,10);ctx.fillStyle='#15263d';ctx.fillRect(x-35,y+30,70,42);ctx.fillStyle='#35e8ff';ctx.fillRect(x-24,y+4,48,36);ctx.fillStyle='#d9fbff';ctx.fillRect(x-12,y+13,8,7);ctx.fillRect(x+5,y+13,8,7);ctx.restore();render(performance.now())}
-function gameOver(){over=true;running=false;openDialog('MECH DESTROYED',`<p>Your armor has reached zero. The city still needs you.</p><p>Score: <b>${score}</b> · Level reached: <b>${level}</b></p>`,[{label:'RETRY MISSION',primary:true,onClick:start}])}
-function useEMP(now){if(now<empReady||!running||paused)return;empReady=now+9000;burst(player.x,player.y,'#9b6cff',45);for(const e of [...enemies])if(Math.hypot(e.x-player.x,e.y-player.y)<190){if(e.boss){burst(e.x,e.y,'#9b6cff',8)}else damageEnemy(e,70)}showBanner('EMP BLAST','Nearby regular robots damaged')}
-function useDash(now){if(!player||now<dashUntil||!running||paused)return;dashUntil=now+2300;invulnUntil=now+500;burst(player.x,player.y,'#43f5a5',12)}
+function gameOver(){over=true;running=false;SFX.lose();openDialog('MECH DESTROYED',`<p>Your armor has reached zero. The city still needs you.</p><p>Score: <b>${score}</b> · Level reached: <b>${level}</b></p>`,[{label:'RETRY MISSION',primary:true,onClick:start}])}
+function useEMP(now){if(now<empReady||!running||paused)return;empReady=now+9000;burst(player.x,player.y,'#9b6cff',45);SFX.emp();for(const e of [...enemies])if(Math.hypot(e.x-player.x,e.y-player.y)<190){if(e.boss){burst(e.x,e.y,'#9b6cff',8)}else damageEnemy(e,70)}showBanner('EMP BLAST','Nearby regular robots damaged')}
+function useDash(now){if(!player||now<dashUntil||!running||paused)return;dashUntil=now+2300;invulnUntil=now+500;burst(player.x,player.y,'#43f5a5',12);SFX.dash()}
 function update(dt,now){if(!player)return;const c=cfg();let mx=0,my=0;if(keys.ArrowLeft||keys.a||keys.A)mx--;if(keys.ArrowRight||keys.d||keys.D)mx++;if(keys.ArrowUp||keys.w||keys.W)my--;if(keys.ArrowDown||keys.s||keys.S)my++;mx+=stick.x;my+=stick.y;const mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}const dash=now<dashUntil?2.1:1;player.x=Math.max(player.r,Math.min(W-player.r,player.x+mx*player.speed*player.move*dash*dt));player.y=Math.max(player.r,Math.min(H-player.r,player.y+my*player.speed*player.move*dash*dt));if(fireHeld||keys[' ']||mouse.down)shootPlayer(now);
  if(levelKills<needKills&&now-lastEnemySpawn>1900/c.spawnRate&&enemies.filter(e=>!e.boss).length<c.maxEnemies){spawnEnemy(false);lastEnemySpawn=now}
  if(!bossSpawned&&levelKills>=needKills&&!enemies.some(e=>!e.boss))spawnEnemy(true);
- for(const e of [...enemies]){const dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1,keep=e.boss?155:220;e.x+=dx/d*e.speed*dt*(d>keep?1:.45);e.y+=dy/d*e.speed*dt*(d>keep?1:.45);if(now>e.shootAt){enemyShoot(e,now);e.shootAt=now+e.shotGap}if(d<e.r+player.r&&now>invulnUntil){armor-=1;invulnUntil=now+(cfg().damage>=1.8?400:700);burst(player.x,player.y,'#ff5577',10);if(armor<=0){armor=0;updateUI();gameOver();return}}}
+ for(const e of [...enemies]){const dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1,keep=e.boss?155:220;e.x+=dx/d*e.speed*dt*(d>keep?1:.45);e.y+=dy/d*e.speed*dt*(d>keep?1:.45);if(now>e.shootAt){enemyShoot(e,now);e.shootAt=now+e.shotGap}if(d<e.r+player.r&&now>invulnUntil){armor-=1;invulnUntil=now+(cfg().damage>=1.8?400:700);burst(player.x,player.y,'#ff5577',10);SFX.hit();if(armor<=0){armor=0;updateUI();gameOver();return}}}
  for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x< -20||b.x>W+20||b.y< -20||b.y>H+20){bullets.splice(i,1);continue}let hit=null;for(const e of enemies)if(Math.hypot(b.x-e.x,b.y-e.y)<b.r+e.r){hit=e;break}if(hit){damageEnemy(hit,b.damage);bullets.splice(i,1)}}
- for(let i=enemyBullets.length-1;i>=0;i--){const b=enemyBullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x< -20||b.x>W+20||b.y< -20||b.y>H+20){enemyBullets.splice(i,1);continue}if(Math.hypot(b.x-player.x,b.y-player.y)<b.r+player.r&&now>invulnUntil){armor-=b.damage||1;invulnUntil=now+(cfg().damage>=1.8?350:500);enemyBullets.splice(i,1);burst(player.x,player.y,'#ff5577',5);if(armor<=0){armor=0;updateUI();gameOver();return}}}
- for(let i=pickups.length-1;i>=0;i--){const p=pickups[i];p.y+=22*dt;if(Math.hypot(p.x-player.x,p.y-player.y)<p.r+player.r){armor=Math.min(10,armor+1);pickups.splice(i,1);showBanner('REPAIR PICKUP','Armor restored')}else if(p.y>H+20)pickups.splice(i,1)}
+ for(let i=enemyBullets.length-1;i>=0;i--){const b=enemyBullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x< -20||b.x>W+20||b.y< -20||b.y>H+20){enemyBullets.splice(i,1);continue}if(Math.hypot(b.x-player.x,b.y-player.y)<b.r+player.r&&now>invulnUntil){armor-=b.damage||1;invulnUntil=now+(cfg().damage>=1.8?350:500);enemyBullets.splice(i,1);burst(player.x,player.y,'#ff5577',5);SFX.hit();if(armor<=0){armor=0;updateUI();gameOver();return}}}
+ for(let i=pickups.length-1;i>=0;i--){const p=pickups[i];p.y+=22*dt;if(Math.hypot(p.x-player.x,p.y-player.y)<p.r+p.r){armor=Math.min(10,armor+1);pickups.splice(i,1);showBanner('REPAIR PICKUP','Armor restored')}else if(p.y>H+20)pickups.splice(i,1)}
  for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.97;p.vy*=.97;p.life-=dt;if(p.life<=0)particles.splice(i,1)}updateUI()}
 function drawCity(){ctx.fillStyle='#050914';ctx.fillRect(0,0,W,H);const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#071020');g.addColorStop(1,'#102748');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(const s of stars){ctx.globalAlpha=s.a;ctx.fillStyle='#9feaff';ctx.fillRect(s.x,s.y,s.r,s.r)}ctx.globalAlpha=1;for(const b of buildings){ctx.fillStyle='#09172b';ctx.fillRect(b.x,H-b.h,b.w,b.h);ctx.strokeStyle='#1b4562';ctx.strokeRect(b.x,H-b.h,b.w,b.h);for(let y=H-b.h+8;y<H-8;y+=13)for(let x=b.x+7;x<b.x+b.w-4;x+=12){ctx.fillStyle=((x+y+b.seed)%4<1)?'#35e8ff':'#1b3150';ctx.globalAlpha=.55;ctx.fillRect(x,y,4,5)}}ctx.globalAlpha=1;
- // Perspective 3D roadway: a vanishing point, converging lane lights and depth-spaced ground bands.
  const horizon=H*.48,vanishX=W*.5;
  const road=ctx.createLinearGradient(0,horizon,0,H);road.addColorStop(0,'#0b1a2a');road.addColorStop(1,'#142d45');ctx.fillStyle=road;ctx.beginPath();ctx.moveTo(vanishX-W*.12,horizon);ctx.lineTo(vanishX+W*.12,horizon);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
  ctx.strokeStyle='#1b5a78';ctx.lineWidth=1.2;
@@ -176,6 +219,17 @@ function drawMech(x,y,r,color,isPlayer=false,final=false){ctx.save();const depth
 function render(now){drawCity();for(const p of pickups){ctx.fillStyle='#43f5a5';ctx.shadowBlur=14;ctx.shadowColor='#43f5a5';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#062016';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('+',p.x,p.y+4)}for(const b of bullets){ctx.fillStyle='#35e8ff';ctx.shadowBlur=12;ctx.shadowColor='#35e8ff';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill()}for(const b of enemyBullets){ctx.fillStyle=b.color;ctx.shadowBlur=10;ctx.shadowColor=b.color;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0;for(const e of enemies){if(e.final){ctx.fillStyle='#ff4b45';ctx.shadowBlur=28;ctx.shadowColor='#ff3d3d';ctx.beginPath();ctx.arc(e.x,e.y,e.r*.75,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;for(let i=0;i<7;i++){const a=now/160+i*Math.PI*2/7;ctx.fillStyle='#ffb32e';ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*e.r*.6,e.y+Math.sin(a)*e.r*.6);ctx.lineTo(e.x+Math.cos(a+.25)*e.r*1.5,e.y+Math.sin(a+.25)*e.r*1.5);ctx.lineTo(e.x+Math.cos(a-.2)*e.r*.7,e.y+Math.sin(a-.2)*e.r*.7);ctx.fill()}}ctx.save();const dep=.62+Math.max(0,Math.min(1,(e.y-H*.46)/(H*.54)))*.48;ctx.globalAlpha=.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.72,e.r*1.05*dep,e.r*.34*dep,0,0,Math.PI*2);ctx.fill();ctx.restore();drawMech(e.x,e.y,e.r,e.color,false,e.final);ctx.fillStyle='#27121c';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4);ctx.fillStyle=e.final?'#ff4e55':'#ff9c63';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*Math.max(0,e.hp/e.maxHp),4);if(e.boss){ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('BOSS · '+Math.max(0,BOSS_HITS[level]-(e.finalHits||0))+' HITS LEFT',e.x,e.y-e.r-16)}}if(player){if(now>invulnUntil||Math.floor(now/90)%2===0)ctx.save();const dep=.62+Math.max(0,Math.min(1,(player.y-H*.46)/(H*.54)))*.48;ctx.globalAlpha=.42;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(player.x,player.y+player.r*.72,player.r*1.1*dep,player.r*.36*dep,0,0,Math.PI*2);ctx.fill();ctx.restore();drawMech(player.x,player.y,player.r,'#35e8ff',true);ctx.fillStyle='#35e8ff';ctx.globalAlpha=.12;ctx.beginPath();ctx.arc(player.x,player.y,player.r+9,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.8);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.r,p.r)}ctx.globalAlpha=1;if(paused){ctx.fillStyle='#03081488';ctx.fillRect(0,0,W,H)}}
 function loop(now){if(!running||paused||over)return;const dt=Math.min(.035,(now-last)/1000||0);last=now;update(dt,now);render(now);if(running&&!paused&&!over)requestAnimationFrame(loop)}
 function applyDifficulty(){$('difficultyIntro').innerHTML='<b>Selected difficulty:</b> '+difficultyNames[$('difficulty').value]+' — '+difficultyText[$('difficulty').value]}
+
+$('soundBtn').onclick=()=>{
+initAudio();
+soundMuted=!soundMuted;
+if(masterGain&&audioCtx){
+masterGain.gain.setTargetAtTime(soundMuted?0:.85,audioCtx.currentTime,.03);
+}
+$('soundBtn').textContent=soundMuted?'🔇 SOUND OFF':'🔊 SOUND ON';
+if(!soundMuted)playTone(660,.12,'triangle',.4,120);
+};
+
 window.addEventListener('resize',resize);
 window.addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key==='Escape')pause();if(e.key.toLowerCase()==='e')useEMP(performance.now());if(e.key.toLowerCase()==='shift')useDash(performance.now())},{passive:false});
 window.addEventListener('keyup',e=>keys[e.key]=false);
@@ -194,3 +248,4 @@ resize();reset();render(performance.now());
 </script>
 </body>
 </html>
+
