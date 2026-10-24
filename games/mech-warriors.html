@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>REXWEB NEXORA — Mech Warriors: Neon Siege</title>
+<style>
+:root{--bg:#050914;--panel:#0b1425;--cyan:#35e8ff;--purple:#9b6cff;--green:#43f5a5;--red:#ff5577;--text:#eaf7ff}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;touch-action:none}
+body{display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 10px;background:#080f1e;border-bottom:1px solid #19314a;z-index:2}
+.brand{font-weight:900;letter-spacing:1px;font-size:clamp(12px,2.5vw,18px);color:var(--cyan)}
+.sub{font-size:10px;color:#9cb7d2;letter-spacing:2px}
+.topright{display:flex;gap:6px;align-items:center}
+button,select{font:inherit;color:var(--text);background:#111f34;border:1px solid #31516c;border-radius:9px;padding:7px 10px;font-weight:750}
+button:active{transform:scale(.97)}
+button.primary{border-color:var(--cyan);color:var(--cyan)}
+#healthWrap{position:absolute;top:5px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;padding:4px 8px;background:#071426cc;border:1px solid #29425d;border-radius:8px;color:#eaf7ff;font-size:11px;font-weight:800;z-index:2;pointer-events:none}
+#healthTrack{width:min(230px,38vw);height:11px;border:1px solid #41617b;border-radius:8px;background:#25121d;overflow:hidden}
+#healthFill{width:100%;height:100%;background:linear-gradient(90deg,#ff5577,#43f5a5);transition:width .15s}
+#healthText{min-width:35px;color:var(--green)}
+#stats{display:flex;gap:5px;flex-wrap:wrap;padding:4px 6px;background:#070d19;justify-content:center;z-index:2}
+.stat{padding:4px 8px;border:1px solid #1d3550;border-radius:8px;background:#0b1525;font-size:12px;white-space:nowrap}
+.stat b{color:var(--cyan)}
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 80%,#122b4b 0%,#050914 68%)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#banner{position:absolute;left:50%;top:12%;transform:translateX(-50%);width:max-content;max-width:90%;text-align:center;padding:10px 16px;border:1px solid #35e8ff88;background:#071426dd;border-radius:12px;box-shadow:0 0 25px #35e8ff22;pointer-events:none;display:none}
+#banner strong{display:block;font-size:clamp(18px,4vw,30px);color:var(--cyan);letter-spacing:2px}
+#banner span{font-size:12px;color:#c8d9ed}
+#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:15px;background:#030814cc;z-index:5;overflow:auto}
+#overlay.hidden{display:none}
+.dialog{width:min(390px,92%);padding:14px;border:1px solid #35e8ff88;border-radius:18px;background:linear-gradient(145deg,#0c1a2d,#080d19);box-shadow:0 0 40px #35e8ff20;text-align:center}
+.dialog h1{font-size:clamp(20px,4.5vw,28px);line-height:1.05;margin:5px 0 12px;color:var(--cyan)}
+.dialog p{color:#b7cbe0;line-height:1.5}
+.dialog .row{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
+.dialog .big{font-size:16px;padding:11px 18px}
+.throne-scene{margin:10px auto 14px;padding:10px;border:1px solid #9b6cff88;border-radius:14px;background:radial-gradient(ellipse at center,#30204f,#08101e);max-width:300px}
+.throne-crown{font-size:22px;color:#f6d36b}
+.throne-seat{font-size:25px}
+.throne-mech{font-size:34px;filter:drop-shadow(0 0 8px #35e8ff)}
+.throne-caption{font-size:10px;letter-spacing:2px;color:#d3b2ff;font-weight:900;margin-top:5px}
+.upgrade-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.upgrade{padding:12px;text-align:left;min-height:74px}
+.upgrade small{display:block;color:#a8bfd7;font-weight:500;margin-top:4px}
+.upgrade b{color:var(--green)}
+#mobileControls{position:absolute;bottom:10px;left:6px;right:6px;display:flex;align-items:flex-end;justify-content:space-between;gap:6px;pointer-events:none;z-index:3}
+.controlgroup{display:flex;flex-direction:row;gap:5px;align-items:flex-end;pointer-events:auto}
+.action{width:clamp(36px,8vw,46px);height:clamp(36px,8vw,46px);border-radius:50%;padding:3px;background:#0b1830e8;border:1px solid #35e8ff99;color:var(--cyan);font-size:10px;box-shadow:0 0 16px #35e8ff18}
+.action.fire{width:clamp(82px,20vw,110px);height:clamp(82px,20vw,110px);font-size:15px;background:#33101fdc;border-color:#ff5577;color:#ff8298}
+.action.emp,.action.dash{width:clamp(34px,7vw,42px);height:clamp(34px,7vw,42px);font-size:9px}
+.action.emp{border-color:#9b6cff;color:#c4aaff}
+.action.dash{border-color:#43f5a5;color:#43f5a5}
+#stick{width:clamp(112px,29vw,155px);height:clamp(82px,21vw,112px);border:1px solid #35e8ff66;border-radius:20px;background:#071426bd;position:relative;touch-action:none;pointer-events:auto;box-shadow:inset 0 0 20px #35e8ff0c}
+#knob{position:absolute;width:42px;height:42px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 30%,#b5f8ff,#1389ac);border:2px solid #e0ffff;box-shadow:0 0 18px #35e8ff66;pointer-events:none}
+.hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:10px;color:#8faac6;background:#071426a8;padding:4px 8px;border-radius:6px;pointer-events:none;white-space:nowrap}
+#pauseTag{position:absolute;top:10px;right:10px;color:#c8d9ed;font-size:11px;background:#081325b8;border:1px solid #29425d;border-radius:7px;padding:5px 8px;display:none}
+.level-complete{width:min(330px,88%);padding:10px;border-color:#43f5a5;box-shadow:0 0 25px #43f5a522}
+.level-complete h1{font-size:20px;color:var(--green)}
+.level-complete p{margin:5px 0;font-size:12px}
+.level-complete .upgrade{min-height:60px;padding:8px}
+@media(max-width:520px){
+ .top{padding:6px 8px}.sub{display:none}
+ button,select{padding:6px 8px;font-size:12px}
+ .stat{font-size:10px;padding:4px 6px}
+ .dialog{padding:12px}.upgrade-grid{gap:6px}
+ .upgrade{padding:9px;font-size:12px}
+ #mobileControls{bottom:7px;left:7px;right:7px}
+ .hint{font-size:9px}
+}
+@media(hover:hover) and (pointer:fine){#mobileControls{opacity:.85}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div><div class="brand">REXWEB NEXORA</div><div class="sub">MECH WARRIORS · NEON SIEGE</div></div>
+ <div class="topright">
+  <select id="difficulty" aria-label="Difficulty">
+   <option value="easy">Easy · Rookie</option>
+   <option value="normal" selected>Normal · Pilot</option>
+   <option value="hard">Hard · Veteran</option>
+   <option value="hardest">Hardest · Nightmare</option>
+  </select>
+  <button id="pauseBtn">Ⅱ Pause</button>
+  <button id="restartBtn">↻</button>
+ </div>
+</header>
+<div id="healthWrap"><span>HEALTH</span><div id="healthTrack"><div id="healthFill"></div></div><b id="healthText">10/10</b></div>
+<div id="stats">
+ <div class="stat">LEVEL <b id="level">1</b>/5</div><div class="stat">ARMOR <b id="armor">10</b></div>
+ <div class="stat">CREDITS <b id="credits">0</b></div><div class="stat">SCORE <b id="score">0</b></div>
+ <div class="stat">KILLS <b id="kills">0</b></div><div class="stat">ENEMIES <b id="enemyProgress">0/10</b></div>
+ <div class="stat">BOSS <b id="bossStatus">NOT ARRIVED</b></div>
+</div>
+<main id="stage">
+ <canvas id="game"></canvas>
+ <div class="hint">MOVE: WASD / ARROWS / JOYSTICK · AIM: MOUSE · FIRE: SPACE / FIRE</div>
+ <div id="pauseTag">PAUSED</div><div id="banner"><strong>MISSION START</strong><span>Clear the sector</span></div>
+ <div id="mobileControls">
+  <div id="stick"><div id="knob"></div></div>
+  <div class="controlgroup"><button class="action dash" id="dashBtn">DASH</button><button class="action emp" id="empBtn">EMP</button><button class="action fire" id="fireBtn">FIRE</button></div>
+ </div>
+ <div id="overlay"><div class="dialog" id="dialog">
+  <h1>MECH WARRIORS</h1>
+  <p>Fight through five dangerous sectors of the neon city. Destroy every regular enemy, defeat each sector boss, upgrade your mech, and claim the throne.</p>
+  <p><b>Campaign:</b> 10, 20, 30, 40, then 50 regular enemies before each boss.</p>
+  <p id="difficultyIntro"><b>Difficulty:</b> Normal · Pilot — balanced combat.</p>
+  <div class="row"><button class="primary big" id="startBtn">START MISSION</button><button id="helpBtn">CONTROLS</button></div>
+  <p id="helpText" hidden>Move with WASD, arrow keys, or the joystick. Aim with the mouse. Hold SPACE or FIRE to shoot. DASH gives a brief speed boost. EMP damages nearby enemies. Defeat the required regular enemies before the boss appears.</p>
+ </div></div>
+</main>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
+const ui={level:$('level'),armor:$('armor'),healthFill:$('healthFill'),healthText:$('healthText'),credits:$('credits'),score:$('score'),kills:$('kills'),enemyProgress:$('enemyProgress'),boss:$('bossStatus'),overlay:$('overlay'),dialog:$('dialog'),banner:$('banner'),pauseTag:$('pauseTag')};
+let W=800,H=500,dpr=1,last=0,running=false,paused=false,over=false,victory=false;
+let level=1,armor=10,credits=0,score=0,kills=0,player,bullets=[],enemyBullets=[],enemies=[],particles=[],pickups=[],buildings=[],stars=[],keys={};
+let mouse={x:400,y:200,down:false},stick={x:0,y:0,active:false},fireHeld=false,lastShot=0,lastEnemySpawn=0,levelKills=0,needKills=10;
+let bossSpawned=false,dashUntil=0,empReady=0,invulnUntil=0,levelTransition=false;
+const upgradeCosts={cannon:70,rapid:60,armor:55,speed:65};
+const LEVEL_QUOTAS=[0,10,20,30,40,50],BOSS_HITS=[0,25,30,40,45,60];
+const settings={
+ easy:{enemyHP:.55,enemySpeed:.65,shotInterval:2.1,damage:.5,spawnRate:.55,aimSpread:1.05,projectileSpeed:.7,maxEnemies:3,bossDamage:.75},
+ normal:{enemyHP:1,enemySpeed:1,shotInterval:1,damage:1,spawnRate:1,aimSpread:.45,projectileSpeed:1,maxEnemies:6,bossDamage:1},
+ hard:{enemyHP:1.5,enemySpeed:1.3,shotInterval:.68,damage:1.5,spawnRate:1.35,aimSpread:.22,projectileSpeed:1.25,maxEnemies:10,bossDamage:1.2},
+ hardest:{enemyHP:2.2,enemySpeed:1.65,shotInterval:.42,damage:2,spawnRate:1.8,aimSpread:.08,projectileSpeed:1.6,maxEnemies:14,bossDamage:1.45}
+};
+const difficultyNames={easy:'Easy · Rookie',normal:'Normal · Pilot',hard:'Hard · Veteran',hardest:'Hardest · Nightmare'};
+const difficultyText={
+ easy:'Fewer enemies, slower movement, weak shots and less accurate aim.',
+ normal:'Balanced combat with standard enemy strength and attack speed.',
+ hard:'Tougher, faster enemies, more attackers and harder-hitting shots.',
+ hardest:'Elite enemy waves, very fast attacks, accurate aim and heavy damage.'
+};
+const cfg=()=>settings[$('difficulty').value]||settings.normal;
+function resize(){const r=canvas.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=Math.max(320,r.width);H=Math.max(260,r.height);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);if(player){player.x=Math.min(W-22,Math.max(22,player.x));player.y=Math.min(H-22,Math.max(22,player.y))}makeCity();render(performance.now())}
+function makeCity(){buildings=[];stars=[];for(let i=0;i<60;i++)stars.push({x:Math.random()*W,y:Math.random()*H*.75,r:Math.random()*1.5+.3,a:Math.random()*.6+.2});for(let x=-10;x<W+80;x+=58){let h=25+Math.random()*90;buildings.push({x,w:35+Math.random()*18,h,seed:Math.random()*100})}}
+function reset(){level=1;armor=10;credits=0;score=0;kills=0;bullets=[];enemyBullets=[];enemies=[];particles=[];pickups=[];keys={};bossSpawned=false;levelKills=0;needKills=LEVEL_QUOTAS[1];over=false;victory=false;paused=false;levelTransition=false;player={x:W/2,y:H*.66,r:12,speed:220,hp:10,maxHp:10,cannon:1,rapid:1,move:1,armorLevel:0};invulnUntil=performance.now()+1800;lastEnemySpawn=performance.now();lastShot=0;dashUntil=0;empReady=0;ui.pauseTag.style.display='none';$('pauseBtn').textContent='Ⅱ Pause';updateUI()}
+function updateUI(){ui.level.textContent=level;ui.armor.textContent=Math.max(0,Math.ceil(armor));ui.healthFill.style.width=(Math.max(0,armor)/10*100)+'%';ui.healthText.textContent=Math.max(0,Math.ceil(armor))+'/10';ui.credits.textContent=credits;ui.score.textContent=score;ui.kills.textContent=kills;ui.enemyProgress.textContent=Math.min(levelKills,needKills)+'/'+needKills;ui.boss.textContent=bossSpawned?'BOSS ACTIVE':(levelKills>=needKills?'BOSS INCOMING':'NOT ARRIVED')}
+function showBanner(title,sub=''){ui.banner.querySelector('strong').textContent=title;ui.banner.querySelector('span').textContent=sub;ui.banner.style.display='block';clearTimeout(showBanner.t);showBanner.t=setTimeout(()=>ui.banner.style.display='none',1900)}
+function openDialog(title,body,buttons){ui.overlay.classList.remove('hidden');ui.dialog.classList.remove('level-complete');ui.dialog.innerHTML=`<h1>${title}</h1>${body}<div class="row" id="dialogButtons"></div>`;const row=$('dialogButtons');buttons.forEach(b=>{const el=document.createElement('button');el.textContent=b.label;if(b.primary)el.className='primary big';el.onclick=b.onClick;row.appendChild(el)})}
+function start(){reset();running=true;ui.overlay.classList.add('hidden');last=performance.now();showBanner('MISSION START',difficultyNames[$('difficulty').value]+': clear '+needKills+' enemies, then defeat the boss');requestAnimationFrame(loop)}
+function pause(){if(!running||over)return;paused=!paused;ui.pauseTag.style.display=paused?'block':'none';$('pauseBtn').textContent=paused?'▶ Resume':'Ⅱ Pause';if(!paused){last=performance.now();requestAnimationFrame(loop)}}
+function spawnEnemy(boss=false){
+ const side=Math.floor(Math.random()*4);let x=side===0?-25:side===1?W+25:Math.random()*W,y=side===2?-25:side===3?H+25:Math.random()*H*.55;
+ const c=cfg(),final=boss&&level===5,required=BOSS_HITS[level],baseSpeed=boss?(final?38:44):55+level*5,baseShotGap=boss?(final?1500:2050):4400+Math.random()*1000;
+ const e={x,y,r:boss?(final?39:22):5.5+Math.random()*1.5,hp:boss?required:(24+level*5)*c.enemyHP,maxHp:0,baseHp:24+level*5,finalHits:0,baseSpeed,speed:baseSpeed*c.enemySpeed,baseShotGap,shootAt:performance.now()+(boss?2200:3000+Math.random()*2500),shotGap:baseShotGap*c.shotInterval,boss,final,color:boss?(final?'#ff4e55':['','#ff5b73','#ff9c4a','#b47cff','#43f5a5'][level]):(Math.random()<.5?'#ff5577':'#b47cff')};
+ e.maxHp=e.hp;enemies.push(e);
+ if(boss){bossSpawned=true;showBanner(final?'OVERLORD TITAN':'LEVEL '+level+' BOSS',final?'Defeat the giant boss! It takes 60 hits!':'Boss requires '+required+' hits')}
+ updateUI()
+}
+function shootPlayer(now){const rate=155/Math.max(1,player.rapid);if(now-lastShot<rate)return;lastShot=now;let target=null,best=Infinity;for(const e of enemies){const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;target=e}}const a=target?Math.atan2(target.y-player.y,target.x-player.x):Math.atan2(mouse.y-player.y,mouse.x-player.x),n=player.cannon>=3?3:player.cannon===2?2:1;for(let i=0;i<n;i++){const ang=a+(i-(n-1)/2)*.13;bullets.push({x:player.x+Math.cos(ang)*18,y:player.y+Math.sin(ang)*18,vx:Math.cos(ang)*520,vy:Math.sin(ang)*520,r:4,damage:13+player.cannon*3})}}
+function enemyShoot(e,now){const c=cfg(),a=Math.atan2(player.y-e.y,player.x-e.x)+(Math.random()-.5)*c.aimSpread,n=e.final?5:e.boss?3:1;for(let i=0;i<n;i++){const spread=e.boss?.30:c.aimSpread,angle=a+(i-(n-1)/2)*spread,speed=(e.final?190:e.boss?165:135)*c.projectileSpeed;enemyBullets.push({x:e.x+Math.cos(angle)*(e.r+3),y:e.y+Math.sin(angle)*(e.r+3),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:e.final?5:4,damage:(e.final?8:e.boss?6:4)*c.damage*(e.boss?c.bossDamage:1),color:e.final?'#ff554f':'#ff9c63'})}}
+function burst(x,y,color,n=12){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=30+Math.random()*190;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.25+Math.random()*.55,max:.8,r:1+Math.random()*3,color})}}
+function damageEnemy(e,d){if(e.boss){const required=BOSS_HITS[level];e.finalHits=Math.min(required,(e.finalHits||0)+1);e.hp=required-e.finalHits}else e.hp-=d;burst(e.x,e.y,e.color,2);if(e.hp<=0){const i=enemies.indexOf(e);if(i<0)return;enemies.splice(i,1);burst(e.x,e.y,e.final?'#ff4b45':e.color,e.boss?35:12);score+=e.boss?600:100+level*10;credits+=e.boss?100:8+Math.floor(Math.random()*8);kills++;if(!e.boss)levelKills++;if(Math.random()<.14&&!e.boss)pickups.push({x:e.x,y:e.y,r:8,type:'repair'});if(e.boss){if(e.final){winGame();return}showBanner('BOSS DEFEATED','Sector boss destroyed · Bonus credits +100');updateUI();completeLevel();return}updateUI();if(levelKills>=needKills&&!enemies.some(enemy=>!enemy.boss)&&!bossSpawned)spawnEnemy(true)}}
+function completeLevel(){if(levelTransition||over)return;levelTransition=true;running=false;showUpgrade()}
+function showUpgrade(){const options=[['cannon','PLASMA CANNON','Increase damage and projectiles'],['rapid','RAPID FIRE','Shoot more frequently'],['armor','UPGRADE ARMOR','Restore 3 armor hits'],['speed','SERVO BOOST','Move faster around the city']];const body=`<p style="color:#43f5a5;font-weight:900;margin:4px 0 10px">LEVEL ${level} COMPLETED</p><p style="margin:4px 0">Credits: <b style="color:var(--green)">${credits}</b></p><button id="expandUpgrade" class="primary big" style="border-color:#43f5a5;color:#43f5a5;width:100%">＋ SHOW UPGRADES</button><div id="upgradeOptions" hidden><div class="upgrade-grid">${options.map(o=>`<button class="upgrade" data-up="${o[0]}"><b>${o[1]}</b><small>${o[2]}</small></button>`).join('')}</div></div>`;openDialog('LEVEL COMPLETED',body,[{label:'CONTINUE',primary:true,onClick:nextLevel}]);ui.dialog.classList.add('level-complete');$('expandUpgrade').onclick=()=>{const box=$('upgradeOptions');box.hidden=!box.hidden;$('expandUpgrade').textContent=box.hidden?'＋ SHOW UPGRADES':'− HIDE UPGRADES'};ui.dialog.querySelectorAll('[data-up]').forEach(el=>el.onclick=()=>buyUpgrade(el.dataset.up))}
+function buyUpgrade(type){if(type==='cannon'){player.cannon=Math.min(3,player.cannon+1);credits=Math.max(0,credits-Math.min(credits,upgradeCosts.cannon))}else if(type==='rapid'){player.rapid=Math.min(3,player.rapid+.5);credits=Math.max(0,credits-Math.min(credits,upgradeCosts.rapid))}else if(type==='armor'){armor=Math.min(10,armor+3);player.hp=armor;credits=Math.max(0,credits-Math.min(credits,upgradeCosts.armor))}else if(type==='speed'){player.move=Math.min(1.7,player.move+.15);credits=Math.max(0,credits-Math.min(credits,upgradeCosts.speed))}updateUI();nextLevel()}
+function nextLevel(){if(level>=5){winGame();return}level++;levelKills=0;needKills=LEVEL_QUOTAS[level];bossSpawned=false;enemies=[];enemyBullets=[];bullets=[];armor=Math.min(10,armor+1);player.hp=armor;levelTransition=false;running=true;ui.overlay.classList.add('hidden');showBanner('LEVEL '+level,'Defeat '+needKills+' regular enemies, then the boss');lastEnemySpawn=performance.now();last=performance.now();updateUI();requestAnimationFrame(loop)}
+function winGame(){over=true;running=false;victory=true;burst(W/2,H/2,'#ff5b4d',80);renderThroneVictory();updateUI();openDialog('VICTORY — THRONE CLAIMED',`<div class="throne-scene"><div class="throne-crown">♛</div><div class="throne-seat">👑</div><div class="throne-mech">🤖</div><div class="throne-caption">THE CITY'S CHAMPION</div></div><p style="font-size:18px;color:var(--green)">VICTORY — THE OVERLORD TITAN IS DEFEATED!</p><p>Your mech takes the throne. You saved the neon city.</p><p>Final score: <b style="color:var(--cyan)">${score}</b><br>Robots destroyed: <b>${kills}</b><br>Credits earned: <b>${credits}</b></p>`,[{label:'PLAY AGAIN',primary:true,onClick:start}])}
+function renderThroneVictory(){drawCity();ctx.save();const x=W/2,y=H*.48;ctx.shadowBlur=25;ctx.shadowColor='#9b6cff';ctx.fillStyle='#40247c';ctx.beginPath();ctx.moveTo(x-75,y+45);ctx.lineTo(x-62,y-55);ctx.lineTo(x-34,y-28);ctx.lineTo(x,y-72);ctx.lineTo(x+34,y-28);ctx.lineTo(x+62,y-55);ctx.lineTo(x+75,y+45);ctx.closePath();ctx.fill();ctx.strokeStyle='#d3b2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#f6d36b';ctx.fillRect(x-48,y+18,96,10);ctx.fillStyle='#15263d';ctx.fillRect(x-35,y+30,70,42);ctx.fillStyle='#35e8ff';ctx.fillRect(x-24,y+4,48,36);ctx.fillStyle='#d9fbff';ctx.fillRect(x-12,y+13,8,7);ctx.fillRect(x+5,y+13,8,7);ctx.restore();render(performance.now())}
+function gameOver(){over=true;running=false;openDialog('MECH DESTROYED',`<p>Your armor has reached zero. The city still needs you.</p><p>Score: <b>${score}</b> · Level reached: <b>${level}</b></p>`,[{label:'RETRY MISSION',primary:true,onClick:start}])}
+function useEMP(now){if(now<empReady||!running||paused)return;empReady=now+9000;burst(player.x,player.y,'#9b6cff',45);for(const e of [...enemies])if(Math.hypot(e.x-player.x,e.y-player.y)<190){if(e.boss){burst(e.x,e.y,'#9b6cff',8)}else damageEnemy(e,70)}showBanner('EMP BLAST','Nearby regular robots damaged')}
+function useDash(now){if(!player||now<dashUntil||!running||paused)return;dashUntil=now+2300;invulnUntil=now+500;burst(player.x,player.y,'#43f5a5',12)}
+function update(dt,now){if(!player)return;const c=cfg();let mx=0,my=0;if(keys.ArrowLeft||keys.a||keys.A)mx--;if(keys.ArrowRight||keys.d||keys.D)mx++;if(keys.ArrowUp||keys.w||keys.W)my--;if(keys.ArrowDown||keys.s||keys.S)my++;mx+=stick.x;my+=stick.y;const mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}const dash=now<dashUntil?2.1:1;player.x=Math.max(player.r,Math.min(W-player.r,player.x+mx*player.speed*player.move*dash*dt));player.y=Math.max(player.r,Math.min(H-player.r,player.y+my*player.speed*player.move*dash*dt));if(fireHeld||keys[' ']||mouse.down)shootPlayer(now);
+ if(levelKills<needKills&&now-lastEnemySpawn>1900/c.spawnRate&&enemies.filter(e=>!e.boss).length<c.maxEnemies){spawnEnemy(false);lastEnemySpawn=now}
+ if(!bossSpawned&&levelKills>=needKills&&!enemies.some(e=>!e.boss))spawnEnemy(true);
+ for(const e of [...enemies]){const dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1,keep=e.boss?155:220;e.x+=dx/d*e.speed*dt*(d>keep?1:.45);e.y+=dy/d*e.speed*dt*(d>keep?1:.45);if(now>e.shootAt){enemyShoot(e,now);e.shootAt=now+e.shotGap}if(d<e.r+player.r&&now>invulnUntil){armor-=1;invulnUntil=now+(cfg().damage>=1.8?400:700);burst(player.x,player.y,'#ff5577',10);if(armor<=0){armor=0;updateUI();gameOver();return}}}
+ for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x< -20||b.x>W+20||b.y< -20||b.y>H+20){bullets.splice(i,1);continue}let hit=null;for(const e of enemies)if(Math.hypot(b.x-e.x,b.y-e.y)<b.r+e.r){hit=e;break}if(hit){damageEnemy(hit,b.damage);bullets.splice(i,1)}}
+ for(let i=enemyBullets.length-1;i>=0;i--){const b=enemyBullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x< -20||b.x>W+20||b.y< -20||b.y>H+20){enemyBullets.splice(i,1);continue}if(Math.hypot(b.x-player.x,b.y-player.y)<b.r+player.r&&now>invulnUntil){armor-=1;invulnUntil=now+(cfg().damage>=1.8?350:500);enemyBullets.splice(i,1);burst(player.x,player.y,'#ff5577',5);if(armor<=0){armor=0;updateUI();gameOver();return}}}
+ for(let i=pickups.length-1;i>=0;i--){const p=pickups[i];p.y+=22*dt;if(Math.hypot(p.x-player.x,p.y-player.y)<p.r+player.r){armor=Math.min(10,armor+1);pickups.splice(i,1);showBanner('REPAIR PICKUP','Armor restored')}else if(p.y>H+20)pickups.splice(i,1)}
+ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.97;p.vy*=.97;p.life-=dt;if(p.life<=0)particles.splice(i,1)}updateUI()}
+function drawCity(){ctx.fillStyle='#050914';ctx.fillRect(0,0,W,H);const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#071020');g.addColorStop(1,'#102748');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(const s of stars){ctx.globalAlpha=s.a;ctx.fillStyle='#9feaff';ctx.fillRect(s.x,s.y,s.r,s.r)}ctx.globalAlpha=1;for(const b of buildings){ctx.fillStyle='#09172b';ctx.fillRect(b.x,H-b.h,b.w,b.h);ctx.strokeStyle='#1b4562';ctx.strokeRect(b.x,H-b.h,b.w,b.h);for(let y=H-b.h+8;y<H-8;y+=13)for(let x=b.x+7;x<b.x+b.w-4;x+=12){ctx.fillStyle=((x+y+b.seed)%4<1)?'#35e8ff':'#1b3150';ctx.globalAlpha=.55;ctx.fillRect(x,y,4,5)}}ctx.globalAlpha=1;ctx.strokeStyle='#183b56';ctx.lineWidth=1;for(let y=H*.72;y<H;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}for(let x=W/2;x<W;x+=40){ctx.beginPath();ctx.moveTo(W/2+(x-W/2)*.08,H*.72);ctx.lineTo(x,H);ctx.stroke()}for(let x=W/2;x>0;x-=40){ctx.beginPath();ctx.moveTo(W/2-(W/2-x)*.08,H*.72);ctx.lineTo(x,H);ctx.stroke()}}
+function drawMech(x,y,r,color,isPlayer=false,final=false){ctx.save();ctx.translate(x,y);const angle=isPlayer?Math.atan2(mouse.y-y,mouse.x-x):Math.atan2(player.y-y,player.x-x);ctx.rotate(angle);const metal='#172638',edge='#71869a',dark='#08111e',glow=isPlayer?'#a9f8ff':(final?'#fff0a0':'#ffb4c4');ctx.shadowBlur=final?25:(isPlayer?17:10);ctx.shadowColor=color;ctx.fillStyle=dark;ctx.fillRect(-r*.56,-r*.92,r*1.12,r*.42);ctx.fillStyle=edge;ctx.fillRect(-r*.48,-r*.91,r*.22,r*.36);ctx.fillRect(r*.26,-r*.91,r*.22,r*.36);ctx.fillStyle=color;ctx.fillRect(-r*.68,-r*.72,r*.36,r*.48);ctx.fillRect(r*.32,-r*.72,r*.36,r*.48);ctx.fillStyle=dark;ctx.fillRect(-r*.63,-r*.67,r*.24,r*.30);ctx.fillRect(r*.39,-r*.67,r*.24,r*.30);ctx.fillStyle=metal;ctx.fillRect(-r*.91,-r*.24,r*.30,r*.72);ctx.fillRect(r*.61,-r*.24,r*.30,r*.72);ctx.fillStyle=edge;ctx.beginPath();ctx.arc(-r*.76,r*.02,r*.16,0,Math.PI*2);ctx.arc(r*.76,r*.02,r*.16,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.fillRect(-r*.88,r*.20,r*.24,r*.28);ctx.fillRect(r*.64,r*.20,r*.24,r*.28);ctx.fillStyle=dark;ctx.beginPath();ctx.moveTo(-r*.52,-r*.60);ctx.lineTo(r*.52,-r*.60);ctx.lineTo(r*.62,r*.36);ctx.lineTo(r*.34,r*.65);ctx.lineTo(-r*.34,r*.65);ctx.lineTo(-r*.62,r*.36);ctx.closePath();ctx.fill();ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-r*.43,-r*.55);ctx.lineTo(r*.43,-r*.55);ctx.lineTo(r*.49,r*.30);ctx.lineTo(r*.28,r*.51);ctx.lineTo(-r*.28,r*.51);ctx.lineTo(-r*.49,r*.30);ctx.closePath();ctx.fill();ctx.fillStyle=metal;ctx.fillRect(-r*.32,-r*.38,r*.64,r*.65);ctx.fillStyle='#26384c';ctx.fillRect(-r*.25,-r*.31,r*.50,r*.49);ctx.fillStyle=glow;ctx.shadowBlur=12;ctx.fillRect(r*.03,-r*.25,r*.25,r*.12);ctx.shadowBlur=0;ctx.fillStyle=dark;ctx.beginPath();ctx.moveTo(-r*.38,-r*.79);ctx.lineTo(-r*.25,-r*1.04);ctx.lineTo(r*.25,-r*1.04);ctx.lineTo(r*.38,-r*.79);ctx.lineTo(r*.27,-r*.57);ctx.lineTo(-r*.27,-r*.57);ctx.closePath();ctx.fill();ctx.fillStyle=edge;ctx.fillRect(-r*.24,-r*.96,r*.48,r*.12);ctx.fillStyle=glow;ctx.fillRect(-r*.20,-r*.91,r*.14,r*.055);ctx.fillRect(r*.06,-r*.91,r*.14,r*.055);ctx.fillStyle='#d7e8f5';ctx.fillRect(-r*.30,-r*.64,r*.60,r*.07);ctx.fillStyle=dark;ctx.fillRect(-r*.38,r*.48,r*.76,r*.20);ctx.fillStyle=metal;ctx.fillRect(-r*.43,r*.62,r*.30,r*.39);ctx.fillRect(r*.13,r*.62,r*.30,r*.39);ctx.fillStyle=edge;ctx.beginPath();ctx.arc(-r*.28,r*.72,r*.10,0,Math.PI*2);ctx.arc(r*.28,r*.72,r*.10,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.fillRect(-r*.48,r*.94,r*.38,r*.18);ctx.fillRect(r*.10,r*.94,r*.38,r*.18);ctx.fillStyle=glow;ctx.fillRect(-r*.38,r*1.00,r*.16,r*.045);ctx.fillRect(r*.22,r*1.00,r*.16,r*.045);if(final){ctx.fillStyle='#ff6a25';for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*r*.17,-r*.98);ctx.lineTo(i*r*.20,-r*1.40-Math.abs(i)*-r*.02);ctx.lineTo((i+.42)*r*.17,-r*.98);ctx.closePath();ctx.fill()}ctx.fillStyle='#fff0a0';ctx.fillRect(-r*.08,-r*1.20,r*.16,r*.22)}ctx.restore();ctx.shadowBlur=0}
+function render(now){drawCity();for(const p of pickups){ctx.fillStyle='#43f5a5';ctx.shadowBlur=14;ctx.shadowColor='#43f5a5';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#062016';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('+',p.x,p.y+4)}for(const b of bullets){ctx.fillStyle='#35e8ff';ctx.shadowBlur=12;ctx.shadowColor='#35e8ff';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill()}for(const b of enemyBullets){ctx.fillStyle=b.color;ctx.shadowBlur=10;ctx.shadowColor=b.color;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0;for(const e of enemies){if(e.final){ctx.fillStyle='#ff4b45';ctx.shadowBlur=28;ctx.shadowColor='#ff3d3d';ctx.beginPath();ctx.arc(e.x,e.y,e.r*.75,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;for(let i=0;i<7;i++){const a=now/160+i*Math.PI*2/7;ctx.fillStyle='#ffb32e';ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*e.r*.6,e.y+Math.sin(a)*e.r*.6);ctx.lineTo(e.x+Math.cos(a+.25)*e.r*1.5,e.y+Math.sin(a+.25)*e.r*1.5);ctx.lineTo(e.x+Math.cos(a-.2)*e.r*.7,e.y+Math.sin(a-.2)*e.r*.7);ctx.fill()}}drawMech(e.x,e.y,e.r,e.color,false,e.final);ctx.fillStyle='#27121c';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4);ctx.fillStyle=e.final?'#ff4e55':'#ff9c63';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*Math.max(0,e.hp/e.maxHp),4);if(e.boss){ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('BOSS · '+Math.max(0,BOSS_HITS[level]-(e.finalHits||0))+' HITS LEFT',e.x,e.y-e.r-16)}}if(player){if(now>invulnUntil||Math.floor(now/90)%2===0)drawMech(player.x,player.y,player.r,'#35e8ff',true);ctx.fillStyle='#35e8ff';ctx.globalAlpha=.12;ctx.beginPath();ctx.arc(player.x,player.y,player.r+9,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.8);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.r,p.r)}ctx.globalAlpha=1;if(paused){ctx.fillStyle='#03081488';ctx.fillRect(0,0,W,H)}}
+function loop(now){if(!running||paused||over)return;const dt=Math.min(.035,(now-last)/1000||0);last=now;update(dt,now);render(now);if(running&&!paused&&!over)requestAnimationFrame(loop)}
+function applyDifficulty(){const c=cfg();for(const e of enemies){if(e.baseSpeed!==undefined)e.speed=e.baseSpeed*c.enemySpeed;if(e.baseShotGap!==undefined)e.shotGap=e.baseShotGap*c.shotInterval;if(!e.boss&&e.baseHp!==undefined){const ratio=e.hp/Math.max(1,e.maxHp);e.maxHp=e.baseHp*c.enemyHP;e.hp=Math.max(1,e.maxHp*ratio)}}$('difficultyIntro').innerHTML='<b>Difficulty:</b> '+difficultyNames[$('difficulty').value]+' — '+difficultyText[$('difficulty').value];showBanner('DIFFICULTY UPDATED',difficultyNames[$('difficulty').value]+' · '+difficultyText[$('difficulty').value])}
+window.addEventListener('resize',resize);
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key==='Escape')pause();if(e.key.toLowerCase()==='e')useEMP(performance.now());if(e.key.toLowerCase()==='shift')useDash(performance.now())},{passive:false});
+window.addEventListener('keyup',e=>keys[e.key]=false);
+canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top});
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){mouse.down=true;canvas.setPointerCapture(e.pointerId)}});window.addEventListener('pointerup',()=>mouse.down=false);
+$('fireBtn').addEventListener('pointerdown',e=>{e.preventDefault();fireHeld=true});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('fireBtn').addEventListener(ev,()=>fireHeld=false));
+$('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();useDash(performance.now())});$('empBtn').addEventListener('pointerdown',e=>{e.preventDefault();useEMP(performance.now())});
+const stickEl=$('stick'),knob=$('knob');
+function stickMove(e){const r=stickEl.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=Math.min(r.width,r.height)*.34,d=Math.hypot(dx,dy)||1,scale=Math.min(1,max/d);stick.x=dx*scale/max;stick.y=dy*scale/max;knob.style.left=`${50+stick.x*34}%`;knob.style.top=`${50+stick.y*34}%`}
+stickEl.addEventListener('pointerdown',e=>{e.preventDefault();stick.active=true;stickEl.setPointerCapture(e.pointerId);stickMove(e)});stickEl.addEventListener('pointermove',e=>{if(stick.active)stickMove(e)});
+function endStick(){stick.active=false;stick.x=stick.y=0;knob.style.left='50%';knob.style.top='50%'}
+stickEl.addEventListener('pointerup',endStick);stickEl.addEventListener('pointercancel',endStick);
+$('startBtn').onclick=start;$('pauseBtn').onclick=pause;$('restartBtn').onclick=()=>{running=false;over=false;start()};$('helpBtn').onclick=()=>{$('helpText').hidden=!$('helpText').hidden};$('difficulty').addEventListener('change',applyDifficulty);
+resize();reset();render(performance.now());
+})();
+</script>
+</body>
+</html>
