@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -140,17 +139,20 @@ osc.connect(gain);gain.connect(masterGain);
 osc.start(now);osc.stop(now+duration+.02);
 }
 
-function playExplosion(){
+function playCalmDefeat(){
 if(soundMuted)return;
 initAudio();if(!audioCtx)return;
-const length=Math.floor(audioCtx.sampleRate*.32);
-const buffer=audioCtx.createBuffer(1,length,audioCtx.sampleRate);
-const data=buffer.getChannelData(0);
-for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
-const source=audioCtx.createBufferSource(),gain=audioCtx.createGain();
-gain.gain.value=.65;source.buffer=buffer;
-source.connect(gain);gain.connect(masterGain);source.start();
-playTone(100,.32,'sawtooth',.35,-65);
+const now=audioCtx.currentTime;
+[523.25, 659.25, 783.99].forEach((freq, i)=>{
+const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+osc.type='sine';
+osc.frequency.setValueAtTime(freq, now + i*0.1);
+gain.gain.setValueAtTime(0.2, now + i*0.1);
+gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.1 + 0.35);
+osc.connect(gain);gain.connect(masterGain);
+osc.start(now + i*0.1);
+osc.stop(now + i*0.1 + 0.37);
+});
 }
 
 const SFX={
@@ -158,7 +160,7 @@ fire(){playTone(780,.09,'square',.28,-480)},
 missile(){playTone(150,.32,'sawtooth',.48,650)},
 dash(){playTone(230,.18,'triangle',.38,650)},
 hit(){playTone(125,.22,'sawtooth',.48,-75)},
-explosion:playExplosion,
+explosion:playCalmDefeat,
 special(){playTone(300,.4,'sawtooth',.42,850)},
 boss(){playTone(85,.55,'sawtooth',.48,45)},
 win(){
@@ -536,4 +538,4 @@ draw();
 </script>
 </body>
 </html>
-```
+
