@@ -157,63 +157,61 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   padding:2px 5px 0 0;
   user-select:none;
   font:calc(var(--code-size,12px) - 1px)/1.6 ui-monospace,Consolas,monospace;
-  z-index:2;
 }
 
-/* Perfect Synchronized Dual-Layer Architecture */
-.editor-scroller{
-  position:relative;
+/* Editor: coloured layer (.hl) sits behind a transparent textarea */
+.code-stack{position:relative;min-width:0;min-height:0}
+.code,.hl{
+  position:absolute;
+  inset:0;
+  margin:0;
+  padding:2px;
+  border:0;
+  font:var(--code-size,12px)/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  tab-size:2;
+  letter-spacing:0;
+}
+.hl{
+  overflow:hidden;
+  pointer-events:none;
+  color:#dceaff;
+  background:transparent;
+}
+.code{
+  display:block;
   width:100%;
   height:100%;
   min-height:0;
+  resize:none;
+  outline:0;
+  background:transparent;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  caret-color:#ffffff;
   overflow:auto;
   overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
-}
-.code, .highlight-layer{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  min-height:100%;
-  margin:0;
-  padding:2px 4px;
-  border:0;
-  outline:0;
-  font:var(--code-size,12px)/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
-  tab-size:2;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  word-break:break-word;
-  box-sizing:border-box;
-}
-.code{
-  background:transparent;
-  color:transparent !important;
-  caret-color:var(--text);
-  resize:none;
-  z-index:3;
-}
-.highlight-layer{
-  background:transparent;
-  color:#dceaff;
-  pointer-events:none;
+  scrollbar-width:none;
   z-index:1;
-  overflow:hidden;
 }
+.code::-webkit-scrollbar{display:none}
+.code::selection{background:#21e7f544;-webkit-text-fill-color:transparent}
 
-/* Token Styles */
-.hl-tag { color: #ff5f7e; }
-.hl-attr { color: #ffa64d; }
-.hl-string { color: #00d99a; }
-.hl-keyword { color: #9c62ff; }
-.hl-number { color: #ffbc42; }
-.hl-comment { color: #8ea5bf; font-style: italic; }
-.hl-selector { color: #21e7f5; }
-.hl-property { color: #168cff; }
-.hl-function { color: #57cbff; }
-.hl-operator { color: #ff7188; }
-.hl-punctuation { color: #8ea5bf; }
+/* Syntax colours (dark theme) */
+.t-c{color:#7d8f7d}
+.t-s{color:#98d982}
+.t-n{color:#f0a35e}
+.t-k{color:#ff79b0}
+.t-f{color:#6cb6ff}
+.t-b{color:#21e7f5}
+.t-t{color:#ff79b0}
+.t-a{color:#f0a35e}
+.t-p{color:#8ea5bf}
+.t-e{color:#e5c07b}
+.t-g{color:#98d982}
+.t-v{color:#c9a8ff}
 
 .panel-foot{
   display:flex;
@@ -294,7 +292,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   background:var(--keyboard-bg);
   color:var(--keyboard-fg);
   font-size:clamp(9px, calc(var(--key-height, 34px) * 0.35), 14px);
-  font-weight:750; /* Changed to bold */
+  font-weight:650;
   overflow:hidden;
   touch-action:manipulation;
   display:flex;
@@ -357,10 +355,23 @@ body.light{
 }
 body.light .topbar,body.light .panel,body.light .tab,body.light .tool,
 body.light .keyboard{background:#fff;color:var(--text)}
-body.light .code{color:transparent !important}
-body.light .highlight-layer{color:#173453}
+body.light .hl{color:#173453}
+body.light .code{caret-color:#10243c}
+body.light .code::selection{background:#168cff44}
 body.light .key{background:var(--keyboard-bg);color:var(--keyboard-fg)}
 body.light .keyboard-head strong{color:#087d9a}
+body.light .t-c{color:#6a7f6a}
+body.light .t-s{color:#1b7f3b}
+body.light .t-n{color:#b45a00}
+body.light .t-k{color:#c2185b}
+body.light .t-f{color:#0b63c5}
+body.light .t-b{color:#00798a}
+body.light .t-t{color:#c2185b}
+body.light .t-a{color:#b45a00}
+body.light .t-p{color:#526982}
+body.light .t-e{color:#8a5a00}
+body.light .t-g{color:#1b7f3b}
+body.light .t-v{color:#6a3db8}
 
 @media(max-width:760px){
   .app{padding:4px;gap:4px}
@@ -397,7 +408,7 @@ body.light .keyboard-head strong{color:#087d9a}
 /* v2 additions */
 body.wrap .editor-wrap{grid-template-columns:minmax(0,1fr)}
 body.wrap .line-numbers{display:none}
-body:not(.wrap) .code, body:not(.wrap) .highlight-layer{white-space:pre;overflow-wrap:normal;word-break:normal}
+body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
 .key.on{background:#0a4d6b;border-color:var(--cyan);color:var(--cyan)}
 .mbtn{padding:9px 8px;border-radius:8px;border:1px solid #14628c;background:#0b1b30;color:var(--text);font-size:12px;text-align:left}
 .mbtn.on{border-color:var(--green);color:var(--green)}
@@ -414,6 +425,27 @@ body:not(.wrap) .code, body:not(.wrap) .highlight-layer{white-space:pre;overflow
 .console-head button{border:1px solid #14628c;background:#0b1b30;border-radius:6px;font-size:10px;padding:2px 8px}
 #consoleOut{flex:1;overflow:auto;padding:2px 8px 6px;font:11px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#dceaff}
 .cl.error{color:#ff7188}.cl.warn{color:#ffd166}.cl.info{color:#7cc7ff}
+
+/* Bigger text only (button sizes stay normal, toolbar stays one row) */
+.tool{font-size:9px;font-weight:700;letter-spacing:-.3px}
+.tool span:first-child{font-size:16px}
+@media(max-width:760px){.tool{font-size:9px}.tool span:first-child{font-size:16px}}
+
+/* Bigger keyboard text */
+.key,.keyboard.compact-mode .key{font-size:clamp(15px,calc(var(--key-height,34px)*.55),24px);font-weight:700}
+.key.wide{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
+.key{white-space:nowrap}
+.key.long,.keyboard.compact-mode .key.long{font-size:10px;letter-spacing:-.2px}
+.key.green,.key[aria-label="?123"],.key[aria-label="/* */"]{flex:1.9 1 0}
+.key[aria-label="ENTER"]{flex:2 1 0}
+.key.space{flex:3 1 0}
+.key.shift,.keyboard.compact-mode .key.shift{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
+.keyboard.compact-mode .key.wide{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
+.keyboard.compact-mode .key.space{font-size:clamp(12px,calc(var(--key-height,34px)*.4),16px)}
+.key.space{font-size:clamp(12px,calc(var(--key-height,34px)*.4),16px)}
+.symbol-toggle{font-size:14px}
+.keyboard-head strong{font-size:12px}
+.compact{font-size:11px}
 </style>
 </head>
 <body>
@@ -474,8 +506,8 @@ body:not(.wrap) .code, body:not(.wrap) .highlight-layer{white-space:pre;overflow
       </div>
       <div class="editor-wrap">
         <div class="line-numbers" id="lineNumbers">1</div>
-        <div class="editor-scroller" id="editorScroller">
-          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"></pre>
+        <div class="code-stack">
+          <pre class="hl" id="hl" aria-hidden="true"></pre>
           <textarea class="code" id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" inputmode="none" virtualkeyboardpolicy="manual" enterkeyhint="done" aria-label="Code editor"></textarea>
         </div>
       </div>
@@ -520,9 +552,8 @@ let future={html:[],css:[],js:[]};
 let symbolsMode=false,shiftMode=false,capsMode=false,lastShiftTap=0;
 
 const code=document.querySelector('#code');
+const hl=document.querySelector('#hl');
 const lineNumbers=document.querySelector('#lineNumbers');
-const editorScroller=document.querySelector('#editorScroller');
-const highlightLayer=document.querySelector('#highlightLayer');
 const keyboard=document.querySelector('#keyboard');
 const keyboardPanel=document.querySelector('#keyboardPanel');
 const editorPanel=document.querySelector('#editorPanel');
@@ -530,205 +561,99 @@ const previewPanel=document.querySelector('#previewPanel');
 const fileNames={html:'index.html',css:'style.css',js:'script.js'};
 const info={html:'HTML · UTF-8',css:'CSS · UTF-8',js:'JavaScript · UTF-8'};
 
-code.value=examples.html;
+/* HL-START ===== Syntax highlighting (colours the code in the editor) ===== */
+const hx=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sp=(c,t)=>'<span class="t-'+c+'">'+hx(t)+'</span>';
+const JS_KW=new Set('const let var function return if else for while do switch case break continue new this class extends super import export default try catch finally throw async await typeof instanceof in of delete void yield static'.split(' '));
+const JS_LIT=new Set(['true','false','null','undefined','NaN','Infinity']);
+const JS_BUILTIN=new Set(['console','document','window','Math','JSON','Array','Object','String','Number','Date','Promise','localStorage','sessionStorage','navigator','location','fetch','setTimeout','setInterval','alert','confirm','prompt','parseInt','parseFloat']);
+const JS_RE=/(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\[\s\S]|[^`\\])*`?)|(0[xX][\da-fA-F]+|\d+\.?\d*(?:[eE][+-]?\d+)?)|([A-Za-z_$][\w$]*)|([^A-Za-z_$\d"'`\/]+|[\s\S])/g;
 
-/* Professional Syntax Highlighting Engine */
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+function hlJS(s){
+  return s.replace(JS_RE,(m,c,str,num,id,o,off,whole)=>{
+    if(c)return sp('c',m);
+    if(str)return sp('s',m);
+    if(num)return sp('n',m);
+    if(id){
+      if(JS_KW.has(id))return sp('k',m);
+      if(JS_LIT.has(id))return sp('n',m);
+      if(JS_BUILTIN.has(id))return sp('b',m);
+      if(whole[off+m.length]==='(')return sp('f',m);
+      return hx(m);
+    }
+    return hx(m);
+  });
 }
 
-function highlightCode(text, lang) {
-  if (!text) return '';
-  if (lang === 'html') {
-    let out = '';
-    let i = 0;
-    const len = text.length;
-    while (i < len) {
-      if (text.startsWith('<!--', i)) {
-        const end = text.indexOf('-->', i + 4);
-        const commentEnd = end === -1 ? len : end + 3;
-        out += '<span class="hl-comment">' + escapeHtml(text.slice(i, commentEnd)) + '</span>';
-        i = commentEnd;
-        continue;
-      }
-      if (text[i] === '<') {
-        const tagClose = text[i+1] === '/';
-        const tagMatch = text.slice(i + (tagClose ? 2 : 1)).match(/^([a-zA-Z0-9_-]+)/);
-        if (tagMatch) {
-          const tagName = tagMatch[1];
-          out += '<span class="hl-punctuation">&lt;' + (tagClose ? '/' : '') + '</span>' + '<span class="hl-tag">' + tagName + '</span>';
-          i += 1 + (tagClose ? 1 : 0) + tagName.length;
-          
-          while (i < len && text[i] !== '>') {
-            if (text[i] === '/' && text[i+1] === '>') {
-              out += '<span class="hl-punctuation">/&gt;</span>';
-              i += 2;
-              break;
-            }
-            if (/\s/.test(text[i])) {
-              out += text[i];
-              i++;
-              continue;
-            }
-            const attrMatch = text.slice(i).match(/^([a-zA-Z0-9_:-]+)/);
-            if (attrMatch) {
-              const attrName = attrMatch[1];
-              out += '<span class="hl-attr">' + attrName + '</span>';
-              i += attrName.length;
-            } else {
-              if (text[i] === '=') {
-                out += '<span class="hl-operator">=</span>';
-              } else if (text[i] === '"' || text[i] === "'") {
-                const q = text[i];
-                let j = i + 1;
-                while (j < len && text[j] !== q) j++;
-                if (j < len) j++;
-                out += '<span class="hl-string">' + escapeHtml(text.slice(i, j)) + '</span>';
-                i = j;
-                continue;
-              } else {
-                out += escapeHtml(text[i]);
-              }
-              i++;
-            }
-          }
-          if (i < len && text[i] === '>') {
-            out += '<span class="hl-punctuation">&gt;</span>';
-            i++;
-          }
-          continue;
-        }
-      }
-      out += escapeHtml(text[i]);
-      i++;
+function cssIsProp(s,idx){
+  const m=s.slice(idx,idx+400).match(/^\s*:[^;{}]*([;{}]|$)/);
+  return !!m&&m[1]!=='{';
+}
+function hlCSS(s){
+  let out='',depth=0,inV=false,pend=false,m;
+  const re=/\/\*[\s\S]*?(?:\*\/|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|@[\w-]+|#[\w-]+|-?(?:\d*\.\d+|\d+)(?:[a-z%]+)?|[\w-]+|[\s\S]/gi;
+  while((m=re.exec(s))){
+    const t=m[0];
+    if(t.startsWith('/*'))out+=sp('c',t);
+    else if(t[0]==='"'||t[0]==="'")out+=sp('s',t);
+    else if(t==='{'){depth++;inV=false;pend=false;out+=hx(t)}
+    else if(t==='}'){depth=Math.max(0,depth-1);inV=false;pend=false;out+=hx(t)}
+    else if(t===';'){inV=false;pend=false;out+=t}
+    else if(t===':'){if(pend){inV=true;pend=false}out+=t}
+    else if(t[0]==='@')out+=sp('k',t);
+    else if(t[0]==='#'&&t.length>1)out+=(inV&&/^#[0-9a-f]{3,8}$/i.test(t))?sp('n',t):sp('e',t);
+    else if(/^-?\.?\d/.test(t))out+=sp('n',t);
+    else if(/^[\w-]+$/.test(t)){
+      if(inV)out+=sp('v',t);
+      else if(depth>0&&cssIsProp(s,re.lastIndex)){out+=sp('g',t);pend=true}
+      else out+=sp('e',t);
     }
-    return out;
-  } else if (lang === 'css') {
-    let out = '';
-    let i = 0;
-    const len = text.length;
-    const keywords = new Set(['from', 'to', 'and', 'media', 'keyframes', 'import']);
-    while (i < len) {
-      if (text.startsWith('/*', i)) {
-        const end = text.indexOf('*/', i + 2);
-        const commentEnd = end === -1 ? len : end + 2;
-        out += '<span class="hl-comment">' + escapeHtml(text.slice(i, commentEnd)) + '</span>';
-        i = commentEnd;
-        continue;
-      }
-      if (text[i] === '"' || text[i] === "'") {
-        const q = text[i];
-        let j = i + 1;
-        while (j < len && text[j] !== q) {
-          if (text[j] === '\\' && j + 1 < len) j++;
-          j++;
-        }
-        if (j < len) j++;
-        out += '<span class="hl-string">' + escapeHtml(text.slice(i, j)) + '</span>';
-        i = j;
-        continue;
-      }
-      const numMatch = text.slice(i).match(/^(#[\da-fA-F]{3,8}|\d+(?:\.\d+)?(?:px|em|rem|%|deg|ms|s)?)/);
-      if (numMatch && (i === 0 || /[\s\:\,\(]/.test(text[i-1]))) {
-        out += '<span class="hl-number">' + escapeHtml(numMatch[1]) + '</span>';
-        i += numMatch[1].length;
-        continue;
-      }
-      const wordMatch = text.slice(i).match(/^[a-zA-Z_-][a-zA-Z0-9_-]*/);
-      if (wordMatch) {
-        const word = wordMatch[0];
-        let k = i + word.length;
-        while (k < len && /\s/.test(text[k])) k++;
-        if (k < len && text[k] === ':') {
-          out += '<span class="hl-property">' + word + '</span>';
-        } else if (text[i] === '@' || keywords.has(word)) {
-          out += '<span class="hl-keyword">' + word + '</span>';
-        } else {
-          out += '<span class="hl-selector">' + word + '</span>';
-        }
-        i += word.length;
-        continue;
-      }
-      if ('{}():;,>+~*'.includes(text[i])) {
-        out += '<span class="hl-operator">' + text[i] + '</span>';
-        i++;
-        continue;
-      }
-      out += escapeHtml(text[i]);
-      i++;
-    }
-    return out;
-  } else if (lang === 'js') {
-    let out = '';
-    let i = 0;
-    const len = text.length;
-    const keywords = new Set(['const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break', 'continue', 'class', 'extends', 'new', 'this', 'true', 'false', 'null', 'undefined', 'async', 'await', 'try', 'catch', 'finally', 'typeof', 'instanceof', 'in', 'of', 'export', 'import', 'default', 'from', 'throw', 'delete', 'void']);
-    while (i < len) {
-      if (text.startsWith('//', i)) {
-        let end = text.indexOf('\n', i);
-        if (end === -1) end = len;
-        out += '<span class="hl-comment">' + escapeHtml(text.slice(i, end)) + '</span>';
-        i = end;
-        continue;
-      }
-      if (text.startsWith('/*', i)) {
-        const end = text.indexOf('*/', i + 2);
-        const commentEnd = end === -1 ? len : end + 2;
-        out += '<span class="hl-comment">' + escapeHtml(text.slice(i, commentEnd)) + '</span>';
-        i = commentEnd;
-        continue;
-      }
-      if (text[i] === '"' || text[i] === "'" || text[i] === '`') {
-        const q = text[i];
-        let j = i + 1;
-        while (j < len && text[j] !== q) {
-          if (text[j] === '\\' && j + 1 < len) j++;
-          j++;
-        }
-        if (j < len) j++;
-        out += '<span class="hl-string">' + escapeHtml(text.slice(i, j)) + '</span>';
-        i = j;
-        continue;
-      }
-      const numMatch = text.slice(i).match(/^(?:0[xX][\da-fA-F]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)/);
-      if (numMatch) {
-        out += '<span class="hl-number">' + numMatch[0] + '</span>';
-        i += numMatch[0].length;
-        continue;
-      }
-      const wordMatch = text.slice(i).match(/^[a-zA-Z_$][a-zA-Z0-9_$]*/);
-      if (wordMatch) {
-        const word = wordMatch[0];
-        let k = i + word.length;
-        while (k < len && /\s/.test(text[k])) k++;
-        if (keywords.has(word)) {
-          out += '<span class="hl-keyword">' + word + '</span>';
-        } else if (k < len && text[k] === '(') {
-          out += '<span class="hl-function">' + word + '</span>';
-        } else if (word === 'true' || word === 'false' || word === 'null' || word === 'undefined') {
-          out += '<span class="hl-number">' + word + '</span>';
-        } else {
-          out += escapeHtml(word);
-        }
-        i += word.length;
-        continue;
-      }
-      if ('=<>!+-*%&|^?:.,;{}[]()'.includes(text[i])) {
-        out += '<span class="hl-operator">' + text[i] + '</span>';
-        i++;
-        continue;
-      }
-      out += escapeHtml(text[i]);
-      i++;
-    }
-    return out;
+    else out+=hx(t);
   }
-  return escapeHtml(text);
+  return out;
 }
 
-function updateHighlighting() {
-  highlightLayer.innerHTML = highlightCode(code.value, current) + '\n';
+function hlAttrs(a){
+  return a.replace(/("[^"]*"?|'[^']*'?)|([^\s="'<>\/]+)|([\s\S])/g,(m,q,n)=>q?sp('s',m):n?sp('a',m):hx(m));
 }
+function hlTag(t){
+  const m=t.match(/^(<\/?)([\w:-]*)([\s\S]*?)(\/?>?)$/);
+  if(!m)return hx(t);
+  return sp('p',m[1])+sp('t',m[2])+hlAttrs(m[3])+sp('p',m[4]);
+}
+function hlHTML(s){
+  let out='',last=0,m;
+  const re=/<\!--[\s\S]*?(?:-->|$)|<(script|style)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)|<![^>]*>?|<\/?[a-zA-Z][^>]*>?/gi;
+  while((m=re.exec(s))){
+    out+=hx(s.slice(last,m.index));
+    const t=m[0];
+    if(t.startsWith("<\x21--"))out+=sp('c',t);
+    else if(m[1]){
+      const open=t.match(/^<[^>]*>/)[0];
+      const rest=t.slice(open.length);
+      const cm=rest.match(/<\/(?:script|style)\s*>$/i);
+      const close=cm?cm[0]:'';
+      const inner=close?rest.slice(0,rest.length-close.length):rest;
+      out+=hlTag(open)+(m[1].toLowerCase()==='script'?hlJS(inner):hlCSS(inner))+(close?hlTag(close):'');
+    }
+    else if(t.startsWith('<!'))out+=sp('k',t);
+    else out+=hlTag(t);
+    last=re.lastIndex;
+    if(!t.length)re.lastIndex++;
+  }
+  return out+hx(s.slice(last));
+}
+function syncHl(){hl.scrollTop=code.scrollTop;hl.scrollLeft=code.scrollLeft}
+function highlight(){
+  const t=code.value;
+  try{
+    hl.innerHTML=t.length>150000?hx(t)+'\n':(current==='html'?hlHTML(t):current==='css'?hlCSS(t):hlJS(t))+'\n';
+  }catch(e){hl.textContent=t+'\n'}
+  syncHl();
+}
+/* HL-END */
+
+code.value=examples.html;
 
 function focusEditorCustom(){
   applyKbAttrs();
@@ -741,8 +666,8 @@ function updateMeta(){
   document.querySelector('#lineCount').textContent=lines+(lines===1?' line':' lines');
   document.querySelector('#filename').textContent=fileNames[current];
   document.querySelector('#fileInfo').textContent=info[current];
-  lineNumbers.scrollTop=editorScroller.scrollTop;
-  updateHighlighting();
+  highlight();
+  lineNumbers.scrollTop=code.scrollTop;
   autosave();
 }
 
@@ -762,13 +687,14 @@ function bringCaretIntoView(){
     const mk=document.createElement('span');mk.textContent='\u200b';m.appendChild(mk);
     const lh=parseFloat(cs.lineHeight)||19;
     const top=mk.offsetTop,left=mk.offsetLeft;
-    if(top<editorScroller.scrollTop)editorScroller.scrollTop=top;
-    else if(top+lh>editorScroller.scrollTop+editorScroller.clientHeight)editorScroller.scrollTop=top+lh-editorScroller.clientHeight;
+    if(top<code.scrollTop)code.scrollTop=top;
+    else if(top+lh>code.scrollTop+code.clientHeight)code.scrollTop=top+lh-code.clientHeight;
     if(cs.whiteSpace==='pre'){
-      if(left<editorScroller.scrollLeft)editorScroller.scrollLeft=Math.max(0,left-20);
-      else if(left>editorScroller.scrollLeft+editorScroller.clientWidth-20)editorScroller.scrollLeft=left-editorScroller.clientWidth+40;
+      if(left<code.scrollLeft)code.scrollLeft=Math.max(0,left-20);
+      else if(left>code.scrollLeft+code.clientWidth-20)code.scrollLeft=left-code.clientWidth+40;
     }
-    lineNumbers.scrollTop=editorScroller.scrollTop;
+    lineNumbers.scrollTop=code.scrollTop;
+    syncHl();
   }catch(e){}
 }
 
@@ -793,7 +719,6 @@ function setLang(lang){
     t.classList.toggle('active',t.dataset.lang===lang);
   });
   updateMeta();
-  updateHighlighting();
   bringCaretIntoView();
 }
 
@@ -803,14 +728,11 @@ document.querySelectorAll('.tab').forEach(t=>{
 
 code.addEventListener('input',()=>{
   saveHistory();
-  updateHighlighting();
   bringCaretIntoView();
 });
 code.addEventListener('keyup', bringCaretIntoView);
 code.addEventListener('click', bringCaretIntoView);
-editorScroller.addEventListener('scroll',()=>{
-  lineNumbers.scrollTop=editorScroller.scrollTop;
-});
+code.addEventListener('scroll',()=>{lineNumbers.scrollTop=code.scrollTop;syncHl();});
 
 function makeDocument(){
   let html=history.html[history.html.length-1];
@@ -819,15 +741,19 @@ function makeDocument(){
   if(current==='html')html=code.value;
   if(current==='css')css=code.value;
   if(current==='js')js=code.value;
+  // Don't inject the untouched sample CSS/JS into the user's own page
   if(html!==examples.html){
     if(css===examples.css)css='';
     if(js===examples.js)js='';
   }
 
+  // Local files like style.css / script.js can't load inside the preview.
+  // The CSS and JS tabs supply them instead, so drop those references.
   html=html
     .replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,m=>/href=["']?(https?:)?\/\//i.test(m)?m:'')
     .replace(/<script\b[^>]*\bsrc=["']?(?!https?:|\/\/)[^"'\s>]+["']?[^>]*>\s*<\/script>/gi,'');
 
+  // Show JS errors in the preview so a silent failure is visible.
   const errTag='<script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();<\/script>';
 
   const styleTag=errTag+'<style>\n'+css+'\n</style>';
@@ -941,6 +867,10 @@ document.querySelector('#themeBtn').onclick=()=>{
 document.querySelector('#menuBtn').onclick=()=>openMenu();
 document.querySelector('#moreBtn').onclick=()=>openMenu();
 
+document.querySelector('#moreBtn').onclick=()=>{
+  alert('Use the language tabs, editor tools and Settings to work on your project.');
+};
+
 document.querySelector('#expandPreview').onclick=()=>{
   const win=window.open('','_blank');
   if(win){
@@ -954,6 +884,7 @@ document.querySelector('#compactToggle').onchange=e=>{
   keyboardPanel.classList.toggle('compact-mode',e.target.checked);
 };
 
+/* Normal keyboard: numbers and letters together. */
 const letterRows=[
   ['1','2','3','4','5','6','7','8','9','0'],
   ['Q','W','E','R','T','Y','U','I','O','P'],
@@ -962,6 +893,7 @@ const letterRows=[
   ['?123','◀','▲','▼','▶',',','SPACE','.','ENTER']
 ];
 
+/* Programming symbols layout. */
 const symbolRows=[
   ['<','>','/','\\','=','+','-','*','%'],
   ['(',')','[',']','{','}','|','&'],
@@ -1080,6 +1012,7 @@ code.addEventListener('keydown',e=>{
 });
 code.addEventListener('focus',()=>{applyKbAttrs();});
 
+/* Settings */
 const settingsDefaults={
   keyboardWidth:100,keyboardHeight:34,
   keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
@@ -1139,6 +1072,7 @@ document.querySelector('#copyCode').onclick=async()=>{
   }
 };
 
+/* ===== v2 features ===== */
 const LS={
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -1150,6 +1084,7 @@ const BOILER='<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8"
 const VOID=new Set(['img','input','br','hr','meta','link']);
 const TAGS=new Set('div span p a ul ol li h1 h2 h3 h4 h5 h6 section article aside nav header footer main button form label input select option textarea table thead tbody tr td th img br hr pre code strong em i b small'.split(' '));
 
+/* ---------- tiny UI helpers ---------- */
 const h=(tag,cls,text,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(fn)e.onclick=fn;return e};
 const sheet=document.querySelector('#sheet'),sheetBody=document.querySelector('#sheetBody');
 function openSheet(title,items){sheetBody.replaceChildren(h('h2','',title),...items);sheet.hidden=false}
@@ -1157,6 +1092,7 @@ function closeSheet(){sheet.hidden=true}
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet()});
 const closeBtn=()=>h('button','mbtn wide','Close',closeSheet);
 
+/* ---------- keyboard mode, font, wrap ---------- */
 function applyKbAttrs(){
   const d=S.kb==='device';
   code.setAttribute('inputmode',d?'text':'none');
@@ -1173,6 +1109,7 @@ function applyPrefs(){
   bringCaretIntoView();
 }
 
+/* ---------- menu ---------- */
 function openMenu(){
   const again=()=>{saveS();applyPrefs();openMenu()};
   const tog=(label,on,fn)=>h('button','mbtn'+(on?' on':''),label,()=>{fn();again()});
@@ -1206,6 +1143,7 @@ function openMenu(){
   openSheet('Menu',[step,grid]);
 }
 
+/* ---------- find & replace ---------- */
 let lastFind='',matchCase=false;
 const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 function openFind(){
@@ -1238,6 +1176,7 @@ function openFind(){
   upd();
 }
 
+/* ---------- snippets & emmet ---------- */
 const SNIPS={
   html:[['Boilerplate',BOILER],['Button','<button id="btn">Click me</button>'],['Link','<a href="#">Link</a>'],['Image','<img src="" alt="">'],['Form','<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Send</button>\n</form>'],['Nav','<nav>\n  <a href="#">Home</a>\n  <a href="#">About</a>\n</nav>']],
   css:[['Reset','*{margin:0;padding:0;box-sizing:border-box}'],['Center (flex)','display:flex;\njustify-content:center;\nalign-items:center;'],['Grid 3 columns','display:grid;\ngrid-template-columns:repeat(3,1fr);\ngap:12px;'],['Media query','@media(max-width:600px){\n  \n}'],['Keyframes','@keyframes fade{\n  from{opacity:0}\n  to{opacity:1}\n}'],['Card','.card{\n  padding:16px;\n  border-radius:12px;\n  box-shadow:0 4px 14px #0003;\n}']],
@@ -1289,6 +1228,7 @@ function tabAction(){
   smartType('  ',s,e);
 }
 
+/* ---------- auto-pair, auto-indent, auto-close tags ---------- */
 function smartType(text,start,end){
   const v=code.value;
   let ins=text,caret=null;
@@ -1322,6 +1262,7 @@ function smartType(text,start,end){
   saveHistory();bringCaretIntoView();
 }
 
+/* ---------- cursor keys ---------- */
 function moveCursor(key){
   focusEditorCustom();
   const v=code.value,p=code.selectionStart;
@@ -1343,6 +1284,7 @@ function moveCursor(key){
   bringCaretIntoView();
 }
 
+/* ---------- projects & autosave ---------- */
 const getFile=k=>k===current?code.value:history[k][history[k].length-1];
 function flush(){
   if(!projects||!projects[curId])return;
@@ -1363,7 +1305,7 @@ function openProject(id){
   current='html';
   code.value=p.html;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.lang==='html'));
-  code.setSelectionRange(0,0);editorScroller.scrollTop=0;
+  code.setSelectionRange(0,0);code.scrollTop=0;
   updateMeta();
   document.querySelector('#saveState').textContent='Opened';
 }
@@ -1409,6 +1351,7 @@ function openProjects(){
   openSheet('Projects',items);
 }
 
+/* ---------- misc menu actions ---------- */
 function gotoLine(){
   closeSheet();
   const n=parseInt(prompt('Go to line number'),10);
@@ -1440,6 +1383,7 @@ function resetSample(){
   updateMeta();
 }
 
+/* ---------- console panel ---------- */
 const consolePanel=document.querySelector('#consolePanel'),consoleOut=document.querySelector('#consoleOut');
 document.querySelector('#consoleBtn').onclick=()=>{consolePanel.hidden=!consolePanel.hidden};
 document.querySelector('#consoleClear').onclick=()=>{consoleOut.innerHTML=''};
