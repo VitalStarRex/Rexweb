@@ -17,7 +17,7 @@
   --green:#00d99a;
   --keyboard-bg:#102a49;
   --keyboard-fg:#e8f4ff;
-  --key-height:34px;
+  --key-height:30px;
   --keyboard-width:100%;
   --editor-height:100%;
 }
@@ -432,18 +432,24 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
 @media(max-width:760px){.tool{font-size:9px}.tool span:first-child{font-size:16px}}
 
 /* Bigger keyboard text */
-.key,.keyboard.compact-mode .key{font-size:clamp(15px,calc(var(--key-height,34px)*.55),24px);font-weight:700}
-.key.wide{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
+.key,.keyboard.compact-mode .key{font-size:clamp(12px,calc(var(--key-height,34px)*.49),22px);font-weight:700}
+.key.wide{font-size:clamp(12px,calc(var(--key-height,34px)*.46),20px)}
 .key{white-space:nowrap}
 .key.long,.keyboard.compact-mode .key.long{font-size:10px;letter-spacing:-.2px}
 .key.green,.key[aria-label="?123"],.key[aria-label="/* */"]{flex:1.9 1 0}
 .key[aria-label="ENTER"]{flex:2 1 0}
 .key.space{flex:3 1 0}
-.key.shift,.keyboard.compact-mode .key.shift{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
-.keyboard.compact-mode .key.wide{font-size:clamp(15px,calc(var(--key-height,34px)*.5),22px)}
+.key.shift,.keyboard.compact-mode .key.shift{font-size:clamp(12px,calc(var(--key-height,34px)*.46),20px)}
+.keyboard.compact-mode .key.wide{font-size:clamp(12px,calc(var(--key-height,34px)*.46),20px)}
 .keyboard.compact-mode .key.space{font-size:clamp(12px,calc(var(--key-height,34px)*.4),16px)}
 .key.space{font-size:clamp(12px,calc(var(--key-height,34px)*.4),16px)}
-.symbol-toggle{font-size:14px}
+.symbol-toggle{font-size:13px;height:26px;margin-bottom:2px}
+.keyboard{padding:2px 4px}
+.keyboard-head{padding:0 1px 1px}
+.keyboard-head strong{font-size:11px}
+.app{gap:4px}
+.panel-head{padding:4px 8px}
+.panel-foot{padding:2px 8px}
 .keyboard-head strong{font-size:12px}
 .compact{font-size:11px}
 </style>
@@ -485,7 +491,7 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
       <h2 id="settingsTitle">Studio Settings</h2>
       <p>Adjust your editor and RexWeb coding keyboard.</p>
       <div class="setting-row"><label for="keyboardWidth">Keyboard width</label><output id="keyboardWidthValue">100%</output><input id="keyboardWidth" type="range" min="60" max="100" value="100"></div>
-      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">34 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="34"></div>
+      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">30 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="30"></div>
       <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
       <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
       <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
@@ -549,7 +555,7 @@ let current='html';
 let history={html:[examples.html],css:[examples.css],js:[examples.js]};
 let positions={html:0,css:0,js:0};
 let future={html:[],css:[],js:[]};
-let symbolsMode=false,shiftMode=false,capsMode=false,lastShiftTap=0;
+let symbolsMode=false,shiftMode=false,capsMode=true,lastShiftTap=0;
 
 const code=document.querySelector('#code');
 const hl=document.querySelector('#hl');
@@ -890,7 +896,7 @@ const letterRows=[
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
   ['SHIFT','Z','X','C','V','B','N','M','⌫'],
-  ['?123','◀','▲','▼','▶',',','SPACE','.','ENTER']
+  ['?123',',','SPACE','.','ENTER']
 ];
 
 /* Programming symbols layout. */
@@ -900,7 +906,7 @@ const symbolRows=[
   ['!','?','@','#','$','^','~','_','`'],
   [':',';',"'",'"',',','.','⌫'],
   ['ABC','TAB','=>','===','!==','&&','||'],
-  ['◀','▲','▼','▶','//','/* */','SPACE','ENTER']
+  ['//','/* */','SPACE','ENTER']
 ];
 
 function renderKeyboard(){
@@ -1014,7 +1020,7 @@ code.addEventListener('focus',()=>{applyKbAttrs();});
 
 /* Settings */
 const settingsDefaults={
-  keyboardWidth:100,keyboardHeight:34,
+  keyboardWidth:100,keyboardHeight:30,
   keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
   editorWidth:100
 };
