@@ -20,6 +20,7 @@
   --key-height:30px;
   --keyboard-width:100%;
   --editor-height:100%;
+  --editor-width:90%;
 }
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden}
@@ -494,7 +495,7 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
       <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">30 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="30"></div>
       <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
       <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
-      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
+      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">90%</output><input id="editorWidth" type="range" min="70" max="100" value="90"></div>
       <p style="font-size:10px">The custom keyboard is designed for touch input. Browser support for suppressing the system keyboard may vary.</p>
       <div class="settings-actions"><button id="resetSettings">Reset</button><button class="done" id="closeSettings">Done</button></div>
     </section>
@@ -953,7 +954,10 @@ function insertAtCursor(text){
   focusEditorCustom();
   const start=code.selectionStart;
   const end=code.selectionEnd;
-  code.setRangeText(text,start,end,'end');
+  const m=text.indexOf('§');
+  const clean=m<0?text:text.replace('§','');
+  code.setRangeText(clean,start,end,'end');
+  if(m>=0)code.setSelectionRange(start+m,start+m);
   saveHistory();
   bringCaretIntoView();
 }
@@ -1022,7 +1026,7 @@ code.addEventListener('focus',()=>{applyKbAttrs();});
 const settingsDefaults={
   keyboardWidth:100,keyboardHeight:30,
   keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
-  editorWidth:100
+  editorWidth:90
 };
 
 function applySettings(){
@@ -1184,9 +1188,90 @@ function openFind(){
 
 /* ---------- snippets & emmet ---------- */
 const SNIPS={
-  html:[['Boilerplate',BOILER],['Button','<button id="btn">Click me</button>'],['Link','<a href="#">Link</a>'],['Image','<img src="" alt="">'],['Form','<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Send</button>\n</form>'],['Nav','<nav>\n  <a href="#">Home</a>\n  <a href="#">About</a>\n</nav>']],
-  css:[['Reset','*{margin:0;padding:0;box-sizing:border-box}'],['Center (flex)','display:flex;\njustify-content:center;\nalign-items:center;'],['Grid 3 columns','display:grid;\ngrid-template-columns:repeat(3,1fr);\ngap:12px;'],['Media query','@media(max-width:600px){\n  \n}'],['Keyframes','@keyframes fade{\n  from{opacity:0}\n  to{opacity:1}\n}'],['Card','.card{\n  padding:16px;\n  border-radius:12px;\n  box-shadow:0 4px 14px #0003;\n}']],
-  js:[['On click','document.querySelector("#btn").addEventListener("click",()=>{\n  \n});'],['Fetch JSON','fetch("https://api.example.com/data")\n  .then(r=>r.json())\n  .then(d=>console.log(d))\n  .catch(console.error);'],['setInterval','setInterval(()=>{\n  \n},1000);'],['Random number','Math.floor(Math.random()*10)'],['DOM ready','document.addEventListener("DOMContentLoaded",()=>{\n  \n});']]
+  html:[
+    ['DOCTYPE','<!DOCTYPE html>\n'],
+    ['Boilerplate',BOILER],
+    ['Full page','<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Website</title>\n</head>\n<body>\n  §\n</body>\n</html>'],
+    ['Meta viewport','<meta name="viewport" content="width=device-width, initial-scale=1.0">'],
+    ['Link CSS','<link rel="stylesheet" href="style.css">'],
+    ['Script tag','<script src="script.js"><\/script>'],
+    ['Style tag','<style>\n  §\n</style>'],
+    ['Inline script','<script>\n  §\n<\/script>'],
+    ['Comment','<\!-- § -->'],
+    ['Heading h1','<h1>§</h1>'],
+    ['Paragraph','<p>§</p>'],
+    ['Div','<div class="§">\n  \n</div>'],
+    ['Span','<span>§</span>'],
+    ['Button','<button id="btn">§</button>'],
+    ['Link','<a href="#">§</a>'],
+    ['Image','<img src="§" alt="">'],
+    ['Input','<input type="text" placeholder="§">'],
+    ['Textarea','<textarea rows="4" placeholder="§"></textarea>'],
+    ['Select','<select>\n  <option value="1">§</option>\n  <option value="2">Option 2</option>\n</select>'],
+    ['Form','<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Send</button>\n</form>'],
+    ['List (ul)','<ul>\n  <li>§</li>\n  <li>Item 2</li>\n</ul>'],
+    ['List (ol)','<ol>\n  <li>§</li>\n  <li>Item 2</li>\n</ol>'],
+    ['Table','<table>\n  <tr>\n    <th>Name</th>\n    <th>Age</th>\n  </tr>\n  <tr>\n    <td>§</td>\n    <td></td>\n  </tr>\n</table>'],
+    ['Nav','<nav>\n  <a href="#">Home</a>\n  <a href="#">About</a>\n  <a href="#">Contact</a>\n</nav>'],
+    ['Header','<header>\n  <h1>§</h1>\n</header>'],
+    ['Section','<section>\n  <h2>§</h2>\n  <p></p>\n</section>'],
+    ['Footer','<footer>\n  <p>© 2026 §</p>\n</footer>'],
+    ['Video','<video src="§" controls></video>'],
+    ['Audio','<audio src="§" controls></audio>'],
+    ['Iframe','<iframe src="§" width="100%" height="300"></iframe>']
+  ],
+  css:[
+    ['Reset','*{margin:0;padding:0;box-sizing:border-box}'],
+    ['Body base','body{\n  font-family:Arial,sans-serif;\n  background:#f4f7fb;\n  color:#193247;\n  line-height:1.5;\n}'],
+    ['Center (flex)','display:flex;\njustify-content:center;\nalign-items:center;'],
+    ['Flex row gap','display:flex;\ngap:12px;\nflex-wrap:wrap;'],
+    ['Flex column','display:flex;\nflex-direction:column;\ngap:12px;'],
+    ['Grid 3 columns','display:grid;\ngrid-template-columns:repeat(3,1fr);\ngap:12px;'],
+    ['Auto grid','display:grid;\ngrid-template-columns:repeat(auto-fit,minmax(160px,1fr));\ngap:12px;'],
+    ['Absolute center','position:absolute;\ntop:50%;\nleft:50%;\ntransform:translate(-50%,-50%);'],
+    ['Sticky header','position:sticky;\ntop:0;\nz-index:10;'],
+    ['Variables',':root{\n  --main:#087f5b;\n  --bg:#ffffff;\n  --text:#193247;\n}'],
+    ['Card','.card{\n  padding:16px;\n  border-radius:12px;\n  box-shadow:0 4px 14px #0003;\n  background:#fff;\n}'],
+    ['Button style','button{\n  background:#087f5b;\n  color:#fff;\n  border:0;\n  border-radius:10px;\n  padding:12px 18px;\n  cursor:pointer;\n}'],
+    ['Hover','&:hover{\n  opacity:.85;\n}'],
+    ['Transition','transition:all .3s ease;'],
+    ['Box shadow','box-shadow:0 4px 14px rgba(0,0,0,.2);'],
+    ['Gradient','background:linear-gradient(135deg,#21e7f5,#9c62ff);'],
+    ['Text gradient','background:linear-gradient(90deg,#21e7f5,#4c8cff);\n-webkit-background-clip:text;\nbackground-clip:text;\ncolor:transparent;'],
+    ['Responsive image','img{\n  max-width:100%;\n  height:auto;\n  display:block;\n}'],
+    ['Media query','@media(max-width:600px){\n  \n}'],
+    ['Dark mode','@media(prefers-color-scheme:dark){\n  body{\n    background:#0b1220;\n    color:#e8f4ff;\n  }\n}'],
+    ['Keyframes','@keyframes fade{\n  from{opacity:0}\n  to{opacity:1}\n}'],
+    ['Animation','animation:fade 1s ease forwards;'],
+    ['Google font','@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");\nbody{font-family:"Poppins",sans-serif}']
+  ],
+  js:[
+    ['console.log','console.log(§);'],
+    ['Select element','const el = document.querySelector("§");'],
+    ['Select all','const items = document.querySelectorAll("§");'],
+    ['On click','document.querySelector("#btn").addEventListener("click",()=>{\n  §\n});'],
+    ['Function','function myFunction(§){\n  \n}'],
+    ['Arrow function','const myFunc = (§) => {\n  \n};'],
+    ['If / else','if (§) {\n  \n} else {\n  \n}'],
+    ['For loop','for (let i = 0; i < §; i++) {\n  \n}'],
+    ['forEach','items.forEach((item)=>{\n  §\n});'],
+    ['Template string','const text = `Hello ${§}`;'],
+    ['Create element','const el = document.createElement("div");\nel.textContent = "§";\ndocument.body.appendChild(el);'],
+    ['Change text','document.querySelector("§").textContent = "";'],
+    ['Change style','document.querySelector("§").style.color = "red";'],
+    ['Toggle class','document.querySelector("§").classList.toggle("active");'],
+    ['Save localStorage','localStorage.setItem("key", JSON.stringify(§));'],
+    ['Read localStorage','const data = JSON.parse(localStorage.getItem("§") || "null");'],
+    ['Fetch JSON','fetch("https://api.example.com/data")\n  .then(r=>r.json())\n  .then(d=>console.log(d))\n  .catch(console.error);'],
+    ['Async / await','async function load(){\n  try{\n    const res = await fetch("§");\n    const data = await res.json();\n    console.log(data);\n  }catch(err){\n    console.error(err);\n  }\n}'],
+    ['Try / catch','try{\n  §\n}catch(err){\n  console.error(err);\n}'],
+    ['setTimeout','setTimeout(()=>{\n  §\n},1000);'],
+    ['setInterval','setInterval(()=>{\n  §\n},1000);'],
+    ['Random number','Math.floor(Math.random()*10)'],
+    ['Class','class MyClass{\n  constructor(§){\n    \n  }\n}'],
+    ['DOM ready','document.addEventListener("DOMContentLoaded",()=>{\n  §\n});'],
+    ['Form submit','document.querySelector("form").addEventListener("submit",(e)=>{\n  e.preventDefault();\n  §\n});']
+  ]
 };
 function openSnippets(){
   const g=h('div','sheet-grid');
@@ -1258,6 +1343,10 @@ function smartType(text,start,end){
     }else if(quotes.includes(text)){
       if(next===text){ins='';caret=start+1}
       else if(!/\w/.test(prev)&&!/\w/.test(next)){ins=text+text;caret=start+1}
+    }else if(text==='-'&&current==='html'&&v.slice(start-3,start)==='<\x21-'){
+      ins='-  -->';caret=start+2;
+    }else if(text==='*'&&prev==='/'&&current!=='html'&&next!=='*'){
+      ins='*  */';caret=start+2;
     }else if(text==='>'&&current==='html'){
       const b=v.slice(0,start),m=b.match(/<([a-zA-Z][\w-]*)(?:\s[^<>]*)?$/);
       if(m&&!VOID.has(m[1].toLowerCase())&&!/\/$/.test(b)){ins='></'+m[1]+'>';caret=start+1}
