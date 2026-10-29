@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -147,7 +148,6 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   width:var(--editor-width,100%);
   max-width:100%;
   margin-inline:auto;
-  position:relative;
 }
 .line-numbers{
   white-space:pre;
@@ -161,7 +161,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   z-index:2;
 }
 
-/* Syntax Highlighting & Dual Layer Overlay Architecture */
+/* Perfect Synchronized Dual-Layer Architecture */
 .editor-scroller{
   position:relative;
   width:100%;
@@ -173,17 +173,20 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 }
 .code, .highlight-layer{
   position:absolute;
-  inset:0;
+  top:0;
+  left:0;
   width:100%;
-  height:100%;
+  min-height:100%;
   margin:0;
-  padding:0;
+  padding:2px 4px;
   border:0;
   outline:0;
   font:var(--code-size,12px)/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
   tab-size:2;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
+  word-break:break-word;
+  box-sizing:border-box;
 }
 .code{
   background:transparent;
@@ -191,7 +194,6 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   caret-color:var(--text);
   resize:none;
   z-index:3;
-  pointer-events:auto;
 }
 .highlight-layer{
   background:transparent;
@@ -201,17 +203,17 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   overflow:hidden;
 }
 
-/* Token Styles matching user spec */
-.hl-tag { color: #ff5f7e; }       /* HTML tags pink/red */
-.hl-attr { color: #ffa64d; }      /* HTML attributes orange */
-.hl-string { color: #00d99a; }    /* Strings / attribute values green */
-.hl-keyword { color: #9c62ff; }   /* JS keywords purple */
-.hl-number { color: #ffbc42; }    /* Numbers orange/yellow */
-.hl-comment { color: #8ea5bf; font-style: italic; } /* Comments muted gray */
-.hl-selector { color: #21e7f5; }  /* CSS selectors cyan */
-.hl-property { color: #168cff; }  /* CSS properties blue */
-.hl-function { color: #57cbff; }  /* JS function names */
-.hl-operator { color: #ff7188; }  /* Operators & punctuation */
+/* Token Styles */
+.hl-tag { color: #ff5f7e; }
+.hl-attr { color: #ffa64d; }
+.hl-string { color: #00d99a; }
+.hl-keyword { color: #9c62ff; }
+.hl-number { color: #ffbc42; }
+.hl-comment { color: #8ea5bf; font-style: italic; }
+.hl-selector { color: #21e7f5; }
+.hl-property { color: #168cff; }
+.hl-function { color: #57cbff; }
+.hl-operator { color: #ff7188; }
 .hl-punctuation { color: #8ea5bf; }
 
 .panel-foot{
@@ -396,7 +398,7 @@ body.light .keyboard-head strong{color:#087d9a}
 /* v2 additions */
 body.wrap .editor-wrap{grid-template-columns:minmax(0,1fr)}
 body.wrap .line-numbers{display:none}
-body:not(.wrap) .code, body:not(.wrap) .highlight-layer{white-space:pre;overflow-wrap:normal}
+body:not(.wrap) .code, body:not(.wrap) .highlight-layer{white-space:pre;overflow-wrap:normal;word-break:normal}
 .key.on{background:#0a4d6b;border-color:var(--cyan);color:var(--cyan)}
 .mbtn{padding:9px 8px;border-radius:8px;border:1px solid #14628c;background:#0b1b30;color:var(--text);font-size:12px;text-align:left}
 .mbtn.on{border-color:var(--green);color:var(--green)}
@@ -531,7 +533,7 @@ const info={html:'HTML · UTF-8',css:'CSS · UTF-8',js:'JavaScript · UTF-8'};
 
 code.value=examples.html;
 
-/* Professional Syntax Highlighting Engine (Robust Multi-Language Tokenizer) */
+/* Professional Syntax Highlighting Engine */
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
@@ -539,12 +541,10 @@ function escapeHtml(str) {
 function highlightCode(text, lang) {
   if (!text) return '';
   if (lang === 'html') {
-    // Tokenize HTML
     let out = '';
     let i = 0;
     const len = text.length;
     while (i < len) {
-      // Comments <!-- ... -->
       if (text.startsWith('<!--', i)) {
         const end = text.indexOf('-->', i + 4);
         const commentEnd = end === -1 ? len : end + 3;
@@ -552,7 +552,6 @@ function highlightCode(text, lang) {
         i = commentEnd;
         continue;
       }
-      // Tags </tag> or <tag>
       if (text[i] === '<') {
         const tagClose = text[i+1] === '/';
         const tagMatch = text.slice(i + (tagClose ? 2 : 1)).match(/^([a-zA-Z0-9_-]+)/);
@@ -561,7 +560,6 @@ function highlightCode(text, lang) {
           out += '<span class="hl-punctuation">&lt;' + (tagClose ? '/' : '') + '</span>' + '<span class="hl-tag">' + tagName + '</span>';
           i += 1 + (tagClose ? 1 : 0) + tagName.length;
           
-          // Parse attributes inside tag until '>'
           while (i < len && text[i] !== '>') {
             if (text[i] === '/' && text[i+1] === '>') {
               out += '<span class="hl-punctuation">/&gt;</span>';
@@ -573,14 +571,12 @@ function highlightCode(text, lang) {
               i++;
               continue;
             }
-            // Attribute name
             const attrMatch = text.slice(i).match(/^([a-zA-Z0-9_:-]+)/);
             if (attrMatch) {
               const attrName = attrMatch[1];
               out += '<span class="hl-attr">' + attrName + '</span>';
               i += attrName.length;
             } else {
-              // Equals or other punctuation
               if (text[i] === '=') {
                 out += '<span class="hl-operator">=</span>';
               } else if (text[i] === '"' || text[i] === "'") {
@@ -604,19 +600,16 @@ function highlightCode(text, lang) {
           continue;
         }
       }
-      // Check for inline script or style content inside HTML if desired, or plain text
       out += escapeHtml(text[i]);
       i++;
     }
     return out;
   } else if (lang === 'css') {
-    // Tokenize CSS
     let out = '';
     let i = 0;
     const len = text.length;
     const keywords = new Set(['from', 'to', 'and', 'media', 'keyframes', 'import']);
     while (i < len) {
-      // Comments /* ... */
       if (text.startsWith('/*', i)) {
         const end = text.indexOf('*/', i + 2);
         const commentEnd = end === -1 ? len : end + 2;
@@ -624,7 +617,6 @@ function highlightCode(text, lang) {
         i = commentEnd;
         continue;
       }
-      // Strings
       if (text[i] === '"' || text[i] === "'") {
         const q = text[i];
         let j = i + 1;
@@ -637,18 +629,15 @@ function highlightCode(text, lang) {
         i = j;
         continue;
       }
-      // Numbers with units (px, em, %, s, etc.) or colors (#fff)
       const numMatch = text.slice(i).match(/^(#[\da-fA-F]{3,8}|\d+(?:\.\d+)?(?:px|em|rem|%|deg|ms|s)?)/);
       if (numMatch && (i === 0 || /[\s\:\,\(]/.test(text[i-1]))) {
         out += '<span class="hl-number">' + escapeHtml(numMatch[1]) + '</span>';
         i += numMatch[1].length;
         continue;
       }
-      // Identifiers / Properties / Selectors
       const wordMatch = text.slice(i).match(/^[a-zA-Z_-][a-zA-Z0-9_-]*/);
       if (wordMatch) {
         const word = wordMatch[0];
-        // Peek ahead to see if it's a property (followed by colon)
         let k = i + word.length;
         while (k < len && /\s/.test(text[k])) k++;
         if (k < len && text[k] === ':') {
@@ -656,13 +645,11 @@ function highlightCode(text, lang) {
         } else if (text[i] === '@' || keywords.has(word)) {
           out += '<span class="hl-keyword">' + word + '</span>';
         } else {
-          // Check if inside rule block or selector
           out += '<span class="hl-selector">' + word + '</span>';
         }
         i += word.length;
         continue;
       }
-      // Operators and punctuation
       if ('{}():;,>+~*'.includes(text[i])) {
         out += '<span class="hl-operator">' + text[i] + '</span>';
         i++;
@@ -673,13 +660,11 @@ function highlightCode(text, lang) {
     }
     return out;
   } else if (lang === 'js') {
-    // Tokenize JavaScript
     let out = '';
     let i = 0;
     const len = text.length;
-    const keywords = new Set(['const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break', 'continue', 'class', 'extends', 'new', 'this', 'true', 'false', 'null', 'undefined', 'async', 'await', 'try', 'catch', 'finally', 'typeof', 'instanceof', 'in', 'of', 'export', 'import', 'default', 'from', 'thorw', 'delete', 'void']);
+    const keywords = new Set(['const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break', 'continue', 'class', 'extends', 'new', 'this', 'true', 'false', 'null', 'undefined', 'async', 'await', 'try', 'catch', 'finally', 'typeof', 'instanceof', 'in', 'of', 'export', 'import', 'default', 'from', 'throw', 'delete', 'void']);
     while (i < len) {
-      // Single-line comment // ...
       if (text.startsWith('//', i)) {
         let end = text.indexOf('\n', i);
         if (end === -1) end = len;
@@ -687,7 +672,6 @@ function highlightCode(text, lang) {
         i = end;
         continue;
       }
-      // Multi-line comment /* ... */
       if (text.startsWith('/*', i)) {
         const end = text.indexOf('*/', i + 2);
         const commentEnd = end === -1 ? len : end + 2;
@@ -695,7 +679,6 @@ function highlightCode(text, lang) {
         i = commentEnd;
         continue;
       }
-      // Strings (", ', `)
       if (text[i] === '"' || text[i] === "'" || text[i] === '`') {
         const q = text[i];
         let j = i + 1;
@@ -708,18 +691,15 @@ function highlightCode(text, lang) {
         i = j;
         continue;
       }
-      // Numbers
       const numMatch = text.slice(i).match(/^(?:0[xX][\da-fA-F]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)/);
       if (numMatch) {
         out += '<span class="hl-number">' + numMatch[0] + '</span>';
         i += numMatch[0].length;
         continue;
       }
-      // Identifiers / Keywords / Functions
       const wordMatch = text.slice(i).match(/^[a-zA-Z_$][a-zA-Z0-9_$]*/);
       if (wordMatch) {
         const word = wordMatch[0];
-        // Peek ahead for function call '('
         let k = i + word.length;
         while (k < len && /\s/.test(text[k])) k++;
         if (keywords.has(word)) {
@@ -734,7 +714,6 @@ function highlightCode(text, lang) {
         i += word.length;
         continue;
       }
-      // Operators & punctuation
       if ('=<>!+-*%&|^?:.,;{}[]()'.includes(text[i])) {
         out += '<span class="hl-operator">' + text[i] + '</span>';
         i++;
@@ -832,7 +811,6 @@ code.addEventListener('keyup', bringCaretIntoView);
 code.addEventListener('click', bringCaretIntoView);
 editorScroller.addEventListener('scroll',()=>{
   lineNumbers.scrollTop=editorScroller.scrollTop;
-  highlightLayer.style.transform = `translate(-${editorScroller.scrollLeft}px, -${editorScroller.scrollTop}px)`;
 });
 
 function makeDocument(){
@@ -842,19 +820,15 @@ function makeDocument(){
   if(current==='html')html=code.value;
   if(current==='css')css=code.value;
   if(current==='js')js=code.value;
-  // Don't inject the untouched sample CSS/JS into the user's own page
   if(html!==examples.html){
     if(css===examples.css)css='';
     if(js===examples.js)js='';
   }
 
-  // Local files like style.css / script.js can't load inside the preview.
-  // The CSS and JS tabs supply them instead, so drop those references.
   html=html
     .replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,m=>/href=["']?(https?:)?\/\//i.test(m)?m:'')
     .replace(/<script\b[^>]*\bsrc=["']?(?!https?:|\/\/)[^"'\s>]+["']?[^>]*>\s*<\/script>/gi,'');
 
-  // Show JS errors in the preview so a silent failure is visible.
   const errTag='<script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();<\/script>';
 
   const styleTag=errTag+'<style>\n'+css+'\n</style>';
@@ -968,10 +942,6 @@ document.querySelector('#themeBtn').onclick=()=>{
 document.querySelector('#menuBtn').onclick=()=>openMenu();
 document.querySelector('#moreBtn').onclick=()=>openMenu();
 
-document.querySelector('#moreBtn').onclick=()=>{
-  alert('Use the language tabs, editor tools and Settings to work on your project.');
-};
-
 document.querySelector('#expandPreview').onclick=()=>{
   const win=window.open('','_blank');
   if(win){
@@ -985,7 +955,6 @@ document.querySelector('#compactToggle').onchange=e=>{
   keyboardPanel.classList.toggle('compact-mode',e.target.checked);
 };
 
-/* Normal keyboard: numbers and letters together. */
 const letterRows=[
   ['1','2','3','4','5','6','7','8','9','0'],
   ['Q','W','E','R','T','Y','U','I','O','P'],
@@ -994,7 +963,6 @@ const letterRows=[
   ['?123','◀','▲','▼','▶',',','SPACE','.','ENTER']
 ];
 
-/* Programming symbols layout. */
 const symbolRows=[
   ['<','>','/','\\','=','+','-','*','%'],
   ['(',')','[',']','{','}','|','&'],
@@ -1113,7 +1081,6 @@ code.addEventListener('keydown',e=>{
 });
 code.addEventListener('focus',()=>{applyKbAttrs();});
 
-/* Settings */
 const settingsDefaults={
   keyboardWidth:100,keyboardHeight:34,
   keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
@@ -1173,7 +1140,6 @@ document.querySelector('#copyCode').onclick=async()=>{
   }
 };
 
-/* ===== v2 features ===== */
 const LS={
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -1185,7 +1151,6 @@ const BOILER='<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8"
 const VOID=new Set(['img','input','br','hr','meta','link']);
 const TAGS=new Set('div span p a ul ol li h1 h2 h3 h4 h5 h6 section article aside nav header footer main button form label input select option textarea table thead tbody tr td th img br hr pre code strong em i b small'.split(' '));
 
-/* ---------- tiny UI helpers ---------- */
 const h=(tag,cls,text,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(fn)e.onclick=fn;return e};
 const sheet=document.querySelector('#sheet'),sheetBody=document.querySelector('#sheetBody');
 function openSheet(title,items){sheetBody.replaceChildren(h('h2','',title),...items);sheet.hidden=false}
@@ -1193,7 +1158,6 @@ function closeSheet(){sheet.hidden=true}
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet()});
 const closeBtn=()=>h('button','mbtn wide','Close',closeSheet);
 
-/* ---------- keyboard mode, font, wrap ---------- */
 function applyKbAttrs(){
   const d=S.kb==='device';
   code.setAttribute('inputmode',d?'text':'none');
@@ -1210,7 +1174,6 @@ function applyPrefs(){
   bringCaretIntoView();
 }
 
-/* ---------- menu ---------- */
 function openMenu(){
   const again=()=>{saveS();applyPrefs();openMenu()};
   const tog=(label,on,fn)=>h('button','mbtn'+(on?' on':''),label,()=>{fn();again()});
@@ -1244,7 +1207,6 @@ function openMenu(){
   openSheet('Menu',[step,grid]);
 }
 
-/* ---------- find & replace ---------- */
 let lastFind='',matchCase=false;
 const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 function openFind(){
@@ -1277,7 +1239,6 @@ function openFind(){
   upd();
 }
 
-/* ---------- snippets & emmet ---------- */
 const SNIPS={
   html:[['Boilerplate',BOILER],['Button','<button id="btn">Click me</button>'],['Link','<a href="#">Link</a>'],['Image','<img src="" alt="">'],['Form','<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Send</button>\n</form>'],['Nav','<nav>\n  <a href="#">Home</a>\n  <a href="#">About</a>\n</nav>']],
   css:[['Reset','*{margin:0;padding:0;box-sizing:border-box}'],['Center (flex)','display:flex;\njustify-content:center;\nalign-items:center;'],['Grid 3 columns','display:grid;\ngrid-template-columns:repeat(3,1fr);\ngap:12px;'],['Media query','@media(max-width:600px){\n  \n}'],['Keyframes','@keyframes fade{\n  from{opacity:0}\n  to{opacity:1}\n}'],['Card','.card{\n  padding:16px;\n  border-radius:12px;\n  box-shadow:0 4px 14px #0003;\n}']],
@@ -1329,7 +1290,6 @@ function tabAction(){
   smartType('  ',s,e);
 }
 
-/* ---------- auto-pair, auto-indent, auto-close tags ---------- */
 function smartType(text,start,end){
   const v=code.value;
   let ins=text,caret=null;
@@ -1363,7 +1323,6 @@ function smartType(text,start,end){
   saveHistory();bringCaretIntoView();
 }
 
-/* ---------- cursor keys ---------- */
 function moveCursor(key){
   focusEditorCustom();
   const v=code.value,p=code.selectionStart;
@@ -1385,7 +1344,6 @@ function moveCursor(key){
   bringCaretIntoView();
 }
 
-/* ---------- projects & autosave ---------- */
 const getFile=k=>k===current?code.value:history[k][history[k].length-1];
 function flush(){
   if(!projects||!projects[curId])return;
@@ -1452,7 +1410,6 @@ function openProjects(){
   openSheet('Projects',items);
 }
 
-/* ---------- misc menu actions ---------- */
 function gotoLine(){
   closeSheet();
   const n=parseInt(prompt('Go to line number'),10);
@@ -1484,7 +1441,6 @@ function resetSample(){
   updateMeta();
 }
 
-/* ---------- console panel ---------- */
 const consolePanel=document.querySelector('#consolePanel'),consoleOut=document.querySelector('#consoleOut');
 document.querySelector('#consoleBtn').onclick=()=>{consolePanel.hidden=!consolePanel.hidden};
 document.querySelector('#consoleClear').onclick=()=>{consoleOut.innerHTML=''};
@@ -1505,4 +1461,3 @@ bringCaretIntoView();
 </script>
 </body>
 </html>
-
