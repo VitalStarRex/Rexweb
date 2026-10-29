@@ -156,7 +156,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   text-align:right;
   padding:2px 5px 0 0;
   user-select:none;
-  font:11px/1.6 ui-monospace,Consolas,monospace;
+  font:calc(var(--code-size,12px) - 1px)/1.6 ui-monospace,Consolas,monospace;
 }
 .code{
   display:block;
@@ -168,8 +168,9 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   outline:0;
   background:transparent;
   color:#dceaff;
-  font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
-  white-space:pre;
+  font:var(--code-size,12px)/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
   tab-size:2;
   overflow:auto;
   overscroll-behavior:contain;
@@ -353,6 +354,26 @@ body.light .keyboard-head strong{color:#087d9a}
   .keyboard-head{padding-bottom:2px}
   .keys,.keyrow{gap:2px}
 }
+/* v2 additions */
+body.wrap .editor-wrap{grid-template-columns:minmax(0,1fr)}
+body.wrap .line-numbers{display:none}
+body:not(.wrap) .code{white-space:pre;overflow-wrap:normal}
+.key.on{background:#0a4d6b;border-color:var(--cyan);color:var(--cyan)}
+.mbtn{padding:9px 8px;border-radius:8px;border:1px solid #14628c;background:#0b1b30;color:var(--text);font-size:12px;text-align:left}
+.mbtn.on{border-color:var(--green);color:var(--green)}
+.mbtn.wide{grid-column:1/-1;text-align:center}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.sheet-row{display:flex;align-items:center;gap:6px;margin:8px 0;font-size:12px}
+.sheet-row>span{flex:1}
+.sheet-row input{flex:1;min-width:0;padding:9px;border-radius:8px;border:1px solid #14628c;background:#0b1b30;color:var(--text)}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper .mbtn{width:42px;text-align:center}
+.console{flex-shrink:0;height:34%;display:flex;flex-direction:column;border-top:1px solid #123c5b;background:#030812}
+.console[hidden]{display:none!important}
+.console-head{display:flex;justify-content:space-between;align-items:center;padding:3px 8px;color:var(--cyan);font-size:10px;font-weight:700}
+.console-head button{border:1px solid #14628c;background:#0b1b30;border-radius:6px;font-size:10px;padding:2px 8px}
+#consoleOut{flex:1;overflow:auto;padding:2px 8px 6px;font:11px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#dceaff}
+.cl.error{color:#ff7188}.cl.warn{color:#ffd166}.cl.info{color:#7cc7ff}
 </style>
 </head>
 <body>
@@ -401,6 +422,8 @@ body.light .keyboard-head strong{color:#087d9a}
     </section>
   </div>
 
+  <div class="settings-backdrop" id="sheet" hidden><section class="settings-modal" id="sheetBody" role="dialog" aria-modal="true"></section></div>
+
   <section class="workspace">
     <div class="panel" id="editorPanel">
       <div class="panel-head">
@@ -421,9 +444,11 @@ body.light .keyboard-head strong{color:#087d9a}
         <button class="iconbtn" id="backToEditor" style="width:auto;padding:0 8px;font-size:11px">← Editor</button>
         LIVE PREVIEW
         <span class="status" id="previewStatus">Ready</span>
+        <button class="iconbtn" id="consoleBtn" title="Console">⌁</button>
         <button class="iconbtn" id="expandPreview" title="Open preview">⛶</button>
       </div>
       <div class="preview-area"><iframe class="preview-frame" id="preview" title="Website live preview" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
+      <div class="console" id="consolePanel" hidden><div class="console-head"><span>CONSOLE</span><button id="consoleClear">Clear</button></div><div id="consoleOut"></div></div>
     </div>
   </section>
 
@@ -449,7 +474,7 @@ let current='html';
 let history={html:[examples.html],css:[examples.css],js:[examples.js]};
 let positions={html:0,css:0,js:0};
 let future={html:[],css:[],js:[]};
-let symbolsMode=false,shiftMode=false;
+let symbolsMode=false,shiftMode=false,capsMode=false,lastShiftTap=0;
 
 const code=document.querySelector('#code');
 const lineNumbers=document.querySelector('#lineNumbers');
@@ -463,8 +488,7 @@ const info={html:'HTML · UTF-8',css:'CSS · UTF-8',js:'JavaScript · UTF-8'};
 code.value=examples.html;
 
 function focusEditorCustom(){
-  code.setAttribute('inputmode','none');
-  code.setAttribute('virtualkeyboardpolicy','manual');
+  applyKbAttrs();
   code.focus({preventScroll:true});
 }
 
@@ -475,52 +499,33 @@ function updateMeta(){
   document.querySelector('#filename').textContent=fileNames[current];
   document.querySelector('#fileInfo').textContent=info[current];
   lineNumbers.scrollTop=code.scrollTop;
+  autosave();
 }
 
 function bringCaretIntoView(){
-  try {
-    const text = code.value;
-    const selStart = code.selectionStart;
-    const computedStyle = window.getComputedStyle(code);
-    const lineHeight = parseFloat(computedStyle.lineHeight) || 19.2;
-    const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
-    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-    const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
-
-    const textBeforeCaret = text.substring(0, selStart);
-    const linesBeforeCaret = textBeforeCaret.split('\n');
-    const currentLineIndex = linesBeforeCaret.length - 1;
-    const currentLineText = linesBeforeCaret[currentLineIndex] || '';
-
-    // Vertical auto-scrolling
-    const targetTop = currentLineIndex * lineHeight;
-    const visibleHeight = code.clientHeight - paddingTop - (parseFloat(computedStyle.paddingBottom) || 0);
-    const currentScrollTop = code.scrollTop;
-
-    if (targetTop < currentScrollTop) {
-      code.scrollTop = Math.max(0, targetTop);
-    } else if (targetTop + lineHeight > currentScrollTop + visibleHeight) {
-      code.scrollTop = targetTop + lineHeight - visibleHeight;
+  try{
+    const cs=getComputedStyle(code);
+    let m=bringCaretIntoView.m;
+    if(!m){
+      m=bringCaretIntoView.m=document.createElement('div');
+      m.style.cssText='position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;box-sizing:border-box';
+      document.body.appendChild(m);
     }
-
-    // Horizontal auto-scrolling
-    const canvas = bringCaretIntoView.canvas || (bringCaretIntoView.canvas = document.createElement('canvas'));
-    const context = canvas.getContext('2d');
-    context.font = computedStyle.font;
-    const charWidth = context.measureText('M').width || 7.2;
-    const currentColumn = currentLineText.length;
-    const targetLeft = currentColumn * charWidth;
-    const visibleWidth = code.clientWidth - paddingLeft - paddingRight;
-    const currentScrollLeft = code.scrollLeft;
-
-    if (targetLeft < currentScrollLeft) {
-      code.scrollLeft = Math.max(0, targetLeft - 20);
-    } else if (targetLeft > currentScrollLeft + visibleWidth - 20) {
-      code.scrollLeft = targetLeft - visibleWidth + 40;
+    m.style.font=cs.font;m.style.whiteSpace=cs.whiteSpace;m.style.overflowWrap=cs.overflowWrap;
+    m.style.tabSize=cs.tabSize;m.style.lineHeight=cs.lineHeight;m.style.padding=cs.padding;
+    m.style.width=code.clientWidth+'px';
+    m.textContent=code.value.substring(0,code.selectionStart);
+    const mk=document.createElement('span');mk.textContent='\u200b';m.appendChild(mk);
+    const lh=parseFloat(cs.lineHeight)||19;
+    const top=mk.offsetTop,left=mk.offsetLeft;
+    if(top<code.scrollTop)code.scrollTop=top;
+    else if(top+lh>code.scrollTop+code.clientHeight)code.scrollTop=top+lh-code.clientHeight;
+    if(cs.whiteSpace==='pre'){
+      if(left<code.scrollLeft)code.scrollLeft=Math.max(0,left-20);
+      else if(left>code.scrollLeft+code.clientWidth-20)code.scrollLeft=left-code.clientWidth+40;
     }
-
-    lineNumbers.scrollTop = code.scrollTop;
-  } catch(e) {}
+    lineNumbers.scrollTop=code.scrollTop;
+  }catch(e){}
 }
 
 function saveHistory(){
@@ -579,7 +584,7 @@ function makeDocument(){
     .replace(/<script\b[^>]*\bsrc=["']?(?!https?:|\/\/)[^"'\s>]+["']?[^>]*>\s*<\/script>/gi,'');
 
   // Show JS errors in the preview so a silent failure is visible.
-  const errTag='<script>window.addEventListener("error",function(e){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#b00020;color:#fff;font:12px monospace;padding:6px;z-index:99999";d.textContent="JS error: "+e.message;document.documentElement.appendChild(d)});<\/script>';
+  const errTag='<script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();<\/script>';
 
   const styleTag=errTag+'<style>\n'+css+'\n</style>';
   html=/<\/head>/i.test(html)
@@ -597,6 +602,7 @@ function makeDocument(){
 }
 
 function run(){
+  document.querySelector('#consoleOut').innerHTML='';
   document.querySelector('#preview').srcdoc=makeDocument();
   document.querySelector('#previewStatus').textContent='Ready';
   document.querySelector('#saveState').textContent='Saved';
@@ -613,7 +619,7 @@ function showPreview(){
 function showEditor(){
   previewPanel.hidden=true;
   editorPanel.hidden=false;
-  keyboardPanel.hidden=false;
+  applyKb();
   document.querySelector('#previewBtn').innerHTML='<span>◎</span>Preview';
   requestAnimationFrame(bringCaretIntoView);
 }
@@ -688,9 +694,8 @@ document.querySelector('#themeBtn').onclick=()=>{
     document.body.classList.contains('light')?'☀':'☾';
 };
 
-document.querySelector('#menuBtn').onclick=()=>{
-  alert('Nexora Code Studio · HTML, CSS and JavaScript editor');
-};
+document.querySelector('#menuBtn').onclick=()=>openMenu();
+document.querySelector('#moreBtn').onclick=()=>openMenu();
 
 document.querySelector('#moreBtn').onclick=()=>{
   alert('Use the language tabs, editor tools and Settings to work on your project.');
@@ -715,7 +720,7 @@ const letterRows=[
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
   ['SHIFT','Z','X','C','V','B','N','M','⌫'],
-  ['?123',',','SPACE','.','ENTER']
+  ['?123','◀','▲','▼','▶',',','SPACE','.','ENTER']
 ];
 
 /* Programming symbols layout. */
@@ -725,7 +730,7 @@ const symbolRows=[
   ['!','?','@','#','$','^','~','_','`'],
   [':',';',"'",'"',',','.','⌫'],
   ['ABC','TAB','=>','===','!==','&&','||'],
-  ['//','/* */','SPACE','ENTER']
+  ['◀','▲','▼','▶','//','/* */','SPACE','ENTER']
 ];
 
 function renderKeyboard(){
@@ -739,9 +744,13 @@ function renderKeyboard(){
       const button=document.createElement('button');
       button.type='button';
       button.className='key';
-      button.textContent=key;
+      let label=key;
+      if(/^[A-Z]$/.test(key)&&!(shiftMode||capsMode))label=key.toLowerCase();
+      if(key==='SHIFT')label=capsMode?'⇪':'⇧';
+      button.textContent=label;
       button.setAttribute('aria-label',key);
-      if(['SHIFT','?123','ABC','TAB','ENTER','SPACE'].includes(key))
+      if(key==='SHIFT'&&(shiftMode||capsMode))button.classList.add('on');
+      if(['SHIFT','?123','ABC','TAB','ENTER','SPACE','◀','▲','▼','▶'].includes(key))
         button.classList.add('special');
       if(['ENTER','TAB','ABC'].includes(key))
         button.classList.add('green','long');
@@ -780,19 +789,23 @@ function insertKey(key){
     return;
   }
   if(key==='SHIFT'){
-    shiftMode=!shiftMode;
-    keyboard.querySelectorAll('.key').forEach(button=>{
-      if(/^[A-Z]$/.test(button.textContent)){
-        button.textContent=shiftMode?button.textContent.toLowerCase():button.textContent.toUpperCase();
-      }
-    });
+    const now=Date.now();
+    if(capsMode){capsMode=false;shiftMode=false}
+    else if(shiftMode&&now-lastShiftTap<350){capsMode=true;shiftMode=false}
+    else shiftMode=!shiftMode;
+    lastShiftTap=now;
+    renderKeyboard();
     return;
   }
+  if(['◀','▶','▲','▼'].includes(key)){moveCursor(key);return}
   focusEditorCustom();
   let start=code.selectionStart;
   let end=code.selectionEnd;
   if(key==='⌫'){
-    if(start===end&&start>0)start--;
+    if(start===end&&start>0){
+      if(S.pair&&['()','[]','{}','""',"''",'``'].includes(code.value[start-1]+code.value[start]))end++;
+      start--;
+    }
     code.setRangeText('',start,end,'end');
     saveHistory();
     bringCaretIntoView();
@@ -801,14 +814,12 @@ function insertKey(key){
   let text=key;
   if(key==='SPACE')text=' ';
   else if(key==='ENTER')text='\n';
-  else if(key==='TAB')text=' ';
+  else if(key==='TAB'){tabAction();return}
   else if(key==='/* */')text='/* */';
   else if(key==='SHIFT')return;
-  else if(/^[A-Z]$/.test(key)&&shiftMode)text=key.toLowerCase();
+  else if(/^[A-Z]$/.test(key))text=(shiftMode||capsMode)?key:key.toLowerCase();
 
-  code.setRangeText(text,start,end,'end');
-  saveHistory();
-  bringCaretIntoView();
+  smartType(text,start,end);
 
   if(shiftMode&&/^[A-Z]$/.test(key)){
     shiftMode=false;
@@ -819,16 +830,17 @@ function insertKey(key){
 code.addEventListener('keydown',e=>{
   if(e.key==='Tab'){
     e.preventDefault();
-    insertAtCursor(' ');
+    tabAction();
+  }
+  if(e.key==='Enter'&&S.pair&&!e.isComposing){
+    e.preventDefault();
+    smartType('\n',code.selectionStart,code.selectionEnd);
   }
   if(e.key==='Escape'){
     code.blur();
   }
 });
-code.addEventListener('focus',()=>{
-  code.setAttribute('inputmode','none');
-  code.setAttribute('virtualkeyboardpolicy','manual');
-});
+code.addEventListener('focus',()=>{applyKbAttrs();});
 
 /* Settings */
 const settingsDefaults={
@@ -890,9 +902,333 @@ document.querySelector('#copyCode').onclick=async()=>{
   }
 };
 
+/* ===== v2 features ===== */
+const LS={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+let S=Object.assign({fontSize:12,kb:'rex',wrap:true,pair:true},LS.get('rexweb:s',{}));
+const saveS=()=>LS.set('rexweb:s',S);
+let projects=LS.get('rexweb:projects',null),curId=LS.get('rexweb:cur',null);
+const BOILER='<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  \n  <script src="script.js"><\/script>\n</body>\n</html>';
+const VOID=new Set(['img','input','br','hr','meta','link']);
+const TAGS=new Set('div span p a ul ol li h1 h2 h3 h4 h5 h6 section article aside nav header footer main button form label input select option textarea table thead tbody tr td th img br hr pre code strong em i b small'.split(' '));
+
+/* ---------- tiny UI helpers ---------- */
+const h=(tag,cls,text,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(fn)e.onclick=fn;return e};
+const sheet=document.querySelector('#sheet'),sheetBody=document.querySelector('#sheetBody');
+function openSheet(title,items){sheetBody.replaceChildren(h('h2','',title),...items);sheet.hidden=false}
+function closeSheet(){sheet.hidden=true}
+sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet()});
+const closeBtn=()=>h('button','mbtn wide','Close',closeSheet);
+
+/* ---------- keyboard mode, font, wrap ---------- */
+function applyKbAttrs(){
+  const d=S.kb==='device';
+  code.setAttribute('inputmode',d?'text':'none');
+  code.setAttribute('virtualkeyboardpolicy',d?'auto':'manual');
+}
+function applyKb(){
+  applyKbAttrs();
+  keyboardPanel.hidden=S.kb==='device'||!previewPanel.hidden;
+}
+function applyPrefs(){
+  document.documentElement.style.setProperty('--code-size',S.fontSize+'px');
+  document.body.classList.toggle('wrap',S.wrap);
+  applyKb();
+  bringCaretIntoView();
+}
+
+/* ---------- menu ---------- */
+function openMenu(){
+  const again=()=>{saveS();applyPrefs();openMenu()};
+  const tog=(label,on,fn)=>h('button','mbtn'+(on?' on':''),label,()=>{fn();again()});
+  const step=h('div','sheet-row');
+  const stepper=h('div','stepper');
+  stepper.append(
+    h('button','mbtn','A−',()=>{S.fontSize=Math.max(9,S.fontSize-1);again()}),
+    h('output','',S.fontSize+'px'),
+    h('button','mbtn','A+',()=>{S.fontSize=Math.min(26,S.fontSize+1);again()})
+  );
+  step.append(h('span','','Code font size'),stepper);
+  const grid=h('div','sheet-grid');
+  grid.append(
+    h('button','mbtn','⌨ Keyboard: '+(S.kb==='rex'?'RexWeb':'Device'),()=>{
+      S.kb=S.kb==='rex'?'device':'rex';saveS();closeSheet();code.blur();applyPrefs();
+      if(S.kb==='device')setTimeout(()=>code.focus(),80);
+    }),
+    tog('↵ Word wrap: '+(S.wrap?'On':'Off'),S.wrap,()=>{S.wrap=!S.wrap}),
+    tog('{} Auto-pair & indent: '+(S.pair?'On':'Off'),S.pair,()=>{S.pair=!S.pair}),
+    h('button','mbtn','🔎 Find & Replace',openFind),
+    h('button','mbtn','✂ Snippets',openSnippets),
+    h('button','mbtn','📁 Projects',openProjects),
+    h('button','mbtn','⌁ Console',()=>{closeSheet();showPreview();consolePanel.hidden=false}),
+    h('button','mbtn','Select all',()=>{closeSheet();code.focus({preventScroll:true});code.select()}),
+    h('button','mbtn','Go to line',gotoLine),
+    h('button','mbtn','⇩ Download all files',dlAll),
+    h('button','mbtn','⚙ Keyboard size & colors',()=>{closeSheet();document.querySelector('#settingsBackdrop').hidden=false}),
+    h('button','mbtn','↺ Reset to sample',resetSample),
+    closeBtn()
+  );
+  openSheet('Menu',[step,grid]);
+}
+
+/* ---------- find & replace ---------- */
+let lastFind='',matchCase=false;
+const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function openFind(){
+  const f=h('input'),r=h('input'),out=h('output','','');
+  f.placeholder='Find';r.placeholder='Replace with';f.value=lastFind;
+  const re=q=>new RegExp(esc(q),matchCase?'g':'gi');
+  const upd=()=>{lastFind=f.value;out.textContent=f.value?(code.value.match(re(f.value))||[]).length+' found':''};
+  const next=()=>{
+    const q=f.value;if(!q)return;
+    const v=matchCase?code.value:code.value.toLowerCase(),n=matchCase?q:q.toLowerCase();
+    let i=v.indexOf(n,code.selectionEnd);if(i<0)i=v.indexOf(n);
+    if(i>=0){code.setSelectionRange(i,i+q.length);bringCaretIntoView()}
+  };
+  const selected=()=>{
+    const s=code.value.slice(code.selectionStart,code.selectionEnd);
+    return f.value&&(matchCase?s===f.value:s.toLowerCase()===f.value.toLowerCase());
+  };
+  const mc=h('button','mbtn'+(matchCase?' on':''),'Aa match case',()=>{matchCase=!matchCase;mc.classList.toggle('on',matchCase);upd()});
+  const grid=h('div','sheet-grid');
+  grid.append(
+    h('button','mbtn','Next',()=>{next();upd()}),
+    h('button','mbtn','Replace',()=>{if(selected()){code.setRangeText(r.value,code.selectionStart,code.selectionEnd,'end');saveHistory()}next();upd()}),
+    h('button','mbtn','Replace all',()=>{if(!f.value)return;code.value=code.value.replace(re(f.value),()=>r.value);saveHistory();upd()}),
+    mc,closeBtn()
+  );
+  f.oninput=upd;
+  const row1=h('div','sheet-row'),row2=h('div','sheet-row');
+  row1.append(f);row2.append(r);
+  openSheet('Find & Replace',[row1,row2,out,grid]);
+  upd();
+}
+
+/* ---------- snippets & emmet ---------- */
+const SNIPS={
+  html:[['Boilerplate',BOILER],['Button','<button id="btn">Click me</button>'],['Link','<a href="#">Link</a>'],['Image','<img src="" alt="">'],['Form','<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Send</button>\n</form>'],['Nav','<nav>\n  <a href="#">Home</a>\n  <a href="#">About</a>\n</nav>']],
+  css:[['Reset','*{margin:0;padding:0;box-sizing:border-box}'],['Center (flex)','display:flex;\njustify-content:center;\nalign-items:center;'],['Grid 3 columns','display:grid;\ngrid-template-columns:repeat(3,1fr);\ngap:12px;'],['Media query','@media(max-width:600px){\n  \n}'],['Keyframes','@keyframes fade{\n  from{opacity:0}\n  to{opacity:1}\n}'],['Card','.card{\n  padding:16px;\n  border-radius:12px;\n  box-shadow:0 4px 14px #0003;\n}']],
+  js:[['On click','document.querySelector("#btn").addEventListener("click",()=>{\n  \n});'],['Fetch JSON','fetch("https://api.example.com/data")\n  .then(r=>r.json())\n  .then(d=>console.log(d))\n  .catch(console.error);'],['setInterval','setInterval(()=>{\n  \n},1000);'],['Random number','Math.floor(Math.random()*10)'],['DOM ready','document.addEventListener("DOMContentLoaded",()=>{\n  \n});']]
+};
+function openSnippets(){
+  const g=h('div','sheet-grid');
+  SNIPS[current].forEach(([n,t])=>g.append(h('button','mbtn',n,()=>{closeSheet();insertAtCursor(t)})));
+  g.append(closeBtn());
+  openSheet('Snippets · '+current.toUpperCase(),[g]);
+}
+function emmetSeq(s,lvl){
+  const i=s.indexOf('>'),j=s.indexOf('+');
+  if(j>=0&&(i<0||j<i)){
+    const a=emmetSeq(s.slice(0,j),lvl),b=emmetSeq(s.slice(j+1),lvl);
+    return a==null||b==null?null:a+'\n'+b;
+  }
+  const head=i<0?s:s.slice(0,i);
+  const m=head.match(/^([a-z][a-z0-9]*)?((?:[#.][\w-]+)*)(?:\*(\d+))?$/);
+  if(!m||(!m[1]&&!m[2]))return null;
+  const tag=m[1]||'div';
+  if(m[1]&&!TAGS.has(tag))return null;
+  const kids=i<0?'':emmetSeq(s.slice(i+1),lvl+1);
+  if(kids==null)return null;
+  const id=(m[2].match(/#([\w-]+)/)||[])[1];
+  const cls=(m[2].match(/\.([\w-]+)/g)||[]).map(c=>c.slice(1)).join(' ');
+  const attrs=(id?' id="'+id+'"':'')+(cls?' class="'+cls+'"':'');
+  const pad='  '.repeat(lvl);
+  let one;
+  if(VOID.has(tag))one=pad+'<'+tag+attrs+'>';
+  else if(kids)one=pad+'<'+tag+attrs+'>\n'+kids+'\n'+pad+'</'+tag+'>';
+  else one=pad+'<'+tag+attrs+'></'+tag+'>';
+  return Array(+m[3]||1).fill(one).join('\n');
+}
+function tabAction(){
+  focusEditorCustom();
+  const s=code.selectionStart,e=code.selectionEnd;
+  if(current==='html'&&s===e){
+    const before=code.value.slice(0,s),m=before.match(/(?:^|[\s>])([!\w.#>*+-]+)$/);
+    if(m){
+      const out=m[1]==='!'?BOILER:emmetSeq(m[1],0);
+      if(out!=null){
+        const indent=before.slice(before.lastIndexOf('\n')+1).match(/^[ \t]*/)[0];
+        code.setRangeText(out.replace(/\n/g,'\n'+indent),s-m[1].length,s,'end');
+        saveHistory();bringCaretIntoView();return;
+      }
+    }
+  }
+  smartType('  ',s,e);
+}
+
+/* ---------- auto-pair, auto-indent, auto-close tags ---------- */
+function smartType(text,start,end){
+  const v=code.value;
+  let ins=text,caret=null;
+  if(S.pair&&start===end){
+    const prev=v[start-1]||'',next=v[start]||'';
+    const PAIRS={'(':')','[':']','{':'}'};
+    const quotes=['"',"'",'`'];
+    if(text==='\n'){
+      const ls=start===0?0:v.lastIndexOf('\n',start-1)+1;
+      const indent=v.slice(ls,start).match(/^[ \t]*/)[0];
+      const between=current==='html'&&prev==='>'&&next==='<';
+      ins='\n'+indent;
+      if((prev&&PAIRS[prev]!==undefined)||between){
+        ins+='  ';caret=start+ins.length;
+        if(PAIRS[prev]===next||between)ins+='\n'+indent;
+      }
+    }else if(PAIRS[text]&&!/\w/.test(next)){
+      ins=text+PAIRS[text];caret=start+1;
+    }else if(Object.values(PAIRS).includes(text)&&next===text){
+      ins='';caret=start+1;
+    }else if(quotes.includes(text)){
+      if(next===text){ins='';caret=start+1}
+      else if(!/\w/.test(prev)&&!/\w/.test(next)){ins=text+text;caret=start+1}
+    }else if(text==='>'&&current==='html'){
+      const b=v.slice(0,start),m=b.match(/<([a-zA-Z][\w-]*)(?:\s[^<>]*)?$/);
+      if(m&&!VOID.has(m[1].toLowerCase())&&!/\/$/.test(b)){ins='></'+m[1]+'>';caret=start+1}
+    }
+  }
+  code.setRangeText(ins,start,end,'end');
+  if(caret!==null)code.setSelectionRange(caret,caret);
+  saveHistory();bringCaretIntoView();
+}
+
+/* ---------- cursor keys ---------- */
+function moveCursor(key){
+  focusEditorCustom();
+  const v=code.value,p=code.selectionStart;
+  let np=p;
+  if(key==='◀')np=Math.max(0,p-1);
+  else if(key==='▶')np=Math.min(v.length,p+1);
+  else{
+    const ls=p===0?0:v.lastIndexOf('\n',p-1)+1,col=p-ls;
+    if(key==='▲'){
+      if(ls===0)np=0;
+      else{const ps=ls>=2?v.lastIndexOf('\n',ls-2)+1:0;np=ps+Math.min(col,ls-1-ps)}
+    }else{
+      const le=v.indexOf('\n',p);
+      if(le<0)np=v.length;
+      else{const ne=v.indexOf('\n',le+1),endL=ne<0?v.length:ne;np=le+1+Math.min(col,endL-le-1)}
+    }
+  }
+  code.setSelectionRange(np,np);
+  bringCaretIntoView();
+}
+
+/* ---------- projects & autosave ---------- */
+const getFile=k=>k===current?code.value:history[k][history[k].length-1];
+function flush(){
+  if(!projects||!projects[curId])return;
+  const p=projects[curId];
+  p.html=getFile('html');p.css=getFile('css');p.js=getFile('js');p.updated=Date.now();
+  LS.set('rexweb:projects',projects);
+}
+let saveT;
+function autosave(){
+  if(!projects)return;
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>{flush();document.querySelector('#saveState').textContent='Saved'},600);
+}
+function openProject(id){
+  const p=projects[id];curId=id;LS.set('rexweb:cur',id);
+  history={html:[p.html],css:[p.css],js:[p.js]};
+  future={html:[],css:[],js:[]};
+  current='html';
+  code.value=p.html;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.lang==='html'));
+  code.setSelectionRange(0,0);code.scrollTop=0;
+  updateMeta();
+  document.querySelector('#saveState').textContent='Opened';
+}
+function initProjects(){
+  if(!projects||!Object.keys(projects).length){
+    const id='p'+Date.now();
+    projects={[id]:{name:'My Website',html:examples.html,css:examples.css,js:examples.js,updated:Date.now()}};
+    curId=id;
+  }
+  if(!projects[curId])curId=Object.keys(projects)[0];
+  openProject(curId);
+}
+function openProjects(){
+  const items=[];
+  Object.entries(projects).forEach(([id,p])=>{
+    const row=h('div','sheet-row');
+    const open=h('button','mbtn'+(id===curId?' on':''),p.name,()=>{flush();openProject(id);closeSheet()});
+    open.style.flex='1';
+    row.append(open,
+      h('button','mbtn','✎',()=>{const n=prompt('Rename project',p.name);if(n&&n.trim()){p.name=n.trim();flush();openProjects()}}),
+      h('button','mbtn','🗑',()=>{
+        if(Object.keys(projects).length<2){alert('You need at least one project.');return}
+        if(!confirm('Delete "'+p.name+'"?'))return;
+        delete projects[id];
+        if(id===curId){curId=Object.keys(projects)[0];openProject(curId)}
+        LS.set('rexweb:projects',projects);
+        openProjects();
+      })
+    );
+    items.push(row);
+  });
+  items.push(
+    h('button','mbtn wide','＋ New project',()=>{
+      const n=prompt('Project name','My Website '+(Object.keys(projects).length+1));
+      if(!n)return;
+      flush();
+      const id='p'+Date.now();
+      projects[id]={name:n.trim()||'Project',html:BOILER,css:'',js:'',updated:Date.now()};
+      openProject(id);closeSheet();
+    }),
+    closeBtn()
+  );
+  openSheet('Projects',items);
+}
+
+/* ---------- misc menu actions ---------- */
+function gotoLine(){
+  closeSheet();
+  const n=parseInt(prompt('Go to line number'),10);
+  if(!n)return;
+  const lines=code.value.split('\n');
+  let pos=0;
+  for(let i=0;i<Math.min(n-1,lines.length-1);i++)pos+=lines[i].length+1;
+  code.focus({preventScroll:true});
+  code.setSelectionRange(pos,pos);
+  bringCaretIntoView();
+}
+function dl(name,content,mime){
+  const u=URL.createObjectURL(new Blob([content],{type:mime}));
+  const a=document.createElement('a');a.href=u;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1500);
+}
+function dlAll(){
+  closeSheet();
+  dl('index.html',getFile('html'),'text/html');
+  setTimeout(()=>dl('style.css',getFile('css'),'text/css'),400);
+  setTimeout(()=>dl('script.js',getFile('js'),'text/javascript'),800);
+}
+function resetSample(){
+  closeSheet();
+  if(!confirm('Replace all three files in this project with the sample?'))return;
+  history={html:[examples.html],css:[examples.css],js:[examples.js]};
+  future={html:[],css:[],js:[]};
+  code.value=history[current][0];
+  updateMeta();
+}
+
+/* ---------- console panel ---------- */
+const consolePanel=document.querySelector('#consolePanel'),consoleOut=document.querySelector('#consoleOut');
+document.querySelector('#consoleBtn').onclick=()=>{consolePanel.hidden=!consolePanel.hidden};
+document.querySelector('#consoleClear').onclick=()=>{consoleOut.innerHTML=''};
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||!d.rexc||e.source!==document.querySelector('#preview').contentWindow)return;
+  consoleOut.append(h('div','cl '+d.t,(d.t==='log'?'':d.t+': ')+d.m));
+  consoleOut.scrollTop=consoleOut.scrollHeight;
+  if(d.t==='error')consolePanel.hidden=false;
+});
+
 applySettings();
 renderKeyboard();
-updateMeta();
+initProjects();
+applyPrefs();
 run();
 bringCaretIntoView();
 </script>
