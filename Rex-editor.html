@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>REXWEB — Nexora Code Studio</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050a16;
+  --panel:#081326;
+  --cyan:#21e7f5;
+  --blue:#168cff;
+  --purple:#9c62ff;
+  --text:#e8f4ff;
+  --muted:#8ea5bf;
+  --green:#00d99a;
+  --keyboard-bg:#102a49;
+  --keyboard-fg:#e8f4ff;
+  --key-height:34px;
+  --keyboard-width:100%;
+  --editor-height:100%;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  background:radial-gradient(ellipse at top,#10274b,#050a16 55%,#02050b);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:inherit;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.app{
+  width:100%;
+  max-width:1200px;
+  height:100vh;
+  height:100dvh;
+  margin:auto;
+  padding:6px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  gap:5px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  flex-shrink:0;
+  border:1px solid var(--cyan);
+  border-radius:12px;
+  background:#040b19;
+  box-shadow:0 0 16px #00d9ff19;
+}
+.logo-mark{font-size:22px;color:var(--cyan);font-weight:900;letter-spacing:-4px}
+.brand{
+  font-size:clamp(16px,3.5vw,24px);
+  font-weight:900;
+  background:linear-gradient(90deg,var(--cyan),#4c8cff);
+  color:transparent;
+  background-clip:text;
+  line-height:1.1;
+}
+.subtitle{font-size:8px;color:var(--muted);letter-spacing:.6px}
+.top-actions{margin-left:auto;display:flex;gap:4px}
+.iconbtn{
+  width:31px;
+  height:31px;
+  flex-shrink:0;
+  border:1px solid #0878be;
+  background:#081a31;
+  border-radius:8px;
+  color:var(--cyan);
+  font-size:16px;
+}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;flex-shrink:0}
+.tab{
+  padding:6px 2px;
+  border-radius:8px;
+  border:1px solid #145a8c;
+  background:#081225;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.tab.active{border:2px solid var(--cyan);color:var(--cyan);background:#08304b}
+.toolbar{
+  display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr));
+  gap:3px;
+  flex-shrink:0;
+}
+.tool{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
+  min-width:0;
+  height:36px;
+  padding:1px 0;
+  background:#0b1b30;
+  border:1px solid #14628c;
+  border-radius:6px;
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.tool span:first-child{font-size:14px;line-height:1;color:var(--cyan)}
+.tool.run{border-color:var(--green);color:var(--green);background:#04251f}
+.workspace{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;gap:5px}
+.panel{
+  border:1px solid #0877b7;
+  border-radius:11px;
+  background:#050e20;
+  overflow:hidden;
+  box-shadow:0 0 12px #00cfff10;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.workspace>.panel{width:100%;flex:1}
+#editorPanel{display:flex;flex-direction:column}
+.panel[hidden],.preview-screen[hidden]{display:none!important}
+.panel-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  border-bottom:1px solid #123c5b;
+  font-size:12px;
+  font-weight:700;
+  flex-shrink:0;
+}
+.filename{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.saved{background:#06432f;color:#00e99e;border-radius:15px;padding:2px 6px;font-size:9px}
+.dots{margin-left:auto;color:var(--muted)}
+.editor-wrap{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:26px minmax(0,1fr);
+  padding:4px 6px 0;
+  overflow:hidden;
+  width:var(--editor-width,100%);
+  max-width:100%;
+  margin-inline:auto;
+}
+.line-numbers{
+  white-space:pre;
+  overflow:hidden;
+  line-height:1.6;
+  color:#6584a9;
+  text-align:right;
+  padding:2px 5px 0 0;
+  user-select:none;
+  font:11px/1.6 ui-monospace,Consolas,monospace;
+}
+.code{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:0;
+  resize:none;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#dceaff;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
+  white-space:pre;
+  tab-size:2;
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.panel-foot{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+  color:var(--muted);
+  padding:4px 8px;
+  border-top:1px solid #123c5b;
+  font-size:9px;
+  flex-shrink:0;
+}
+.preview-screen{display:flex;flex-direction:column;flex:1;min-height:0}
+.preview-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  color:var(--cyan);
+  font-weight:800;
+  font-size:11px;
+  flex-shrink:0;
+}
+.status{margin-left:auto;color:#00e99e;background:#053b2b;border-radius:15px;padding:3px 6px;font-size:9px}
+.preview-area{flex:1;min-height:0;padding:0 6px 6px}
+.preview-frame{border:0;width:100%;height:100%;min-height:0;background:#fff;border-radius:6px;display:block}
+.keyboard{
+  flex-shrink:0;
+  margin:0;
+  width:var(--keyboard-width,100%);
+  max-width:100%;
+  margin-inline:auto;
+  padding:4px 6px;
+  background:#040b19;
+  border-color:#123f61;
+  box-shadow:0 -4px 18px #0007;
+  position:relative;
+  z-index:4;
+  border-radius:11px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  max-height:calc(100vh - 120px);
+  overflow:hidden;
+}
+.keyboard-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 1px 3px;
+  flex-shrink:0;
+}
+.keyboard-head strong{color:var(--cyan);font-size:10px;white-space:nowrap}
+.compact{margin-left:auto;color:var(--muted);display:flex;gap:3px;align-items:center;font-size:9px;white-space:nowrap}
+.compact input{margin:0;accent-color:var(--cyan)}
+.symbol-toggle{
+  width:100%;
+  height:max(24px, calc(var(--key-height, 34px) * 0.9));
+  margin-bottom:3px;
+  border:1px solid var(--purple);
+  border-radius:7px;
+  color:#fff;
+  background:linear-gradient(100deg,#171747,#24205b);
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.3px;
+  flex-shrink:0;
+}
+.keys{display:flex;flex-direction:column;gap:3px;width:100%;margin:auto;flex:1;min-height:0;justify-content:space-between}
+.keyrow{display:flex;gap:3px;justify-content:center;align-items:stretch;width:100%;flex:1;min-height:0}
+.key{
+  flex:1 1 0;
+  min-width:0;
+  height:var(--key-height,34px);
+  min-height:20px;
+  padding:1px;
+  border:1px solid #126ca5;
+  border-radius:6px;
+  background:var(--keyboard-bg);
+  color:var(--keyboard-fg);
+  font-size:clamp(9px, calc(var(--key-height, 34px) * 0.35), 14px);
+  font-weight:650;
+  overflow:hidden;
+  touch-action:manipulation;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.key.special{color:var(--cyan)}
+.key.green{border-color:#00c98f;color:#67ffd1}
+.key.red{border-color:#ff365d;color:#ff7188}
+.key.wide{flex:1.35 1 0;font-size:clamp(9px, calc(var(--key-height, 34px) * 0.3), 10px)}
+.key.space{flex:3 1 0}
+.key.shift{flex:1.4 1 0}
+.key.long{font-size:clamp(8px, calc(var(--key-height, 34px) * 0.28), 9px)}
+.key:active,.symbol-toggle:active{filter:brightness(1.35)}
+.keyboard.compact-mode .key{height:var(--key-height, 34px);font-size:clamp(9px, calc(var(--key-height, 34px) * 0.35), 10px)}
+.keyboard.compact-mode .keys,.keyboard.compact-mode .keyrow{gap:2px}
+.keyboard.compact-mode .symbol-toggle{margin-bottom:2px}
+.keyboard.compact-mode .keyboard-head{padding-bottom:2px}
+.footer{display:none}
+
+/* Settings dialog */
+.settings-backdrop{
+  position:fixed;
+  inset:0;
+  background:#000b;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+}
+.settings-backdrop[hidden]{display:none}
+.settings-modal{
+  width:min(440px,100%);
+  max-height:85dvh;
+  overflow:auto;
+  background:#071326;
+  border:1px solid var(--cyan);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 0 28px #00d9ff33;
+}
+.settings-modal h2{margin:0 0 6px;color:var(--cyan);font-size:19px}
+.settings-modal p{color:var(--muted);font-size:11px}
+.setting-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin:10px 0}
+.setting-row label{font-size:12px}
+.setting-row output{color:var(--cyan);font-size:11px}
+.setting-row input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--cyan)}
+.setting-row.color-row{grid-template-columns:1fr 50px}
+.setting-row input[type=color]{width:50px;height:31px;padding:2px;background:#0b1b30;border:1px solid #14628c;border-radius:7px}
+.settings-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:12px}
+.settings-actions button{padding:7px 11px;border-radius:8px;border:1px solid #14628c;background:#0b1b30}
+.settings-actions .done{background:#06432f;border-color:#00d99a}
+
+body.light{
+  --text:#10243c;
+  --muted:#526982;
+  background:#eaf3ff;
+  color:var(--text);
+}
+body.light .topbar,body.light .panel,body.light .tab,body.light .tool,
+body.light .keyboard{background:#fff;color:var(--text)}
+body.light .code{color:#173453}
+body.light .key{background:var(--keyboard-bg);color:var(--keyboard-fg)}
+body.light .keyboard-head strong{color:#087d9a}
+
+@media(max-width:760px){
+  .app{padding:4px;gap:4px}
+  .topbar{gap:5px;padding:4px 6px;border-radius:10px}
+  .logo-mark{font-size:20px}
+  .brand{font-size:clamp(15px,4vw,20px)}
+  .subtitle{font-size:7px}
+  .top-actions{gap:3px}
+  .iconbtn{width:29px;height:29px;font-size:15px}
+  .tabs{gap:3px}
+  .tab{padding:5px 2px;font-size:10px}
+  .toolbar{gap:2px}
+  .tool{height:33px;font-size:7px}
+  .tool span:first-child{font-size:13px}
+  .panel-head{padding:5px 7px}
+  .keyboard{padding:3px 5px;border-radius:10px}
+  .keyboard-head strong{font-size:9px}
+  .keyboard-head{gap:4px}
+  .keys{gap:2px}
+  .keyrow{gap:2px}
+  .key{border-radius:5px}
+}
+@media(max-height:700px){
+  .app{gap:3px;padding:3px}
+  .topbar{padding:3px 6px}
+  .logo-mark{font-size:18px}
+  .iconbtn{height:27px}
+  .tab{padding:4px 2px}
+  .tool{height:30px}
+  .keyboard{padding:2px 4px;background:#040b19}
+  .keyboard-head{padding-bottom:2px}
+  .keys,.keyrow{gap:2px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <button class="iconbtn" aria-label="Menu" id="menuBtn">☰</button>
+    <div class="logo-mark">&lt;/&gt;</div>
+    <div><div class="brand">REXWEB</div><div class="subtitle">NEXORA CODE STUDIO</div></div>
+    <div class="top-actions">
+      <button class="iconbtn" id="themeBtn" title="Toggle theme">☾</button>
+      <button class="iconbtn" id="settingsBtn" title="Settings" aria-label="Settings">⚙</button>
+      <button class="iconbtn" id="moreBtn" title="More options">⋮</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Language tabs">
+    <button class="tab active" data-lang="html">〈/〉 HTML</button>
+    <button class="tab" data-lang="css">⬡ CSS</button>
+    <button class="tab" data-lang="js">JS JavaScript</button>
+  </nav>
+
+  <div class="toolbar">
+    <button class="tool run" id="run"><span>▷</span>Run</button>
+    <button class="tool" id="previewBtn"><span>◎</span>Preview</button>
+    <button class="tool" id="download"><span>⇩</span>Download</button>
+    <button class="tool" id="uploadBtn"><span>⇧</span>Upload</button>
+    <button class="tool" id="clear"><span>◇</span>Clear</button>
+    <button class="tool" id="undo"><span>↶</span>Undo</button>
+    <button class="tool" id="redo"><span>↻</span>Redo</button>
+    <button class="tool" id="copyCode"><span>▣</span>Copy</button>
+  </div>
+
+  <input type="file" id="fileInput" accept=".html,.htm,.css,.js,.txt" hidden>
+
+  <div class="settings-backdrop" id="settingsBackdrop" hidden>
+    <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <h2 id="settingsTitle">Studio Settings</h2>
+      <p>Adjust your editor and RexWeb coding keyboard.</p>
+      <div class="setting-row"><label for="keyboardWidth">Keyboard width</label><output id="keyboardWidthValue">100%</output><input id="keyboardWidth" type="range" min="60" max="100" value="100"></div>
+      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">34 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="34"></div>
+      <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
+      <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
+      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
+      <p style="font-size:10px">The custom keyboard is designed for touch input. Browser support for suppressing the system keyboard may vary.</p>
+      <div class="settings-actions"><button id="resetSettings">Reset</button><button class="done" id="closeSettings">Done</button></div>
+    </section>
+  </div>
+
+  <section class="workspace">
+    <div class="panel" id="editorPanel">
+      <div class="panel-head">
+        <span style="color:var(--cyan)">〈/〉</span>
+        <span class="filename" id="filename">index.html</span>
+        <span class="saved" id="saveState">Ready</span>
+        <span class="dots">•••</span>
+      </div>
+      <div class="editor-wrap">
+        <div class="line-numbers" id="lineNumbers">1</div>
+        <textarea class="code" id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" inputmode="none" virtualkeyboardpolicy="manual" enterkeyhint="done" aria-label="Code editor"></textarea>
+      </div>
+      <div class="panel-foot"><span id="fileInfo">HTML · UTF-8</span><span id="lineCount">1 line</span></div>
+    </div>
+
+    <div class="panel preview-screen" id="previewPanel" hidden>
+      <div class="preview-head">
+        <button class="iconbtn" id="backToEditor" style="width:auto;padding:0 8px;font-size:11px">← Editor</button>
+        LIVE PREVIEW
+        <span class="status" id="previewStatus">Ready</span>
+        <button class="iconbtn" id="expandPreview" title="Open preview">⛶</button>
+      </div>
+      <div class="preview-area"><iframe class="preview-frame" id="preview" title="Website live preview" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
+    </div>
+  </section>
+
+  <section class="panel keyboard compact-mode" id="keyboardPanel">
+    <div class="keyboard-head">
+      <span style="font-size:17px;color:var(--cyan)">▦</span>
+      <strong>REXWEB CODING KEYBOARD</strong>
+      <label class="compact"><input type="checkbox" id="compactToggle" checked> Compact</label>
+    </div>
+    <button class="symbol-toggle" id="symbolsToggle" type="button">#+= &nbsp; Symbols</button>
+    <div class="keys" id="keyboard"></div>
+  </section>
+</div>
+
+<script>
+const examples={
+  html:'<!DOCTYPE html>\n<html lang="en">\n<head>\n <meta charset="UTF-8">\n <meta name="viewport" content="width=device-width, initial-scale=1.0">\n <title>My Website</title>\n</head>\n<body>\n <h1>Welcome!</h1>\n <p>My first website.</p>\n <button onclick="alert(&quot;Hello!&quot;)">Explore Website</button>\n</body>\n</html>',
+  css:'body {\n font-family: Arial, sans-serif;\n padding: 24px;\n background: #f4f7fb;\n color: #193247;\n}\nh1 { color: #087f5b; }\nbutton {\n background: #087f5b;\n color: white;\n border: 0;\n border-radius: 10px;\n padding: 14px 20px;\n}',
+  js:'const heading = document.querySelector("h1");\nif (heading) {\n heading.textContent = "Welcome to RexWeb!";\n}\nconsole.log("Nexora Code Studio is ready.");'
+};
+
+let current='html';
+let history={html:[examples.html],css:[examples.css],js:[examples.js]};
+let positions={html:0,css:0,js:0};
+let future={html:[],css:[],js:[]};
+let symbolsMode=false,shiftMode=false;
+
+const code=document.querySelector('#code');
+const lineNumbers=document.querySelector('#lineNumbers');
+const keyboard=document.querySelector('#keyboard');
+const keyboardPanel=document.querySelector('#keyboardPanel');
+const editorPanel=document.querySelector('#editorPanel');
+const previewPanel=document.querySelector('#previewPanel');
+const fileNames={html:'index.html',css:'style.css',js:'script.js'};
+const info={html:'HTML · UTF-8',css:'CSS · UTF-8',js:'JavaScript · UTF-8'};
+
+code.value=examples.html;
+
+function focusEditorCustom(){
+  code.setAttribute('inputmode','none');
+  code.setAttribute('virtualkeyboardpolicy','manual');
+  code.focus({preventScroll:true});
+}
+
+function updateMeta(){
+  const lines=code.value.split('\n').length;
+  lineNumbers.textContent=Array.from({length:lines},(_,i)=>i+1).join('\n');
+  document.querySelector('#lineCount').textContent=lines+(lines===1?' line':' lines');
+  document.querySelector('#filename').textContent=fileNames[current];
+  document.querySelector('#fileInfo').textContent=info[current];
+  lineNumbers.scrollTop=code.scrollTop;
+}
+
+function bringCaretIntoView(){
+  try {
+    const text = code.value;
+    const selStart = code.selectionStart;
+    const computedStyle = window.getComputedStyle(code);
+    const lineHeight = parseFloat(computedStyle.lineHeight) || 19.2;
+    const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+    const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+    
+    const textBeforeCaret = text.substring(0, selStart);
+    const linesBeforeCaret = textBeforeCaret.split('\n');
+    const currentLineIndex = linesBeforeCaret.length - 1;
+    const currentLineText = linesBeforeCaret[currentLineIndex] || '';
+    
+    // Vertical Auto-Scrolling Calculation
+    const targetTop = currentLineIndex * lineHeight;
+    const visibleHeight = code.clientHeight - paddingTop - (parseFloat(computedStyle.paddingBottom) || 0);
+    const currentScrollTop = code.scrollTop;
+    
+    if (targetTop < currentScrollTop) {
+      code.scrollTop = Math.max(0, targetTop);
+    } else if (targetTop + lineHeight > currentScrollTop + visibleHeight) {
+      code.scrollTop = targetTop + lineHeight - visibleHeight;
+    }
+    
+    // Horizontal Auto-Scrolling Calculation
+    const canvas = bringCaretIntoView.canvas || (bringCaretIntoView.canvas = document.createElement('canvas'));
+    const context = canvas.getContext('2d');
+    context.font = computedStyle.font;
+    const charWidth = context.measureText('M').width || 7.2;
+    const currentColumn = currentLineText.length;
+    const targetLeft = currentColumn * charWidth;
+    const visibleWidth = code.clientWidth - paddingLeft - paddingRight;
+    const currentScrollLeft = code.scrollLeft;
+    
+    if (targetLeft < currentScrollLeft) {
+      code.scrollLeft = Math.max(0, targetLeft - 20);
+    } else if (targetLeft > currentScrollLeft + visibleWidth - 20) {
+      code.scrollLeft = targetLeft - visibleWidth + 40;
+    }
+    
+    lineNumbers.scrollTop = code.scrollTop;
+  } catch(e) {}
+}
+
+function saveHistory(){
+  const arr=history[current];
+  if(arr[arr.length-1]!==code.value){
+    arr.push(code.value);
+    if(arr.length>100)arr.shift();
+    future[current]=[];
+  }
+  updateMeta();
+  document.querySelector('#saveState').textContent='Edited';
+}
+
+function setLang(lang){
+  positions[current]=code.selectionStart;
+  current=lang;
+  code.value=history[current][history[current].length-1];
+  const pos=Math.min(positions[current]||0,code.value.length);
+  code.setSelectionRange(pos,pos);
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.lang===lang);
+  });
+  updateMeta();
+  bringCaretIntoView();
+}
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>setLang(t.dataset.lang));
+});
+
+code.addEventListener('input',()=>{
+  saveHistory();
+  bringCaretIntoView();
+});
+code.addEventListener('keyup', bringCaretIntoView);
+code.addEventListener('click', bringCaretIntoView);
+code.addEventListener('scroll',()=>{lineNumbers.scrollTop=code.scrollTop;});
+
+function makeDocument(){
+  let html=history.html[history.html.length-1];
+  const css=history.css[history.css.length-1];
+  const js=history.js[history.js.length-1];
+  if(current==='html')html=code.value;
+  if(current==='css'){
+    html=html.replace('</head>','<style>\n'+code.value+'\n</style>\n</head>');
+  }else{
+    html=html.replace('</head>','<style>\n'+css+'\n</style>\n</head>');
+  }
+  const script=current==='js'?code.value:js;
+  if(script.trim()){
+    html=html.replace('</body>','<script>\n'+script+'\n<\/script>\n</body>');
+  }
+  return html;
+}
+
+function run(){
+  document.querySelector('#preview').srcdoc=makeDocument();
+  document.querySelector('#previewStatus').textContent='Ready';
+  document.querySelector('#saveState').textContent='Saved';
+}
+
+function showPreview(){
+  run();
+  editorPanel.hidden=true;
+  keyboardPanel.hidden=true;
+  previewPanel.hidden=false;
+  document.querySelector('#previewBtn').innerHTML='<span>⌨</span>Editor';
+}
+
+function showEditor(){
+  previewPanel.hidden=true;
+  editorPanel.hidden=false;
+  keyboardPanel.hidden=false;
+  document.querySelector('#previewBtn').innerHTML='<span>◎</span>Preview';
+  requestAnimationFrame(bringCaretIntoView);
+}
+
+document.querySelector('#run').onclick=showPreview;
+document.querySelector('#previewBtn').onclick=()=>{
+  if(previewPanel.hidden)showPreview();else showEditor();
+};
+document.querySelector('#backToEditor').onclick=showEditor;
+
+document.querySelector('#download').onclick=()=>{
+  const content=current==='html'?makeDocument():code.value;
+  const mime=current==='html'?'text/html':current==='css'?'text/css':'text/javascript';
+  const blob=new Blob([content],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=fileNames[current];
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+
+document.querySelector('#uploadBtn').onclick=()=>document.querySelector('#fileInput').click();
+document.querySelector('#fileInput').onchange=e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    code.value=String(reader.result);
+    history[current].push(code.value);
+    future[current]=[];
+    updateMeta();
+    document.querySelector('#saveState').textContent='Loaded';
+    bringCaretIntoView();
+  };
+  reader.readAsText(file);
+  e.target.value='';
+};
+
+document.querySelector('#clear').onclick=()=>{
+  if(confirm('Clear the current file?')){
+    code.value='';
+    saveHistory();
+    bringCaretIntoView();
+  }
+};
+
+document.querySelector('#undo').onclick=()=>{
+  if(history[current].length>1){
+    future[current].push(history[current].pop());
+    code.value=history[current][history[current].length-1];
+    updateMeta();
+    document.querySelector('#saveState').textContent='Undo';
+    bringCaretIntoView();
+  }
+};
+
+document.querySelector('#redo').onclick=()=>{
+  if(future[current].length){
+    const value=future[current].pop();
+    history[current].push(value);
+    code.value=value;
+    updateMeta();
+    document.querySelector('#saveState').textContent='Redo';
+    bringCaretIntoView();
+  }
+};
+
+document.querySelector('#themeBtn').onclick=()=>{
+  document.body.classList.toggle('light');
+  document.querySelector('#themeBtn').textContent=
+    document.body.classList.contains('light')?'☀':'☾';
+};
+
+document.querySelector('#menuBtn').onclick=()=>{
+  alert('Nexora Code Studio · HTML, CSS and JavaScript editor');
+};
+
+document.querySelector('#moreBtn').onclick=()=>{
+  alert('Use the language tabs, editor tools and Settings to work on your project.');
+};
+
+document.querySelector('#expandPreview').onclick=()=>{
+  const win=window.open('','_blank');
+  if(win){
+    win.document.open();
+    win.document.write(makeDocument());
+    win.document.close();
+  }
+};
+
+document.querySelector('#compactToggle').onchange=e=>{
+  keyboardPanel.classList.toggle('compact-mode',e.target.checked);
+};
+
+/* Normal keyboard: numbers and letters together. */
+const letterRows=[
+  ['1','2','3','4','5','6','7','8','9','0'],
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['SHIFT','Z','X','C','V','B','N','M','⌫'],
+  ['?123',',','SPACE','.','ENTER']
+];
+
+/* Programming symbols layout. */
+const symbolRows=[
+  ['<','>','/','\\','=','+','-','*','%'],
+  ['(',')','[',']','{','}','|','&'],
+  ['!','?','@','#','$','^','~','_','`'],
+  [':',';',"'",'"',',','.','⌫'],
+  ['ABC','TAB','=>','===','!==','&&','||'],
+  ['//','/* */','SPACE','ENTER']
+];
+
+function renderKeyboard(){
+  keyboard.innerHTML='';
+  const rows=symbolsMode?symbolRows:letterRows;
+  rows.forEach(row=>{
+    const wrap=document.createElement('div');
+    wrap.className='keyrow';
+    row.forEach(raw=>{
+      const key=raw;
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='key';
+      button.textContent=key;
+      button.setAttribute('aria-label',key);
+      if(['SHIFT','?123','ABC','TAB','ENTER','SPACE'].includes(key))
+        button.classList.add('special');
+      if(['ENTER','TAB','ABC'].includes(key))
+        button.classList.add('green','long');
+      if(key==='⌫')button.classList.add('red','wide');
+      if(key==='SHIFT')button.classList.add('shift','long');
+      if(key==='SPACE')button.classList.add('space','long');
+      if(['===','!==','/* */'].includes(key))button.classList.add('long');
+      button.addEventListener('pointerdown',e=>e.preventDefault());
+      button.addEventListener('click',()=>insertKey(key));
+      wrap.appendChild(button);
+    });
+    keyboard.appendChild(wrap);
+  });
+  document.querySelector('#symbolsToggle').textContent=
+    symbolsMode?'ABC ← Back to letters':'#+= Symbols';
+}
+
+document.querySelector('#symbolsToggle').onclick=()=>{
+  symbolsMode=!symbolsMode;
+  renderKeyboard();
+};
+
+function insertAtCursor(text){
+  focusEditorCustom();
+  const start=code.selectionStart;
+  const end=code.selectionEnd;
+  code.setRangeText(text,start,end,'end');
+  saveHistory();
+  bringCaretIntoView();
+}
+
+function insertKey(key){
+  if(key==='ABC'||key==='?123'){
+    symbolsMode=key==='?123';
+    renderKeyboard();
+    return;
+  }
+  if(key==='SHIFT'){
+    shiftMode=!shiftMode;
+    keyboard.querySelectorAll('.key').forEach(button=>{
+      if(/^[A-Z]$/.test(button.textContent)){
+        button.textContent=shiftMode?button.textContent.toLowerCase():button.textContent.toUpperCase();
+      }
+    });
+    return;
+  }
+  focusEditorCustom();
+  let start=code.selectionStart;
+  let end=code.selectionEnd;
+  if(key==='⌫'){
+    if(start===end&&start>0)start--;
+    code.setRangeText('',start,end,'end');
+    saveHistory();
+    bringCaretIntoView();
+    return;
+  }
+  let text=key;
+  if(key==='SPACE')text=' ';
+  else if(key==='ENTER')text='\n';
+  else if(key==='TAB')text=' ';
+  else if(key==='/* */')text='/* */';
+  else if(key==='SHIFT')return;
+  else if(/^[A-Z]$/.test(key)&&shiftMode)text=key.toLowerCase();
+  
+  code.setRangeText(text,start,end,'end');
+  saveHistory();
+  bringCaretIntoView();
+  
+  if(shiftMode&&/^[A-Z]$/.test(key)){
+    shiftMode=false;
+    renderKeyboard();
+  }
+}
+
+code.addEventListener('keydown',e=>{
+  if(e.key==='Tab'){
+    e.preventDefault();
+    insertAtCursor(' ');
+  }
+  if(e.key==='Escape'){
+    code.blur();
+  }
+});
+code.addEventListener('focus',()=>{
+  code.setAttribute('inputmode','none');
+  code.setAttribute('virtualkeyboardpolicy','manual');
+});
+
+/* Settings */
+const settingsDefaults={
+  keyboardWidth:100,keyboardHeight:34,
+  keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
+  editorWidth:100
+};
+
+function applySettings(){
+  const kw=+document.querySelector('#keyboardWidth').value;
+  const kh=+document.querySelector('#keyboardHeight').value;
+  const ew=+document.querySelector('#editorWidth').value;
+  const bg=document.querySelector('#keyboardBgColor').value;
+  const fg=document.querySelector('#keyboardFontColor').value;
+  document.documentElement.style.setProperty('--keyboard-width',kw+'%');
+  document.documentElement.style.setProperty('--key-height',kh+'px');
+  document.documentElement.style.setProperty('--editor-width',ew+'%');
+  document.documentElement.style.setProperty('--keyboard-bg',bg);
+  document.documentElement.style.setProperty('--keyboard-fg',fg);
+  document.querySelector('#keyboardWidthValue').textContent=kw+'%';
+  document.querySelector('#keyboardHeightValue').textContent=kh+' px';
+  document.querySelector('#editorWidthValue').textContent=ew+'%';
+  bringCaretIntoView();
+}
+
+['keyboardWidth','keyboardHeight','editorWidth','keyboardBgColor','keyboardFontColor'].forEach(id=>{
+  document.querySelector('#'+id).addEventListener('input',applySettings);
+});
+
+document.querySelector('#settingsBtn').onclick=()=>{
+  document.querySelector('#settingsBackdrop').hidden=false;
+};
+document.querySelector('#closeSettings').onclick=()=>{
+  document.querySelector('#settingsBackdrop').hidden=true;
+};
+document.querySelector('#settingsBackdrop').addEventListener('click',e=>{
+  if(e.target.id==='settingsBackdrop')e.currentTarget.hidden=true;
+});
+document.querySelector('#resetSettings').onclick=()=>{
+  Object.entries(settingsDefaults).forEach(([id,value])=>{
+    document.querySelector('#'+id).value=value;
+  });
+  applySettings();
+};
+
+document.querySelector('#copyCode').onclick=async()=>{
+  try{
+    await navigator.clipboard.writeText(code.value);
+    document.querySelector('#saveState').textContent='Copied';
+  }catch(error){
+    code.focus();
+    code.select();
+    try{
+      document.execCommand('copy');
+      document.querySelector('#saveState').textContent='Copied';
+    }catch(err){
+      document.querySelector('#saveState').textContent='Select code';
+    }
+  }
+};
+
+applySettings();
+renderKeyboard();
+updateMeta();
+run();
+bringCaretIntoView();
+</script>
+</body>
+</html>
+
