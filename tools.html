@@ -1,900 +1,1179 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>REXWEB — Nexora Code Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050b19" id="themeColor">
+<title>Digital Tools | RexWeb Nexora</title>
+<meta name="description" content="Explore advanced digital tools, calculators, converters, text utilities, a code board, and more at RexWeb Nexora.">
+
 <style>
 :root{
-  color-scheme:dark;
-  --bg:#050a16;
-  --panel:#081326;
-  --cyan:#21e7f5;
-  --blue:#168cff;
-  --purple:#9c62ff;
-  --text:#e8f4ff;
-  --muted:#8ea5bf;
-  --green:#00d99a;
-  --keyboard-bg:#102a49;
-  --keyboard-fg:#e8f4ff;
-  --key-height:34px;
-  --keyboard-width:100%;
-  --editor-height:100%;
+--bg:#030918;--surface:#071327;--card:#09172b;
+--text:#f4f7ff;--muted:#aabbd5;--border:#203d61;
+--blue:#00c8ff;--purple:#8650ff;--green:#39ff14;
 }
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{
-  background:radial-gradient(ellipse at top,#10274b,#050a16 55%,#02050b);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+html[data-theme="light"]{
+--bg:#f2f6ff;--surface:#fff;--card:#fff;
+--text:#101b32;--muted:#52627c;--border:#d4e0f4;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+a{color:inherit;text-decoration:none}
 button,input,textarea,select{font:inherit}
-button{cursor:pointer;color:inherit;touch-action:manipulation}
-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.app{
-  width:100%;
-  max-width:1200px;
-  height:100vh;
-  height:100dvh;
-  margin:auto;
-  padding:6px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  gap:5px;
+button{cursor:pointer}
+.container{width:min(1100px,93%);margin:auto}
+header{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border)}
+.topbar{min-height:65px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:23px;font-weight:900}
+.brand span{color:var(--blue)}
+.actions{display:flex;gap:8px}
+.icon-btn{padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text)}
+.category-nav{overflow-x:auto;border-top:1px solid var(--border)}
+.category-row{display:flex;gap:9px;padding:10px 0;width:max-content}
+.category-row a{padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card);font-size:12px;font-weight:bold}
+.hero{padding:40px 0;background:radial-gradient(ellipse at top right,#7545ff35,transparent 55%)}
+.badge{color:var(--blue);font-size:11px;font-weight:bold;letter-spacing:2px}
+h1{font-size:clamp(32px,6vw,48px);margin:15px 0}
+.gradient{background:linear-gradient(90deg,var(--blue),#a56aff,#ff43c6);color:transparent;background-clip:text}
+.hero p,.muted{color:var(--muted);line-height:1.7;font-size:14px}
+.section{padding:25px 0}
+.search{width:100%;padding:14px;border:1px solid var(--border);border-radius:11px;background:var(--card);color:var(--text);margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;overflow:hidden}
+.tool-card:hover{border-color:var(--blue)}
+.tool-heading{display:flex;align-items:center;gap:10px}
+.tool-icon{font-size:24px}
+.tool-heading h3{font-size:16px}
+.tool-toggle{margin-left:auto;width:35px;height:35px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--blue);font-size:20px;flex-shrink:0;transition:transform .2s}
+.tool-toggle:hover{border-color:var(--blue)}
+.tool-content{padding-top:13px}
+.tool-card.collapsed .tool-content{display:none}
+.tool-card.collapsed .tool-toggle{transform:rotate(-90deg)}
+.tool-card .desc{color:var(--muted);font-size:12px;line-height:1.6;margin:9px 0 13px}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+input:not([type=checkbox]):not([type=range]):not([type=color]),textarea,select{
+width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);outline:none
 }
-.topbar{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:5px 8px;
-  flex-shrink:0;
-  border:1px solid var(--cyan);
-  border-radius:12px;
-  background:#040b19;
-  box-shadow:0 0 16px #00d9ff19;
-}
-.logo-mark{font-size:22px;color:var(--cyan);font-weight:900;letter-spacing:-4px}
-.brand{
-  font-size:clamp(16px,3.5vw,24px);
-  font-weight:900;
-  background:linear-gradient(90deg,var(--cyan),#4c8cff);
-  color:transparent;
-  background-clip:text;
-  line-height:1.1;
-}
-.subtitle{font-size:8px;color:var(--muted);letter-spacing:.6px}
-.top-actions{margin-left:auto;display:flex;gap:4px}
-.iconbtn{
-  width:31px;
-  height:31px;
-  flex-shrink:0;
-  border:1px solid #0878be;
-  background:#081a31;
-  border-radius:8px;
-  color:var(--cyan);
-  font-size:16px;
-}
-.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;flex-shrink:0}
-.tab{
-  padding:6px 2px;
-  border-radius:8px;
-  border:1px solid #145a8c;
-  background:#081225;
-  font-size:11px;
-  font-weight:700;
-  white-space:nowrap;
-}
-.tab.active{border:2px solid var(--cyan);color:var(--cyan);background:#08304b}
-.toolbar{
-  display:grid;
-  grid-template-columns:repeat(8,minmax(0,1fr));
-  gap:3px;
-  flex-shrink:0;
-}
-.tool{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:1px;
-  min-width:0;
-  height:36px;
-  padding:1px 0;
-  background:#0b1b30;
-  border:1px solid #14628c;
-  border-radius:6px;
-  font-size:8px;
-  white-space:nowrap;
-  overflow:hidden;
-}
-.tool span:first-child{font-size:14px;line-height:1;color:var(--cyan)}
-.tool.run{border-color:var(--green);color:var(--green);background:#04251f}
-.workspace{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;gap:5px}
-.panel{
-  border:1px solid #0877b7;
-  border-radius:11px;
-  background:#050e20;
-  overflow:hidden;
-  box-shadow:0 0 12px #00cfff10;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-.workspace>.panel{width:100%;flex:1}
-#editorPanel{display:flex;flex-direction:column}
-.panel[hidden],.preview-screen[hidden]{display:none!important}
-.panel-head{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 8px;
-  border-bottom:1px solid #123c5b;
-  font-size:12px;
-  font-weight:700;
-  flex-shrink:0;
-}
-.filename{font-weight:600;overflow:hidden;text-overflow:ellipsis}
-.saved{background:#06432f;color:#00e99e;border-radius:15px;padding:2px 6px;font-size:9px}
-.dots{margin-left:auto;color:var(--muted)}
-.editor-wrap{
-  flex:1;
-  min-height:0;
-  display:grid;
-  grid-template-columns:26px minmax(0,1fr);
-  padding:4px 6px 0;
-  overflow:hidden;
-  width:var(--editor-width,100%);
-  max-width:100%;
-  margin-inline:auto;
-}
-.line-numbers{
-  white-space:pre;
-  overflow:hidden;
-  line-height:1.6;
-  color:#6584a9;
-  text-align:right;
-  padding:2px 5px 0 0;
-  user-select:none;
-  font:11px/1.6 ui-monospace,Consolas,monospace;
-}
-.code{
-  display:block;
-  width:100%;
-  height:100%;
-  min-height:0;
-  resize:none;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#dceaff;
-  font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
-  white-space:pre;
-  tab-size:2;
-  overflow:auto;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-}
-.panel-foot{
-  display:flex;
-  justify-content:space-between;
-  gap:6px;
-  color:var(--muted);
-  padding:4px 8px;
-  border-top:1px solid #123c5b;
-  font-size:9px;
-  flex-shrink:0;
-}
-.preview-screen{display:flex;flex-direction:column;flex:1;min-height:0}
-.preview-head{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 8px;
-  color:var(--cyan);
-  font-weight:800;
-  font-size:11px;
-  flex-shrink:0;
-}
-.status{margin-left:auto;color:#00e99e;background:#053b2b;border-radius:15px;padding:3px 6px;font-size:9px}
-.preview-area{flex:1;min-height:0;padding:0 6px 6px;position:relative}
-.preview-frame{position:absolute;inset:0 6px 6px;width:calc(100% - 12px);height:calc(100% - 6px);border:0;background:#fff;border-radius:6px;display:block}
-.keyboard{
-  flex-shrink:0;
-  margin:0;
-  width:var(--keyboard-width,100%);
-  max-width:100%;
-  margin-inline:auto;
-  padding:4px 6px;
-  background:#040b19;
-  border-color:#123f61;
-  box-shadow:0 -4px 18px #0007;
-  position:relative;
-  z-index:4;
-  border-radius:11px;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-  max-height:calc(100vh - 120px);
-  overflow:hidden;
-}
-.keyboard-head{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:0 1px 3px;
-  flex-shrink:0;
-}
-.keyboard-head strong{color:var(--cyan);font-size:10px;white-space:nowrap}
-.compact{margin-left:auto;color:var(--muted);display:flex;gap:3px;align-items:center;font-size:9px;white-space:nowrap}
-.compact input{margin:0;accent-color:var(--cyan)}
-.symbol-toggle{
-  width:100%;
-  height:max(24px, calc(var(--key-height, 34px) * 0.9));
-  margin-bottom:3px;
-  border:1px solid var(--purple);
-  border-radius:7px;
-  color:#fff;
-  background:linear-gradient(100deg,#171747,#24205b);
-  font-size:11px;
-  font-weight:750;
-  letter-spacing:.3px;
-  flex-shrink:0;
-}
-.keys{display:flex;flex-direction:column;gap:3px;width:100%;margin:auto;flex:1;min-height:0;justify-content:space-between}
-.keyrow{display:flex;gap:3px;justify-content:center;align-items:stretch;width:100%;flex:1;min-height:0}
-.key{
-  flex:1 1 0;
-  min-width:0;
-  height:var(--key-height,34px);
-  min-height:20px;
-  padding:1px;
-  border:1px solid #126ca5;
-  border-radius:6px;
-  background:var(--keyboard-bg);
-  color:var(--keyboard-fg);
-  font-size:clamp(9px, calc(var(--key-height, 34px) * 0.35), 14px);
-  font-weight:650;
-  overflow:hidden;
-  touch-action:manipulation;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.key.special{color:var(--cyan)}
-.key.green{border-color:#00c98f;color:#67ffd1}
-.key.red{border-color:#ff365d;color:#ff7188}
-.key.wide{flex:1.35 1 0;font-size:clamp(9px, calc(var(--key-height, 34px) * 0.3), 10px)}
-.key.space{flex:3 1 0}
-.key.shift{flex:1.4 1 0}
-.key.long{font-size:clamp(8px, calc(var(--key-height, 34px) * 0.28), 9px)}
-.key:active,.symbol-toggle:active{filter:brightness(1.35)}
-.keyboard.compact-mode .key{height:var(--key-height, 34px);font-size:clamp(9px, calc(var(--key-height, 34px) * 0.35), 10px)}
-.keyboard.compact-mode .keys,.keyboard.compact-mode .keyrow{gap:2px}
-.keyboard.compact-mode .symbol-toggle{margin-bottom:2px}
-.keyboard.compact-mode .keyboard-head{padding-bottom:2px}
-.footer{display:none}
+textarea{min-height:95px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--blue)}
+.row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:10px 12px;border:0;border-radius:8px;background:linear-gradient(110deg,#008dff,#7545ff);color:white;font-size:12px;font-weight:bold}
+.btn.alt{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.result{margin-top:11px;padding:11px;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:13px;line-height:1.7;overflow-wrap:anywhere;white-space:pre-wrap}
+.calc{border-color:#39ff1470;box-shadow:0 0 18px #39ff1410}
+.calc input{border-color:#39ff1470!important}
+.calc .tool-icon,.calc h3{color:var(--green)}
+.calc .btn{background:#143b17;border:1px solid var(--green);color:var(--green);box-shadow:0 0 8px #39ff1420}
+.calc-display{font-size:22px!important;text-align:right;border-color:var(--green)!important;box-shadow:inset 0 0 12px #39ff1418}
+.calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
+.calc-buttons button{padding:13px 3px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px}
+.calc-buttons button:hover{border-color:var(--green);color:var(--green)}
+.calc-buttons .equals{background:#143b17;color:var(--green);border-color:var(--green)}
+input[type=range]{width:100%;accent-color:var(--blue)}
+input[type=color]{width:100%;height:45px;border:0;background:transparent}
+footer{margin-top:35px;border-top:1px solid var(--border);background:var(--surface);padding:25px 0;color:var(--muted);font-size:12px}
+.menu{display:none;position:fixed;z-index:50;right:10px;top:65px;width:min(300px,90vw);padding:15px;background:var(--surface);border:1px solid var(--border);border-radius:12px;max-height:80vh;overflow:auto}
+.menu.open{display:block}
+.menu a{display:block;padding:12px;border:1px solid var(--border);border-radius:8px;margin:6px 0;font-size:13px}
 
-/* Settings dialog */
-.settings-backdrop{
-  position:fixed;
-  inset:0;
-  background:#000b;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:12px;
+/* NAVIGATION BRANDING */
+.nav-brand{
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px 0 16px;
+font-size:15px;
+font-weight:900;
+letter-spacing:2px;
+color:var(--blue);
 }
-.settings-backdrop[hidden]{display:none}
-.settings-modal{
-  width:min(440px,100%);
-  max-height:85dvh;
-  overflow:auto;
-  background:#071326;
-  border:1px solid var(--cyan);
-  border-radius:14px;
-  padding:14px;
-  box-shadow:0 0 28px #00d9ff33;
+.nav-brand span{
+width:28px;
+height:28px;
+display:grid;
+place-items:center;
+border-radius:8px;
+background:linear-gradient(135deg,#008dff,#8650ff);
+color:#fff;
+letter-spacing:0;
 }
-.settings-modal h2{margin:0 0 6px;color:var(--cyan);font-size:19px}
-.settings-modal p{color:var(--muted);font-size:11px}
-.setting-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin:10px 0}
-.setting-row label{font-size:12px}
-.setting-row output{color:var(--cyan);font-size:11px}
-.setting-row input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--cyan)}
-.setting-row.color-row{grid-template-columns:1fr 50px}
-.setting-row input[type=color]{width:50px;height:31px;padding:2px;background:#0b1b30;border:1px solid #14628c;border-radius:7px}
-.settings-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:12px}
-.settings-actions button{padding:7px 11px;border-radius:8px;border:1px solid #14628c;background:#0b1b30}
-.settings-actions .done{background:#06432f;border-color:#00d99a}
 
-body.light{
-  --text:#10243c;
-  --muted:#526982;
-  background:#eaf3ff;
-  color:var(--text);
-}
-body.light .topbar,body.light .panel,body.light .tab,body.light .tool,
-body.light .keyboard{background:#fff;color:var(--text)}
-body.light .code{color:#173453}
-body.light .key{background:var(--keyboard-bg);color:var(--keyboard-fg)}
-body.light .keyboard-head strong{color:#087d9a}
+/* CODE BOARD & PREVIEW WRAPPER */
+.preview-wrapper{position:relative;border:2px solid var(--blue);border-radius:12px;overflow:hidden;background:white}
+.preview-frame{display:block;width:100%;height:260px;background:white;border:0}
+.preview-action{position:absolute;right:8px;top:8px;z-index:2;background:#071327;color:white;border:1px solid var(--blue);padding:9px 12px;border-radius:8px;font-weight:bold}
+.preview-hint{padding:10px;background:#071327;color:var(--blue);text-align:center;font-size:12px;cursor:pointer}
+.fullscreen-overlay{display:none;position:fixed;inset:0;z-index:99999;background:#030918;padding:10px}
+.fullscreen-layout{height:100%;display:flex;flex-direction:column;gap:8px}
+.fullscreen-header{display:flex;align-items:center;justify-content:space-between;gap:8px;color:white}
+.fullscreen-frame{flex:1;width:100%;min-height:0;background:white;border:1px solid var(--blue);border-radius:10px}
+.close-preview{padding:10px 14px;border:0;border-radius:8px;background:#ff3860;color:white;font-weight:bold}
+.file-list{font-size:12px;overflow-wrap:anywhere}
+.tool-card[hidden]{display:none!important}
 
-@media(max-width:760px){
-  .app{padding:4px;gap:4px}
-  .topbar{gap:5px;padding:4px 6px;border-radius:10px}
-  .logo-mark{font-size:20px}
-  .brand{font-size:clamp(15px,4vw,20px)}
-  .subtitle{font-size:7px}
-  .top-actions{gap:3px}
-  .iconbtn{width:29px;height:29px;font-size:15px}
-  .tabs{gap:3px}
-  .tab{padding:5px 2px;font-size:10px}
-  .toolbar{gap:2px}
-  .tool{height:33px;font-size:7px}
-  .tool span:first-child{font-size:13px}
-  .panel-head{padding:5px 7px}
-  .keyboard{padding:3px 5px;border-radius:10px}
-  .keyboard-head strong{font-size:9px}
-  .keyboard-head{gap:4px}
-  .keys{gap:2px}
-  .keyrow{gap:2px}
-  .key{border-radius:5px}
-}
-@media(max-height:700px){
-  .app{gap:3px;padding:3px}
-  .topbar{padding:3px 6px}
-  .logo-mark{font-size:18px}
-  .iconbtn{height:27px}
-  .tab{padding:4px 2px}
-  .tool{height:30px}
-  .keyboard{padding:2px 4px;background:#040b19}
-  .keyboard-head{padding-bottom:2px}
-  .keys,.keyrow{gap:2px}
+@media(max-width:600px){
+.grid{grid-template-columns:1fr}
+.hero{padding:30px 0}
+.brand{font-size:20px}
 }
 </style>
 </head>
+
 <body>
-<div class="app">
-  <header class="topbar">
-    <button class="iconbtn" aria-label="Menu" id="menuBtn">☰</button>
-    <div class="logo-mark">&lt;/&gt;</div>
-    <div><div class="brand">REXWEB</div><div class="subtitle">NEXORA CODE STUDIO</div></div>
-    <div class="top-actions">
-      <button class="iconbtn" id="themeBtn" title="Toggle theme">☾</button>
-      <button class="iconbtn" id="settingsBtn" title="Settings" aria-label="Settings">⚙</button>
-      <button class="iconbtn" id="moreBtn" title="More options">⋮</button>
-    </div>
-  </header>
 
-  <nav class="tabs" aria-label="Language tabs">
-    <button class="tab active" data-lang="html">〈/〉 HTML</button>
-    <button class="tab" data-lang="css">⬡ CSS</button>
-    <button class="tab" data-lang="js">JS JavaScript</button>
-  </nav>
+<header>
+<div class="container topbar">
+<a class="brand" href="index.html">Rex<span>Web</span></a>
+<div class="actions">
+<button class="icon-btn" id="themeToggle" aria-label="Switch theme" type="button">☀️</button>
+<button class="icon-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false" type="button">☰</button>
+</div>
+</div>
 
-  <div class="toolbar">
-    <button class="tool run" id="run"><span>▷</span>Run</button>
-    <button class="tool" id="previewBtn"><span>◎</span>Preview</button>
-    <button class="tool" id="download"><span>⇩</span>Download</button>
-    <button class="tool" id="uploadBtn"><span>⇧</span>Upload</button>
-    <button class="tool" id="clear"><span>◇</span>Clear</button>
-    <button class="tool" id="undo"><span>↶</span>Undo</button>
-    <button class="tool" id="redo"><span>↻</span>Redo</button>
-    <button class="tool" id="copyCode"><span>▣</span>Copy</button>
-  </div>
+<nav class="category-nav" aria-label="Main navigation">
+<div class="container category-row">
+<a href="index.html">🏠 Home</a>
+<a href="tools.html">🛠️ Tools</a>
+<a href="templates.html">💻 Web Templates</a>
+<a href="video-editor.html">🎬 Video Editor</a>
+<a href="ebooks.html">📚 Ebooks</a>
+<a href="games.html">🎮 Games</a>
+<a href="marketplace.html">🛍️ Marketplace</a>
+</div>
+<div class="container nav-brand"><span>R</span> REXWEB DIGITAL</div>
+</nav>
+</header>
 
-  <input type="file" id="fileInput" accept=".html,.htm,.css,.js,.txt" hidden>
+<nav class="menu" id="sideMenu" aria-label="Additional navigation">
+<a href="index.html">🏠 Home</a>
+<a href="tools.html">🛠️ Tools</a>
+<a href="templates.html">💻 Web Templates</a>
+<a href="video-editor.html">🎬 Video Editor</a>
+<a href="ebooks.html">📚 Ebooks</a>
+<a href="games.html">🎮 Games</a>
+<a href="marketplace.html">🛍️ Marketplace</a>
+<a href="https://vitalstar.web.app/">⭐ Enter VitalStar</a>
+<a href="explore.html">🌍 Explore</a>
+<a href="login.html">🔐 Login</a>
+<a href="register.html">👤 Register</a>
+<a href="about.html">ℹ️ About</a>
+<a href="contact.html">✉️ Contact</a>
+<a href="privacy.html">🔒 Privacy Policy</a>
+<a href="terms.html">📄 Terms & Conditions</a>
+</nav>
 
-  <div class="settings-backdrop" id="settingsBackdrop" hidden>
-    <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-      <h2 id="settingsTitle">Studio Settings</h2>
-      <p>Adjust your editor and RexWeb coding keyboard.</p>
-      <div class="setting-row"><label for="keyboardWidth">Keyboard width</label><output id="keyboardWidthValue">100%</output><input id="keyboardWidth" type="range" min="60" max="100" value="100"></div>
-      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">34 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="34"></div>
-      <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
-      <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
-      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
-      <p style="font-size:10px">The custom keyboard is designed for touch input. Browser support for suppressing the system keyboard may vary.</p>
-      <div class="settings-actions"><button id="resetSettings">Reset</button><button class="done" id="closeSettings">Done</button></div>
-    </section>
-  </div>
+<section class="hero">
+<div class="container">
+<span class="badge">REXWEB DIGITAL TOOLKIT</span>
+<h1>Powerful Tools.<br><span class="gradient">Simpler Digital Life.</span></h1>
+<p>Calculate, create, convert, and code with useful browser-based tools. Expand only the tools you need to keep your workspace clean.</p>
+</div>
+</section>
 
-  <section class="workspace">
-    <div class="panel" id="editorPanel">
-      <div class="panel-head">
-        <span style="color:var(--cyan)">〈/〉</span>
-        <span class="filename" id="filename">index.html</span>
-        <span class="saved" id="saveState">Ready</span>
-        <span class="dots">•••</span>
-      </div>
-      <div class="editor-wrap">
-        <div class="line-numbers" id="lineNumbers">1</div>
-        <textarea class="code" id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" inputmode="none" virtualkeyboardpolicy="manual" enterkeyhint="done" aria-label="Code editor"></textarea>
-      </div>
-      <div class="panel-foot"><span id="fileInfo">HTML · UTF-8</span><span id="lineCount">1 line</span></div>
-    </div>
+<main class="container section">
+<input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools..." aria-label="Search tools">
 
-    <div class="panel preview-screen" id="previewPanel" hidden>
-      <div class="preview-head">
-        <button class="iconbtn" id="backToEditor" style="width:auto;padding:0 8px;font-size:11px">← Editor</button>
-        LIVE PREVIEW
-        <span class="status" id="previewStatus">Ready</span>
-        <button class="iconbtn" id="expandPreview" title="Open preview">⛶</button>
-      </div>
-      <div class="preview-area"><iframe class="preview-frame" id="preview" title="Website live preview" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
-    </div>
-  </section>
+<div class="grid" id="toolsGrid">
 
-  <section class="panel keyboard compact-mode" id="keyboardPanel">
-    <div class="keyboard-head">
-      <span style="font-size:17px;color:var(--cyan)">▦</span>
-      <strong>REXWEB CODING KEYBOARD</strong>
-      <label class="compact"><input type="checkbox" id="compactToggle" checked> Compact</label>
-    </div>
-    <button class="symbol-toggle" id="symbolsToggle" type="button">#+= &nbsp; Symbols</button>
-    <div class="keys" id="keyboard"></div>
-  </section>
+<!-- ================= CALCULATING TOOLS ================= -->
+
+<!-- SCIENTIFIC CALCULATOR -->
+<article class="tool-card calc collapsed" data-name="scientific calculator math trigonometry" data-category="Calculators">
+<div class="tool-heading"><span class="tool-icon">🧮</span><h3>Scientific Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Scientific Calculator">+</button></div>
+<div class="tool-content">
+<p class="desc">Scientific functions, powers, roots, trigonometry and arithmetic. Trigonometric functions use degrees.</p>
+<input id="calcDisplay" class="calc-display" placeholder="0" aria-label="Calculator display" readonly>
+<div class="calc-buttons">
+<button data-calc="sin(">sin</button><button data-calc="cos(">cos</button><button data-calc="tan(">tan</button><button data-calc="sqrt(">√</button>
+<button data-calc="log(">log</button><button data-calc="ln(">ln</button><button data-calc="^">xʸ</button><button data-calc="!">x!</button>
+<button data-calc="(">(</button><button data-calc=")">)</button><button data-calc="pi">π</button><button data-calc="e">e</button>
+<button data-calc="7">7</button><button data-calc="8">8</button><button data-calc="9">9</button><button data-calc="/">÷</button>
+<button data-calc="4">4</button><button data-calc="5">5</button><button data-calc="6">6</button><button data-calc="*">×</button>
+<button data-calc="1">1</button><button data-calc="2">2</button><button data-calc="3">3</button><button data-calc="-">−</button>
+<button data-calc="0">0</button><button data-calc=".">.</button><button id="calcBack">⌫</button><button data-calc="+">+</button>
+<button id="calcClear">AC</button><button data-calc="%">%</button><button data-calc="Ans">Ans</button><button class="equals" id="calcEquals">=</button>
+</div>
+<div class="result" id="calcResult">Your answer will appear here.</div>
+</div>
+</article>
+
+<!-- STOPWATCH AND TIMER -->
+<article class="tool-card collapsed" data-name="stopwatch and timer clock countdown" data-category="Time">
+<div class="tool-heading"><span class="tool-icon">⏱️</span><h3>Stopwatch and Timer</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stopwatch and Timer">+</button></div>
+<div class="tool-content">
+<p class="desc">Precise stopwatch with lap tracking and countdown timer functionality.</p>
+<h4 style="margin-top:10px;font-size:14px;color:var(--blue);">Stopwatch</h4>
+<div class="result" id="stopwatchDisplay" style="font-size:24px;text-align:center;font-weight:bold;">00:00:00</div>
+<div class="row">
+<button class="btn" id="swStart">Start</button><button class="btn alt" id="swPause">Pause</button><button class="btn alt" id="swLap">Lap</button><button class="btn alt" id="swReset">Reset</button>
+</div>
+<div class="result" id="swLaps" style="max-height:90px;overflow:auto;font-size:12px;">No laps recorded.</div>
+<h4 style="margin-top:20px;font-size:14px;color:var(--blue);">Countdown Timer</h4>
+<div class="row">
+<input type="number" id="timerSeconds" placeholder="Seconds" value="60" min="1" style="max-width:140px;">
+<button class="btn" id="timerStart">Start Timer</button><button class="btn alt" id="timerReset">Reset</button>
+</div>
+<div class="result" id="timerDisplay" style="font-size:20px;text-align:center;font-weight:bold;">00:00</div>
+</div>
+</article>
+
+<!-- AGE CALCULATOR -->
+<article class="tool-card collapsed" data-name="age calculator date birthday calendar" data-category="Calculators">
+<div class="tool-heading"><span class="tool-icon">📅</span><h3>Age Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Age Calculator">+</button></div>
+<div class="tool-content">
+<p class="desc">Calculate your exact age in years, months, and days.</p>
+<style>
+.rex-age-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;color:var(--text);margin-top:15px}
+.rex-age-box *{box-sizing:border-box}
+.rex-age-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.rex-age-subtitle{color:var(--muted);margin-bottom:20px;font-size:14px}
+.rex-age-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rex-age-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+.rex-age-field select{width:100%;min-width:0;padding:12px 5px;border-radius:10px;background:var(--bg);border:1px solid var(--blue);color:var(--text);font-size:14px;outline:none}
+.rex-age-calendar{margin-top:18px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:12px}
+.rex-age-calendar-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.rex-age-calendar-head strong{color:#a56aff;font-size:15px}
+.rex-age-nav{display:flex;gap:6px}
+.rex-age-nav button{width:36px;height:36px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:9px;font-size:20px}
+.rex-age-weekdays,.rex-age-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.rex-age-weekdays span{text-align:center;color:var(--muted);font-size:12px;padding:8px 0}
+.rex-age-days button{min-width:0;aspect-ratio:1;border:1px solid transparent;background:transparent;color:var(--text);border-radius:9px;font-size:13px}
+.rex-age-days button:not(:disabled):hover{border-color:var(--blue);background:var(--card)}
+.rex-age-days button.selected{background:linear-gradient(135deg,#a855ff,#6735ff);color:white;font-weight:bold}
+.rex-age-days button:disabled{color:var(--muted);opacity:.35;cursor:not-allowed}
+.rex-age-selected{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;margin-top:15px}
+.rex-age-selected small{color:var(--muted);display:block;margin-bottom:5px}
+.rex-age-selected strong{display:block;font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+.rex-age-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.rex-age-actions button{padding:13px 8px;border-radius:11px;font-size:14px;font-weight:bold}
+.rex-age-clear{background:transparent;border:1px solid var(--blue);color:var(--blue)}
+.rex-age-apply{background:linear-gradient(135deg,#a855ff,#6735ff);border:0;color:white}
+.rex-age-result{margin-top:16px;padding:15px;border-radius:14px;border:1px solid var(--border);background:var(--card);line-height:1.8;overflow-wrap:anywhere}
+.rex-age-result .age-heading{color:var(--blue);font-size:15px;font-weight:bold;display:block;margin-bottom:4px}
+.rex-age-result .age-label{color:var(--blue);font-weight:bold}
+@media(max-width:360px){.rex-age-box{padding:10px}.rex-age-field select,.rex-age-days button{font-size:12px}}
+</style>
+<div class="rex-age-box">
+<div class="rex-age-title">Select Your Birthday</div>
+<div class="rex-age-subtitle">Choose your year, month, and day.</div>
+<div class="rex-age-fields">
+<div class="rex-age-field"><label for="rexBirthYear">YEAR</label><select id="rexBirthYear"><option value="">Year</option></select></div>
+<div class="rex-age-field"><label for="rexBirthMonth">MONTH</label><select id="rexBirthMonth"><option value="">Month</option></select></div>
+<div class="rex-age-field"><label for="rexBirthDay">DAY</label><select id="rexBirthDay"><option value="">Day</option></select></div>
+</div>
+<div class="rex-age-calendar">
+<div class="rex-age-calendar-head"><strong id="rexCalendarTitle">Choose a date</strong><div class="rex-age-nav"><button type="button" id="rexPrevMonth" aria-label="Previous month">‹</button><button type="button" id="rexNextMonth" aria-label="Next month">›</button></div></div>
+<div class="rex-age-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+<div class="rex-age-days" id="rexCalendarDays"></div>
+</div>
+<div class="rex-age-selected"><small>Selected Birthday</small><strong id="rexSelectedDate">No date selected</strong></div>
+<div class="rex-age-actions"><button type="button" class="rex-age-clear" id="rexClearDate">Clear</button><button type="button" class="rex-age-apply" id="rexApplyDate">Use Birthday ✓</button></div>
+<div class="rex-age-result" id="ageResult" aria-live="polite">Your age details will appear here.</div>
+</div>
+</div>
+</article>
+
+<!-- PERCENTAGE CALCULATOR -->
+<article class="tool-card collapsed" data-name="percentage calculator math finance" data-category="Calculators">
+<div class="tool-heading"><span class="tool-icon">💯</span><h3>Percentage Calculator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Percentage Calculator">+</button></div>
+<div class="tool-content">
+<p class="desc">Calculate percentages, increases, decreases, and proportions instantly.</p>
+<label>What is</label>
+<div class="row"><input type="number" id="p1" placeholder="X" style="flex:1;"><span style="align-self:center;color:var(--muted)">% of</span><input type="number" id="p2" placeholder="Y" style="flex:1;"></div>
+<div class="row"><button class="btn" id="calcPercent1">Calculate</button></div>
+<div class="result" id="percentResult1">Result will appear here.</div>
+<label style="margin-top:15px;">Percentage Increase / Decrease from X to Y</label>
+<div class="row"><input type="number" id="p3" placeholder="Initial value X" style="flex:1;"><input type="number" id="p4" placeholder="Final value Y" style="flex:1;"></div>
+<div class="row"><button class="btn" id="calcPercent2">Calculate Change</button></div>
+<div class="result" id="percentResult2">Change result will appear here.</div>
+</div>
+</article>
+
+<!-- CASE CONVERTER -->
+<article class="tool-card collapsed" data-name="case converter uppercase lowercase title text" data-category="Text">
+<div class="tool-heading"><span class="tool-icon">🔠</span><h3>Case Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Case Converter">+</button></div>
+<div class="tool-content">
+<p class="desc">Convert text into uppercase, lowercase, title case, or sentence case.</p>
+<textarea id="caseInput" placeholder="Enter your text..."></textarea>
+<div class="row"><button class="btn" data-case="upper">UPPERCASE</button><button class="btn" data-case="lower">lowercase</button><button class="btn" data-case="title">Title Case</button><button class="btn alt" data-case="sentence">Sentence case</button></div>
+<div class="row"><button class="btn alt" id="copyCase">Copy Result</button></div>
+<div class="result" id="caseResult">Converted text appears in the editor above.</div>
+</div>
+</article>
+
+<!-- URL CONVERTER -->
+<article class="tool-card collapsed" data-name="url encoder decoder links" data-category="Converters">
+<div class="tool-heading"><span class="tool-icon">🔗</span><h3>URL Encoder / Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand URL Encoder / Decoder">+</button></div>
+<div class="tool-content">
+<p class="desc">Encode or decode URL text.</p>
+<textarea id="urlInput" placeholder="Enter text..."></textarea>
+<div class="row"><button class="btn" id="urlEncode">Encode</button><button class="btn" id="urlDecode">Decode</button><button class="btn alt" id="urlCopy">Copy</button></div>
+<div class="result" id="urlResult">Your result appears here.</div>
+</div>
+</article>
+
+<!-- NUMBER BASE CONVERTER -->
+<article class="tool-card collapsed" data-name="number base binary decimal hexadecimal converter" data-category="Converters">
+<div class="tool-heading"><span class="tool-icon">🔢</span><h3>Number Base Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Number Base Converter">+</button></div>
+<div class="tool-content">
+<p class="desc">Convert whole numbers between binary, octal, decimal, and hexadecimal.</p>
+<label>Number</label><input id="baseInput" placeholder="Example: 1010">
+<label>Input base</label><select id="baseFrom"><option value="2">Binary</option><option value="8">Octal</option><option value="10" selected>Decimal</option><option value="16">Hexadecimal</option></select>
+<div class="row"><button class="btn" id="convertBase">Convert</button></div>
+<div class="result" id="baseResult">Converted values appear here.</div>
+</div>
+</article>
+
+<!-- IMAGE FORMAT CONVERTER -->
+<article class="tool-card collapsed" data-name="image format converter png jpeg webp avif bmp ico gif tiff heic svg" data-category="Images">
+<div class="tool-heading"><span class="tool-icon">🔄</span><h3>Image Format Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Image Format Converter">+</button></div>
+<div class="tool-content">
+<p class="desc">Convert images across 10 different formats in your browser. Browser support varies by format.</p>
+<label for="convImageFile">Upload Image</label><input type="file" id="convImageFile" accept="image/*">
+<label>Target Format</label>
+<select id="targetFormat"><option value="image/png">PNG (.png)</option><option value="image/jpeg">JPEG (.jpg)</option><option value="image/webp">WEBP (.webp)</option><option value="image/avif">AVIF (.avif)</option><option value="image/bmp">BMP (.bmp)</option><option value="image/x-icon">ICO (.ico)</option><option value="image/gif">GIF (.gif)</option><option value="image/tiff">TIFF (.tiff)</option><option value="image/heic">HEIC (.heic)</option><option value="image/svg+xml">SVG (.svg)</option></select>
+<div class="row"><button class="btn" id="convertImgBtn">Convert & Download</button></div>
+<div class="result" id="convImgResult">Upload an image and choose format to convert.</div>
+</div>
+</article>
+
+<!-- UNIT CONVERTER -->
+<article class="tool-card collapsed" data-name="unit converter length weight temperature data" data-category="Converters">
+<div class="tool-heading"><span class="tool-icon">⚖️</span><h3>Unit Converter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Unit Converter">+</button></div>
+<div class="tool-content">
+<p class="desc">Convert length, weight, temperature, and digital data units.</p>
+<label>Category</label><select id="unitCategory"><option value="length">Length (Meters, Feet, Inches, Kilometers)</option><option value="weight">Weight (Kilograms, Pounds, Grams, Ounces)</option><option value="temp">Temperature (Celsius, Fahrenheit, Kelvin)</option><option value="data">Data Storage (MB, GB, TB, KB)</option></select>
+<label>Value</label><input type="number" id="unitVal" value="1">
+<div class="row"><div style="flex:1;"><label>From</label><select id="unitFrom"></select></div><div style="flex:1;"><label>To</label><select id="unitTo"></select></div></div>
+<div class="row"><button class="btn" id="convertUnitBtn">Convert</button></div>
+<div class="result" id="unitResult">Converted result appears here.</div>
+</div>
+</article>
+
+<!-- HTML ENTITY ENCODER AND DECODER -->
+<article class="tool-card collapsed" data-name="html entity encoder decoder escape" data-category="Coding">
+<div class="tool-heading"><span class="tool-icon">🔤</span><h3>HTML Entity Encoder and Decoder</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Entity Encoder and Decoder">+</button></div>
+<div class="tool-content">
+<p class="desc">Encode special characters into safe HTML entities or decode entities back to text.</p>
+<textarea id="entityInput" placeholder="Enter text or HTML entities (&lt;div&gt;)..."></textarea>
+<div class="row"><button class="btn" id="encodeEntity">Encode Entities</button><button class="btn" id="decodeEntity">Decode Entities</button><button class="btn alt" id="copyEntity">Copy Result</button></div>
+<div class="result" id="entityResult">Converted result appears here.</div>
+</div>
+</article>
+
+<!-- ADVANCED TEXT COUNTER -->
+<article class="tool-card collapsed" data-name="text word character sentence paragraph counter reading time" data-category="Text">
+<div class="tool-heading"><span class="tool-icon">📝</span><h3>Advanced Text Counter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Text Counter">+</button></div>
+<div class="tool-content">
+<p class="desc">Track words, characters, paragraphs, sentences, spaces, and estimated reading time.</p>
+<textarea id="wordInput" placeholder="Type or paste your text here..."></textarea>
+<div class="result" id="wordResult">Words: 0</div>
+<div class="row"><button class="btn alt" id="clearText">Clear Text</button><button class="btn" id="copyText">Copy Text</button></div>
+</div>
+</article>
+
+<!-- PASSWORD GENERATOR -->
+<article class="tool-card collapsed" data-name="password generator secure random" data-category="Security">
+<div class="tool-heading"><span class="tool-icon">🔐</span><h3>Password Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Password Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Create a random password locally in your browser.</p>
+<label>Password length: <span id="passLengthLabel">16</span></label>
+<input type="range" id="passLength" min="8" max="48" value="16">
+<label><input type="checkbox" id="passNumbers" checked> Include numbers</label>
+<label><input type="checkbox" id="passSymbols" checked> Include symbols</label>
+<div class="row"><button class="btn" id="generatePass">Generate</button><button class="btn alt" id="copyPass">Copy</button></div>
+<div class="result" id="passResult">Your password appears here.</div>
+</div>
+</article>
+
+<!-- ADVANCED CODE BOARD -->
+<article class="tool-card collapsed" data-name="code board html css javascript editor preview upload files fullscreen" data-category="Coding">
+<div class="tool-heading"><span class="tool-icon">💻</span><h3>Advanced Code Board</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Advanced Code Board">+</button></div>
+<div class="tool-content">
+<p class="desc">Write code, upload HTML/CSS/JS files, and preview your project. Tap the preview to open fullscreen.</p>
+<label>Live Preview — Tap to Open Fullscreen</label>
+<div class="preview-wrapper" id="previewWrapper"><button class="preview-action" id="fullscreenPreview" type="button">⛶ Fullscreen</button><iframe id="codePreview" class="preview-frame" title="Live code preview" sandbox="allow-scripts"></iframe><div class="preview-hint" id="previewHint">👆 Tap here to open fullscreen preview</div></div>
+<label for="codeFiles">Upload HTML, CSS or JavaScript files</label><input type="file" id="codeFiles" accept=".html,.htm,.css,.js,text/html,text/css,text/javascript,application/javascript" multiple>
+<p class="desc">Select your HTML file and any CSS or JavaScript files it needs.</p>
+<div class="result file-list" id="uploadedFiles">No files selected.</div>
+<label for="codeInput">HTML / CSS / JavaScript Editor</label>
+<textarea id="codeInput" style="min-height:220px;font-family:monospace" spellcheck="false" placeholder="<!DOCTYPE html>
+<html>
+<head><title>My Project</title></head>
+<body><h1>Hello RexWeb!</h1></body>
+</html>"></textarea>
+<div class="row"><button class="btn" id="runCode">▶ Run Preview</button><button class="btn alt" id="copyCode">Copy Code</button><button class="btn alt" id="clearCode">Clear Editor</button><button class="btn alt" id="clearFiles">Remove Files</button></div>
+<div class="result" id="codeStatus">Ready to preview your project.</div>
+</div>
+</article>
+
+<!-- COLOR PICKER -->
+<article class="tool-card collapsed" data-name="color picker hex rgb colour design" data-category="Design">
+<div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Picker</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Picker">+</button></div>
+<div class="tool-content">
+<p class="desc">Select a color and obtain HEX and RGB values.</p>
+<input type="color" id="colorInput" value="#00c8ff">
+<div class="result" id="colorResult">HEX: #00C8FF · RGB: 0, 200, 255</div>
+<div class="row"><button class="btn" id="copyColor">Copy HEX</button></div>
+</div>
+</article>
+
+<!-- TEXT REVERSER -->
+<article class="tool-card collapsed" data-name="text reverse letters" data-category="Text">
+<div class="tool-heading"><span class="tool-icon">🔄</span><h3>Text Reverser</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Text Reverser">+</button></div>
+<div class="tool-content">
+<p class="desc">Reverse the order of characters in text.</p>
+<textarea id="reverseInput" placeholder="Enter text..."></textarea>
+<div class="row"><button class="btn" id="reverseBtn">Reverse</button><button class="btn alt" id="copyReverse">Copy</button></div>
+<div class="result" id="reverseResult">Your reversed text appears here.</div>
+</div>
+</article>
+
+<!-- HTML FORMATTER -->
+<article class="tool-card collapsed" data-name="html formatter code developer" data-category="Coding">
+<div class="tool-heading"><span class="tool-icon">🧩</span><h3>HTML Formatter</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand HTML Formatter">+</button></div>
+<div class="tool-content">
+<p class="desc">Format basic HTML with indentation for easier reading.</p>
+<textarea id="htmlInput" style="font-family:monospace" placeholder="<div><h1>Hello</h1></div>"></textarea>
+<div class="row"><button class="btn" id="formatHtml">Format HTML</button><button class="btn alt" id="copyHtml">Copy</button></div>
+<div class="result" id="htmlResult">Formatted code appears here.</div>
+</div>
+</article>
+
+<!-- CSS GRADIENT GENERATOR -->
+<article class="tool-card collapsed" data-name="css gradient generator color background designer" data-category="Design">
+<div class="tool-heading"><span class="tool-icon">🌈</span><h3>CSS Gradient Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Create beautiful linear or radial CSS gradients with custom color stops and angles.</p>
+<div class="row"><div style="flex:1;"><label>Color 1</label><input type="color" id="gradColor1" value="#00c8ff"></div><div style="flex:1;"><label>Color 2</label><input type="color" id="gradColor2" value="#8650ff"></div></div>
+<label>Direction / Angle: <span id="gradAngleVal">90</span>°</label>
+<input type="range" id="gradAngle" min="0" max="360" value="90">
+<div id="gradPreview" style="width:100%;height:80px;border-radius:8px;margin:12px 0;border:1px solid var(--border);"></div>
+<div class="result" id="gradResult">background: linear-gradient(90deg, #00C8FF, #8650FF);</div>
+<div class="row"><button class="btn" id="copyGrad">Copy CSS</button></div>
+</div>
+</article>
+
+<!-- QR CODE GENERATOR -->
+<article class="tool-card collapsed" data-name="qr code generator link text barcode" data-category="Utilities">
+<div class="tool-heading"><span class="tool-icon">📱</span><h3>QR Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand QR Code Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Generate a QR code from any text or website link.</p>
+<textarea id="qrInput" placeholder="Enter text or URL..."></textarea>
+<div class="row"><button class="btn" id="generateQr">Generate QR Code</button></div>
+<div style="text-align:center;margin-top:12px;" id="qrContainer"></div>
+<div class="result" id="qrResult">Enter text above to generate QR code.</div>
+</div>
+</article>
+
+<!-- JSON FORMATTER AND VALIDATOR -->
+<article class="tool-card collapsed" data-name="json formatter validator parser code" data-category="Coding">
+<div class="tool-heading"><span class="tool-icon">📋</span><h3>JSON Formatter & Validator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand JSON Formatter & Validator">+</button></div>
+<div class="tool-content">
+<p class="desc">Pretty print, minify, and validate JSON data strings.</p>
+<textarea id="jsonInput" style="font-family:monospace" placeholder='{"name": "RexWeb", "version": 1.0}'></textarea>
+<div class="row"><button class="btn" id="formatJson">Format / Pretty Print</button><button class="btn alt" id="minifyJson">Minify</button><button class="btn alt" id="validateJson">Validate</button></div>
+<div class="result" id="jsonResult">Formatted JSON or validation status appears here.</div>
+</div>
+</article>
+
+<!-- CSS GRADIENT-TO-CODE GENERATOR -->
+<article class="tool-card collapsed" data-name="css gradient to code generator multi stop" data-category="Design">
+<div class="tool-heading"><span class="tool-icon">🎨</span><h3>CSS Gradient-to-Code Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand CSS Gradient-to-Code Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Generate production-ready multi-stop CSS gradient snippets with cross-browser fallbacks.</p>
+<label>Preset Style</label>
+<select id="gradPreset"><option value="sunset">Sunset Glow</option><option value="ocean">Ocean Blue</option><option value="neon">Neon Cyberpunk</option><option value="emerald">Emerald Lush</option></select>
+<div id="gradPresetBox" style="width:100%;height:70px;border-radius:8px;margin:10px 0;border:1px solid var(--border);"></div>
+<div class="result" id="gradPresetResult">CSS code will appear here.</div>
+<div class="row"><button class="btn" id="copyGradPreset">Copy CSS Code</button></div>
+</div>
+</article>
+
+<!-- COLOR PALETTE GENERATOR -->
+<article class="tool-card collapsed" data-name="color palette generator harmony design" data-category="Design">
+<div class="tool-heading"><span class="tool-icon">🎨</span><h3>Color Palette Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Color Palette Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Generate harmonious color palettes based on any base color choice.</p>
+<label>Base Color</label><input type="color" id="paletteBase" value="#008dff">
+<div class="row"><button class="btn" id="generatePalette">Generate Palette</button></div>
+<div class="row" id="paletteBoxes" style="margin-top:12px;gap:8px;"></div>
+<div class="result" id="paletteResult">Palette colors will appear here.</div>
+</div>
+</article>
+
+<!-- STYLISH TEXT GENERATOR -->
+<article class="tool-card collapsed" data-name="stylish text generator fonts unicode cool" data-category="Text">
+<div class="tool-heading"><span class="tool-icon">✨</span><h3>Stylish Text Generator</h3><button class="tool-toggle" aria-expanded="false" aria-label="Expand Stylish Text Generator">+</button></div>
+<div class="tool-content">
+<p class="desc">Transform your plain text into 50 unique Unicode styles and decorative effects.</p>
+<textarea id="stylishInput" placeholder="Type your text here..."></textarea>
+<div class="row"><button class="btn" id="generateStylish">Generate 50 Styles</button></div>
+<div class="result" id="stylishResult" style="max-height:400px;overflow:auto;display:flex;flex-direction:column;gap:10px;">Stylish variants will appear here.</div>
+</div>
+</article>
+
+</div>
+</main>
+
+<footer>
+<div class="container">
+<strong>REXWEB DIGITAL</strong>
+<p style="margin-top:8px">Explore · Create · Grow</p>
+<p style="margin-top:8px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
+</div>
+</footer>
+
+<div id="previewFullscreen" class="fullscreen-overlay">
+<div class="fullscreen-layout">
+<div class="fullscreen-header"><strong>💻 RexWeb Live Preview</strong><button id="closeFullscreen" class="close-preview">✕ Close</button></div>
+<iframe id="fullscreenFrame" class="fullscreen-frame" title="Fullscreen code preview"></iframe>
+</div>
 </div>
 
 <script>
-const examples={
-  html:'<!DOCTYPE html>\n<html lang="en">\n<head>\n <meta charset="UTF-8">\n <meta name="viewport" content="width=device-width, initial-scale=1.0">\n <title>My Website</title>\n</head>\n<body>\n <h1>Welcome!</h1>\n <p>My first website.</p>\n <button onclick="alert(&quot;Hello!&quot;)">Explore Website</button>\n</body>\n</html>',
-  css:'body {\n font-family: Arial, sans-serif;\n padding: 24px;\n background: #f4f7fb;\n color: #193247;\n}\nh1 { color: #087f5b; }\nbutton {\n background: #087f5b;\n color: white;\n border: 0;\n border-radius: 10px;\n padding: 14px 20px;\n}',
-  js:'const heading = document.querySelector("h1");\nif (heading) {\n heading.textContent = "Welcome to RexWeb!";\n}\nconsole.log("Nexora Code Studio is ready.");'
+const $=id=>document.getElementById(id);
+const show=(id,text)=>$(id).textContent=text;
+
+/* THEME: index.html is the source of truth */
+function getSharedTheme(){
+try{
+return localStorage.getItem("rexweb-theme")||
+localStorage.getItem("theme")||
+document.documentElement.dataset.theme||
+"dark";
+}catch(e){return document.documentElement.dataset.theme||"dark";}
+}
+function setTheme(theme){
+theme=theme==="light"?"light":"dark";
+document.documentElement.dataset.theme=theme;
+$("themeToggle").textContent=theme==="dark"?"☀️":"🌙";
+$("themeColor").content=theme==="dark"?"#050b19":"#f2f6ff";
+try{
+localStorage.setItem("rexweb-theme",theme);
+localStorage.setItem("theme",theme);
+}catch(e){}
+}
+setTheme(getSharedTheme());
+$("themeToggle").onclick=()=>{
+const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
+setTheme(next);
+window.dispatchEvent(new CustomEvent("rexweb:themechange",{detail:{theme:next}}));
 };
-
-let current='html';
-let history={html:[examples.html],css:[examples.css],js:[examples.js]};
-let positions={html:0,css:0,js:0};
-let future={html:[],css:[],js:[]};
-let symbolsMode=false,shiftMode=false;
-
-const code=document.querySelector('#code');
-const lineNumbers=document.querySelector('#lineNumbers');
-const keyboard=document.querySelector('#keyboard');
-const keyboardPanel=document.querySelector('#keyboardPanel');
-const editorPanel=document.querySelector('#editorPanel');
-const previewPanel=document.querySelector('#previewPanel');
-const fileNames={html:'index.html',css:'style.css',js:'script.js'};
-const info={html:'HTML · UTF-8',css:'CSS · UTF-8',js:'JavaScript · UTF-8'};
-
-code.value=examples.html;
-
-function focusEditorCustom(){
-  code.setAttribute('inputmode','none');
-  code.setAttribute('virtualkeyboardpolicy','manual');
-  code.focus({preventScroll:true});
-}
-
-function updateMeta(){
-  const lines=code.value.split('\n').length;
-  lineNumbers.textContent=Array.from({length:lines},(_,i)=>i+1).join('\n');
-  document.querySelector('#lineCount').textContent=lines+(lines===1?' line':' lines');
-  document.querySelector('#filename').textContent=fileNames[current];
-  document.querySelector('#fileInfo').textContent=info[current];
-  lineNumbers.scrollTop=code.scrollTop;
-}
-
-function bringCaretIntoView(){
-  try {
-    const text = code.value;
-    const selStart = code.selectionStart;
-    const computedStyle = window.getComputedStyle(code);
-    const lineHeight = parseFloat(computedStyle.lineHeight) || 19.2;
-    const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
-    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-    const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
-
-    const textBeforeCaret = text.substring(0, selStart);
-    const linesBeforeCaret = textBeforeCaret.split('\n');
-    const currentLineIndex = linesBeforeCaret.length - 1;
-    const currentLineText = linesBeforeCaret[currentLineIndex] || '';
-
-    // Vertical auto-scrolling
-    const targetTop = currentLineIndex * lineHeight;
-    const visibleHeight = code.clientHeight - paddingTop - (parseFloat(computedStyle.paddingBottom) || 0);
-    const currentScrollTop = code.scrollTop;
-
-    if (targetTop < currentScrollTop) {
-      code.scrollTop = Math.max(0, targetTop);
-    } else if (targetTop + lineHeight > currentScrollTop + visibleHeight) {
-      code.scrollTop = targetTop + lineHeight - visibleHeight;
-    }
-
-    // Horizontal auto-scrolling
-    const canvas = bringCaretIntoView.canvas || (bringCaretIntoView.canvas = document.createElement('canvas'));
-    const context = canvas.getContext('2d');
-    context.font = computedStyle.font;
-    const charWidth = context.measureText('M').width || 7.2;
-    const currentColumn = currentLineText.length;
-    const targetLeft = currentColumn * charWidth;
-    const visibleWidth = code.clientWidth - paddingLeft - paddingRight;
-    const currentScrollLeft = code.scrollLeft;
-
-    if (targetLeft < currentScrollLeft) {
-      code.scrollLeft = Math.max(0, targetLeft - 20);
-    } else if (targetLeft > currentScrollLeft + visibleWidth - 20) {
-      code.scrollLeft = targetLeft - visibleWidth + 40;
-    }
-
-    lineNumbers.scrollTop = code.scrollTop;
-  } catch(e) {}
-}
-
-function saveHistory(){
-  const arr=history[current];
-  if(arr[arr.length-1]!==code.value){
-    arr.push(code.value);
-    if(arr.length>100)arr.shift();
-    future[current]=[];
-  }
-  updateMeta();
-  document.querySelector('#saveState').textContent='Edited';
-}
-
-function setLang(lang){
-  positions[current]=code.selectionStart;
-  current=lang;
-  code.value=history[current][history[current].length-1];
-  const pos=Math.min(positions[current]||0,code.value.length);
-  code.setSelectionRange(pos,pos);
-  document.querySelectorAll('.tab').forEach(t=>{
-    t.classList.toggle('active',t.dataset.lang===lang);
-  });
-  updateMeta();
-  bringCaretIntoView();
-}
-
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>setLang(t.dataset.lang));
+window.addEventListener("storage",e=>{
+if(e.key==="rexweb-theme"||e.key==="theme")setTheme(e.newValue||"dark");
 });
 
-code.addEventListener('input',()=>{
-  saveHistory();
-  bringCaretIntoView();
+/* MENU */
+$("menuToggle").onclick=()=>{
+const menu=$("sideMenu");
+const opened=menu.classList.toggle("open");
+$("menuToggle").setAttribute("aria-expanded",String(opened));
+$("menuToggle").setAttribute("aria-label",opened?"Close menu":"Open menu");
+};
+document.addEventListener("click",e=>{
+if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle")){
+$("sideMenu").classList.remove("open");
+$("menuToggle").setAttribute("aria-expanded","false");
+$("menuToggle").setAttribute("aria-label","Open menu");
+}
 });
-code.addEventListener('keyup', bringCaretIntoView);
-code.addEventListener('click', bringCaretIntoView);
-code.addEventListener('scroll',()=>{lineNumbers.scrollTop=code.scrollTop;});
 
-function makeDocument(){
-  let html=history.html[history.html.length-1];
-  let css=history.css[history.css.length-1];
-  let js=history.js[history.js.length-1];
-  if(current==='html')html=code.value;
-  if(current==='css')css=code.value;
-  if(current==='js')js=code.value;
-  // Don't inject the untouched sample CSS/JS into the user's own page
-  if(html!==examples.html){
-    if(css===examples.css)css='';
-    if(js===examples.js)js='';
-  }
+/* TOOL CATEGORIES AND FILTER */
+const toolsGrid=$("toolsGrid");
+const toolCards=Array.from(document.querySelectorAll(".tool-card"));
+const categories=["All",...new Set(toolCards.map(card=>card.dataset.category||"Other"))];
+let activeCategory="All";
+let searchQuery="";
 
-  // Local files like style.css / script.js can't load inside the preview.
-  // The CSS and JS tabs supply them instead, so drop those references.
-  html=html
-    .replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,m=>/href=["']?(https?:)?\/\//i.test(m)?m:'')
-    .replace(/<script\b[^>]*\bsrc=["']?(?!https?:|\/\/)[^"'\s>]+["']?[^>]*>\s*<\/script>/gi,'');
+const categoryBar=document.createElement("div");
+categoryBar.className="category-filters";
+categoryBar.setAttribute("aria-label","Filter tools by category");
+categoryBar.style.cssText="display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:thin;";
+$("toolSearch").insertAdjacentElement("afterend",categoryBar);
 
-  // Show JS errors in the preview so a silent failure is visible.
-  const errTag='<script>window.addEventListener("error",function(e){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#b00020;color:#fff;font:12px monospace;padding:6px;z-index:99999";d.textContent="JS error: "+e.message;document.documentElement.appendChild(d)});<\/script>';
+categories.forEach(category=>{
+const button=document.createElement("button");
+button.type="button";
+button.textContent=category;
+button.dataset.categoryFilter=category;
+button.style.cssText="flex-shrink:0;padding:9px 13px;border:1px solid var(--border);border-radius:20px;background:var(--card);color:var(--text);font-size:12px;font-weight:bold;";
+button.setAttribute("aria-pressed",String(category==="All"));
+button.onclick=()=>{
+activeCategory=category;
+categoryBar.querySelectorAll("button").forEach(b=>{
+const active=b.dataset.categoryFilter===category;
+b.setAttribute("aria-pressed",String(active));
+b.style.background=active?"linear-gradient(110deg,#008dff,#7545ff)":"var(--card)";
+b.style.color=active?"#fff":"var(--text)";
+b.style.borderColor=active?"var(--blue)":"var(--border)";
+});
+filterTools();
+};
+categoryBar.appendChild(button);
+});
+categoryBar.querySelector('[data-category-filter="All"]').click();
 
-  const styleTag=errTag+'<style>\n'+css+'\n</style>';
-  html=/<\/head>/i.test(html)
-    ? html.replace(/<\/head>/i,()=>styleTag+'\n</head>')
-    : styleTag+html;
+function filterTools(){
+toolCards.forEach(card=>{
+const matchesCategory=activeCategory==="All"||(card.dataset.category||"Other")===activeCategory;
+const matchesSearch=(card.dataset.name+" "+card.textContent).toLowerCase().includes(searchQuery);
+card.hidden=!(matchesCategory&&matchesSearch);
+});
+}
+$("toolSearch").addEventListener("input",function(){
+searchQuery=this.value.toLowerCase().trim();
+filterTools();
+});
 
-  if(js.trim()){
-    const safeJs=js.replace(/<\/script/gi,'<\\/script');
-    const scriptTag='<script>\n'+safeJs+'\n<\/script>';
-    html=/<\/body>/i.test(html)
-      ? html.replace(/<\/body>/i,()=>scriptTag+'\n</body>')
-      : html+scriptTag;
-  }
-  return html;
+/* RECENTLY USED TOOLS */
+const RECENT_KEY="rexweb_nexora_recent_tools_v1";
+function getRecentTools(){
+try{
+const value=JSON.parse(localStorage.getItem(RECENT_KEY)||"[]");
+return Array.isArray(value)?value:[];
+}catch(e){return [];}
+}
+function saveRecentTool(card){
+const name=card.querySelector("h3").textContent;
+let recent=getRecentTools().filter(item=>item.name!==name);
+recent.unshift({name:name,category:card.dataset.category||"Other"});
+recent=recent.slice(0,6);
+try{localStorage.setItem(RECENT_KEY,JSON.stringify(recent));}catch(e){}
+renderRecentTools();
+}
+const recentSection=document.createElement("section");
+recentSection.className="recent-section";
+recentSection.style.cssText="margin:8px 0 20px;";
+recentSection.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><h3 style="font-size:16px">🕘 Recently Used Tools</h3><button type="button" id="clearRecent" class="btn alt">Clear</button></div><div id="recentTools" style="display:flex;gap:8px;overflow-x:auto;padding:3px 0"></div>';
+categoryBar.insertAdjacentElement("afterend",recentSection);
+
+function renderRecentTools(){
+const box=$("recentTools");
+box.innerHTML="";
+const recent=getRecentTools();
+if(!recent.length){
+const empty=document.createElement("p");
+empty.className="muted";
+empty.textContent="Your recently opened tools will appear here.";
+box.appendChild(empty);
+return;
+}
+recent.forEach(item=>{
+const card=toolCards.find(c=>c.querySelector("h3").textContent===item.name);
+if(!card)return;
+const button=document.createElement("button");
+button.type="button";
+button.style.cssText="flex-shrink:0;text-align:left;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:12px;";
+button.textContent=(card.querySelector(".tool-icon")?.textContent||"🛠️")+" "+item.name;
+button.onclick=()=>{
+activeCategory="All";
+searchQuery="";
+$("toolSearch").value="";
+categoryBar.querySelector('[data-category-filter="All"]').click();
+card.hidden=false;
+card.classList.remove("collapsed");
+const toggle=card.querySelector(".tool-toggle");
+toggle.textContent="−";
+toggle.setAttribute("aria-expanded","true");
+card.scrollIntoView({behavior:"smooth",block:"start"});
+saveRecentTool(card);
+};
+box.appendChild(button);
+});
+}
+$("clearRecent").onclick=()=>{
+try{localStorage.removeItem(RECENT_KEY);}catch(e){}
+renderRecentTools();
+};
+renderRecentTools();
+
+/* EXPAND / COLLAPSE */
+toolCards.forEach(card=>{
+const btn=card.querySelector(".tool-toggle");
+card.classList.add("collapsed");
+btn.textContent="+";
+btn.setAttribute("aria-expanded","false");
+btn.setAttribute("aria-label","Expand "+card.querySelector("h3").textContent);
+btn.onclick=()=>{
+const collapsed=card.classList.toggle("collapsed");
+btn.textContent=collapsed?"+":"−";
+btn.setAttribute("aria-expanded",String(!collapsed));
+btn.setAttribute("aria-label",(collapsed?"Expand ":"Collapse ")+card.querySelector("h3").textContent);
+if(!collapsed)saveRecentTool(card);
+};
+});
+
+/* COPY HELPER */
+async function copyValue(value,id){
+if(!value){show(id,"Nothing to copy yet.");return;}
+try{
+await navigator.clipboard.writeText(value);
+show(id,"Copied successfully!");
+}catch(e){
+const t=document.createElement("textarea");
+t.value=value;
+document.body.appendChild(t);
+t.select();
+const ok=document.execCommand("copy");
+t.remove();
+show(id,ok?"Copied successfully!":"Copy manually, please.");
+}
 }
 
-function run(){
-  document.querySelector('#preview').srcdoc=makeDocument();
-  document.querySelector('#previewStatus').textContent='Ready';
-  document.querySelector('#saveState').textContent='Saved';
+/* SCIENTIFIC CALCULATOR */
+let lastAnswer=0;
+document.querySelectorAll("[data-calc]").forEach(b=>b.onclick=()=>{$("calcDisplay").value+=b.dataset.calc;});
+$("calcClear").onclick=()=>{$("calcDisplay").value="";show("calcResult","Cleared.");};
+$("calcBack").onclick=()=>$("calcDisplay").value=$("calcDisplay").value.slice(0,-1);
+
+function factorial(n){
+if(!Number.isInteger(n)||n<0||n>170)throw Error("Factorial needs a whole number from 0 to 170.");
+let r=1;for(let i=2;i<=n;i++)r*=i;return r;
 }
-
-function showPreview(){
-  run();
-  editorPanel.hidden=true;
-  keyboardPanel.hidden=true;
-  previewPanel.hidden=false;
-  document.querySelector('#previewBtn').innerHTML='<span>⌨</span>Editor';
+function sciCalc(source){
+let s=source.replace(/\s/g,"").replace(/π/g,"pi");
+if(!s||s.length>180)throw Error("Enter a valid expression.");
+if(!/^[0-9+\-*/().%^!,a-zA-Z]+$/.test(s))throw Error("Unsupported character.");
+const tokens=s.match(/sin|cos|tan|sqrt|log|ln|pi|Ans|e|[0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?|[()+\-*/%^!]/gi)||[];
+if(tokens.join("")!==s)throw Error("Check the expression.");
+let i=0;
+function expr(){let x=term();while(tokens[i]==="+"||tokens[i]==="-"){let op=tokens[i++],y=term();x=op==="+"?x+y:x-y;}return x;}
+function term(){let x=unary();while(["*","/","%"].includes(tokens[i])){let op=tokens[i++],y=unary();if((op==="/"||op==="%")&&y===0)throw Error("Cannot divide by zero.");x=op==="*"?x*y:op==="/"?x/y:x%y;}return x;}
+function unary(){if(tokens[i]==="+"){i++;return unary();}if(tokens[i]==="-"){i++;return-unary();}return power();}
+function power(){let x=atom();if(tokens[i]==="^"){i++;x=Math.pow(x,unary());}while(tokens[i]==="!"){i++;x=factorial(x);}return x;}
+function atom(){
+let t=tokens[i++];
+if(t==="("){let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");return x;}
+if(/^\d/.test(t||""))return Number(t);
+if(t==="pi")return Math.PI;if(t==="e")return Math.E;if(t==="Ans")return lastAnswer;
+if(["sin","cos","tan","sqrt","log","ln"].includes(t)){
+if(tokens[i++]!=="(")throw Error("Use function(argument).");
+let x=expr();if(tokens[i++]!==")")throw Error("Check brackets.");
+if(t==="sin")return Math.sin(x*Math.PI/180);
+if(t==="cos")return Math.cos(x*Math.PI/180);
+if(t==="tan")return Math.tan(x*Math.PI/180);
+if(t==="sqrt"){if(x<0)throw Error("Square root requires a non-negative number.");return Math.sqrt(x);}
+if(t==="log"){if(x<=0)throw Error("Log requires a positive number.");return Math.log10(x);}
+if(x<=0)throw Error("Natural log requires a positive number.");return Math.log(x);
 }
-
-function showEditor(){
-  previewPanel.hidden=true;
-  editorPanel.hidden=false;
-  keyboardPanel.hidden=false;
-  document.querySelector('#previewBtn').innerHTML='<span>◎</span>Preview';
-  requestAnimationFrame(bringCaretIntoView);
+throw Error("Check the expression.");
 }
-
-document.querySelector('#run').onclick=showPreview;
-document.querySelector('#previewBtn').onclick=()=>{
-  if(previewPanel.hidden)showPreview();else showEditor();
-};
-document.querySelector('#backToEditor').onclick=showEditor;
-
-document.querySelector('#download').onclick=()=>{
-  const content=current==='html'?makeDocument():code.value;
-  const mime=current==='html'?'text/html':current==='css'?'text/css':'text/javascript';
-  const blob=new Blob([content],{type:mime});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=fileNames[current];
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+const result=expr();
+if(i<tokens.length||!Number.isFinite(result))throw Error("Invalid expression.");
+return result;
+}
+$("calcEquals").onclick=()=>{
+try{lastAnswer=sciCalc($("calcDisplay").value);$("calcDisplay").value=String(Number(lastAnswer.toPrecision(12)));show("calcResult","Answer: "+$("calcDisplay").value);}
+catch(e){show("calcResult",e.message||"Invalid expression.");}
 };
 
-document.querySelector('#uploadBtn').onclick=()=>document.querySelector('#fileInput').click();
-document.querySelector('#fileInput').onchange=e=>{
-  const file=e.target.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    code.value=String(reader.result);
-    history[current].push(code.value);
-    future[current]=[];
-    updateMeta();
-    document.querySelector('#saveState').textContent='Loaded';
-    bringCaretIntoView();
-  };
-  reader.readAsText(file);
-  e.target.value='';
+/* STOPWATCH AND TIMER */
+let swTimer=null,swSeconds=0,laps=[];
+function formatTime(sec){const hrs=Math.floor(sec/3600).toString().padStart(2,'0');const mins=Math.floor((sec%3600)/60).toString().padStart(2,'0');const s=(sec%60).toFixed(1).padStart(4,'0');return `${hrs}:${mins}:${s}`;}
+$("swStart").onclick=()=>{if(swTimer)return;swTimer=setInterval(()=>{swSeconds+=0.1;show("stopwatchDisplay",formatTime(swSeconds));},100);};
+$("swPause").onclick=()=>{clearInterval(swTimer);swTimer=null;};
+$("swLap").onclick=()=>{laps.push(formatTime(swSeconds));show("swLaps",laps.join("\n"));};
+$("swReset").onclick=()=>{clearInterval(swTimer);swTimer=null;swSeconds=0;laps=[];show("stopwatchDisplay","00:00:00");show("swLaps","No laps recorded.");};
+let countdownInterval=null;
+$("timerStart").onclick=()=>{
+let sec=+$("timerSeconds").value;if(!Number.isFinite(sec)||sec<=0)return;
+clearInterval(countdownInterval);
+const end=Date.now()+sec*1000;
+const tick=()=>{
+sec=Math.max(0,Math.ceil((end-Date.now())/1000));
+show("timerDisplay",`${Math.floor(sec/60).toString().padStart(2,'0')}:${(sec%60).toString().padStart(2,'0')}`);
+if(sec<=0){clearInterval(countdownInterval);countdownInterval=null;show("timerDisplay","Time's up!");}
+};
+tick();countdownInterval=setInterval(tick,250);
+};
+$("timerReset").onclick=()=>{clearInterval(countdownInterval);countdownInterval=null;show("timerDisplay","00:00");};
+
+/* AGE CALCULATOR */
+(()=>{
+const yearSelect=$("rexBirthYear"),monthSelect=$("rexBirthMonth"),daySelect=$("rexBirthDay"),calendarDays=$("rexCalendarDays"),calendarTitle=$("rexCalendarTitle"),selectedDate=$("rexSelectedDate"),result=$("ageResult");
+if(!yearSelect||yearSelect.dataset.ready)return;
+yearSelect.dataset.ready="true";
+const today=new Date();today.setHours(0,0,0,0);
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const weekdays=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+let chosen=null,viewYear=today.getFullYear(),viewMonth=today.getMonth();
+for(let y=today.getFullYear();y>=1900;y--){const o=document.createElement("option");o.value=y;o.textContent=y;yearSelect.appendChild(o);}
+months.forEach((name,index)=>{const o=document.createElement("option");o.value=index;o.textContent=name;monthSelect.appendChild(o);});
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+function formatDate(date){return date?weekdays[date.getDay()]+", "+months[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear():"No date selected";}
+function syncSelectors(){yearSelect.value=viewYear;monthSelect.value=viewMonth;fillDays();}
+function fillDays(){
+const oldDay=chosen?chosen.getDate():1,total=daysInMonth(viewYear,viewMonth);
+daySelect.innerHTML='<option value="">Day</option>';
+for(let d=1;d<=total;d++){const o=document.createElement("option");o.value=d;o.textContent=d;daySelect.appendChild(o);}
+if(oldDay<=total&&chosen)daySelect.value=oldDay;
+renderCalendar();
+}
+function renderCalendar(){
+calendarTitle.textContent=months[viewMonth]+" "+viewYear;calendarDays.innerHTML="";
+const firstDay=new Date(viewYear,viewMonth,1).getDay(),total=daysInMonth(viewYear,viewMonth);
+for(let i=0;i<firstDay;i++)calendarDays.appendChild(document.createElement("span"));
+for(let d=1;d<=total;d++){
+const button=document.createElement("button");button.type="button";button.textContent=d;button.setAttribute("aria-label",months[viewMonth]+" "+d);
+const date=new Date(viewYear,viewMonth,d);date.setHours(0,0,0,0);button.disabled=date>today;
+if(chosen&&chosen.getFullYear()===viewYear&&chosen.getMonth()===viewMonth&&chosen.getDate()===d){button.classList.add("selected");button.setAttribute("aria-pressed","true");}
+button.addEventListener("click",()=>{chosen=new Date(viewYear,viewMonth,d);chosen.setHours(0,0,0,0);syncSelectors();selectedDate.textContent=formatDate(chosen);});
+calendarDays.appendChild(button);
+}
+}
+yearSelect.addEventListener("change",()=>{
+if(!yearSelect.value)return;viewYear=Number(yearSelect.value);
+if(viewYear===today.getFullYear()&&viewMonth>today.getMonth())viewMonth=today.getMonth();
+if(chosen&&chosen.getFullYear()!==viewYear){chosen=null;selectedDate.textContent="No date selected";}
+fillDays();
+});
+monthSelect.addEventListener("change",()=>{
+if(monthSelect.value==="")return;viewMonth=Number(monthSelect.value);
+if(viewYear===today.getFullYear()&&viewMonth>today.getMonth()){viewMonth=today.getMonth();monthSelect.value=viewMonth;}
+if(chosen&&(chosen.getFullYear()!==viewYear||chosen.getMonth()!==viewMonth)){chosen=null;selectedDate.textContent="No date selected";}
+fillDays();
+});
+daySelect.addEventListener("change",()=>{
+if(!daySelect.value)return;const date=new Date(viewYear,viewMonth,Number(daySelect.value));if(date>today)return;
+chosen=date;selectedDate.textContent=formatDate(chosen);renderCalendar();
+});
+$("rexPrevMonth").addEventListener("click",()=>{
+if(viewYear===1900&&viewMonth===0)return;viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}
+chosen=null;syncSelectors();selectedDate.textContent="No date selected";
+});
+$("rexNextMonth").addEventListener("click",()=>{
+if(viewYear===today.getFullYear()&&viewMonth>=today.getMonth())return;
+viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}
+chosen=null;syncSelectors();selectedDate.textContent="No date selected";
+});
+$("rexClearDate").addEventListener("click",()=>{
+chosen=null;yearSelect.value="";monthSelect.value="";daySelect.value="";
+selectedDate.textContent="No date selected";result.textContent="Your age details will appear here.";renderCalendar();
+});
+$("rexApplyDate").addEventListener("click",()=>{
+if(!chosen){result.textContent="Please select your birth year, month, and day first.";return;}
+calculateAge();
+});
+function calculateAge(){
+if(!chosen||chosen>today){result.textContent="Please select a valid birthday.";return;}
+let years=today.getFullYear()-chosen.getFullYear(),monthsOld=today.getMonth()-chosen.getMonth(),daysOld=today.getDate()-chosen.getDate();
+if(daysOld<0){monthsOld--;daysOld+=new Date(today.getFullYear(),today.getMonth(),0).getDate();}
+if(monthsOld<0){years--;monthsOld+=12;}
+const nextBirthday=new Date(today.getFullYear(),chosen.getMonth(),Math.min(chosen.getDate(),daysInMonth(today.getFullYear(),chosen.getMonth())));
+if(nextBirthday<today)nextBirthday.setFullYear(today.getFullYear()+1);
+const daysUntil=Math.round((nextBirthday-today)/86400000);
+result.innerHTML='<span class="age-heading">Your Exact Age</span>'+years+' years, '+monthsOld+' months, '+daysOld+' days<br><span class="age-label">Birthday:</span> '+weekdays[chosen.getDay()]+', '+months[chosen.getMonth()]+' '+chosen.getDate()+'<br><span class="age-label">Next Birthday:</span> '+daysUntil+' day'+(daysUntil===1?'':'s')+' to go.<br><span class="age-label">Date (NBD):</span> '+formatDate(nextBirthday);
+}
+syncSelectors();
+})();
+
+/* PERCENTAGE CALCULATOR */
+$("calcPercent1").onclick=()=>{
+const x=parseFloat($("p1").value),y=parseFloat($("p2").value);
+if(isNaN(x)||isNaN(y)){show("percentResult1","Enter valid numbers.");return;}
+show("percentResult1",`${x}% of ${y} = ${(x/100)*y}`);
+};
+$("calcPercent2").onclick=()=>{
+const x=parseFloat($("p3").value),y=parseFloat($("p4").value);
+if(isNaN(x)||isNaN(y)||x===0){show("percentResult2","Enter valid numbers.");return;}
+const change=((y-x)/x)*100;show("percentResult2",`Change: ${change.toFixed(2)}% (${change>=0?'Increase':'Decrease'})`);
 };
 
-document.querySelector('#clear').onclick=()=>{
-  if(confirm('Clear the current file?')){
-    code.value='';
-    saveHistory();
-    bringCaretIntoView();
-  }
+/* CASE CONVERTER */
+document.querySelectorAll("[data-case]").forEach(b=>b.onclick=()=>{
+let t=$("caseInput").value;
+if(b.dataset.case==="upper")t=t.toUpperCase();
+if(b.dataset.case==="lower")t=t.toLowerCase();
+if(b.dataset.case==="title")t=t.toLowerCase().replace(/\b\p{L}/gu,m=>m.toUpperCase());
+if(b.dataset.case==="sentence")t=t.toLowerCase().replace(/(^\s*\p{L}|[.!?]\s+\p{L})/gu,m=>m.toUpperCase());
+$("caseInput").value=t;show("caseResult","Text converted successfully.");
+});
+$("copyCase").onclick=()=>copyValue($("caseInput").value,"caseResult");
+
+/* URL ENCODER / DECODER */
+$("urlEncode").onclick=()=>show("urlResult",encodeURIComponent($("urlInput").value));
+$("urlDecode").onclick=()=>{try{show("urlResult",decodeURIComponent($("urlInput").value));}catch(e){show("urlResult","Invalid encoded text.");}};
+$("urlCopy").onclick=()=>copyValue($("urlResult").textContent,"urlResult");
+
+/* NUMBER BASE CONVERTER */
+$("convertBase").onclick=()=>{
+const raw=$("baseInput").value.trim(),base=+$("baseFrom").value;
+if(!raw||!/^[+-]?[0-9a-f]+$/i.test(raw)){show("baseResult","Enter a valid whole number.");return;}
+const digits=raw.replace(/^[+-]/,""),validDigits={2:/^[01]+$/,8:/^[0-7]+$/,10:/^[0-9]+$/,16:/^[0-9a-f]+$/i};
+if(!validDigits[base].test(digits)){show("baseResult","Invalid digits for selected base.");return;}
+const n=parseInt(raw,base);
+if(!Number.isSafeInteger(n)){show("baseResult","Number too large.");return;}
+show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);
 };
 
-document.querySelector('#undo').onclick=()=>{
-  if(history[current].length>1){
-    future[current].push(history[current].pop());
-    code.value=history[current][history[current].length-1];
-    updateMeta();
-    document.querySelector('#saveState').textContent='Undo';
-    bringCaretIntoView();
-  }
+/* IMAGE FORMAT CONVERTER */
+$("convertImgBtn").onclick=()=>{
+const f=$("convImageFile").files[0],target=$("targetFormat").value;
+if(!f){show("convImgResult","Please upload an image first.");return;}
+if(["image/svg+xml","image/heic","image/tiff","image/gif","image/x-icon","image/bmp"].includes(target)){
+show("convImgResult","This format is not reliably supported by the browser's Canvas API. Please choose PNG, JPEG, or WEBP.");return;
+}
+const reader=new FileReader();
+reader.onload=e=>{
+const img=new Image();
+img.onload=()=>{
+const canvas=document.createElement("canvas");canvas.width=img.width;canvas.height=img.height;
+const ctx=canvas.getContext("2d");
+if(target==="image/jpeg"){ctx.fillStyle="#FFFFFF";ctx.fillRect(0,0,canvas.width,canvas.height);}
+ctx.drawImage(img,0,0);
+if(!canvas.toBlob){show("convImgResult","Image conversion is not supported by this browser.");return;}
+canvas.toBlob(blob=>{
+if(!blob){show("convImgResult","This image format is not supported by your browser.");return;}
+const ext=target==="image/jpeg"?"jpg":target.split("/")[1];
+const url=URL.createObjectURL(blob),a=document.createElement("a");
+a.href=url;a.download=`converted-image.${ext}`;document.body.appendChild(a);a.click();a.remove();
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+show("convImgResult",`Successfully converted to ${ext.toUpperCase()} and downloaded.`);
+},target,0.92);
+};
+img.onerror=()=>show("convImgResult","The uploaded image could not be opened.");
+img.src=e.target.result;
+};
+reader.onerror=()=>show("convImgResult","Unable to read this file.");
+reader.readAsDataURL(f);
 };
 
-document.querySelector('#redo').onclick=()=>{
-  if(future[current].length){
-    const value=future[current].pop();
-    history[current].push(value);
-    code.value=value;
-    updateMeta();
-    document.querySelector('#saveState').textContent='Redo';
-    bringCaretIntoView();
-  }
+/* UNIT CONVERTER */
+const unitData={
+length:{Meters:1,Feet:3.28084,Inches:39.3701,Kilometers:0.001},
+weight:{Kilograms:1,Pounds:2.20462,Grams:1000,Ounces:35.274},
+temp:{Celsius:"C",Fahrenheit:"F",Kelvin:"K"},
+data:{MB:1,GB:1/1024,TB:1/(1024*1024),KB:1024}
+};
+function updateUnitDropdowns(){
+const cat=$("unitCategory").value,keys=Object.keys(unitData[cat]);
+$("unitFrom").innerHTML=keys.map(k=>`<option value="${k}">${k}</option>`).join("");
+$("unitTo").innerHTML=keys.map((k,i)=>`<option value="${k}" ${i===1?'selected':''}>${k}</option>`).join("");
+}
+$("unitCategory").onchange=updateUnitDropdowns;updateUnitDropdowns();
+$("convertUnitBtn").onclick=()=>{
+const cat=$("unitCategory").value,val=parseFloat($("unitVal").value),from=$("unitFrom").value,to=$("unitTo").value;
+if(!Number.isFinite(val)){show("unitResult","Enter a valid number.");return;}
+if(cat==="temp"){
+let c;
+if(from==="Celsius")c=val;
+else if(from==="Fahrenheit")c=(val-32)*5/9;
+else c=val-273.15;
+let res;
+if(to==="Celsius")res=c;
+else if(to==="Fahrenheit")res=c*9/5+32;
+else res=c+273.15;
+show("unitResult",`${val} ${from} = ${res.toFixed(2)} ${to}`);
+}else{
+const res=val/unitData[cat][from]*unitData[cat][to];
+show("unitResult",`${val} ${from} = ${Number(res.toPrecision(8))} ${to}`);
+}
 };
 
-document.querySelector('#themeBtn').onclick=()=>{
-  document.body.classList.toggle('light');
-  document.querySelector('#themeBtn').textContent=
-    document.body.classList.contains('light')?'☀':'☾';
+/* HTML ENTITY ENCODER / DECODER */
+$("encodeEntity").onclick=()=>show("entityResult",$("entityInput").value.replace(/[\u00A0-\u9999<>&]/g,i=>'&#'+i.charCodeAt(0)+';'));
+$("decodeEntity").onclick=()=>show("entityResult",new DOMParser().parseFromString($("entityInput").value,"text/html").documentElement.textContent);
+$("copyEntity").onclick=()=>copyValue($("entityResult").textContent,"entityResult");
+
+/* ADVANCED TEXT COUNTER */
+$("wordInput").addEventListener("input",()=>{
+const t=$("wordInput").value,words=t.trim()?t.trim().split(/\s+/u).length:0,chars=Array.from(t).length;
+const sentences=(t.match(/[.!?]+(?=\s|$)/g)||[]).length,paragraphs=t.trim()?t.trim().split(/\n\s*\n/).length:0;
+show("wordResult",`Words: ${words}\nCharacters: ${chars}\nSentences: ${sentences}\nParagraphs: ${paragraphs}\nEst. Reading: ${Math.ceil(words/200)} min`);
+});
+$("clearText").onclick=()=>{$("wordInput").value="";$("wordInput").dispatchEvent(new Event("input"));};
+$("copyText").onclick=()=>copyValue($("wordInput").value,"wordResult");
+
+/* PASSWORD GENERATOR */
+$("passLength").oninput=()=>$("passLengthLabel").textContent=$("passLength").value;
+$("generatePass").onclick=()=>{
+let chars="abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+if($("passNumbers").checked)chars+="23456789";
+if($("passSymbols").checked)chars+="!@#$%^&*()-_=+?";
+const length=+$("passLength").value,arr=new Uint32Array(length);
+crypto.getRandomValues(arr);
+let p="";for(let i=0;i<length;i++)p+=chars[arr[i]%chars.length];
+show("passResult",p);
+};
+$("copyPass").onclick=()=>copyValue($("passResult").textContent,"passResult");
+
+/* ADVANCED CODE BOARD */
+let uploadedCodeFiles={},fullscreenOpen=false,previousBodyOverflow="";
+function buildPreview(){
+let html=$("codeInput").value.trim();
+if(!html)html="<!DOCTYPE html><html><body><h2>Welcome to RexWeb</h2></body></html>";
+const css=Object.entries(uploadedCodeFiles).filter(([n])=>/\.css$/i.test(n)).map(([,c])=>c).join("\n");
+const js=Object.entries(uploadedCodeFiles).filter(([n])=>/\.js$/i.test(n)).map(([,c])=>c).join("\n");
+if(css)html=html.replace(/<\/head\s*>/i,`<style>\n${css}\n</style>\n</head>`);
+if(js)html=html.replace(/<\/body\s*>/i,`<script>\n${js}\n<\/script>\n</body>`);
+return html;
+}
+function runCodePreview(){
+const html=buildPreview();$("codePreview").srcdoc=html;
+if(fullscreenOpen)$("fullscreenFrame").srcdoc=html;
+show("codeStatus","Preview updated.");
+}
+$("runCode").onclick=runCodePreview;
+$("codeInput").oninput=()=>show("codeStatus","Code changed. Tap Run Preview.");
+$("codeFiles").addEventListener("change",async function(){
+const files=Array.from(this.files||[]),loaded={};
+for(const f of files){if(/\.(html?|css|js)$/i.test(f.name))loaded[f.name]=await f.text();}
+uploadedCodeFiles=loaded;
+const htmlEntry=Object.entries(loaded).find(([n])=>/\.html?$/i.test(n));
+if(htmlEntry)$("codeInput").value=htmlEntry[1];
+show("uploadedFiles",Object.keys(loaded).length?"Loaded: "+Object.keys(loaded).join(", "):"No files.");
+runCodePreview();
+});
+function openFullscreenPreview(){
+if(fullscreenOpen)return;
+previousBodyOverflow=document.body.style.overflow;
+$("previewFullscreen").style.display="block";document.body.style.overflow="hidden";
+$("fullscreenFrame").srcdoc=buildPreview();fullscreenOpen=true;
+}
+function closeFullscreenPreview(){
+if(!fullscreenOpen)return;
+$("previewFullscreen").style.display="none";document.body.style.overflow=previousBodyOverflow;
+$("fullscreenFrame").srcdoc="";$("fullscreenFrame").src="";fullscreenOpen=false;
+}
+$("fullscreenPreview").onclick=openFullscreenPreview;
+$("previewHint").onclick=openFullscreenPreview;
+$("closeFullscreen").onclick=closeFullscreenPreview;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeFullscreenPreview();});
+$("copyCode").onclick=()=>copyValue($("codeInput").value,"codeStatus");
+$("clearCode").onclick=()=>{$("codeInput").value="";runCodePreview();};
+$("clearFiles").onclick=()=>{uploadedCodeFiles={};$("codeFiles").value="";show("uploadedFiles","None.");runCodePreview();};
+runCodePreview();
+
+/* COLOR PICKER */
+$("colorInput").oninput=function(){
+const hex=this.value.toUpperCase(),r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+show("colorResult",`HEX: ${hex} · RGB: ${r}, ${g}, ${b}`);
+};
+$("copyColor").onclick=()=>copyValue($("colorInput").value.toUpperCase(),"colorResult");
+
+/* TEXT REVERSER */
+$("reverseBtn").onclick=()=>show("reverseResult",Array.from($("reverseInput").value).reverse().join("")||"Enter text.");
+$("copyReverse").onclick=()=>copyValue($("reverseResult").textContent,"reverseResult");
+
+/* HTML FORMATTER */
+$("formatHtml").onclick=()=>{
+const src=$("htmlInput").value;
+if(!src.trim()){show("htmlResult","Paste HTML first.");return;}
+const tokens=src.replace(/>\s*</g,">\n<").split("\n").map(x=>x.trim()).filter(Boolean);
+let depth=0,out=[];
+for(const t of tokens){
+if(/^<\//.test(t))depth=Math.max(0,depth-1);
+out.push("  ".repeat(depth)+t);
+if(/^<[a-z][\w:-]*(?:\s[^>]*)?>$/i.test(t)&&!/^<\//.test(t)&&!/<\/[^>]+>/.test(t))depth++;
+}
+show("htmlResult",out.join("\n"));
+};
+$("copyHtml").onclick=()=>copyValue($("htmlResult").textContent,"htmlResult");
+
+/* CSS GRADIENT GENERATOR */
+function updateGradient(){
+const c1=$("gradColor1").value,c2=$("gradColor2").value,ang=$("gradAngle").value;
+show("gradAngleVal",ang);
+const css=`background: linear-gradient(${ang}deg, ${c1}, ${c2});`;
+$("gradPreview").style.background=`linear-gradient(${ang}deg, ${c1}, ${c2})`;
+show("gradResult",css);
+}
+$("gradColor1").oninput=updateGradient;$("gradColor2").oninput=updateGradient;$("gradAngle").oninput=updateGradient;updateGradient();
+$("copyGrad").onclick=()=>copyValue($("gradResult").textContent,"gradResult");
+
+/* QR CODE GENERATOR */
+$("generateQr").onclick=()=>{
+const val=$("qrInput").value.trim(),container=$("qrContainer");
+container.innerHTML="";
+if(!val){show("qrResult","Enter text or URL.");return;}
+const img=document.createElement("img");
+img.alt="Generated QR code";
+img.src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(val)}`;
+img.style.cssText="max-width:100%;border-radius:8px";
+img.onerror=()=>show("qrResult","Could not load the QR service. Check your internet connection.");
+container.appendChild(img);show("qrResult","QR Code requested. Save the image when it loads.");
 };
 
-document.querySelector('#menuBtn').onclick=()=>{
-  alert('Nexora Code Studio · HTML, CSS and JavaScript editor');
+/* JSON FORMATTER */
+$("formatJson").onclick=()=>{
+try{const o=JSON.parse($("jsonInput").value);$("jsonInput").value=JSON.stringify(o,null,2);show("jsonResult","Formatted!");}
+catch(e){show("jsonResult","Error: "+e.message);}
+};
+$("minifyJson").onclick=()=>{
+try{const o=JSON.parse($("jsonInput").value);$("jsonInput").value=JSON.stringify(o);show("jsonResult","Minified!");}
+catch(e){show("jsonResult","Error: "+e.message);}
+};
+$("validateJson").onclick=()=>{
+try{JSON.parse($("jsonInput").value);show("jsonResult","Valid JSON format.");}
+catch(e){show("jsonResult","Invalid: "+e.message);}
 };
 
-document.querySelector('#moreBtn').onclick=()=>{
-  alert('Use the language tabs, editor tools and Settings to work on your project.');
+/* GRADIENT PRESETS */
+const presets={
+sunset:"linear-gradient(135deg, #f857a6 0%, #ff5858 100%)",
+ocean:"linear-gradient(135deg, #2af598 0%, #009efd 100%)",
+neon:"linear-gradient(135deg, #f7ff00 0%, #db36a4 100%)",
+emerald:"linear-gradient(135deg, #0ba360 0%, #3cba92 100%)"
+};
+function updatePreset(){
+const val=presets[$("gradPreset").value];
+$("gradPresetBox").style.background=val;show("gradPresetResult",`background: ${val};`);
+}
+$("gradPreset").onchange=updatePreset;updatePreset();
+$("copyGradPreset").onclick=()=>copyValue($("gradPresetResult").textContent,"gradPresetResult");
+
+/* COLOR PALETTE GENERATOR */
+$("generatePalette").onclick=()=>{
+const base=$("paletteBase").value,boxes=$("paletteBoxes"),hex=base.replace("#","");
+boxes.innerHTML="";
+const r=parseInt(hex.substring(0,2),16),g=parseInt(hex.substring(2,4),16),b=parseInt(hex.substring(4,6),16);
+const colors=[base];
+for(let i=1;i<=4;i++){
+const f=1+i*.2;
+colors.push("#"+((1<<24)+(Math.round(r/f)<<16)+(Math.round(g/f)<<8)+Math.round(b/f)).toString(16).slice(1).toUpperCase());
+}
+colors.forEach(c=>{
+const div=document.createElement("button");div.type="button";div.title="Copy "+c;
+div.style.cssText=`flex:1;min-width:40px;height:50px;background:${c};border-radius:6px;border:1px solid var(--border);`;
+div.onclick=()=>copyValue(c,"paletteResult");boxes.appendChild(div);
+});
+show("paletteResult","Palette: "+colors.join(", "));
 };
 
-document.querySelector('#expandPreview').onclick=()=>{
-  const win=window.open('','_blank');
-  if(win){
-    win.document.open();
-    win.document.write(makeDocument());
-    win.document.close();
-  }
+/* STYLISH TEXT GENERATOR */
+const sMaps={
+bold:{a:'𝗮',b:'𝗯',c:'𝗰',d:'𝗱',e:'𝗲',f:'𝗳',g:'𝗴',h:'𝗵',i:'𝗶',j:'𝗷',k:'𝗸',l:'𝗹',m:'𝗺',n:'𝗻',o:'𝗼',p:'𝗽',q:'𝗾',r:'𝗿',s:'𝘀',t:'𝘁',u:'𝘂',v:'𝘃',w:'𝘄',x:'𝘅',y:'𝘆',z:'𝘇',A:'𝗔',B:'𝗕',C:'𝗖',D:'𝗗',E:'𝗘',F:'𝗙',G:'𝗚',H:'𝗛',I:'𝗜',J:'𝗝',K:'𝗞',L:'𝗟',M:'𝗠',N:'𝗡',O:'𝗢',P:'𝗣',Q:'𝗤',R:'𝗥',S:'𝗦',T:'𝗧',U:'𝗨',V:'𝗩',W:'𝗪',X:'𝗫',Y:'𝗬',Z:'𝗭'},
+italic:{a:'𝑎',b:'𝑏',c:'𝑐',d:'𝑑',e:'𝑒',f:'𝑓',g:'𝑔',h:'ℎ',i:'𝑖',j:'𝑗',k:'𝑘',l:'𝑙',m:'𝑚',n:'𝑛',o:'𝑜',p:'𝑝',q:'𝑞',r:'𝑟',s:'𝑠',t:'𝑡',u:'𝑢',v:'𝑣',w:'𝑤',x:'𝑥',y:'𝑦',z:'𝑧',A:'𝐴',B:'𝐵',C:'𝐶',D:'𝐷',E:'𝐸',F:'𝐹',G:'𝐺',H:'𝐻',I:'𝐼',J:'𝐽',K:'𝐾',L:'𝐿',M:'𝑀',N:'𝑁',O:'𝑂',P:'𝑃',Q:'𝑄',R:'𝑅',S:'𝑆',T:'𝑇',U:'𝑈',V:'𝑉',W:'𝑊',X:'𝑋',Y:'𝑌',Z:'𝑍'},
+gothic:{a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷',A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'Ⓜ',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ'},
+script:{a:'𝒶',b:'𝒷',c:'𝒸',d:'𝒹',e:'ℯ',f:'𝒻',g:'ℊ',h:'𝒽',i:'𝒾',j:'𝒿',k:'𝓀',l:'𝓁',m:'𝓂',n:'𝓃',o:'ℴ',p:'𝓅',q:'𝓆',r:'𝓇',s:'𝓈',t:'𝓉',u:'𝓊',v:'𝓋',w:'𝓌',x:'𝓍',y:'𝓎',z:'𝓏',A:'𝒜',B:'ℬ',C:'𝒞',D:'𝒟',E:'ℰ',F:'ℱ',G:'𝒢',H:'ℋ',I:'ℐ',J:'𝒥',K:'𝒦',L:'ℒ',M:'ℳ',N:'𝒩',O:'𝒪',P:'𝒫',Q:'𝒬',R:'ℛ',S:'𝒮',T:'𝒯',U:'𝒰',V:'𝒱',W:'𝒲',X:'𝒳',Y:'𝒴',Z:'𝒵'},
+mono:{a:'𝚊',b:'𝚋',c:'𝚌',d:'𝚍',e:'𝚎',f:'𝚏',g:'𝚐',h:'𝚑',i:'𝚒',j:'𝚓',k:'𝚔',l:'𝚕',m:'𝚖',n:'𝚗',o:'𝚘',p:'𝚙',q:'𝚚',r:'𝚛',s:'𝚜',t:'𝚝',u:'𝚞',v:'𝚟',w:'𝚠',x:'𝚡',y:'𝚢',z:'𝚣',A:'𝙰',B:'𝙱',C:'𝙲',D:'𝙳',E:'𝙴',F:'𝙵',G:'𝙶',H:'𝙷',I:'𝙸',J:'𝙹',K:'𝙺',L:'𝙻',M:'𝙼',N:'𝙽',O:'𝙾',P:'𝙿',Q:'𝚀',R:'𝚁',S:'𝚂',T:'𝚃',U:'𝚄',V:'𝚅',W:'𝚆',X:'𝚇',Y:'𝚈',Z:'𝚉'},
+double:{a:'𝕒',b:'𝕓',c:'𝕔',d:'𝕕',e:'𝕖',f:'𝕗',g:'𝕘',h:'𝕙',i:'𝕚',j:'𝕛',k:'𝕜',l:'𝕝',m:'𝕞',n:'𝕟',o:'𝕠',p:'𝕡',q:'𝕢',r:'𝕣',s:'𝕤',t:'𝕥',u:'𝕦',v:'𝕧',w:'𝕨',x:'𝕩',y:'𝕪',z:'𝕫',A:'𝔸',B:'𝔹',C:'ℂ',D:'𝔻',E:'𝔼',F:'𝔽',G:'𝔾',H:'ℍ',I:'𝕀',J:'𝕁',K:'𝕂',L:'𝕃',M:'𝕄',N:'ℕ',O:'𝕆',P:'ℙ',Q:'ℚ',R:'ℝ',S:'𝕊',T:'𝕋',U:'𝕌',V:'𝕍',W:'𝕎',X:'𝕏',Y:'𝕐',Z:'ℤ'},
+circled:{a:'ⓐ',b:'ⓑ',c:'ⓒ',d:'ⓓ',e:'ⓔ',f:'ⓕ',g:'ⓖ',h:'ⓗ',i:'ⓘ',j:'ⓙ',k:'ⓚ',l:'ⓛ',m:'ⓜ',n:'ⓝ',o:'ⓞ',p:'ⓟ',q:'ⓠ',r:'ⓡ',s:'ⓢ',t:'ⓣ',u:'ⓤ',v:'ⓥ',w:'ⓦ',x:'ⓧ',y:'ⓨ',z:'ⓩ',A:'Ⓐ',B:'Ⓑ',C:'Ⓒ',D:'Ⓓ',E:'Ⓔ',F:'Ⓕ',G:'Ⓖ',H:'Ⓗ',I:'Ⓘ',J:'Ⓙ',K:'Ⓚ',L:'Ⓛ',M:'Ⓜ',N:'Ⓝ',O:'Ⓞ',P:'Ⓟ',Q:'Ⓠ',R:'Ⓡ',S:'Ⓢ',T:'Ⓣ',U:'Ⓤ',V:'Ⓥ',W:'Ⓦ',X:'Ⓧ',Y:'Ⓨ',Z:'Ⓩ'},
+fullWidth:str=>str.split('').map(c=>c===' '?' ':c.charCodeAt(0)>=33&&c.charCodeAt(0)<=126?String.fromCharCode(c.charCodeAt(0)+65248):c).join('')
 };
-
-document.querySelector('#compactToggle').onchange=e=>{
-  keyboardPanel.classList.toggle('compact-mode',e.target.checked);
-};
-
-/* Normal keyboard: numbers and letters together. */
-const letterRows=[
-  ['1','2','3','4','5','6','7','8','9','0'],
-  ['Q','W','E','R','T','Y','U','I','O','P'],
-  ['A','S','D','F','G','H','J','K','L'],
-  ['SHIFT','Z','X','C','V','B','N','M','⌫'],
-  ['?123',',','SPACE','.','ENTER']
+$("generateStylish").onclick=()=>{
+const txt=$("stylishInput").value.trim()||"RexWeb Digital";
+const t=map=>typeof map==="function"?map(txt):txt.split("").map(c=>map[c]||c).join("");
+const styles=[
+t(sMaps.script),t(sMaps.double),t(sMaps.bold),t(sMaps.italic),t(sMaps.mono),t(sMaps.gothic),t(sMaps.circled),t(sMaps.fullWidth),
+"꧁༒☬"+txt+"☬༒꧂","꧁𓊈𒆜"+txt+"𒆜𓊉꧂","★彡["+txt+"]彡★","『"+t(sMaps.fullWidth)+"』","♛ "+t(sMaps.italic)+" ♛","✦ "+t(sMaps.script)+" ✦","𓆩★𓆪 "+txt+" 𓆩★𓆪","⚡"+txt+"⚡","☯︎ "+txt.toUpperCase()+" ☯︎","♡ "+txt+" ♡","亗 "+txt+" 亗","༺☆༻"+txt+"༺☆༻","꧁ঔৣ☬"+txt+"☬ঔৣ꧂","✧༺♥༻∞ "+txt+" ∞༺♥༻✧","『★』"+txt+"『★』","☠ "+txt.toUpperCase()+" ☠","么 "+txt+" 么","࿐ ࿔:･ﾟ"+txt+"･ﾟ:࿐","♜ "+txt.toUpperCase()+" ♜","⫷ "+txt+" ⫸","乂❤‿❤乂 "+txt,"✨『"+txt+"』✨","⚜️ "+t(sMaps.gothic)+" ⚜️","♕ "+t(sMaps.double)+" ♕","☾⋆⁺₊✧ "+txt+" ✧₊⁺⋆☽","ᯓ★ "+txt,"𖤐 "+txt.toUpperCase()+" 𖤐","༒︎"+txt+"༒︎","✺ "+t(sMaps.italic)+" ✺","⊹ ࣪ ˖ "+txt+" ˖ ࣪ ⊹","꧁༺"+txt.toUpperCase()+"༻꧂","★彡 "+t(sMaps.bold)+" 彡★","◥꧁ད"+txt+"ཌ꧂◤","𓆩⚡𓆪 "+t(sMaps.script),"♡︎₊˚ "+txt+" ˚₊♡︎","✯ "+txt+" ✯","乂 "+txt.toUpperCase()+" 乂","⌁༺ "+txt+" ༻⌁","𖣘『"+t(sMaps.italic)+"』𖣘","👑 "+t(sMaps.script)+" 👑","⟡ "+txt+" ⟡","『ツ』"+txt+"『ツ』","༄ᶦᶰᵈ᭄ "+txt,"✧･ﾟ: *✧ "+txt+" ✧*:･ﾟ✧","𓂀 "+txt+" 𓂀"
 ];
-
-/* Programming symbols layout. */
-const symbolRows=[
-  ['<','>','/','\\','=','+','-','*','%'],
-  ['(',')','[',']','{','}','|','&'],
-  ['!','?','@','#','$','^','~','_','`'],
-  [':',';',"'",'"',',','.','⌫'],
-  ['ABC','TAB','=>','===','!==','&&','||'],
-  ['//','/* */','SPACE','ENTER']
-];
-
-function renderKeyboard(){
-  keyboard.innerHTML='';
-  const rows=symbolsMode?symbolRows:letterRows;
-  rows.forEach(row=>{
-    const wrap=document.createElement('div');
-    wrap.className='keyrow';
-    row.forEach(raw=>{
-      const key=raw;
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='key';
-      button.textContent=key;
-      button.setAttribute('aria-label',key);
-      if(['SHIFT','?123','ABC','TAB','ENTER','SPACE'].includes(key))
-        button.classList.add('special');
-      if(['ENTER','TAB','ABC'].includes(key))
-        button.classList.add('green','long');
-      if(key==='⌫')button.classList.add('red','wide');
-      if(key==='SHIFT')button.classList.add('shift','long');
-      if(key==='SPACE')button.classList.add('space','long');
-      if(['===','!==','/* */'].includes(key))button.classList.add('long');
-      button.addEventListener('pointerdown',e=>e.preventDefault());
-      button.addEventListener('click',()=>insertKey(key));
-      wrap.appendChild(button);
-    });
-    keyboard.appendChild(wrap);
-  });
-  document.querySelector('#symbolsToggle').textContent=
-    symbolsMode?'ABC ← Back to letters':'#+= Symbols';
-}
-
-document.querySelector('#symbolsToggle').onclick=()=>{
-  symbolsMode=!symbolsMode;
-  renderKeyboard();
-};
-
-function insertAtCursor(text){
-  focusEditorCustom();
-  const start=code.selectionStart;
-  const end=code.selectionEnd;
-  code.setRangeText(text,start,end,'end');
-  saveHistory();
-  bringCaretIntoView();
-}
-
-function insertKey(key){
-  if(key==='ABC'||key==='?123'){
-    symbolsMode=key==='?123';
-    renderKeyboard();
-    return;
-  }
-  if(key==='SHIFT'){
-    shiftMode=!shiftMode;
-    keyboard.querySelectorAll('.key').forEach(button=>{
-      if(/^[A-Z]$/.test(button.textContent)){
-        button.textContent=shiftMode?button.textContent.toLowerCase():button.textContent.toUpperCase();
-      }
-    });
-    return;
-  }
-  focusEditorCustom();
-  let start=code.selectionStart;
-  let end=code.selectionEnd;
-  if(key==='⌫'){
-    if(start===end&&start>0)start--;
-    code.setRangeText('',start,end,'end');
-    saveHistory();
-    bringCaretIntoView();
-    return;
-  }
-  let text=key;
-  if(key==='SPACE')text=' ';
-  else if(key==='ENTER')text='\n';
-  else if(key==='TAB')text=' ';
-  else if(key==='/* */')text='/* */';
-  else if(key==='SHIFT')return;
-  else if(/^[A-Z]$/.test(key)&&shiftMode)text=key.toLowerCase();
-
-  code.setRangeText(text,start,end,'end');
-  saveHistory();
-  bringCaretIntoView();
-
-  if(shiftMode&&/^[A-Z]$/.test(key)){
-    shiftMode=false;
-    renderKeyboard();
-  }
-}
-
-code.addEventListener('keydown',e=>{
-  if(e.key==='Tab'){
-    e.preventDefault();
-    insertAtCursor(' ');
-  }
-  if(e.key==='Escape'){
-    code.blur();
-  }
+const container=$("stylishResult");container.innerHTML="";
+styles.forEach((styledText,idx)=>{
+const item=document.createElement("div");
+item.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);border:1px solid var(--border);padding:8px 12px;border-radius:8px;";
+const span=document.createElement("span");span.textContent=`${idx+1}. ${styledText}`;span.style.overflowWrap="anywhere";
+const copyBtn=document.createElement("button");copyBtn.textContent="Copy";copyBtn.className="btn alt";copyBtn.style.cssText="padding:6px 10px;font-size:11px;flex-shrink:0;";
+copyBtn.onclick=()=>copyValue(styledText,"stylishResult");
+item.appendChild(span);item.appendChild(copyBtn);container.appendChild(item);
 });
-code.addEventListener('focus',()=>{
-  code.setAttribute('inputmode','none');
-  code.setAttribute('virtualkeyboardpolicy','manual');
-});
-
-/* Settings */
-const settingsDefaults={
-  keyboardWidth:100,keyboardHeight:34,
-  keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
-  editorWidth:100
 };
 
-function applySettings(){
-  const kw=+document.querySelector('#keyboardWidth').value;
-  const kh=+document.querySelector('#keyboardHeight').value;
-  const ew=+document.querySelector('#editorWidth').value;
-  const bg=document.querySelector('#keyboardBgColor').value;
-  const fg=document.querySelector('#keyboardFontColor').value;
-  document.documentElement.style.setProperty('--keyboard-width',kw+'%');
-  document.documentElement.style.setProperty('--key-height',kh+'px');
-  document.documentElement.style.setProperty('--editor-width',ew+'%');
-  document.documentElement.style.setProperty('--keyboard-bg',bg);
-  document.documentElement.style.setProperty('--keyboard-fg',fg);
-  document.querySelector('#keyboardWidthValue').textContent=kw+'%';
-  document.querySelector('#keyboardHeightValue').textContent=kh+' px';
-  document.querySelector('#editorWidthValue').textContent=ew+'%';
-  bringCaretIntoView();
-}
-
-['keyboardWidth','keyboardHeight','editorWidth','keyboardBgColor','keyboardFontColor'].forEach(id=>{
-  document.querySelector('#'+id).addEventListener('input',applySettings);
-});
-
-document.querySelector('#settingsBtn').onclick=()=>{
-  document.querySelector('#settingsBackdrop').hidden=false;
-};
-document.querySelector('#closeSettings').onclick=()=>{
-  document.querySelector('#settingsBackdrop').hidden=true;
-};
-document.querySelector('#settingsBackdrop').addEventListener('click',e=>{
-  if(e.target.id==='settingsBackdrop')e.currentTarget.hidden=true;
-});
-document.querySelector('#resetSettings').onclick=()=>{
-  Object.entries(settingsDefaults).forEach(([id,value])=>{
-    document.querySelector('#'+id).value=value;
-  });
-  applySettings();
-};
-
-document.querySelector('#copyCode').onclick=async()=>{
-  try{
-    await navigator.clipboard.writeText(code.value);
-    document.querySelector('#saveState').textContent='Copied';
-  }catch(error){
-    code.focus();
-    code.select();
-    try{
-      document.execCommand('copy');
-      document.querySelector('#saveState').textContent='Copied';
-    }catch(err){
-      document.querySelector('#saveState').textContent='Select code';
-    }
-  }
-};
-
-applySettings();
-renderKeyboard();
-updateMeta();
-run();
-bringCaretIntoView();
+/* FOOTER */
+$("year").textContent=new Date().getFullYear();
 </script>
+
 </body>
 </html>
