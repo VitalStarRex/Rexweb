@@ -566,6 +566,11 @@ function makeDocument(){
   if(current==='html')html=code.value;
   if(current==='css')css=code.value;
   if(current==='js')js=code.value;
+  // Don't inject the untouched sample CSS/JS into the user's own page
+  if(html!==examples.html){
+    if(css===examples.css)css='';
+    if(js===examples.js)js='';
+  }
 
   // Local files like style.css / script.js can't load inside the preview.
   // The CSS and JS tabs supply them instead, so drop those references.
