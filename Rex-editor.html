@@ -1694,5 +1694,261 @@ applyPrefs();
 run();
 bringCaretIntoView();
 </script>
+
+<style>
+/* Upgrade 3: keyboard look */
+.key{border-color:#168cff;box-shadow:0 0 5px #168cff44,inset 0 0 4px #168cff22}
+.key[aria-label="ENTER"]{background:#04372d;border-color:#00e0a8;color:#67ffd1;box-shadow:0 0 6px #00e0a855}
+.keyboard{overflow-x:hidden}
+.keys,.keyrow{max-width:100%}
+/* Upgrade 2: CSS library UI */
+.lib-chips{display:flex;gap:5px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.lib-chips::-webkit-scrollbar{display:none}
+.lib-chip{flex:0 0 auto;padding:6px 10px;border-radius:14px;border:1px solid #14628c;background:#0b1b30;font-size:11px;color:var(--text)}
+.lib-chip.on{border-color:var(--cyan);color:var(--cyan)}
+.lib-search{width:100%;padding:9px;border-radius:8px;border:1px solid #14628c;background:#0b1b30;color:var(--text);margin:4px 0 8px}
+.lib-card b{font-size:12px;display:block}
+.lib-card small{display:block;color:var(--muted);font:9px/1.3 ui-monospace,Consolas,monospace;white-space:pre;overflow:hidden;max-height:2.7em;margin-top:2px}
+.lib-count{font-size:10px;color:var(--muted);margin:0 0 4px}
+body.light .lib-chip,body.light .lib-search{background:#fff}
+</style>
+<!-- REXWEB 3-UPGRADE PATCH: correctly integrated at document end -->
+<script>
+(function(){
+if(typeof VOID==='undefined'||typeof smartType==='undefined'){alert('REXWEB patch: required editor functions were not found.');return}
+/* ============ UPGRADE 1: intelligent HTML auto-close tags ============ */
+'area base embed source track wbr col param img br hr input meta link'.split(' ').forEach(t=>VOID.add(t));
+const TAG_BEFORE=/<([a-zA-Z][\w:-]*)(?:\s[^<>]*)?$/;
+const _smart=smartType;
+smartType=function(text,start,end){
+  if(S.pair&&current==='html'&&start===end){
+    const v=code.value,prev=v[start-1]||'',next=v[start]||'';
+    const done=(caret)=>{code.setSelectionRange(caret,caret);saveHistory();bringCaretIntoView()};
+    if(text==='<'&&!/\w/.test(next)){
+      code.setRangeText('<>',start,end,'end');done(start+1);return;
+    }
+    if(text==='!'&&prev==='<'&&next==='>'){
+      code.setRangeText('!',start,start+1,'end');done(start+1);return;
+    }
+    if(text==='>'){
+      const b=v.slice(0,start),m=b.match(TAG_BEFORE);
+      const real=m&&!/\/$/.test(b)&&!VOID.has(m[1].toLowerCase());
+      const closed=real&&v.slice(next==='>'?start+1:start).startsWith('</'+m[1]+'>');
+      if(next==='>'){
+        if(real&&!closed)code.setRangeText('></'+m[1]+'>',start,start+1,'end');
+        done(start+1);return;
+      }
+      if(real&&closed){code.setRangeText('>',start,end,'end');done(start+1);return}
+    }
+  }
+  return _smart(text,start,end);
+};
+function htmlBackspace(){
+  if(!S.pair||current!=='html'||code.selectionStart!==code.selectionEnd)return false;
+  const v=code.value,s=code.selectionStart;
+  if(v[s-1]==='<'&&v[s]==='>'){
+    code.setRangeText('',s-1,s+1,'end');saveHistory();bringCaretIntoView();return true;
+  }
+  const m=v.slice(0,s).match(/<([a-zA-Z][\w:-]*)(?:\s[^<>]*)?>$/);
+  if(m){
+    const close='</'+m[1]+'>';
+    if(v.slice(s).startsWith(close)){
+      const from=s-m[0].length;
+      code.setRangeText('',from,s+close.length,'end');saveHistory();bringCaretIntoView();return true;
+    }
+  }
+  return false;
+}
+const _ik=insertKey;
+insertKey=function(key){
+  if(key==='⌫'){focusEditorCustom();if(htmlBackspace())return}
+  return _ik(key);
+};
+/* desktop + Android virtual keyboards */
+code.addEventListener('beforeinput',e=>{
+  if(current!=='html'||!S.pair||e.isComposing||code.selectionStart!==code.selectionEnd)return;
+  if(e.inputType==='deleteContentBackward'){if(htmlBackspace())e.preventDefault();return}
+  if(e.inputType==='insertText'&&(e.data==='<'||e.data==='>')){
+    e.preventDefault();smartType(e.data,code.selectionStart,code.selectionEnd);
+  }
+});
+/* fallback for keyboards that commit '>' without a cancelable beforeinput */
+code.addEventListener('input',e=>{
+  if(current!=='html'||!S.pair||e.data!=='>')return;
+  const pos=code.selectionStart,v=code.value,b=v.slice(0,pos-1),m=b.match(TAG_BEFORE);
+  if(m&&!/\/$/.test(b)&&!VOID.has(m[1].toLowerCase())&&!v.slice(pos).startsWith('</'+m[1]+'>')){
+    code.setRangeText('</'+m[1]+'>',pos,pos,'preserve');
+    code.setSelectionRange(pos,pos);saveHistory();
+  }
+});
+
+/* ============ UPGRADE 2: CSS Essentials + 100 snippets ============ */
+const KF={
+fadeIn:['from { opacity: 0; }','to { opacity: 1; }'],
+slideIn:['from { opacity: 0; transform: translateX(-30px); }','to { opacity: 1; transform: translateX(0); }'],
+bounce:['0%, 100% { transform: translateY(0); }','50% { transform: translateY(-20px); }'],
+pulse:['0%, 100% { transform: scale(1); opacity: 1; }','50% { transform: scale(1.05); opacity: .8; }'],
+spin:['to { transform: rotate(360deg); }'],
+float:['0%, 100% { transform: translateY(0); }','50% { transform: translateY(-12px); }'],
+shake:['0%, 100% { transform: translateX(0); }','25% { transform: translateX(-6px); }','75% { transform: translateX(6px); }'],
+zoomIn:['from { opacity: 0; transform: scale(.6); }','to { opacity: 1; transform: scale(1); }']
+};
+const HV=l=>({sel:':hover',lines:l});
+const CATS=[
+['Essentials',[
+['CSS Essentials','color:white;background:black;font-size:18px;font-family:Arial;display:flex;position:relative;border:1px solid cyan;margin:10px;padding:15px;width:100%;height:auto;']]],
+['Layout',[
+['Flex Center','display:flex;justify-content:center;align-items:center;'],
+['Flex Column','display:flex;flex-direction:column;gap:15px;'],
+['Flex Row','display:flex;flex-direction:row;gap:15px;'],
+['Flex Space Between','display:flex;justify-content:space-between;align-items:center;'],
+['Flex Wrap','display:flex;flex-wrap:wrap;gap:15px;'],
+['Grid Center','display:grid;place-items:center;'],
+['Grid Columns','display:grid;grid-template-columns:repeat(3, 1fr);gap:15px;'],
+['Auto Grid','display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;'],
+['Absolute Center','position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);'],
+['Fixed Center','position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);']]],
+['Backgrounds',[
+['Gradient Background','background:linear-gradient(135deg, #111827, #2563eb);'],
+['Radial Background','background:radial-gradient(circle, #2563eb, #050914);'],
+['Image Background',"background-image:url('image.jpg');background-size:cover;background-position:center;"],
+['Dark Background','background:#080d1a;color:white;'],
+['Glass Background','background:rgba(255,255,255,.1);backdrop-filter:blur(15px);'],
+['Transparent Background','background:transparent;'],
+['Background Overlay','background:linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6));'],
+['Background Repeat Off','background-repeat:no-repeat;background-size:cover;background-position:center;'],
+['Background Attachment','background-attachment:fixed;background-size:cover;'],
+['Gradient Border','border:2px solid transparent;background:linear-gradient(#101827,#101827) padding-box, linear-gradient(90deg,cyan,purple) border-box;']]],
+['Typography',[
+['Bold Text','font-weight:700;'],['Light Text','font-weight:300;'],['Center Text','text-align:center;'],
+['Uppercase Text','text-transform:uppercase;letter-spacing:2px;'],['Capitalized Text','text-transform:capitalize;'],
+['Text Shadow','text-shadow:2px 2px 5px rgba(0,0,0,.5);'],
+['Gradient Text','background:linear-gradient(90deg, cyan, purple);background-clip:text;color:transparent;'],
+['Text Spacing','letter-spacing:2px;word-spacing:5px;line-height:1.6;'],
+['Text Ellipsis','overflow:hidden;white-space:nowrap;text-overflow:ellipsis;'],
+['Responsive Font','font-size:clamp(16px, 3vw, 32px);']]],
+['Borders & Shapes',[
+['Rounded Box','border-radius:15px;'],['Circle Shape','width:100px;height:100px;border-radius:50%;'],['Pill Shape','border-radius:999px;'],
+['Dashed Border','border:2px dashed cyan;'],['Dotted Border','border:2px dotted cyan;'],['Bottom Border','border:none;border-bottom:2px solid cyan;'],
+['Outline Border','outline:2px solid cyan;outline-offset:4px;'],['Double Border','border:4px double cyan;'],
+['Rounded Top','border-radius:15px 15px 0 0;'],['Rounded Bottom','border-radius:0 0 15px 15px;']]],
+['Shadows & Effects',[
+['Soft Shadow','box-shadow:0 4px 15px rgba(0,0,0,.15);'],['Deep Shadow','box-shadow:0 15px 35px rgba(0,0,0,.35);'],
+['Neon Glow','box-shadow:0 0 15px cyan, 0 0 30px rgba(0,255,255,.3);'],['Inner Shadow','box-shadow:inset 0 2px 10px rgba(0,0,0,.3);'],
+['Blur Effect','filter:blur(5px);'],['Bright Effect','filter:brightness(1.2);'],['Grayscale Effect','filter:grayscale(100%);'],
+['Image Shadow','filter:drop-shadow(0 5px 10px rgba(0,0,0,.3));'],
+['Glass Effect','background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);'],
+['Hover Highlight','transition:box-shadow .3s ease, transform .3s ease;',{extra:HV(['transform: translateY(-3px);','box-shadow: 0 8px 20px rgba(0,0,0,.3);'])}]]],
+['Buttons & Interaction',[
+['Button Base','padding:12px 24px;border:none;border-radius:8px;cursor:pointer;'],['Button Gradient','background:linear-gradient(90deg, #00d4ff, #7c3aed);color:white;border:none;'],
+['Button Outline','background:transparent;border:2px solid cyan;color:cyan;'],['Button Hover','transition:.3s ease;'],
+['Button Press','transform:scale(.96);',{nest:'&:active'}],['Pointer Cursor','cursor:pointer;'],
+['Disabled Element','opacity:.5;cursor:not-allowed;pointer-events:none;'],['Focus Outline','outline:2px solid cyan;outline-offset:3px;'],
+['Smooth Transition','transition:all .3s ease-in-out;'],['No Selection','user-select:none;-webkit-user-select:none;']]],
+['Animation',[
+['Fade Animation','animation:fadeIn .5s ease forwards;',{kf:'fadeIn'}],['Slide Animation','animation:slideIn .5s ease forwards;',{kf:'slideIn'}],
+['Bounce Animation','animation:bounce 1s infinite;',{kf:'bounce'}],['Pulse Animation','animation:pulse 1.5s infinite;',{kf:'pulse'}],
+['Spin Animation','animation:spin 2s linear infinite;',{kf:'spin'}],['Float Animation','animation:float 3s ease-in-out infinite;',{kf:'float'}],
+['Shake Animation','animation:shake .4s ease-in-out;',{kf:'shake'}],['Zoom Animation','animation:zoomIn .5s ease forwards;',{kf:'zoomIn'}],
+['Animation Delay','animation-delay:.5s;animation-fill-mode:both;'],
+['Animation Control','animation-duration:1s;animation-timing-function:ease;animation-iteration-count:infinite;']]],
+['Images & Media',[
+['Image Fit','width:100%;height:100%;object-fit:cover;'],['Image Contain','width:100%;height:100%;object-fit:contain;'],
+['Circular Image','width:120px;height:120px;border-radius:50%;object-fit:cover;'],
+['Image Hover Zoom','transition:transform .3s ease;',{extra:HV(['transform: scale(1.08);'])}],
+['Image Crop Center','object-fit:cover;object-position:center;'],['Video Responsive','width:100%;height:auto;aspect-ratio:16 / 9;'],
+['Video Cover','width:100%;height:100%;object-fit:cover;'],['Aspect 16:9','aspect-ratio:16 / 9;'],
+['Aspect 1:1','aspect-ratio:1 / 1;'],['Aspect 4:3','aspect-ratio:4 / 3;']]],
+['Responsive',[
+['Responsive Width','width:min(100% - 32px, 1200px);margin-inline:auto;'],['Full Width','width:100%;max-width:100%;'],['Full Height','min-height:100vh;'],
+['Responsive Padding','padding:clamp(12px, 3vw, 40px);'],['Responsive Gap','gap:clamp(8px, 2vw, 24px);'],
+['Responsive Grid','display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr));gap:20px;'],
+['Mobile Friendly','max-width:100%;box-sizing:border-box;'],['Hide Overflow','overflow:hidden;'],
+['Horizontal Scroll','overflow-x:auto;overflow-y:hidden;white-space:nowrap;'],['Sticky Element','position:sticky;top:0;z-index:100;']]],
+['Utilities',[
+['Box Sizing','box-sizing:border-box;'],['Remove Margin','margin:0;'],['Remove Padding','padding:0;'],['Hide Element','display:none;'],
+['Invisible Element','visibility:hidden;'],['Center Container','width:100%;max-width:1100px;margin:0 auto;'],
+['Layer Priority','position:relative;z-index:10;'],['Smooth Scrolling','scroll-behavior:smooth;'],
+['Custom Scrollbar','scrollbar-width:thin;scrollbar-color:cyan #101827;'],
+['Safe Area Padding','padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);']]]
+];
+const ITEMS=[],seen=new Set();
+CATS.forEach(([cat,list])=>list.forEach(([name,css,o])=>{ITEMS.push(Object.assign({cat,name,css},o||{}));seen.add(css)}));
+[...(LIB.css||[]),...(SNIPS.css||[])].forEach(([name,css])=>{
+  if(seen.has(css))return;seen.add(css);ITEMS.push({cat:'Classic',name,css,raw:true});
+});
+const NAMES=['All',...CATS.map(c=>c[0]),'Classic'];
+function fmtLines(css){
+  return css.split(';').map(x=>x.trim()).filter(Boolean).map(x=>{const i=x.indexOf(':');return x.slice(0,i).trim()+': '+x.slice(i+1).trim()+';'});
+}
+function cssInsert(it){
+  closeSheet();
+  if(!previewPanel.hidden)showEditor();
+  if(current!=='css')setLang('css');
+  if(it.raw){insertAtCursor(it.css);return}
+  focusEditorCustom();
+  const v=code.value,s=code.selectionStart,e=code.selectionEnd;
+  const lines=fmtLines(it.css);
+  const before=v.slice(0,s).replace(/\/\*[\s\S]*?\*\//g,'');
+  const depth=(before.match(/\{/g)||[]).length-(before.match(/\}/g)||[]).length;
+  const ls=s===0?0:v.lastIndexOf('\n',s-1)+1;
+  const pre=v.slice(ls,s),blank=!pre.trim(),lineInd=v.slice(ls).match(/^[ \t]*/)[0];
+  const block=(sel,ls2)=>[sel+' {',...ls2.map(l=>'  '+l),'}'];
+  let out;
+  if(depth>0){
+    const ind=blank?(pre||'  '):lineInd+'  ';
+    let body=it.nest?block(it.nest,lines):lines.slice();
+    if(it.extra)body=body.concat('',block('&'+it.extra.sel,it.extra.lines));
+    body=body.join('\n'+ind);
+    out=blank?(pre?'':'  ')+body:'\n'+ind+body+'\n'+lineInd;
+  }else{
+    const sel=it.nest?'.element'+it.nest.slice(1):'.element';
+    let parts=[block(sel,lines).join('\n')];
+    if(it.extra)parts.push(block('.element'+it.extra.sel,it.extra.lines).join('\n'));
+    out=(blank?'':'\n\n')+parts.join('\n\n')+'\n';
+  }
+  code.setRangeText(out,s,e,'end');
+  const caret=code.selectionStart;
+  if(it.kf&&!new RegExp('@keyframes\\s+'+it.kf+'\\b').test(code.value)){
+    const L=code.value.length;
+    code.setRangeText('\n\n@keyframes '+it.kf+' {\n'+KF[it.kf].map(l=>'  '+l).join('\n')+'\n}\n',L,L,'preserve');
+    code.setSelectionRange(caret,caret);
+  }
+  saveHistory();bringCaretIntoView();
+}
+function openCssLib(){
+  let q='',cat='All';
+  const search=h('input','lib-search');search.type='search';search.placeholder='Search '+ITEMS.length+' CSS snippets…';
+  const chips=h('div','lib-chips'),count=h('div','lib-count'),grid=h('div','sheet-grid');
+  const draw=()=>{
+    chips.replaceChildren(...NAMES.map(n=>h('button','lib-chip'+(n===cat?' on':''),n,()=>{cat=n;draw()})));
+    const t=q.trim().toLowerCase();
+    const list=ITEMS.filter(it=>(cat==='All'||it.cat===cat)&&(!t||(it.name+' '+it.css+' '+it.cat).toLowerCase().includes(t)));
+    count.textContent=list.length+' snippet'+(list.length===1?'':'s');
+    grid.replaceChildren(...list.map(it=>{
+      const b=h('button','mbtn lib-card','',()=>cssInsert(it));
+      const n=h('b','',it.name),c=h('small','',it.css.length>90?it.css.slice(0,90)+'…':it.css);
+      b.append(n,c);return b;
+    }));
+  };
+  search.oninput=()=>{q=search.value;draw()};
+  openSheet('CSS Snippets',[search,chips,count,grid,closeBtn()]);
+  draw();
+}
+const _openLib=openLib,_openSnippets=openSnippets;
+openLib=function(lang){return lang==='css'?openCssLib():_openLib(lang)};
+openSnippets=function(){return current==='css'?openCssLib():_openSnippets()};
+
+/* ============ UPGRADE 3: compact keyboard as default ============ */
+capsMode=false;shiftMode=false;
+settingsDefaults.keyboardFontColor='#21e7f5';
+const fg=document.querySelector('#keyboardFontColor');
+fg.value='#21e7f5';
+applySettings();
+keyboardPanel.classList.add('compact-mode');
+document.querySelector('#compactToggle').checked=true;
+renderKeyboard();
+})();
+</script>
 </body>
 </html>
