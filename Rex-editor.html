@@ -88,57 +88,74 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 }
 .tab.active{border:2px solid var(--cyan);color:var(--cyan);background:#08304b}
 .toolbar-row{
-  position:fixed;
+  position:absolute;
   right:5px;
-  top:88px;
-  z-index:1200;
+  top:34px;
+  bottom:25px;
+  z-index:3;
   display:flex;
   flex-direction:column;
   align-items:stretch;
-  gap:5px;
-  width:106px;
-}
-.toolbar-menu-btn{
-  flex:0 0 38px;
-  width:38px;
-  align-self:flex-end;
-  height:38px;
-  border:1px solid #168cff;
-  border-radius:9px;
-  background:#081a31;
-  color:var(--cyan);
-  font-size:20px;
-  box-shadow:0 0 9px #168cff55;
+  gap:0;
+  width:132px;
+  max-height:calc(100% - 59px);
+  pointer-events:none;
 }
 .toolbar{
+  pointer-events:auto;
   display:grid;
   grid-template-columns:minmax(0,1fr);
-  gap:4px;
+  gap:6px;
   width:100%;
   box-sizing:border-box;
   max-height:calc(100dvh - 145px);
   overflow-y:auto;
-  padding:5px;
-  border:1px solid #168cff;
-  border-radius:10px;
-  background:rgba(4,11,25,.97);
-  box-shadow:0 8px 24px #0009,0 0 12px #168cff33;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#168cff transparent;
+  padding:7px;
+  border:1px solid #258dff;
+  border-radius:13px;
+  background:linear-gradient(155deg,rgba(10,29,55,.99),rgba(3,9,22,.98));
+  box-shadow:0 12px 30px #000b,0 0 18px #168cff35,inset 0 1px #ffffff12;
+  backdrop-filter:blur(14px);
+  animation:toolbarReveal .16s ease-out;
 }
+@keyframes toolbarReveal{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 .toolbar[hidden]{display:none!important}
 .toolbar .tool{
   width:100%;
-  height:34px;
-  min-height:34px;
+  height:36px;
+  min-height:36px;
   flex-direction:row;
   justify-content:flex-start;
-  gap:5px;
-  padding:0 6px;
-  font-size:9px;
-  border-radius:7px;
+  gap:9px;
+  padding:0 10px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.15px;
+  border-radius:9px;
+  border:1px solid #1b4568;
+  background:linear-gradient(110deg,#102640,#09182c);
+  color:#dceeff;
+  box-shadow:inset 0 1px #ffffff0b;
+  transition:transform .14s ease,border-color .14s ease,background .14s ease,box-shadow .14s ease;
 }
-.toolbar .tool span:first-child{width:13px;font-size:11px;line-height:1}
-body.light .toolbar{background:rgba(255,255,255,.97)}
-body.light .toolbar-menu-btn{background:#fff}
+.toolbar .tool:active{transform:scale(.97)}
+.toolbar .tool:hover{border-color:var(--cyan);background:linear-gradient(110deg,#123653,#0b2038);box-shadow:0 0 10px #21e7f522}
+.toolbar .tool span:first-child{display:grid;place-items:center;width:19px;height:19px;flex:0 0 19px;font-size:14px;line-height:1;color:var(--cyan);border-radius:6px;background:#21e7f511}
+.toolbar .tool.run{border-color:#087f67;background:linear-gradient(110deg,#063c35,#06251f);color:#52f5bd}
+.toolbar .tool.run span:first-child{color:#52f5bd;background:#00d99a18}
+.toolbar .tool.paste-tool{border-color:#247fc2;background:linear-gradient(110deg,#103b62,#0b2543);color:#8fe7ff}
+.toolbar .tool.paste-tool span:first-child{color:#8fe7ff;background:#21e7f51c}
+.toolbar .tool.danger-tool{border-color:#783b50;color:#ff9bad;background:linear-gradient(110deg,#3a1828,#211321)}
+.toolbar .tool.danger-tool span:first-child{color:#ff8298;background:#ff526b18}
+body.light .toolbar{background:linear-gradient(155deg,rgba(255,255,255,.99),rgba(232,243,255,.98));border-color:#8bbde8;box-shadow:0 12px 28px #24486b35,0 0 12px #168cff22}
+body.light .toolbar .tool{background:linear-gradient(110deg,#fff,#edf5ff);color:#17314c;border-color:#c5d9eb}
+body.light .toolbar .tool:hover{background:#e4f4ff;border-color:#168cff}
+body.light .toolbar .tool.run{background:linear-gradient(110deg,#e2fff4,#d2f7e8);color:#087653;border-color:#8dd9bb}
+body.light .toolbar .tool.paste-tool{background:linear-gradient(110deg,#e4f7ff,#d8edff);color:#075b87;border-color:#8fc7e8}
+body.light .toolbar .tool.danger-tool{background:linear-gradient(110deg,#fff0f3,#ffe4ea);color:#a52d4b;border-color:#efb5c2}
 .tool{
   display:flex;
   flex-direction:column;
@@ -169,7 +186,7 @@ body.light .toolbar-menu-btn{background:#fff}
   min-height:0;
 }
 .workspace>.panel{width:100%;flex:1}
-#editorPanel{display:flex;flex-direction:column}
+#editorPanel{display:flex;flex-direction:column;position:relative}
 .panel[hidden],.preview-screen[hidden]{display:none!important}
 .panel-head{
   display:flex;
@@ -183,7 +200,27 @@ body.light .toolbar-menu-btn{background:#fff}
 }
 .filename{font-weight:600;overflow:hidden;text-overflow:ellipsis}
 .saved{background:#06432f;color:#00e99e;border-radius:15px;padding:2px 6px;font-size:9px}
-.dots{margin-left:auto;color:var(--muted)}
+.dots{
+  margin-left:auto;
+  flex:0 0 27px;
+  width:27px;
+  height:25px;
+  padding:0;
+  border:1px solid #2581b7;
+  border-radius:8px;
+  background:linear-gradient(145deg,#102b49,#071629);
+  box-shadow:inset 0 1px #ffffff12;
+  color:var(--cyan);
+  font-size:15px;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:1px;
+}
+.dots[aria-expanded="true"]{
+  border-color:var(--cyan);
+  box-shadow:0 0 8px #21e7f555;
+}
+body.light .dots{background:#fff}
 .editor-wrap{
   flex:1;
   min-height:0;
@@ -430,11 +467,10 @@ body.light .t-v{color:#6a3db8}
   .iconbtn{width:29px;height:29px;font-size:15px}
   .tabs{gap:3px}
   .tab{padding:5px 2px;font-size:10px}
-  .toolbar-row{right:4px;top:82px;width:106px}
-  .toolbar-menu-btn{width:36px;height:36px;flex-basis:36px;font-size:18px}
-  .toolbar{width:100%;gap:3px}
-  .toolbar .tool{height:30px;min-height:30px;font-size:8px;gap:4px;padding:0 5px}
-  .tool span:first-child{font-size:11px}
+  .toolbar-row{right:4px;top:32px;bottom:23px;width:124px;max-height:calc(100% - 55px)}
+  .toolbar{width:100%;gap:4px}
+  .toolbar .tool{height:38px;min-height:38px;font-size:11px;gap:6px;padding:0 7px}
+  .tool span:first-child{font-size:12px}
   .panel-head{padding:5px 7px}
   .keyboard{padding:3px 5px;border-radius:10px}
   .keyboard-head strong{font-size:9px}
@@ -522,21 +558,6 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
     <button class="tab" data-lang="js">JS JavaScript</button>
   </nav>
 
-  <div class="toolbar-row">
-    <button class="toolbar-menu-btn" id="toolbarMenuBtn" type="button"
-      aria-label="Show or hide editor buttons" aria-expanded="false" title="Show editor buttons">☰</button>
-    <div class="toolbar" hidden>
-    <button class="tool run" id="run"><span>▷</span>Run</button>
-    <button class="tool" id="previewBtn"><span>◎</span>Preview</button>
-    <button class="tool" id="download"><span>⇩</span>Download</button>
-    <button class="tool" id="uploadBtn"><span>⇧</span>Upload</button>
-    <button class="tool" id="clear"><span>◇</span>Clear</button>
-    <button class="tool" id="undo"><span>↶</span>Undo</button>
-    <button class="tool" id="redo"><span>↻</span>Redo</button>
-    <button class="tool" id="copyCode"><span>▣</span>Copy</button>
-    <button class="tool" id="pasteCode" title="Paste clipboard text into the editor"><span>▤</span>Paste</button>
-    </div>
-  </div>
 
   <input type="file" id="fileInput" accept=".html,.htm,.css,.js,.txt" hidden>
 
@@ -562,7 +583,22 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
         <span style="color:var(--cyan)">〈/〉</span>
         <span class="filename" id="filename">index.html</span>
         <span class="saved" id="saveState">Ready</span>
-        <span class="dots">•••</span>
+        <button class="dots" id="toolbarMenuBtn" type="button"
+          aria-label="Show or hide editor buttons" aria-expanded="false"
+          aria-controls="editorToolbar" title="Show editor buttons">•••</button>
+      </div>
+      <div class="toolbar-row">
+        <div class="toolbar" id="editorToolbar" hidden>
+        <button class="tool paste-tool" id="pasteCode" title="Paste clipboard text into the editor"><span>▤</span>Paste</button>
+        <button class="tool run" id="run"><span>▷</span>Run</button>
+        <button class="tool" id="previewBtn"><span>◎</span>Preview</button>
+        <button class="tool" id="download"><span>⇩</span>Download</button>
+        <button class="tool" id="uploadBtn"><span>⇧</span>Upload</button>
+        <button class="tool" id="copyCode"><span>▣</span>Copy</button>
+        <button class="tool" id="undo"><span>↶</span>Undo</button>
+        <button class="tool" id="redo"><span>↻</span>Redo</button>
+        <button class="tool danger-tool" id="clear"><span>◇</span>Clear</button>
+        </div>
       </div>
       <div class="editor-wrap">
         <div class="line-numbers" id="lineNumbers">1</div>
@@ -839,6 +875,7 @@ function run(){
 }
 
 function showPreview(){
+  closeEditorToolbar();
   run();
   editorPanel.hidden=true;
   keyboardPanel.hidden=true;
@@ -926,7 +963,12 @@ document.querySelector('#themeBtn').onclick=()=>{
 
 document.querySelector('#menuBtn').onclick=()=>openMenu();
 const toolbarMenuBtn=document.querySelector('#toolbarMenuBtn');
-const editorToolbar=document.querySelector('.toolbar');
+const editorToolbar=document.querySelector('#editorToolbar');
+function closeEditorToolbar(){
+  editorToolbar.hidden=true;
+  toolbarMenuBtn.setAttribute('aria-expanded','false');
+  toolbarMenuBtn.title='Show editor buttons';
+}
 toolbarMenuBtn.onclick=()=>{
   const willShow=editorToolbar.hidden;
   editorToolbar.hidden=!willShow;
@@ -1184,7 +1226,7 @@ const TAGS=new Set('div span p a ul ol li h1 h2 h3 h4 h5 h6 section article asid
 /* ---------- tiny UI helpers ---------- */
 const h=(tag,cls,text,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(fn)e.onclick=fn;return e};
 const sheet=document.querySelector('#sheet'),sheetBody=document.querySelector('#sheetBody');
-function openSheet(title,items){sheetBody.replaceChildren(h('h2','',title),...items);sheet.hidden=false}
+function openSheet(title,items){closeEditorToolbar();sheetBody.replaceChildren(h('h2','',title),...items);sheet.hidden=false}
 function closeSheet(){sheet.hidden=true}
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet()});
 const closeBtn=()=>h('button','mbtn wide','Close',closeSheet);
@@ -2037,5 +2079,15 @@ document.querySelector('#compactToggle').checked=true;
 renderKeyboard();
 })();
 </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page</title>
+</head>
+<body>
+  
 </body>
 </html>
