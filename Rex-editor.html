@@ -87,12 +87,58 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   white-space:nowrap;
 }
 .tab.active{border:2px solid var(--cyan);color:var(--cyan);background:#08304b}
+.toolbar-row{
+  position:fixed;
+  right:5px;
+  top:88px;
+  z-index:1200;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:5px;
+  width:106px;
+}
+.toolbar-menu-btn{
+  flex:0 0 38px;
+  width:38px;
+  align-self:flex-end;
+  height:38px;
+  border:1px solid #168cff;
+  border-radius:9px;
+  background:#081a31;
+  color:var(--cyan);
+  font-size:20px;
+  box-shadow:0 0 9px #168cff55;
+}
 .toolbar{
   display:grid;
-  grid-template-columns:repeat(8,minmax(0,1fr));
-  gap:3px;
-  flex-shrink:0;
+  grid-template-columns:minmax(0,1fr);
+  gap:4px;
+  width:100%;
+  box-sizing:border-box;
+  max-height:calc(100dvh - 145px);
+  overflow-y:auto;
+  padding:5px;
+  border:1px solid #168cff;
+  border-radius:10px;
+  background:rgba(4,11,25,.97);
+  box-shadow:0 8px 24px #0009,0 0 12px #168cff33;
 }
+.toolbar[hidden]{display:none!important}
+.toolbar .tool{
+  width:100%;
+  height:34px;
+  min-height:34px;
+  flex-direction:row;
+  justify-content:flex-start;
+  gap:5px;
+  padding:0 6px;
+  font-size:9px;
+  border-radius:7px;
+}
+.toolbar .tool span:first-child{width:13px;font-size:11px;line-height:1}
+body.light .toolbar{background:rgba(255,255,255,.97)}
+body.light .toolbar-menu-btn{background:#fff}
 .tool{
   display:flex;
   flex-direction:column;
@@ -384,9 +430,11 @@ body.light .t-v{color:#6a3db8}
   .iconbtn{width:29px;height:29px;font-size:15px}
   .tabs{gap:3px}
   .tab{padding:5px 2px;font-size:10px}
-  .toolbar{gap:2px}
-  .tool{height:33px;font-size:7px}
-  .tool span:first-child{font-size:13px}
+  .toolbar-row{right:4px;top:82px;width:106px}
+  .toolbar-menu-btn{width:36px;height:36px;flex-basis:36px;font-size:18px}
+  .toolbar{width:100%;gap:3px}
+  .toolbar .tool{height:30px;min-height:30px;font-size:8px;gap:4px;padding:0 5px}
+  .tool span:first-child{font-size:11px}
   .panel-head{padding:5px 7px}
   .keyboard{padding:3px 5px;border-radius:10px}
   .keyboard-head strong{font-size:9px}
@@ -474,7 +522,10 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
     <button class="tab" data-lang="js">JS JavaScript</button>
   </nav>
 
-  <div class="toolbar">
+  <div class="toolbar-row">
+    <button class="toolbar-menu-btn" id="toolbarMenuBtn" type="button"
+      aria-label="Show or hide editor buttons" aria-expanded="true" title="Hide editor buttons">☰</button>
+    <div class="toolbar">
     <button class="tool run" id="run"><span>▷</span>Run</button>
     <button class="tool" id="previewBtn"><span>◎</span>Preview</button>
     <button class="tool" id="download"><span>⇩</span>Download</button>
@@ -483,6 +534,8 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
     <button class="tool" id="undo"><span>↶</span>Undo</button>
     <button class="tool" id="redo"><span>↻</span>Redo</button>
     <button class="tool" id="copyCode"><span>▣</span>Copy</button>
+    <button class="tool" id="pasteCode" title="Paste clipboard text into the editor"><span>▤</span>Paste</button>
+    </div>
   </div>
 
   <input type="file" id="fileInput" accept=".html,.htm,.css,.js,.txt" hidden>
@@ -872,6 +925,15 @@ document.querySelector('#themeBtn').onclick=()=>{
 };
 
 document.querySelector('#menuBtn').onclick=()=>openMenu();
+const toolbarMenuBtn=document.querySelector('#toolbarMenuBtn');
+const editorToolbar=document.querySelector('.toolbar');
+toolbarMenuBtn.onclick=()=>{
+  const willShow=editorToolbar.hidden;
+  editorToolbar.hidden=!willShow;
+  toolbarMenuBtn.setAttribute('aria-expanded',String(willShow));
+  toolbarMenuBtn.title=willShow?'Hide editor buttons':'Show editor buttons';
+};
+
 document.querySelector('#moreBtn').onclick=()=>openMenu();
 
 document.querySelector('#moreBtn').onclick=()=>{
@@ -1078,6 +1140,31 @@ document.querySelector('#copyCode').onclick=async()=>{
       document.querySelector('#saveState').textContent='Copied';
     }catch(err){
       document.querySelector('#saveState').textContent='Select code';
+    }
+  }
+};
+
+/* Paste clipboard text at the current editor cursor/selection. */
+document.querySelector('#pasteCode').onclick=async()=>{
+  code.focus();
+  try{
+    if(!navigator.clipboard || !navigator.clipboard.readText){
+      throw new Error('Clipboard reading is unavailable');
+    }
+    const text=await navigator.clipboard.readText();
+    if(text){
+      insertAtCursor(text);
+      document.querySelector('#saveState').textContent='Pasted';
+    }else{
+      document.querySelector('#saveState').textContent='Clipboard is empty';
+    }
+  }catch(error){
+    const text=prompt('Paste your copied code here:');
+    if(text!==null){
+      insertAtCursor(text);
+      document.querySelector('#saveState').textContent='Pasted';
+    }else{
+      document.querySelector('#saveState').textContent='Paste cancelled';
     }
   }
 };
