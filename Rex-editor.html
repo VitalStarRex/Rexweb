@@ -1141,6 +1141,9 @@ function openMenu(){
     tog('{} Auto-pair & indent: '+(S.pair?'On':'Off'),S.pair,()=>{S.pair=!S.pair}),
     h('button','mbtn','🔎 Find & Replace',openFind),
     h('button','mbtn','✂ Snippets',openSnippets),
+    h('button','mbtn','</> HTML snippets',()=>openLib('html')),
+    h('button','mbtn','⬡ CSS snippets',()=>openLib('css')),
+    h('button','mbtn','JS JS snippets',()=>openLib('js')),
     h('button','mbtn','📁 Projects',openProjects),
     h('button','mbtn','⌁ Console',()=>{closeSheet();showPreview();consolePanel.hidden=false}),
     h('button','mbtn','Select all',()=>{closeSheet();code.focus({preventScroll:true});code.select()}),
@@ -1489,6 +1492,200 @@ window.addEventListener('message',e=>{
   consoleOut.scrollTop=consoleOut.scrollHeight;
   if(d.t==='error')consolePanel.hidden=false;
 });
+
+/* ===== 50 HTML / CSS / JS snippet library ===== */
+const R=String.raw;
+const LIB={
+html:[
+['Doctype page','<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Page</title>\n</head>\n<body>\n  §\n</body>\n</html>'],
+['Meta viewport','<meta name="viewport" content="width=device-width, initial-scale=1">'],
+['Meta description','<meta name="description" content="§">'],
+['Link CSS','<link rel="stylesheet" href="style.css">'],
+['Script defer','<script src="app.js" defer><\/script>'],
+['Favicon','<link rel="icon" href="favicon.ico">'],
+['Theme color','<meta name="theme-color" content="#6366f1">'],
+['Open Graph','<meta property="og:title" content="§">\n<meta property="og:image" content="img.jpg">'],
+['Preconnect','<link rel="preconnect" href="https://fonts.googleapis.com">'],
+['Canonical','<link rel="canonical" href="https://example.com/§">'],
+['Header + nav','<header>\n  <nav><a href="/">Home</a><a href="/about">About</a></nav>\n</header>'],
+['Main section','<main>\n  <section>\n    <h2>§</h2>\n    <p>Text</p>\n  </section>\n</main>'],
+['Article','<article>\n  <h2>§</h2>\n  <p>Content</p>\n</article>'],
+['Aside','<aside>§</aside>'],
+['Footer','<footer>\n  <p>&copy; 2026 §</p>\n</footer>'],
+['Figure','<figure>\n  <img src="§" alt="Desc">\n  <figcaption>Caption</figcaption>\n</figure>'],
+['Details','<details>\n  <summary>§</summary>\n  Hidden content\n</details>'],
+['Time','<time datetime="2026-10-30">Oct 30, 2026</time>'],
+['Address','<address>§</address>'],
+['Blockquote','<blockquote cite="">§</blockquote>'],
+['Heading + text','<h1>§</h1>\n<p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p>'],
+['External link','<a href="https://§" target="_blank" rel="noopener noreferrer">Link</a>'],
+['Anchor link','<a href="#§">Jump to section</a>'],
+['Email link','<a href="mailto:§">Email</a>'],
+['Phone link','<a href="tel:+§">Call</a>'],
+['Download link','<a href="§" download>Download</a>'],
+['Unordered list','<ul>\n  <li>§</li>\n  <li>Two</li>\n</ul>'],
+['Ordered list','<ol start="1">\n  <li>§</li>\n  <li>Two</li>\n</ol>'],
+['Definition list','<dl>\n  <dt>§</dt>\n  <dd>Definition</dd>\n</dl>'],
+['Code block','<pre><code>§</code></pre>'],
+['Form','<form action="/submit" method="post">\n  §\n  <button type="submit">Send</button>\n</form>'],
+['Label + input','<label for="name">Name</label>\n<input id="name" name="name" required>'],
+['Email input','<input type="email" placeholder="you@example.com" required>'],
+['Password input','<input type="password" minlength="8" autocomplete="current-password">'],
+['Number input','<input type="number" min="0" max="10" step="1">'],
+['Range slider','<input type="range" min="0" max="100" value="50">'],
+['Date / color / file','<input type="date">\n<input type="color">\n<input type="file" accept="image/*">'],
+['Select','<select>\n  <option>§</option>\n  <option>Two</option>\n</select>'],
+['Textarea','<textarea rows="4" placeholder="§"></textarea>'],
+['Datalist','<input list="fruits">\n<datalist id="fruits">\n  <option value="Apple">\n  <option value="Pear">\n</datalist>'],
+['Lazy image','<img src="§" alt="Desc" loading="lazy" width="400" height="300">'],
+['Picture','<picture>\n  <source srcset="a.webp" type="image/webp">\n  <img src="§" alt="">\n</picture>'],
+['Video','<video src="§" controls poster="p.jpg"></video>'],
+['Audio','<audio src="§" controls></audio>'],
+['Iframe','<iframe src="§" loading="lazy" title="Embed"></iframe>'],
+['Table','<table>\n  <thead>\n    <tr><th>§</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Rex</td></tr>\n  </tbody>\n</table>'],
+['Dialog','<dialog id="d">\n  <p>§</p>\n  <button onclick="d.close()">Close</button>\n</dialog>'],
+['Progress + meter','<progress value="70" max="100"></progress>\n<meter value="0.6"></meter>'],
+['Popover','<button popovertarget="p">Toggle</button>\n<div id="p" popover>§</div>'],
+['Canvas','<canvas id="c" width="300" height="150"></canvas>']
+],
+css:[
+['Reset','*{box-sizing:border-box;margin:0;padding:0}'],
+['Center (grid)','.center{display:grid;place-items:center;min-height:100vh}'],
+['Flex space-between','.flex-between{display:flex;justify-content:space-between;align-items:center}'],
+['Auto grid','.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}'],
+['Container','.container{width:min(100% - 2rem,1100px);margin-inline:auto}'],
+['Sticky header','.sticky-header{position:sticky;top:0;z-index:10}'],
+['Full bleed','.full-bleed{width:100vw;margin-left:calc(50% - 50vw)}'],
+['Aspect ratio','.aspect{aspect-ratio:16/9;object-fit:cover;width:100%}'],
+['Stack spacing','.stack>*+*{margin-top:1rem}'],
+['Smooth scroll','html{scroll-behavior:smooth}'],
+['System font body','body{font-family:system-ui,sans-serif;line-height:1.6}'],
+['Fluid h1','h1{font-size:clamp(2rem,5vw,4rem)}'],
+['Truncate text','.truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'],
+['Clamp 3 lines','.clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}'],
+['Gradient text','.gradient-text{background:linear-gradient(90deg,#6366f1,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}'],
+['Pretty wrap','p{text-wrap:pretty}'],
+['Balance headings','h1,h2{text-wrap:balance}'],
+['Selection color','::selection{background:#6366f1;color:#fff}'],
+['Drop cap','.drop-cap::first-letter{font-size:3em;float:left;line-height:1;margin-right:.1em}'],
+['Link underline','a{text-decoration-thickness:2px;text-underline-offset:3px}'],
+['Button','.btn{padding:.6em 1.2em;border:0;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer}'],
+['Button hover','.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgb(0 0 0/.2)}'],
+['Button press','.btn:active{transform:scale(.97)}'],
+['Focus ring','input:focus-visible{outline:2px solid #6366f1;outline-offset:2px}'],
+['Invalid input','input:invalid{border-color:crimson}'],
+['Accent color','input[type=checkbox]{accent-color:#6366f1}'],
+['Disabled button','button:disabled{opacity:.5;cursor:not-allowed}'],
+['Textarea resize','textarea{resize:vertical}'],
+['Placeholder style','input::placeholder{color:#999;font-style:italic}'],
+['Outline button','.btn-outline{background:none;border:2px solid currentColor}'],
+['Card','.card{border-radius:16px;box-shadow:0 4px 20px rgb(0 0 0/.1);padding:1.5rem}'],
+['Glass effect','.glass{background:rgb(255 255 255/.15);backdrop-filter:blur(10px);border:1px solid rgb(255 255 255/.2)}'],
+['Card hover lift','.card:hover{transform:translateY(-6px);transition:.3s}'],
+['Gradient background','.gradient-bg{background:linear-gradient(135deg,#667eea,#764ba2)}'],
+['Overlay','.overlay{position:absolute;inset:0;background:rgb(0 0 0/.5)}'],
+['Avatar','.avatar{width:48px;aspect-ratio:1;border-radius:50%;object-fit:cover}'],
+['Responsive image','img{max-width:100%;height:auto;display:block}'],
+['Grayscale hover','.grayscale{filter:grayscale(1);transition:.3s}\n.grayscale:hover{filter:none}'],
+['Neon text','.neon{text-shadow:0 0 8px #0ff,0 0 20px #0ff}'],
+['Fading divider','.divider{height:1px;background:linear-gradient(90deg,transparent,#888,transparent)}'],
+['Spinner','@keyframes spin{to{transform:rotate(360deg)}}\n.spinner{animation:spin 1s linear infinite}'],
+['Fade in','@keyframes fade{from{opacity:0;transform:translateY(10px)}}\n.fade-in{animation:fade .5s ease}'],
+['Pulse','@keyframes pulse{50%{opacity:.5}}\n.pulse{animation:pulse 2s infinite}'],
+['Dark mode variables',':root{--bg:#fff;--text:#111}\n@media(prefers-color-scheme:dark){:root{--bg:#111;--text:#eee}}'],
+['Use variables','body{background:var(--bg);color:var(--text)}'],
+['Reduced motion','@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}'],
+['Scroll snap','.scroll-snap{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}\n.scroll-snap>*{scroll-snap-align:start}'],
+[':has() checked','.parent:has(input:checked){background:#e0e7ff}'],
+['Container query','.card-wrap{container-type:inline-size}\n@container(min-width:400px){.card{display:flex}}'],
+['Hide scrollbar','.hide-scrollbar{scrollbar-width:none}\n.hide-scrollbar::-webkit-scrollbar{display:none}']
+],
+js:[
+['$ select',R`const $ = (s, p = document) => p.querySelector(s);`],
+['$$ select all',R`const $$ = (s, p = document) => [...p.querySelectorAll(s)];`],
+['Toggle class',R`el.classList.toggle("active");`],
+['DOM ready',R`document.addEventListener("DOMContentLoaded", () => {
+  §
+});`],
+['Event delegation',R`parent.addEventListener("click", e => {
+  if (e.target.matches(".item")) {
+    §
+  }
+});`],
+['Smooth scroll to',R`el.scrollIntoView({ behavior: "smooth" });`],
+['Create element',R`const el = Object.assign(document.createElement("div"), { className: "box", textContent: "Hi" });`],
+['Clear children',R`el.replaceChildren();`],
+['Set theme attr',R`document.documentElement.dataset.theme = "dark";`],
+['Is visible',R`const isVisible = el => !!(el.offsetWidth || el.offsetHeight);`],
+['Unique array',R`const unique = arr => [...new Set(arr)];`],
+['Shuffle',R`const shuffle = arr => arr.sort(() => Math.random() - 0.5);`],
+['Chunk',R`const chunk = (a, n) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));`],
+['Group by',R`const groupBy = (a, k) => a.reduce((r, x) => ((r[x[k]] ||= []).push(x), r), {});`],
+['Sum',R`const sum = a => a.reduce((x, y) => x + y, 0);`],
+['Last item',R`const last = a => a.at(-1);`],
+['Deep clone',R`const clone = o => structuredClone(o);`],
+['Pick keys',R`const pick = (o, ks) => Object.fromEntries(ks.map(k => [k, o[k]]));`],
+['Range',R`const range = n => [...Array(n).keys()];`],
+['Sort by key',R`const sortBy = (a, k) => [...a].sort((x, y) => x[k] > y[k] ? 1 : -1);`],
+['Capitalize',R`const capitalize = s => s[0].toUpperCase() + s.slice(1);`],
+['Slugify',R`const slugify = s => s.toLowerCase().trim().replace(/[^\w]+/g, "-").replace(/^-|-$/g, "");`],
+['Random int',R`const randInt = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;`],
+['Clamp',R`const clamp = (n, min, max) => Math.min(Math.max(n, min), max);`],
+['Money format',R`const money = n => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);`],
+['Random color',R`const randomColor = () => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");`],
+['UUID',R`const uuid = () => crypto.randomUUID();`],
+['Truncate string',R`const truncate = (s, n) => s.length > n ? s.slice(0, n) + "…" : s;`],
+['Is email',R`const isEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);`],
+['Time ago (days)',R`const timeAgo = d => new Intl.RelativeTimeFormat("en").format(-Math.round((Date.now() - d) / 864e5), "day");`],
+['Fetch JSON',R`const data = await fetch(url).then(r => r.json());`],
+['Sleep',R`const sleep = ms => new Promise(r => setTimeout(r, ms));`],
+['Promise.all fetch',R`const [a, b] = await Promise.all([fetch(u1), fetch(u2)]);`],
+['POST JSON',R`await fetch(url, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(obj)
+});`],
+['Abort fetch',R`const ctrl = new AbortController();
+fetch(url, { signal: ctrl.signal });
+ctrl.abort();`],
+['Debounce',R`const debounce = (fn, ms = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };`],
+['Throttle',R`const throttle = (fn, ms) => { let last = 0; return (...a) => { const n = Date.now(); if (n - last >= ms) { last = n; fn(...a); } }; };`],
+['Once',R`const once = fn => { let done; return (...a) => done ? undefined : (done = true, fn(...a)); };`],
+['Retry',R`const retry = async (fn, n = 3) => { try { return await fn(); } catch (e) { if (n > 1) return retry(fn, n - 1); throw e; } };`],
+['URL params',R`const params = Object.fromEntries(new URLSearchParams(location.search));`],
+['Save localStorage',R`localStorage.setItem("k", JSON.stringify(obj));`],
+['Read localStorage',R`const obj = JSON.parse(localStorage.getItem("k") ?? "null");`],
+['Copy text',R`await navigator.clipboard.writeText("copied!");`],
+['Prefers dark',R`const dark = matchMedia("(prefers-color-scheme: dark)").matches;`],
+['Intersection observer',R`new IntersectionObserver(([e]) => e.isIntersecting && el.classList.add("show")).observe(el);`],
+['Is mobile',R`const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);`],
+['Download text file',R`const download = (text, name) => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text]));
+  a.download = name;
+  a.click();
+};`],
+['Toggle fullscreen',R`document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();`],
+['Copy element text',R`const copy = el => navigator.clipboard.writeText(el.innerText);`],
+['Toggle theme + save',R`const toggleTheme = () => {
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = t;
+  localStorage.theme = t;
+};`]
+]
+};
+const LIB_NAMES={html:'HTML',css:'CSS',js:'JS'};
+function openLib(lang){
+  const g=h('div','sheet-grid');
+  LIB[lang].forEach(([n,t],i)=>g.append(h('button','mbtn',(i+1)+'. '+n,()=>{
+    closeSheet();
+    if(!previewPanel.hidden)showEditor();
+    if(current!==lang)setLang(lang);
+    insertAtCursor(t);
+  })));
+  g.append(closeBtn());
+  openSheet(LIB_NAMES[lang]+' snippets · '+LIB[lang].length,[g]);
+}
 
 applySettings();
 renderKeyboard();
