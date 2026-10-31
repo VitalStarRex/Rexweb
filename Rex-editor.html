@@ -570,6 +570,16 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
       <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
       <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
       <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
+      <div class="ac-box" id="acBox">
+        <div class="ac-head"><h3 id="acTitle">Smart Auto-Close</h3><button type="button" class="ac-sw" id="acOn" role="switch" aria-checked="true" aria-labelledby="acTitle"><i></i><b>ON</b></button></div>
+        <p>Inserts matching brackets, quotes and HTML tags while you type, on the RexWeb keyboard and on device keyboards.</p>
+        <div class="ac-list">
+          <div class="ac-row"><span>Bracket pairing<small>( ) [ ] { } &lt; &gt; and comments</small></span><button type="button" class="ac-sw" id="acBrackets" role="switch" aria-checked="true" aria-label="Bracket pairing"><i></i><b>ON</b></button></div>
+          <div class="ac-row"><span>Quote pairing<small>" ' `</small></span><button type="button" class="ac-sw" id="acQuotes" role="switch" aria-checked="true" aria-label="Quote pairing"><i></i><b>ON</b></button></div>
+          <div class="ac-row"><span>HTML tag completion<small>&lt;div&gt; becomes &lt;div&gt;&lt;/div&gt;</small></span><button type="button" class="ac-sw" id="acHtml" role="switch" aria-checked="true" aria-label="HTML tag completion"><i></i><b>ON</b></button></div>
+          <div class="ac-row"><span>Automatic paired deletion<small>Backspace removes both halves</small></span><button type="button" class="ac-sw" id="acDel" role="switch" aria-checked="true" aria-label="Automatic paired deletion"><i></i><b>ON</b></button></div>
+        </div>
+      </div>
       <p style="font-size:10px">The custom keyboard is designed for touch input. Browser support for suppressing the system keyboard may vary.</p>
       <div class="settings-actions"><button id="resetSettings">Reset</button><button class="done" id="closeSettings">Done</button></div>
     </section>
@@ -2742,6 +2752,455 @@ body.light #rexBusy{background:#fffffff2}
   applyPrefs=function(){_ap();schedule()};
   window.__rexHl={scanMode,hlWindow};
   schedule();
+})();
+</script>
+<style>
+/* ===== Smart Auto-Close settings ===== */
+.ac-box{margin:12px 0 4px;padding:10px;border:1px solid #14628c;border-radius:10px;background:#0a1a30}
+.ac-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ac-box h3{margin:0;font-size:14px;color:var(--cyan)}
+.ac-box>p{margin:4px 0 0;font-size:10px}
+.ac-list{margin-top:8px;display:grid;gap:6px;transition:opacity .15s}
+.ac-box.off .ac-list{opacity:.45}
+.ac-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border:1px solid #14628c55;border-radius:8px;background:#0b1b30;font-size:12px}
+.ac-row small{display:block;color:var(--muted);font-size:10px;margin-top:1px}
+.ac-sw{flex:0 0 auto;position:relative;width:58px;height:26px;padding:0;border-radius:13px;border:1px solid #3a5d7d;background:#13243a;color:#8fa6bd;font-size:10px;font-weight:800;letter-spacing:.4px;cursor:pointer;transition:background .15s,border-color .15s}
+.ac-sw i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#8fa6bd;transition:transform .15s,background .15s}
+.ac-sw b{position:absolute;top:0;bottom:0;right:7px;display:flex;align-items:center;font-weight:800}
+.ac-sw[aria-checked="true"]{background:#06432f;border-color:#00d99a;color:#00d99a}
+.ac-sw[aria-checked="true"] i{transform:translateX(32px);background:#00d99a}
+.ac-sw[aria-checked="true"] b{right:auto;left:8px}
+@media(prefers-reduced-motion:reduce){.ac-sw,.ac-sw i,.ac-list{transition:none}}
+</style>
+<script>
+/* =====================================================================
+   SMART AUTO-CLOSE: characters, symbols and HTML tags
+   Sits on top of the existing editor. Every entry point (RexWeb keyboard,
+   device keyboard, desktop keyboard) ends in the same engine below.
+   ===================================================================== */
+(function(){
+'use strict';
+if(typeof smartType==='undefined'||typeof insertKey==='undefined'||typeof S==='undefined'||typeof code==='undefined')return;
+const $=s=>document.querySelector(s);
+
+/* ---------- settings (saved with the editor's other preferences) ---------- */
+const DEF={on:true,brackets:true,quotes:true,html:true,del:true};
+S.ac=Object.assign({},DEF,(S.ac&&typeof S.ac==='object')?S.ac:{});
+
+/* ---------- constants ---------- */
+const VOIDS=new Set('area base br col embed hr img input link meta param source track wbr keygen command'.split(' '));
+const OPEN={'(':')','[':']','{':'}'};
+const CLOSE={')':'(',']':'[','}':'{'};
+const DOMAIN=new Set(['(',')','[',']','{','}','<','>','"',"'",'`','=','!','?','-','*','/',':',';']);
+const CURLY={'\u201c':'"','\u201d':'"','\u2018':"'",'\u2019':"'"};
+const TAGLIKE=new Set('a abbr address article aside audio b blockquote body button canvas code dd details dialog div dl dt em fieldset figure footer form h1 h2 h3 h4 h5 h6 header html i img input label legend li main nav ol option p pre section select span strong summary table tbody td textarea tfoot th thead tr u ul video'.split(' '));
+const WORD=/[\p{L}\p{N}_$]/u;
+const isWord=c=>!!c&&WORD.test(c);
+const TAGRE=/<(\/?)([A-Za-z][\w:.-]*)/y;
+
+function isJSON(v){
+  if(!/^\s*[\[{]/.test(v))return false;
+  const t=v.replace(/"(?:[^"\\\n]|\\.)*"/g,'""');
+  return !/[;']|`|\/\/|\/\*|=>|\b(?:function|const|let|var|return|class|import|export|if|for|while|new|this)\b/.test(t);
+}
+function backslashes(v,i){let n=0;while(i-1-n>=0&&v[i-1-n]==='\\')n++;return n}
+
+/* ---------- syntax scanner: what is the caret inside? ----------
+   Walks the text before the caret once and reports the language region
+   (html / css / js / php / json), string, comment, open tag, bracket
+   stack and open HTML elements. */
+function scan(full,pos,tab){
+  const v=full.length>pos?full.slice(0,pos):full,n=v.length;
+  let mode=tab==='html'?'html':tab==='css'?'css':'js';
+  if(tab!=='html'&&/^\s*<\?/.test(v))mode='html';
+  else if(tab==='js'&&isJSON(full))mode='json';
+  let sub=null,q=null,tag='',tagRaw='',tagStart=-1,region=null;
+  const stack=[],stackPos=[],els=[];
+  const tpl=[];
+  const pp=(c,i)=>{
+    if(c==='}'&&tpl.length&&stack.length-1===tpl[tpl.length-1]&&stack[stack.length-1]==='{'){
+      stack.pop();stackPos.pop();tpl.pop();sub='str';q='`';return;       /* back into the template text */
+    }
+    if(OPEN[c]){stack.push(c);stackPos.push(i)}
+    else if(CLOSE[c]&&stack.length&&stack[stack.length-1]===CLOSE[c]){stack.pop();stackPos.pop()}
+  };
+  let i=0;
+  while(i<n){
+    const c=v[i];
+    if(region&&c==='<'&&v[i+1]==='/'&&v.substr(i+2,region.length).toLowerCase()===region){
+      mode='html';sub=null;q=null;region=null;stack.length=0;stackPos.length=0;continue;
+    }
+    if(sub==='str'){
+      if(c==='\\'){i+=2;continue}
+      if(q==='`'&&c==='$'&&v[i+1]==='{'){tpl.push(stack.length);stack.push('{');stackPos.push(i+1);sub=null;q=null;i+=2;continue}
+      if(c===q||(c==='\n'&&q!=='`')){sub=null;q=null}
+      i++;continue;
+    }
+    if(sub==='lc'){
+      if(c==='\n')sub=null;
+      else if(mode==='php'&&c==='?'&&v[i+1]==='>'){sub=null;mode='html';i+=2;continue}
+      i++;continue;
+    }
+    if(sub==='bc'){if(c==='*'&&v[i+1]==='/'){sub=null;i+=2;continue}i++;continue}
+    if(sub==='hc'){if(c==='-'&&v[i+1]==='-'&&v[i+2]==='>'){sub=null;i+=3;continue}i++;continue}
+    if(sub==='attrq'){if(c===q){sub='tag';q=null}i++;continue}
+    if(sub==='tag'){
+      if(c==='"'||c==="'"){sub='attrq';q=c;i++;continue}
+      if(c==='>'){
+        const closing=tag[0]==='/',bang=tag[0]==='!';
+        if(closing){
+          const nm=tag.slice(1);let k=-1;
+          for(let j=els.length-1;j>=0;j--)if(els[j].toLowerCase()===nm){k=j;break}
+          if(k>=0)els.length=k;
+        }else if(!bang&&v[i-1]!=='/'&&!VOIDS.has(tag)){
+          els.push(tagRaw);
+          if(tag==='script'||tag==='style'){
+            const head=v.slice(tagStart,i);
+            mode=tag==='style'?'css':(/type\s*=\s*["']?(?:application\/(?:ld\+)?json|importmap)/i.test(head)?'json':'js');
+            region=tag;
+          }
+        }
+        sub=null;
+      }
+      i++;continue;
+    }
+    /* sub===null */
+    if(mode==='html'){
+      if(c==='<'){
+        if(v.startsWith('<!--',i)){sub='hc';i+=4;continue}
+        if(v[i+1]==='?'){mode='php';i+=v.startsWith('<?php',i)?5:(v[i+2]==='='?3:2);continue}
+        TAGRE.lastIndex=i;const m=TAGRE.exec(v);
+        if(m){sub='tag';tagRaw=m[2];tag=(m[1]?'/':'')+m[2].toLowerCase();tagStart=i;i+=m[0].length;continue}
+        if(v[i+1]==='!'){sub='tag';tag='!';tagRaw='!';tagStart=i;i+=2;continue}
+        i++;continue;
+      }
+      pp(c,i);i++;continue;
+    }
+    if(mode==='php'&&c==='?'&&v[i+1]==='>'){mode='html';i+=2;continue}
+    if(c==='"'||(c==="'"&&mode!=='json')||(c==='`'&&(mode==='js'||mode==='php'))){sub='str';q=c;i++;continue}
+    if(c==='/'&&mode!=='json'){
+      const d=v[i+1];
+      if(d==='*'){sub='bc';i+=2;continue}
+      if(d==='/'&&(mode==='js'||mode==='php')){sub='lc';i+=2;continue}
+    }
+    if(c==='#'&&mode==='php'){sub='lc';i++;continue}
+    pp(c,i);i++;
+  }
+  return {mode,sub,q,tag,tagRaw,tagStart,region,stack,stackPos,els};
+}
+
+/* ---------- the engine: what should typing `ch` do here? ----------
+   returns null for "insert the character as typed", or an edit object
+   {ins,from?,to?,caret?,selStart?,selEnd?}. */
+const wrap=(o,c,start,end)=>({ins:o+code.value.slice(start,end)+c,from:start,to:end,selStart:start+1,selEnd:end+1});
+const skip=start=>({ins:'',from:start,to:start,caret:start+1});
+
+let swallow=null;
+function engine(ch,start,end){
+  const a=S.ac;
+  if(!a.on)return null;
+  const v=code.value,sel=start!==end;
+  const prev=v[start-1]||'',next=v[end]||'';
+  const st=scan(v,start,current);
+  const m=st.mode,sub=st.sub;
+  const inCom=sub==='lc'||sub==='bc'||sub==='hc';
+  const inStr=sub==='str',inAttr=sub==='attrq',inTag=sub==='tag';
+
+  /* ( [ {  */
+  if(OPEN[ch]){
+    if(!a.brackets)return null;
+    if(m==='json'&&ch==='(')return null;
+    if(sel)return wrap(ch,OPEN[ch],start,end);
+    if(inCom||inTag||inAttr||(inStr&&st.q!=='`'))return null;
+    if(isWord(next))return null;
+    return {ins:ch+OPEN[ch],caret:start+1};
+  }
+  /* ) ] }  : type over a closer that is really there */
+  if(CLOSE[ch]){
+    if(!a.brackets||sel||inCom||inTag||inAttr||(inStr&&st.q!=='`'))return null;
+    if(next===ch&&st.stack[st.stack.length-1]===CLOSE[ch])return skip(start);
+    return null;
+  }
+  /* <  */
+  if(ch==='<'){
+    if(!a.brackets||sel||m!=='html'||sub!==null)return null;
+    if(isWord(prev)||isWord(next))return null;
+    return {ins:'<>',caret:start+1};
+  }
+  /* >  : finish a tag and add its closing tag */
+  if(ch==='>'){
+    if(m!=='html'||!inTag||sel)return null;
+    const t=st.tag,nextGt=next==='>';
+    if(t[0]==='/'||t==='!')return nextGt?skip(start):null;
+    const closeable=a.html&&!VOIDS.has(t)&&prev!=='/';
+    const closed=v.substr(nextGt?start+1:start,t.length+3).toLowerCase()==='</'+t+'>';
+    if(closeable&&!closed)return {ins:'></'+st.tagRaw+'>',from:start,to:nextGt?start+1:start,caret:start+1};
+    return nextGt?skip(start):null;
+  }
+  /* quotes */
+  if(ch==='"'||ch==="'"||ch==='`'){
+    if(!a.quotes)return null;
+    if(m==='json'&&ch!=='"')return null;
+    if(m==='css'&&ch==='`')return null;
+    if(sel){
+      if(inTag||(inAttr))return null;
+      return wrap(ch,ch,start,end);
+    }
+    if(inCom)return null;
+    if(backslashes(v,start)%2===1)return null;
+    if(inStr)return (st.q===ch&&next===ch)?skip(start):null;
+    if(inAttr){
+      if(st.q===ch&&next===ch){
+        /* empty value made by the = key: a first quote is the habit of opening it, so keep the caret inside;
+           a second quick quote means "empty value, move on" */
+        if(prev===ch){
+          if(swallow&&swallow.pos===start&&swallow.val===v){swallow=null;return skip(start)}
+          swallow={pos:start,val:v};
+          return {ins:'',from:start,to:start,caret:start};
+        }
+        return skip(start);
+      }
+      /* typed ' right after the auto-made "" : switch the empty pair to '' */
+      if(st.q!==ch&&ch!=='`'&&prev===st.q&&next===st.q)return {ins:ch+ch,from:start-1,to:start+1,caret:start};
+      return null;
+    }
+    if(inTag){
+      if(ch==='`'||isWord(next))return null;
+      return {ins:ch+ch,caret:start+1};
+    }
+    if(m==='html'&&next===ch){
+      /* HTML text has no string tracking: an odd number of this quote earlier on the line means we are inside it */
+      const ls=v.lastIndexOf('\n',start-1)+1;let cnt=0;
+      for(let k=ls;k<start;k++)if(v[k]===ch)cnt++;
+      if(cnt%2===1)return skip(start);
+    }
+    if(isWord(prev)||isWord(next)||prev===ch)return null;
+    return {ins:ch+ch,caret:start+1};
+  }
+  /* =  : attribute name in an HTML tag gets its quotes */
+  if(ch==='='){
+    if(!a.quotes||sel||m!=='html'||!inTag)return null;
+    if(st.tag[0]==='/'||st.tag==='!')return null;
+    if(next==='"'||next==="'"||next==='='||isWord(next))return null;
+    if(!/\s[^\s"'=<>\/]+$/.test(v.slice(st.tagStart,start)))return null;
+    return {ins:'=""',caret:start+2};
+  }
+  /* !  and  ?  right after <  (<!DOCTYPE, <!-- ... , <?php ?>) */
+  if(ch==='!'||ch==='?'){
+    if(!a.html||sel||m!=='html'||sub!==null||prev!=='<')return null;
+    const to=next==='>'?start+1:start;
+    if(ch==='!')return {ins:'!',from:start,to,caret:start+1};
+    return {ins:'?php  ?>',from:start,to,caret:start+5};
+  }
+  /* -  : <!-- becomes <!-- | --> */
+  if(ch==='-'){
+    if(!a.html||sel||m!=='html'||!inTag||st.tag!=='!'||v.slice(start-3,start)!=='<!-')return null;
+    return {ins:'-  -->',caret:start+2};
+  }
+  /* *  : /* becomes /* | *\/ */
+  if(ch==='*'){
+    if(!a.brackets||sel||sub!==null||prev!=='/'||!(m==='js'||m==='css'||m==='php'))return null;
+    if(next==='*'||next==='/')return null;
+    return {ins:'*  */',caret:start+2};
+  }
+  /* /  : </ completes the closing tag */
+  if(ch==='/'){
+    if(!a.html||sel||prev!=='<'||sub!==null||!st.els.length)return null;
+    if(m==='html'||st.region){
+      const name=st.els[st.els.length-1],closer='</'+name+'>';
+      let to=next==='>'?start+1:start;
+      /* the closing tag is already waiting right after the caret: reuse it, never double it */
+      if(v.substr(start,closer.length).toLowerCase()===closer.toLowerCase())to=start+closer.length;
+      return {ins:'/'+name+'>',from:start,to,caret:start+name.length+2};
+    }
+    return null;
+  }
+  /* :  : CSS property and JSON key get their space */
+  if(ch===':'){
+    if(sel||sub!==null)return null;
+    if(m==='json')return (prev==='"'&&next!==' ')?{ins:': ',caret:start+2}:null;
+    if(m==='css'){
+      if(st.stack[st.stack.length-1]!=='{')return null;
+      const p=st.stackPos[st.stackPos.length-1];
+      const hs=Math.max(v.lastIndexOf(';',p-1),v.lastIndexOf('{',p-1),v.lastIndexOf('}',p-1))+1;
+      if(/^@(?:media|supports|container|layer|scope|keyframes|-\w+-keyframes|starting-style|document)\b/i.test(v.slice(hs,p).trim()))return null;
+      const ls=Math.max(v.lastIndexOf(';',start-1),v.lastIndexOf('{',start-1),v.lastIndexOf('}',start-1),v.lastIndexOf('\n',start-1))+1;
+      const word=v.slice(ls,start).trim();
+      if(!/^-{0,2}[a-z][a-z0-9-]*$/i.test(word)||TAGLIKE.has(word.toLowerCase()))return null;
+      if(next===' '||next===':'||isWord(next))return null;
+      return {ins:': ',caret:start+2};
+    }
+    return null;
+  }
+  /* ;  : never doubled */
+  if(ch===';'){
+    if(sel||sub!==null||next!==';')return null;
+    if(m==='js'||m==='css'||m==='php')return skip(start);
+    return null;
+  }
+  return null;
+}
+
+/* ---------- apply an edit object ---------- */
+function apply(r,start,end){
+  const rs=r.from!==undefined?r.from:start,re=r.to!==undefined?r.to:end;
+  if(r.ins!==''||re>rs)code.setRangeText(r.ins,rs,re,'end');
+  const a=r.selStart!==undefined?r.selStart:(r.caret!==undefined?r.caret:rs+r.ins.length);
+  const b=r.selEnd!==undefined?r.selEnd:a;
+  code.setSelectionRange(a,b);
+  if(r.ins!==''||re>rs)saveHistory();
+  bringCaretIntoView();
+}
+function typeChar(ch,start,end){
+  const r=engine(ch,start,end);
+  apply(r||{ins:ch},start,end);
+}
+
+/* ---------- Backspace: remove both halves of an untouched pair ---------- */
+function backspacePlan(){
+  const a=S.ac,v=code.value,s=code.selectionStart,e=code.selectionEnd;
+  if(s!==e||s===0||!a.on||!a.del)return null;
+  const prev=v[s-1],next=v[s]||'',two=prev+next;
+  if(two==='()'||two==='[]'||two==='{}'){
+    return a.brackets?{from:s-1,to:s+1}:null;
+  }
+  if(two==='""'||two==="''"||two==='``'){
+    if(!a.quotes||isWord(v[s-2])||backslashes(v,s-1)%2===1)return null;
+    return {from:s-1,to:s+1};
+  }
+  if(two==='<>'){
+    if(!a.brackets||current!=='html'&&!/^\s*<\?/.test(v))return null;
+    return scan(v,s-1,current).mode==='html'?{from:s-1,to:s+1}:null;
+  }
+  if(prev==='>'&&next==='<'&&a.html){
+    const mm=v.slice(Math.max(0,s-400),s).match(/<([A-Za-z][\w:.-]*)(?:\s[^<>]*)?>$/);
+    if(mm&&!VOIDS.has(mm[1].toLowerCase())){
+      const close='</'+mm[1]+'>';
+      if(v.substr(s,close.length).toLowerCase()===close.toLowerCase())return {from:s-mm[0].length,to:s+close.length};
+    }
+  }
+  return null;
+}
+function backspaceNow(){
+  swallow=null;
+  focusEditorCustom();
+  const v=code.value,s=code.selectionStart,e=code.selectionEnd;
+  let from=s,to=e;
+  if(s===e){
+    if(s===0)return;
+    const plan=backspacePlan();
+    if(plan){from=plan.from;to=plan.to}
+    else{
+      from=s-1;
+      const c=v.charCodeAt(s-1);
+      if(c>=0xDC00&&c<=0xDFFF&&s>=2){const h=v.charCodeAt(s-2);if(h>=0xD800&&h<=0xDBFF)from=s-2}
+    }
+  }
+  code.setRangeText('',from,to,'end');
+  saveHistory();bringCaretIntoView();
+}
+
+/* ---------- RexWeb keyboard + every internal caller ---------- */
+const _prevSmart=smartType;
+smartType=function(text,start,end){
+  if(typeof text==='string'){
+    if(text!=='"'&&text!=="'")swallow=null;
+    if(text.length===1&&DOMAIN.has(text)){typeChar(text,start,end);return}
+    if(text==='/* */'&&start===end&&S.ac.on&&S.ac.brackets){
+      const st=scan(code.value,start,current);
+      if(st.sub===null&&(st.mode==='js'||st.mode==='css'||st.mode==='php')){
+        apply({ins:'/*  */',caret:start+3},start,end);return;
+      }
+    }
+  }
+  return _prevSmart(text,start,end);
+};
+const _prevKey=insertKey;
+insertKey=function(key){
+  if(key==='\u232b'){backspaceNow();return}
+  return _prevKey(key);
+};
+
+/* ---------- device + desktop keyboards ---------- */
+let pending=null;
+code.addEventListener('beforeinput',e=>{
+  const t=e.inputType;
+  if(t==='deleteContentBackward'){
+    if(e.isComposing)return;
+    e.stopImmediatePropagation();               /* this engine owns paired deletion */
+    if(!S.ac.on||!e.cancelable)return;
+    const plan=backspacePlan();
+    if(plan){
+      e.preventDefault();
+      code.setRangeText('',plan.from,plan.to,'end');
+      saveHistory();bringCaretIntoView();
+    }
+    return;
+  }
+  if((t==='insertLineBreak'||t==='insertParagraph')&&S.pair&&e.cancelable&&!e.isComposing){
+    e.preventDefault();e.stopImmediatePropagation();
+    smartType('\n',code.selectionStart,code.selectionEnd);
+    return;
+  }
+  if(t!=='insertText'||!e.data||e.data.length!==1)return;
+  const ch=CURLY[e.data]||e.data;
+  if(!DOMAIN.has(ch)||!S.ac.on||e.isComposing)return;
+  const s=code.selectionStart,en=code.selectionEnd;
+  if(!e.cancelable){                              /* rare keyboards: fix up after the fact */
+    pending={ch,s,en,sel:code.value.slice(s,en),len:code.value.length};
+    e.stopImmediatePropagation();
+    return;
+  }
+  const r=engine(ch,s,en);
+  e.stopImmediatePropagation();
+  if(!r&&ch===e.data)return;                      /* plain character: let the browser insert it */
+  e.preventDefault();
+  apply(r||{ins:ch},s,en);
+},true);
+code.addEventListener('keydown',e=>{if(e.key!=='"'&&e.key!=="'")swallow=null},true);
+code.addEventListener('input',e=>{
+  swallow=null;
+  if(!pending)return;
+  const p=pending;pending=null;
+  if(code.value.length!==p.len-(p.en-p.s)+1)return;
+  code.setRangeText(p.sel,p.s,p.s+1,'end');
+  e.stopImmediatePropagation();
+  typeChar(p.ch,p.s,p.en);
+},true);
+
+/* ---------- settings UI ---------- */
+const KEYS={acOn:'on',acBrackets:'brackets',acQuotes:'quotes',acHtml:'html',acDel:'del'};
+function syncUI(){
+  Object.keys(KEYS).forEach(id=>{
+    const b=$('#'+id);if(!b)return;
+    const on=!!S.ac[KEYS[id]];
+    b.setAttribute('aria-checked',String(on));
+    b.querySelector('b').textContent=on?'ON':'OFF';
+  });
+  const box=$('#acBox');if(box)box.classList.toggle('off',!S.ac.on);
+}
+Object.keys(KEYS).forEach(id=>{
+  const b=$('#'+id);if(!b)return;
+  b.addEventListener('click',()=>{S.ac[KEYS[id]]=!S.ac[KEYS[id]];saveS();syncUI()});
+});
+const rs=$('#resetSettings');
+if(rs)rs.addEventListener('click',()=>{S.ac=Object.assign({},DEF);saveS();syncUI()});
+syncUI();
+
+/* quick switch in the ••• menu, next to the existing Auto-pair toggle */
+if(typeof openMenu!=='undefined'&&typeof h==='function'){
+  const _om=openMenu;
+  openMenu=function(){
+    _om();
+    const g=sheetBody.querySelector('.sheet-grid');if(!g)return;
+    const b=h('button','mbtn'+(S.ac.on?' on':''),'\u2726 Smart Auto-Close: '+(S.ac.on?'On':'Off'),()=>{S.ac.on=!S.ac.on;saveS();syncUI();openMenu()});
+    const anchor=[...g.children].find(x=>/Auto-pair/.test(x.textContent));
+    if(anchor)anchor.after(b);else g.append(b);
+  };
+}
+
+/* test hook (read-only helpers) */
+window.__rexAC={scan,engine,backspacePlan};
 })();
 </script>
 </body>
