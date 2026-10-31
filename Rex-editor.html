@@ -566,10 +566,10 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
       <h2 id="settingsTitle">Studio Settings</h2>
       <p>Adjust your editor and RexWeb coding keyboard.</p>
       <div class="setting-row"><label for="keyboardWidth">Keyboard width</label><output id="keyboardWidthValue">100%</output><input id="keyboardWidth" type="range" min="60" max="100" value="100"></div>
-      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">30 px</output><input id="keyboardHeight" type="range" min="20" max="50" value="30"></div>
+      <div class="setting-row"><label for="keyboardHeight">Keyboard key height</label><output id="keyboardHeightValue">36 px</output><input id="keyboardHeight" type="range" min="24" max="64" value="36"></div>
       <div class="setting-row color-row"><label for="keyboardBgColor">Keyboard background</label><input id="keyboardBgColor" type="color" value="#102a49"></div>
       <div class="setting-row color-row"><label for="keyboardFontColor">Keyboard text color</label><input id="keyboardFontColor" type="color" value="#e8f4ff"></div>
-      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">90%</output><input id="editorWidth" type="range" min="70" max="100" value="90"></div>
+      <div class="setting-row"><label for="editorWidth">Editor width</label><output id="editorWidthValue">100%</output><input id="editorWidth" type="range" min="70" max="100" value="100"></div>
       <p style="font-size:10px">The custom keyboard is designed for touch input. Browser support for suppressing the system keyboard may vary.</p>
       <div class="settings-actions"><button id="resetSettings">Reset</button><button class="done" id="closeSettings">Done</button></div>
     </section>
@@ -625,11 +625,11 @@ body:not(.wrap) .code,body:not(.wrap) .hl{white-space:pre;overflow-wrap:normal}
 
   <section class="panel keyboard compact-mode" id="keyboardPanel">
     <div class="keyboard-head">
-      <span style="font-size:17px;color:var(--cyan)">▦</span>
-      <strong>REXWEB CODING KEYBOARD</strong>
+      <strong>⌨ REXWEB</strong>
       <label class="compact"><input type="checkbox" id="compactToggle" checked> Compact</label>
+      <button class="symbol-toggle" id="symbolsToggle" type="button">#+= Symbols</button>
+      <button class="kb-collapse" id="kbCollapse" type="button" aria-label="Collapse keyboard" aria-expanded="true" title="Hide / show keys">⌄</button>
     </div>
-    <button class="symbol-toggle" id="symbolsToggle" type="button">#+= &nbsp; Symbols</button>
     <div class="keys" id="keyboard"></div>
   </section>
 </div>
@@ -1046,7 +1046,7 @@ function renderKeyboard(){
     keyboard.appendChild(wrap);
   });
   document.querySelector('#symbolsToggle').textContent=
-    symbolsMode?'ABC ← Back to letters':'#+= Symbols';
+    symbolsMode?'ABC Letters':'#+= Symbols';
 }
 
 document.querySelector('#symbolsToggle').onclick=()=>{
@@ -1128,9 +1128,9 @@ code.addEventListener('focus',()=>{applyKbAttrs();});
 
 /* Settings */
 const settingsDefaults={
-  keyboardWidth:100,keyboardHeight:30,
+  keyboardWidth:100,keyboardHeight:36,
   keyboardBgColor:'#102a49',keyboardFontColor:'#e8f4ff',
-  editorWidth:90
+  editorWidth:100
 };
 
 function applySettings(){
@@ -1216,7 +1216,7 @@ const LS={
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 };
-let S=Object.assign({fontSize:12,kb:'rex',wrap:true,pair:true},LS.get('rexweb:s',{}));
+let S=Object.assign({fontSize:13,kb:'rex',wrap:true,pair:true},LS.get('rexweb:s',{}));
 const saveS=()=>LS.set('rexweb:s',S);
 let projects=LS.get('rexweb:projects',null),curId=LS.get('rexweb:cur',null);
 const BOILER='<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  \n  <script src="script.js"><\/script>\n</body>\n</html>';
@@ -1841,6 +1841,42 @@ bringCaretIntoView();
 .lib-count{font-size:10px;color:var(--muted);margin:0 0 4px}
 body.light .lib-chip,body.light .lib-search{background:#fff}
 </style>
+<style>
+/* Upgrade 4: tall scrolling editor + bigger keyboard */
+:root{--key-height:36px;--editor-width:100%}
+.app{padding:3px;gap:3px}
+.topbar{padding:2px 6px;border-radius:10px}
+.iconbtn{width:28px;height:28px;font-size:15px}
+.logo-mark{font-size:19px}
+.tab{padding:3px 2px}
+.panel-head{padding:2px 8px}
+.panel-foot{padding:1px 8px}
+.toolbar-row{top:30px;bottom:6px;max-height:calc(100% - 38px)}
+.panel-foot{position:absolute;right:6px;bottom:4px;padding:0;border:0;pointer-events:none;z-index:2;background:transparent}
+.panel-foot #fileInfo{display:none}
+.panel-foot #lineCount{background:#050e20e6;border:1px solid #123c5b;border-radius:8px;padding:1px 7px}
+body.light .panel-foot #lineCount{background:#fffffff0;border-color:#c5d9eb}
+.workspace{gap:3px}
+.workspace>.panel{border-radius:10px}
+.editor-wrap{padding:2px 2px 0;grid-template-columns:38px minmax(0,1fr)}
+body.wrap .editor-wrap{grid-template-columns:38px minmax(0,1fr)}
+body.wrap .line-numbers{display:block}
+.line-numbers{padding:2px 6px 70px 0;font-size:calc(var(--code-size,12px) - 1px);line-height:calc(var(--code-size,12px)*1.6)}
+.code,.hl{padding:2px 4px 70px 4px}
+.code{touch-action:pan-y pinch-zoom}
+.keyboard{padding:3px 4px;max-height:50dvh}
+.keyboard-head{gap:6px;padding:0 1px 3px;min-height:28px}
+.keyboard-head strong{font-size:11px;letter-spacing:.4px}
+.compact{margin-left:0;font-size:10px}
+.keyboard-head .symbol-toggle{width:auto;flex:0 0 auto;margin:0 0 0 auto;padding:0 12px;height:27px;font-size:11px;border-radius:8px}
+.kb-collapse{flex:0 0 auto;width:34px;height:27px;border:1px solid #14628c;border-radius:8px;background:#0b1b30;color:var(--cyan);font-size:15px;line-height:1;padding:0}
+.keyboard.collapsed .keys,.keyboard.collapsed .symbol-toggle,.keyboard.collapsed .compact{display:none}
+.keyboard.collapsed strong{margin-right:auto}
+.keyboard.collapsed .keyboard-head{padding-bottom:0}
+.keys,.keyboard.compact-mode .keys,.keyrow,.keyboard.compact-mode .keyrow{gap:4px}
+.key,.keyboard.compact-mode .key{height:min(var(--key-height,38px),calc((46dvh - 56px)/6));min-height:24px;border-radius:8px}
+body.light .kb-collapse{background:#fff}
+</style>
 <!-- REXWEB 3-UPGRADE PATCH: correctly integrated at document end -->
 <script>
 (function(){
@@ -2010,15 +2046,51 @@ const NAMES=['All',...CATS.map(c=>c[0]),'Classic'];
 function fmtLines(css){
   return css.split(';').map(x=>x.trim()).filter(Boolean).map(x=>{const i=x.indexOf(':');return x.slice(0,i).trim()+': '+x.slice(i+1).trim()+';'});
 }
-function cssInsert(it){
+function htmlCssInsert(it){
+  focusEditorCustom();
+  const v=code.value,s=code.selectionStart,e=code.selectionEnd,before=v.slice(0,s);
+  const done=msg=>{saveHistory();bringCaretIntoView();document.querySelector('#saveState').textContent=msg};
+  /* 1) caret inside style="..." -> add the declarations inline */
+  const attr=before.match(/\sstyle\s*=\s*(["'])([^"']*)$/i);
+  if(attr){
+    let css=it.css;
+    if(it.raw&&css.includes('{'))css=css.slice(css.indexOf('{')+1,css.lastIndexOf('}'));
+    const decl=fmtLines(css).join(' '),cur=attr[2].trim();
+    const sep=cur?(/;$/.test(cur)?' ':'; '):'';
+    code.setRangeText((attr[2]&&!/\s$/.test(attr[2])?sep:'')+decl,s,e,'end');
+    done('CSS added inline');return;
+  }
+  /* 2) caret inside a <style> block -> add rules there */
+  const o=before.lastIndexOf('<style'),c=before.lastIndexOf('</style');
+  const oe=o>=0?before.indexOf('>',o):-1;
+  if(o>c&&oe>=0){cssInsert(it,oe+1);return}
+  /* 3) anywhere else in the HTML -> insert a ready <style> block at the caret */
+  const ls=s===0?0:v.lastIndexOf('\n',s-1)+1;
+  const pre=v.slice(ls,s),blank=!pre.trim(),ind=blank?pre:v.slice(ls).match(/^[ \t]*/)[0];
+  const block=(sel,l)=>[sel+' {',...l.map(x=>'  '+x),'}'];
+  let inner;
+  if(it.raw)inner=it.css.split('\n');
+  else{
+    inner=block('.element'+(it.nest?it.nest.slice(1):''),fmtLines(it.css));
+    if(it.extra)inner=inner.concat('',block('.element'+it.extra.sel,it.extra.lines));
+    if(it.kf)inner=inner.concat('',['@keyframes '+it.kf+' {',...KF[it.kf].map(x=>'  '+x),'}']);
+  }
+  const txt=['<style>',...inner.map(x=>x?'  '+x:x),'</style>'].join('\n'+ind);
+  const tail=(e>=v.length||v[e]==='\n')?'':'\n'+ind;
+  code.setRangeText((blank?'':'\n'+ind)+txt+tail,s,e,'end');
+  done('CSS added to HTML');
+}
+function cssInsert(it,base){
   closeSheet();
   if(!previewPanel.hidden)showEditor();
-  if(current!=='css')setLang('css');
+  if(current==='html'&&base===undefined){htmlCssInsert(it);return}
+  if(current==='js')setLang('css');
+  const inHtml=base!==undefined;
   if(it.raw){insertAtCursor(it.css);return}
   focusEditorCustom();
   const v=code.value,s=code.selectionStart,e=code.selectionEnd;
   const lines=fmtLines(it.css);
-  const before=v.slice(0,s).replace(/\/\*[\s\S]*?\*\//g,'');
+  const before=v.slice(base||0,s).replace(/\/\*[\s\S]*?\*\//g,'');
   const depth=(before.match(/\{/g)||[]).length-(before.match(/\}/g)||[]).length;
   const ls=s===0?0:v.lastIndexOf('\n',s-1)+1;
   const pre=v.slice(ls,s),blank=!pre.trim(),lineInd=v.slice(ls).match(/^[ \t]*/)[0];
@@ -2034,13 +2106,24 @@ function cssInsert(it){
     const sel=it.nest?'.element'+it.nest.slice(1):'.element';
     let parts=[block(sel,lines).join('\n')];
     if(it.extra)parts.push(block('.element'+it.extra.sel,it.extra.lines).join('\n'));
-    out=(blank?'':'\n\n')+parts.join('\n\n')+'\n';
+    const txt=parts.join('\n\n');
+    if(inHtml){
+      const ind0=blank?pre:lineInd;
+      out=(blank?'':'\n\n'+ind0)+txt.split('\n').map((l,i)=>i&&l?ind0+l:l).join('\n')+'\n'+ind0;
+    }else out=(blank?'':'\n\n')+txt+'\n';
   }
   code.setRangeText(out,s,e,'end');
   const caret=code.selectionStart;
   if(it.kf&&!new RegExp('@keyframes\\s+'+it.kf+'\\b').test(code.value)){
-    const L=code.value.length;
-    code.setRangeText('\n\n@keyframes '+it.kf+' {\n'+KF[it.kf].map(l=>'  '+l).join('\n')+'\n}\n',L,L,'preserve');
+    const kfl=['@keyframes '+it.kf+' {',...KF[it.kf].map(l=>'  '+l),'}'];
+    const k=inHtml?code.value.indexOf('</style>',caret):-1;
+    if(k>=0){
+      const kls=code.value.lastIndexOf('\n',k-1)+1,at=code.value.slice(kls,k).trim()===''?kls:k;
+      code.setRangeText((at===k?'\n':'')+'\n'+kfl.map(l=>'  '+l).join('\n')+'\n',at,at,'preserve');
+    }else{
+      const L=code.value.length;
+      code.setRangeText('\n\n'+kfl.join('\n')+'\n',L,L,'preserve');
+    }
     code.setSelectionRange(caret,caret);
   }
   saveHistory();bringCaretIntoView();
@@ -2079,15 +2162,91 @@ document.querySelector('#compactToggle').checked=true;
 renderKeyboard();
 })();
 </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Page</title>
-</head>
-<body>
-  
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+
+/* ===== Upgrade 4a: type "</" and the matching closing tag is found for you ===== */
+function openTagBefore(v,pos){
+  let t=v.slice(0,pos).replace(/<!--[\s\S]*?-->/g,m=>' '.repeat(m.length));
+  t=t.replace(/(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\2>)/gi,(a,o,n,b,c)=>o+' '.repeat(b.length)+c);
+  const re=/<(\/?)([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
+  const st=[];let m;
+  while((m=re.exec(t))){
+    const name=m[2].toLowerCase();
+    if(m[1]){const i=st.map(x=>x.toLowerCase()).lastIndexOf(name);if(i>=0)st.length=i}
+    else if(!VOID.has(name)&&!/\/\s*$/.test(m[3]))st.push(m[2]);
+  }
+  return st.length?st[st.length-1]:null;
+}
+const _smart4=smartType;
+smartType=function(text,start,end){
+  if(text==='/'&&S.pair&&current==='html'&&start===end&&code.value[start-1]==='<'){
+    const v=code.value,name=openTagBefore(v,start-1);
+    if(name){
+      code.setRangeText('/'+name+'>',start,start+(v[start]==='>'?1:0),'end');
+      saveHistory();bringCaretIntoView();return;
+    }
+  }
+  return _smart4(text,start,end);
+};
+code.addEventListener('beforeinput',e=>{
+  if(current!=='html'||!S.pair||e.isComposing||e.inputType!=='insertText'||e.data!=='/')return;
+  const p=code.selectionStart;
+  if(p!==code.selectionEnd||code.value[p-1]!=='<')return;
+  if(openTagBefore(code.value,p-1)){e.preventDefault();smartType('/',p,p)}
+});
+
+/* ===== Upgrade 4b: line numbers that stay aligned with wrapped lines ===== */
+let mEl,cv;
+function wrapNumbers(){
+  try{
+    if(!S.wrap)return;
+    const ln=$('#lineNumbers');
+    if(!ln||getComputedStyle(ln).display==='none')return;
+    const cs=getComputedStyle(code);
+    const w=code.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    if(w<=0)return;
+    if(!mEl){
+      mEl=document.createElement('div');
+      mEl.style.cssText='position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;box-sizing:content-box;padding:0;border:0;margin:0';
+      document.body.appendChild(mEl);
+      cv=document.createElement('canvas').getContext('2d');
+    }
+    mEl.style.font=cs.font;mEl.style.lineHeight=cs.lineHeight;mEl.style.letterSpacing=cs.letterSpacing;
+    mEl.style.whiteSpace='pre-wrap';mEl.style.overflowWrap='anywhere';mEl.style.tabSize=cs.tabSize;mEl.style.width=w+'px';
+    cv.font=cs.font;
+    const cw=cv.measureText('0').width||7,cpr=Math.max(1,Math.floor(w/cw));
+    const lh=parseFloat(cs.lineHeight)||20,lines=code.value.split('\n'),outp=new Array(lines.length);
+    for(let i=0;i<lines.length;i++){
+      let rows=1;const L=lines[i];
+      if(L.length>cpr*0.9){mEl.textContent=L;rows=Math.max(1,Math.round(mEl.offsetHeight/lh))}
+      outp[i]=(i+1)+(rows>1?'\n'.repeat(rows-1):'');
+    }
+    ln.textContent=outp.join('\n');
+    ln.scrollTop=code.scrollTop;
+  }catch(e){}
+}
+const _um4=updateMeta;
+updateMeta=function(){_um4();wrapNumbers()};
+const _ap4=applyPrefs;
+applyPrefs=function(){_ap4();wrapNumbers()};
+if(window.ResizeObserver)new ResizeObserver(wrapNumbers).observe(code);
+window.addEventListener('resize',wrapNumbers);
+
+/* ===== Upgrade 4c: collapse / expand the keyboard keys ===== */
+const kbp=$('#keyboardPanel'),kbc=$('#kbCollapse');
+kbc.onclick=()=>{
+  const c=kbp.classList.toggle('collapsed');
+  kbc.textContent=c?'⌃':'⌄';
+  kbc.setAttribute('aria-expanded',String(!c));
+  kbc.setAttribute('aria-label',c?'Expand keyboard':'Collapse keyboard');
+  requestAnimationFrame(()=>{wrapNumbers();bringCaretIntoView()});
+};
+kbc.addEventListener('pointerdown',e=>e.preventDefault());
+
+updateMeta();
+})();
+</script>
 </body>
 </html>
