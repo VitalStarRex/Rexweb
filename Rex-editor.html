@@ -2296,5 +2296,22 @@ openMenu=function(){
 updateMeta();
 })();
 </script>
+<style>
+body .code, body .hl{
+  white-space:pre-wrap !important;
+  overflow-wrap:anywhere !important;
+}
+.code{overflow-x:hidden !important;touch-action:pan-y pinch-zoom}
+</style>
+<script>
+(function(){
+  if(!S.wrapFixed){
+    S.wrap = true;
+    S.wrapFixed = true;
+    saveS();
+  }
+  applyPrefs();
+})();
+</script>
 </body>
 </html>
