@@ -2313,5 +2313,66 @@ body .code, body .hl{
   applyPrefs();
 })();
 </script>
+<style>
+/* Smooth movement + taller editor / bigger keyboard */
+html,body{-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+:root{--key-height:46px}
+.app{padding:2px;gap:2px}
+.topbar{padding:1px 6px}
+.tab{padding:2px}
+.keyboard{max-height:54dvh;padding:3px 4px;transition:max-height .2s ease}
+.key,.keyboard.compact-mode .key{
+  height:min(var(--key-height,46px),calc((52dvh - 52px)/6));
+  min-height:30px;
+  transition:transform .08s ease,filter .08s ease,background .12s ease;
+  will-change:transform;
+}
+.key:active{transform:scale(.93)}
+.key,.symbol-toggle,.kb-collapse,.tool,.tab,.iconbtn,.mbtn{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.code{scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;will-change:scroll-position}
+.hl,.line-numbers{scroll-behavior:auto}
+.workspace>.panel{transition:none}
+.tab,.tool,.iconbtn,.mbtn{transition:background .15s ease,border-color .15s ease,transform .1s ease}
+.tab:active,.iconbtn:active,.mbtn:active{transform:scale(.96)}
+.settings-modal{animation:toolbarReveal .16s ease-out}
+@media(prefers-reduced-motion:reduce){.code{scroll-behavior:auto}.key,.keyboard{transition:none}}
+</style>
+<script>
+(function(){
+  /* taller keys by default (slider range stays the same) */
+  try{
+    const kh=document.querySelector('#keyboardHeight');
+    kh.max=72;kh.value=46;
+    settingsDefaults.keyboardHeight=46;
+    applySettings();
+  }catch(e){}
+
+  /* smoother typing: re-colour at most once per frame */
+  try{
+    const _hl=highlight;let pend=false;
+    highlight=function(){
+      if(pend)return;pend=true;
+      requestAnimationFrame(()=>{pend=false;_hl()});
+    };
+  }catch(e){}
+
+  /* hold Backspace and arrow keys to repeat */
+  let t1=null,t2=null,held=false;
+  const stop=()=>{clearTimeout(t1);clearInterval(t2);t1=t2=null};
+  keyboard.addEventListener('pointerdown',e=>{
+    const b=e.target.closest('.key');if(!b)return;
+    const k=b.getAttribute('aria-label');
+    if(!['⌫','◀','▶','▲','▼'].includes(k))return;
+    held=false;stop();
+    t1=setTimeout(()=>{held=true;t2=setInterval(()=>insertKey(k),45)},350);
+  },true);
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>keyboard.addEventListener(ev,stop,true));
+  keyboard.addEventListener('click',e=>{
+    if(held){e.stopPropagation();e.preventDefault();held=false}
+  },true);
+
+  requestAnimationFrame(()=>{bringCaretIntoView()});
+})();
+</script>
 </body>
 </html>
