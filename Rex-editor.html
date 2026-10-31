@@ -2374,5 +2374,375 @@ html,body{-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
   requestAnimationFrame(()=>{bringCaretIntoView()});
 })();
 </script>
+<style>
+/* Locked layout: editor and keyboard keep one position and one size */
+:root{--lock-h:100dvh}
+.app{position:fixed;top:0;left:0;right:0;margin:0 auto;height:var(--lock-h)}
+.keyboard,.keyboard.collapsed{
+  flex:0 0 auto;
+  height:min(calc(6*var(--key-height,46px) + 57px),calc(var(--lock-h)*.52));
+  max-height:none;
+  transition:none;
+}
+.keyboard.collapsed .keys,.keyboard.collapsed .symbol-toggle,.keyboard.collapsed .compact{display:flex}
+.keyboard.collapsed .symbol-toggle{display:block}
+.keyboard.collapsed .compact{display:flex}
+.keys{flex:1 1 0;min-height:0}
+.key,.keyboard.compact-mode .key{height:auto;min-height:0}
+.kb-collapse{display:none}
+.workspace{flex:1 1 0;min-height:0}
+#editorPanel,#previewPanel{min-height:0}
+</style>
+<script>
+(function(){
+  const root=document.documentElement;
+  let lastW=window.innerWidth;
+  const lock=()=>{
+    root.style.setProperty('--lock-h',window.innerHeight+'px');
+    requestAnimationFrame(()=>{try{bringCaretIntoView()}catch(e){}});
+  };
+  lock();
+  /* only re-measure on rotation / width change, so nothing jumps when the browser bar moves */
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth!==lastW){lastW=window.innerWidth;lock()}
+  });
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{lastW=window.innerWidth;lock()},250));
+})();
+</script>
+<style>
+/* User-adjustable layout: fixed by default, changed only from Settings or the keyboard arrow */
+.keyboard{height:min(calc(6*var(--key-height,46px) + 57px),calc(var(--lock-h)*.6))}
+.keyboard.collapsed{height:auto}
+.keyboard.collapsed .keys,.keyboard.collapsed .symbol-toggle,.keyboard.collapsed .compact{display:none!important}
+.kb-collapse{display:block}
+</style>
+<script>
+(function(){
+  const IDS=['keyboardWidth','keyboardHeight','editorWidth','keyboardBgColor','keyboardFontColor'];
+  const kbc=document.querySelector('#kbCollapse');
+  let saved=LS.get('rexweb:layout',{});
+  /* restore what the user chose last time */
+  IDS.forEach(id=>{if(saved[id]!=null)document.querySelector('#'+id).value=saved[id]});
+  const write=()=>{
+    const o={collapsed:keyboardPanel.classList.contains('collapsed')};
+    IDS.forEach(id=>o[id]=document.querySelector('#'+id).value);
+    LS.set('rexweb:layout',o);
+  };
+  const _as=applySettings;
+  applySettings=function(){_as();write()};
+  applySettings();
+  if(saved.collapsed)kbc.click();
+  kbc.addEventListener('click',write);
+})();
+</script>
+<style>
+/* Tall editor, medium keyboard */
+.keyboard{height:min(calc(6*var(--key-height,32px) + 57px),calc(var(--lock-h)*.5))}
+.keyboard.collapsed{height:auto}
+.editor-wrap{padding-top:2px}
+
+/* Smooth scrolling everywhere */
+.settings-modal,.toolbar,#consoleOut,.lib-chips,.sheet-grid,.keys{scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.code{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.hl,.line-numbers{scroll-behavior:auto}
+@media(prefers-reduced-motion:reduce){.settings-modal,.toolbar,#consoleOut,.lib-chips,.sheet-grid,.code{scroll-behavior:auto}}
+
+/* Loading indicator */
+#rexBusy{
+  position:fixed;left:50%;top:64px;transform:translate(-50%,-8px);
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;border-radius:999px;
+  background:#071326f2;border:1px solid var(--cyan);color:var(--cyan);
+  font-size:12px;font-weight:700;z-index:60;pointer-events:none;
+  box-shadow:0 6px 20px #000a,0 0 14px #21e7f544;
+  opacity:0;visibility:hidden;transition:opacity .15s ease,transform .15s ease,visibility .15s;
+}
+#rexBusy.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+#rexBusy i{width:14px;height:14px;border-radius:50%;border:2px solid #21e7f533;border-top-color:var(--cyan);animation:rexspin .7s linear infinite}
+@keyframes rexspin{to{transform:rotate(360deg)}}
+#rexBar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:61;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);background-size:40% 100%;background-repeat:no-repeat;
+  animation:rexbar 1s linear infinite;transition:opacity .15s}
+#rexBar.show{opacity:1}
+@keyframes rexbar{from{background-position:-40% 0}to{background-position:140% 0}}
+body.light #rexBusy{background:#fffffff2}
+</style>
+<div id="rexBusy" role="status" aria-live="polite"><i></i><span id="rexBusyText">Loading…</span></div>
+<div id="rexBar"></div>
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const pill=$('#rexBusy'),txt=$('#rexBusyText'),bar=$('#rexBar'),state=$('#saveState');
+  let timer=null;
+  function busy(label,max){
+    txt.textContent=label||'Loading…';
+    pill.classList.add('show');bar.classList.add('show');
+    clearTimeout(timer);timer=setTimeout(done,max||4000);
+  }
+  function done(){clearTimeout(timer);pill.classList.remove('show');bar.classList.remove('show')}
+  window.rexBusy=busy;window.rexDone=done;
+
+  /* medium keyboard by default (applied once; later changes in Settings are kept) */
+  try{
+    settingsDefaults.keyboardHeight=32;
+    if(LS.get('rexweb:layoutv',0)<3){
+      $('#keyboardHeight').value=32;
+      applySettings();
+      LS.set('rexweb:layoutv',3);
+    }
+  }catch(e){}
+
+  /* preview: show loading until the page inside has finished loading */
+  const frame=$('#preview');
+  frame.addEventListener('load',()=>{done();$('#previewStatus').textContent='Ready'});
+  const _run=run;
+  run=function(){
+    _run();
+    if(!previewPanel.hidden||true){
+      $('#previewStatus').textContent='Loading…';
+      busy('Loading preview…',8000);
+    }
+  };
+
+  /* upload / paste: stop the indicator as soon as the editor reports a result */
+  new MutationObserver(()=>{
+    const t=state.textContent;
+    if(/^(Loaded|Pasted|Clipboard is empty|Paste cancelled)$/.test(t))done();
+  }).observe(state,{childList:true,characterData:true,subtree:true});
+  $('#fileInput').addEventListener('change',e=>{if(e.target.files&&e.target.files[0])busy('Loading file…',6000)},true);
+  $('#pasteCode').addEventListener('click',()=>busy('Pasting…',3000),true);
+
+  /* download all: three files are saved one after another */
+  const _dlAll=dlAll;
+  dlAll=function(){busy('Preparing files…',1600);_dlAll()};
+})();
+</script>
+<style>
+/* instant caret movement (touch scrolling stays smooth natively) */
+.code{scroll-behavior:auto!important}
+</style>
+<script>
+(function(){
+  /* 1) Keys act the moment your finger touches them, not after release */
+  const kb=document.querySelector('#keyboard');
+  kb.addEventListener('pointerdown',e=>{
+    const b=e.target.closest('.key');if(!b)return;
+    b.__fired=true;
+    setTimeout(()=>{b.__fired=false},500);
+    insertKey(b.getAttribute('aria-label'));
+  },true);
+  kb.addEventListener('click',e=>{
+    const b=e.target.closest('.key');
+    if(b&&b.__fired){b.__fired=false;e.stopPropagation();e.preventDefault()}
+  },true);
+
+  /* 2) Do the heavy bookkeeping once per frame instead of on every keystroke */
+  const _um=updateMeta;let umP=false;
+  updateMeta=function(){
+    if(umP)return;umP=true;
+    requestAnimationFrame(()=>{umP=false;_um()});
+  };
+  const _bc=bringCaretIntoView;let bcP=false;
+  bringCaretIntoView=function(){
+    if(bcP)return;bcP=true;
+    requestAnimationFrame(()=>{bcP=false;_bc()});
+  };
+})();
+</script>
+<script>
+/* With the phone's own keyboard, fit the editor into the space above it */
+(function(){
+  const vv=window.visualViewport,root=document.documentElement;
+  if(!vv)return;
+  const fit=()=>{
+    if(S.kb==='device')root.style.setProperty('--lock-h',Math.round(vv.height)+'px');
+    else root.style.setProperty('--lock-h',window.innerHeight+'px');
+    requestAnimationFrame(()=>bringCaretIntoView());
+  };
+  vv.addEventListener('resize',()=>{if(S.kb==='device')fit()});
+  const _ap=applyPrefs;
+  applyPrefs=function(){_ap();fit()};
+  fit();
+})();
+</script>
+<style>
+/* fewer GPU layers = smoother dragging */
+.key{will-change:auto}
+</style>
+<script>
+/* Fast typing and dragging: colour only what is on screen, measure each line once */
+(function(){
+  const $=s=>document.querySelector(s);
+  const ln=$('#lineNumbers');
+  let cache=new Map(),ckey='',mEl=null,cvx=null,cprV=80;
+  let L={text:null,lines:[],starts:[],rows:[],rowStart:[0],total:0,lh:20,n:1};
+  let win={a:0,b:0,top:0,bot:0};
+
+  function ensureM(){
+    if(mEl)return;
+    mEl=document.createElement('div');
+    mEl.style.cssText='position:fixed;left:-9999px;top:0;visibility:hidden;pointer-events:none;box-sizing:content-box;padding:0;border:0;margin:0;white-space:pre-wrap;overflow-wrap:anywhere';
+    document.body.appendChild(mEl);
+    cvx=document.createElement('canvas').getContext('2d');
+  }
+  function metrics(){
+    ensureM();
+    const cs=getComputedStyle(code);
+    const w=code.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    const lh=parseFloat(cs.lineHeight)||20;
+    const key=[cs.fontSize,cs.fontFamily,w,lh,cs.letterSpacing,cs.tabSize].join('|');
+    if(key!==ckey){
+      ckey=key;cache.clear();
+      mEl.style.fontSize=cs.fontSize;mEl.style.fontFamily=cs.fontFamily;mEl.style.lineHeight=cs.lineHeight;
+      mEl.style.letterSpacing=cs.letterSpacing;mEl.style.tabSize=cs.tabSize;mEl.style.width=Math.max(w,1)+'px';
+      cvx.font=cs.fontSize+' '+cs.fontFamily;
+      const cw=cvx.measureText('0').width||7;
+      cprV=Math.max(1,Math.floor(w/cw));
+    }
+    return {lh,w,cpr:cprV};
+  }
+
+  /* line numbers + row map. Long lines are measured once and remembered. */
+  function updateNumbers(){
+    const m=metrics(),v=code.value,lines=v.split('\n'),n=lines.length;
+    const starts=new Array(n),rows=new Array(n),rowStart=new Array(n+1),labels=new Array(n);
+    let off=0,r=0;const lim=m.cpr*0.9;
+    for(let i=0;i<n;i++){
+      const t=lines[i];starts[i]=off;off+=t.length+1;
+      let k=1;
+      if(m.w>0&&t.length>lim){
+        k=cache.get(t);
+        if(k===undefined){
+          mEl.textContent=t;
+          k=Math.max(1,Math.round(mEl.offsetHeight/m.lh));
+          if(cache.size>4000)cache.clear();
+          cache.set(t,k);
+        }
+      }
+      rows[i]=k;rowStart[i]=r;r+=k;
+      labels[i]=k>1?(i+1)+'\n'.repeat(k-1):String(i+1);
+    }
+    rowStart[n]=r;
+    ln.textContent=labels.join('\n');
+    L={text:v,lines,starts,rows,rowStart,total:r,lh:m.lh,n};
+    $('#lineCount').textContent=n+(n===1?' line':' lines');
+    ln.scrollTop=code.scrollTop;
+  }
+  function lineAtRow(row){
+    let lo=0,hi=L.n-1;
+    while(lo<hi){const mid=(lo+hi+1)>>1;if(L.rowStart[mid]<=row)lo=mid;else hi=mid-1}
+    return lo;
+  }
+  function lineAtOffset(pos){
+    let lo=0,hi=L.n-1;
+    while(lo<hi){const mid=(lo+hi+1)>>1;if(L.starts[mid]<=pos)lo=mid;else hi=mid-1}
+    return lo;
+  }
+
+  /* colour only the lines near the screen; the rest stays plain text */
+  function scanMode(v,A){
+    const re=/<!--|-->|<(script|style)\b[^>]*>|<\/(?:script|style)\s*>/gi;
+    let mode='html',m;
+    while((m=re.exec(v))&&m.index<A){
+      const t=m[0];
+      if(mode==='html'){
+        if(t==='<!--')mode='comment';
+        else if(m[1])mode=m[1].toLowerCase();
+      }else if(mode==='comment'){
+        if(t==='-->')mode='html';
+      }else if(t[1]==='/'&&t.slice(2).toLowerCase().indexOf(mode)===0){
+        mode='html';
+      }
+    }
+    return mode;
+  }
+  function hlWindow(v,A,B){
+    const mode=scanMode(v,A),sub=v.slice(A,B);
+    let out;
+    if(mode==='comment'){
+      const i=sub.indexOf('-->');
+      out=i<0?sp('c',sub):sp('c',sub.slice(0,i+3))+hlHTML(sub.slice(i+3));
+    }else if(mode==='script'||mode==='style'){
+      const i=sub.search(new RegExp('</'+mode+'\\s*>','i'));
+      const f=mode==='script'?hlJS:hlCSS;
+      out=i<0?f(sub):f(sub.slice(0,i))+hlHTML(sub.slice(i));
+    }else out=hlHTML(sub);
+    return hx(v.slice(0,A))+out+hx(v.slice(B));
+  }
+  function renderHl(){
+    if(L.text!==code.value)updateNumbers();
+    const v=L.text,n=L.n,lh=L.lh;
+    const vis=Math.max(1,code.clientHeight/lh),r0=code.scrollTop/lh;
+    const a=lineAtRow(Math.max(0,r0-vis*1.5));
+    const b=Math.min(n,lineAtRow(r0+vis*2.5)+1);
+    const A=L.starts[a],B=b>=n?v.length:L.starts[b];
+    win={a,b,top:L.rowStart[a],bot:L.rowStart[b]};
+    try{hl.innerHTML=(v.length>400000?hx(v):hlWindow(v,A,B))+'\n'}
+    catch(e){hl.textContent=v+'\n'}
+    syncHl();
+  }
+
+  let qP=false;
+  function schedule(){
+    if(qP)return;qP=true;
+    requestAnimationFrame(()=>{qP=false;updateNumbers();renderHl()});
+  }
+  updateMeta=function(){
+    $('#filename').textContent=fileNames[current];
+    $('#fileInfo').textContent=info[current];
+    schedule();
+    autosave();
+  };
+  highlight=schedule;
+
+  /* caret: measure only the current line, never the whole file */
+  function caretScroll(){
+    try{
+      if(code.clientHeight<=0)return;
+      if(L.text!==code.value)updateNumbers();
+      const pos=code.selectionStart,i=lineAtOffset(pos);
+      ensureM();
+      mEl.textContent=L.text.slice(L.starts[i],pos);
+      const mk=document.createElement('span');mk.textContent='\u200b';mEl.appendChild(mk);
+      const pad=parseFloat(getComputedStyle(code).paddingTop)||0;
+      const top=L.rowStart[i]*L.lh+mk.offsetTop+pad;
+      if(top<code.scrollTop)code.scrollTop=top;
+      else if(top+L.lh>code.scrollTop+code.clientHeight)code.scrollTop=top+L.lh-code.clientHeight;
+      ln.scrollTop=code.scrollTop;
+      syncHl();
+    }catch(e){}
+  }
+  let cQ=false;
+  bringCaretIntoView=function(){
+    if(cQ)return;cQ=true;
+    requestAnimationFrame(()=>{cQ=false;caretScroll()});
+  };
+
+  /* dragging: only re-colour when the screen nears the edge of the coloured part */
+  let sQ=false;
+  code.addEventListener('scroll',()=>{
+    if(sQ||L.text===null)return;sQ=true;
+    requestAnimationFrame(()=>{
+      sQ=false;
+      const vis=code.clientHeight/L.lh,r0=code.scrollTop/L.lh;
+      if((win.a>0&&r0<win.top+vis*0.4)||(win.b<L.n&&r0+vis>win.bot-vis*0.4))renderHl();
+    });
+  },{passive:true});
+
+  /* save to storage less often while typing */
+  autosave=function(){
+    if(!projects)return;
+    clearTimeout(saveT);
+    saveT=setTimeout(()=>{flush();$('#saveState').textContent='Saved'},1500);
+  };
+
+  if(window.ResizeObserver)new ResizeObserver(schedule).observe(code);
+  window.addEventListener('resize',schedule);
+  const _ap=applyPrefs;
+  applyPrefs=function(){_ap();schedule()};
+  window.__rexHl={scanMode,hlWindow};
+  schedule();
+})();
+</script>
 </body>
 </html>
