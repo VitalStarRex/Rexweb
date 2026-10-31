@@ -843,6 +843,20 @@ function makeDocument(){
     if(js===examples.js)js='';
   }
 
+  // A complete page that has its own <style> / <script> must run exactly as it is.
+  // The CSS and JS tabs are only added when the page links to local files
+  // (style.css / script.js) or has no styles / scripts of its own.
+  {
+    const fullPage=/<html[\s>]/i.test(html)||/<body[\s>]/i.test(html);
+    const links=html.match(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi)||[];
+    const linksLocalCss=links.some(m=>!/href=["']?(https?:)?\/\//i.test(m));
+    const linksLocalJs=/<script\b[^>]*\bsrc=["']?(?!https?:|\/\/)[^"'\s>]+/i.test(html);
+    const ownStyle=/<style[\s>]/i.test(html);
+    const ownScript=/<script\b(?![^>]*\bsrc=)[^>]*>/i.test(html);
+    if(fullPage&&ownStyle&&!linksLocalCss)css='';
+    if(fullPage&&ownScript&&!linksLocalJs)js='';
+  }
+
   // Local files like style.css / script.js can't load inside the preview.
   // The CSS and JS tabs supply them instead, so drop those references.
   html=html
@@ -852,7 +866,12 @@ function makeDocument(){
   // Show JS errors in the preview so a silent failure is visible.
   const errTag='<script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();<\/script>';
 
-  const styleTag=errTag+'<style>\n'+css+'\n</style>';
+  // The preview is sandboxed, so localStorage/sessionStorage would throw and break
+  // pages that save a theme or settings. Give it a working stand-in that is
+  // remembered between runs (kept inside the editor, never shared with your site).
+  const snap=JSON.stringify(LS.get('rexweb:prevstore',{})).replace(/</g,'\\u003c');
+  const storeTag='<script>(function(){var seed='+snap+';function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();<\/script>';
+  const styleTag=storeTag+errTag+'<style>\n'+css+'\n</style>';
   html=/<\/head>/i.test(html)
     ? html.replace(/<\/head>/i,()=>styleTag+'\n</head>')
     : styleTag+html;
@@ -2244,6 +2263,35 @@ kbc.onclick=()=>{
   requestAnimationFrame(()=>{wrapNumbers();bringCaretIntoView()});
 };
 kbc.addEventListener('pointerdown',e=>e.preventDefault());
+
+/* ===== Upgrade 4d: remember what the preview page saves (theme, settings) ===== */
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||!d.rexs||e.source!==$('#preview').contentWindow)return;
+  const s=LS.get('rexweb:prevstore',{});
+  if(d.o==='set')s[d.k]=d.v;
+  else if(d.o==='del')delete s[d.k];
+  else if(d.o==='clear')Object.keys(s).forEach(k=>delete s[k]);
+  LS.set('rexweb:prevstore',s);
+});
+
+/* ===== Upgrade 4e: preview can use the real site's saved data (same origin) ===== */
+if(S.shareStorage===undefined)S.shareStorage=true;
+function applySandbox(){
+  const f=$('#preview');
+  const v='allow-scripts allow-forms allow-modals'+(S.shareStorage?' allow-same-origin':'');
+  if(f.getAttribute('sandbox')!==v)f.setAttribute('sandbox',v);
+}
+const _run4=run;
+run=function(){applySandbox();_run4()};
+const _om4=openMenu;
+openMenu=function(){
+  _om4();
+  const g=sheetBody.querySelector('.sheet-grid');
+  if(!g)return;
+  const b=h('button','mbtn'+(S.shareStorage?' on':''),'🔗 Preview uses site data: '+(S.shareStorage?'On':'Off'),()=>{S.shareStorage=!S.shareStorage;saveS();openMenu()});
+  g.insertBefore(b,g.lastElementChild);
+};
 
 updateMeta();
 })();
