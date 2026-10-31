@@ -1968,6 +1968,7 @@ code.addEventListener('beforeinput',e=>{
 });
 /* fallback for keyboards that commit '>' without a cancelable beforeinput */
 code.addEventListener('input',e=>{
+  if(window.__rexAC)return; /* the Smart Auto-Close engine below handles '>' itself, with quote/script/settings awareness */
   if(current!=='html'||!S.pair||e.data!=='>')return;
   const pos=code.selectionStart,v=code.value,b=v.slice(0,pos-1),m=b.match(TAG_BEFORE);
   if(m&&!/\/$/.test(b)&&!VOID.has(m[1].toLowerCase())&&!v.slice(pos).startsWith('</'+m[1]+'>')){
@@ -2919,6 +2920,17 @@ function engine(ch,start,end){
   if(CLOSE[ch]){
     if(!a.brackets||sel||inCom||inTag||inAttr||(inStr&&st.q!=='`'))return null;
     if(next===ch&&st.stack[st.stack.length-1]===CLOSE[ch])return skip(start);
+    /* closing a block from its own blank line: reuse the closer already waiting below, never double it */
+    if(st.stack[st.stack.length-1]===CLOSE[ch]){
+      const ls=v.lastIndexOf('\n',start-1)+1;
+      if(/^[ \t]*$/.test(v.slice(ls,start))){
+        const gap=/^[ \t\r\n]*/.exec(v.slice(end))[0],at=end+gap.length;
+        if(v[at]===ch&&gap.indexOf('\n')>=0){
+          const keep=gap.length-gap.lastIndexOf('\n')-1; /* the waiting closer keeps its own indentation */
+          return {ins:'',from:ls,to:at-keep,caret:ls+keep+1};
+        }
+      }
+    }
     return null;
   }
   /* <  */
@@ -3010,7 +3022,9 @@ function engine(ch,start,end){
       const name=st.els[st.els.length-1],closer='</'+name+'>';
       let to=next==='>'?start+1:start;
       /* the closing tag is already waiting right after the caret: reuse it, never double it */
-      if(v.substr(start,closer.length).toLowerCase()===closer.toLowerCase())to=start+closer.length;
+      const lc=closer.toLowerCase(),gt=next==='>'?1:0;
+      if(v.substr(start,closer.length).toLowerCase()===lc)to=start+closer.length;
+      else if(gt&&v.substr(start+1,closer.length).toLowerCase()===lc)to=start+1+closer.length; /* '<' was auto-paired to '<>' just before an existing closer */
       return {ins:'/'+name+'>',from:start,to,caret:start+name.length+2};
     }
     return null;
@@ -3201,6 +3215,30 @@ if(typeof openMenu!=='undefined'&&typeof h==='function'){
 
 /* test hook (read-only helpers) */
 window.__rexAC={scan,engine,backspacePlan};
+})();
+</script>
+<script>
+/* Keyboard sits at the very bottom: the app fills the whole visible screen height */
+(function(){
+  const root=document.documentElement;
+  const probe=document.createElement('div');
+  probe.style.cssText='position:fixed;left:0;top:0;width:0;height:100dvh;visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  let last=0;
+  function fill(){
+    if(typeof S!=='undefined'&&S.kb==='device')return;
+    const h=Math.round(probe.offsetHeight||window.innerHeight);
+    if(h>0&&h!==last){
+      last=h;
+      root.style.setProperty('--lock-h',h+'px');
+    }
+  }
+  fill();
+  window.addEventListener('load',fill);
+  window.addEventListener('pageshow',fill);
+  window.addEventListener('resize',fill);
+  window.addEventListener('orientationchange',()=>setTimeout(fill,250));
+  [200,600,1500].forEach(t=>setTimeout(fill,t));
 })();
 </script>
 </body>
