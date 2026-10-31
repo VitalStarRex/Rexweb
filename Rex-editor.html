@@ -2536,18 +2536,15 @@ body.light #rexBusy{background:#fffffff2}
 (function(){
   /* 1) Keys act the moment your finger touches them, not after release */
   const kb=document.querySelector('#keyboard');
-  let lastDown=0;
   kb.addEventListener('pointerdown',e=>{
     const b=e.target.closest('.key');if(!b)return;
-    b.__fired=true;lastDown=Date.now();
+    b.__fired=true;
     setTimeout(()=>{b.__fired=false},500);
     insertKey(b.getAttribute('aria-label'));
   },true);
-  /* The key already typed on touch. When that key redraws the keyboard (?123 / ABC / shift), the tap's click
-     would land on the NEW key now under the finger and type it too, so swallow any click that follows a key touch. */
   kb.addEventListener('click',e=>{
     const b=e.target.closest('.key');
-    if((b&&b.__fired)||Date.now()-lastDown<700){if(b)b.__fired=false;e.stopPropagation();e.preventDefault()}
+    if(b&&b.__fired){b.__fired=false;e.stopPropagation();e.preventDefault()}
   },true);
 
   /* 2) Do the heavy bookkeeping once per frame instead of on every keystroke */
