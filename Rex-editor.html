@@ -2536,15 +2536,18 @@ body.light #rexBusy{background:#fffffff2}
 (function(){
   /* 1) Keys act the moment your finger touches them, not after release */
   const kb=document.querySelector('#keyboard');
+  let lastDown=0;
   kb.addEventListener('pointerdown',e=>{
     const b=e.target.closest('.key');if(!b)return;
-    b.__fired=true;
+    b.__fired=true;lastDown=Date.now();
     setTimeout(()=>{b.__fired=false},500);
     insertKey(b.getAttribute('aria-label'));
   },true);
+  /* The key already typed on touch. When that key redraws the keyboard (?123 / ABC / shift), the tap's click
+     would land on the NEW key now under the finger and type it too, so swallow any click that follows a key touch. */
   kb.addEventListener('click',e=>{
     const b=e.target.closest('.key');
-    if(b&&b.__fired){b.__fired=false;e.stopPropagation();e.preventDefault()}
+    if((b&&b.__fired)||Date.now()-lastDown<700){if(b)b.__fired=false;e.stopPropagation();e.preventDefault()}
   },true);
 
   /* 2) Do the heavy bookkeeping once per frame instead of on every keystroke */
@@ -3239,6 +3242,76 @@ window.__rexAC={scan,engine,backspacePlan};
   window.addEventListener('resize',fill);
   window.addEventListener('orientationchange',()=>setTimeout(fill,250));
   [200,600,1500].forEach(t=>setTimeout(fill,t));
+})();
+</script>
+<style>
+/* ===== Smooth + responsive patch ===== */
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.toolbar,.settings-modal,#rexBusy{backdrop-filter:none!important}
+.hl,.line-numbers{contain:strict}
+.panel,.keyboard{contain:layout paint}
+.key,.tab,.tool,.iconbtn,.mbtn,.dots,.symbol-toggle,.kb-collapse{
+  transition:none!important;touch-action:manipulation;
+}
+.key:active,.tab:active,.tool:active,.iconbtn:active,.mbtn:active{
+  transform:scale(.95);filter:brightness(1.3)
+}
+.code{scroll-behavior:auto!important;overscroll-behavior:contain}
+.sheet-grid,.settings-modal,.toolbar,#consoleOut,.lib-chips{
+  scroll-behavior:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain
+}
+</style>
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+
+  /* 1) Keep the colour layer and line numbers locked to the editor every frame while scrolling */
+  let last=0,running=false,touching=false;
+  function tick(){
+    const t=code.scrollTop,l=code.scrollLeft;
+    if(hl.scrollTop!==t)hl.scrollTop=t;
+    if(hl.scrollLeft!==l)hl.scrollLeft=l;
+    if(lineNumbers.scrollTop!==t)lineNumbers.scrollTop=t;
+    if(touching||performance.now()-last<600)requestAnimationFrame(tick);
+    else running=false;
+  }
+  function kick(){
+    last=performance.now();
+    if(!running){running=true;requestAnimationFrame(tick)}
+  }
+  code.addEventListener('scroll',kick,{passive:true});
+  code.addEventListener('wheel',kick,{passive:true});
+  code.addEventListener('touchstart',()=>{touching=true;kick()},{passive:true});
+  ['touchend','touchcancel'].forEach(ev=>
+    code.addEventListener(ev,()=>{touching=false;kick()},{passive:true}));
+
+  /* 2) The ⋮ button opens the menu (an older line was turning it into an alert) */
+  $('#moreBtn').onclick=()=>openMenu();
+
+  /* 3) Editor tool panel: close after using a tool, and when you tap outside it */
+  const tb=$('#editorToolbar');
+  tb.addEventListener('click',e=>{
+    const b=e.target.closest('.tool');
+    if(b&&!['undo','redo'].includes(b.id))setTimeout(closeEditorToolbar,0);
+  });
+  document.addEventListener('pointerdown',e=>{
+    if(!tb.hidden&&!e.target.closest('#editorToolbar,#toolbarMenuBtn'))closeEditorToolbar();
+  },true);
+
+  /* 4) Escape closes any open dialog */
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape')return;
+    $('#settingsBackdrop').hidden=true;
+    closeSheet();
+  });
+
+  /* 5) Never lose work: save the moment the app is hidden or closed */
+  const saveNow=()=>{try{flush()}catch(e){}};
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)saveNow()});
+  window.addEventListener('pagehide',saveNow);
+
+  /* 6) Stop the long-press menu from interrupting held Backspace / arrow keys */
+  $('#keyboard').addEventListener('contextmenu',e=>e.preventDefault());
 })();
 </script>
 </body>
