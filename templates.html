@@ -1,1 +1,169 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>RexWeb | Templates</title>
+<style>
+:root{--bg:#080b18;--panel:#11182d;--panel2:#192440;--text:#f4f7ff;--muted:#aab6cf;--cyan:#36ddf5;--purple:#a78bfa;--line:rgba(139,165,220,.2)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 12% 0%,rgba(26,171,210,.16),transparent 35%),radial-gradient(ellipse at 90% 12%,rgba(128,83,255,.15),transparent 35%),var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.page{width:min(100% - 26px,980px);margin:auto;padding:18px 0 35px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;gap:12px}.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:1px}.mark{width:39px;height:39px;display:grid;place-items:center;border:1px solid #36ddf5;border-radius:12px;color:#36ddf5;font-size:19px}.brand small{display:block;color:#9eacc8;font-size:9px;letter-spacing:2px;margin-top:3px}.tag{font-size:10px;letter-spacing:1px;border:1px solid var(--line);padding:8px 11px;border-radius:30px;color:#cad6ef}
+.intro{text-align:center;max-width:650px;margin:0 auto 27px}.eyebrow{font-size:10px;color:var(--cyan);letter-spacing:2px;font-weight:bold}.intro h1{font-size:clamp(29px,6vw,45px);margin:10px 0}.intro h1 span{color:var(--cyan)}.intro p{color:var(--muted);font-size:13px;line-height:1.7;margin:0}
+.section-label{font-size:10px;letter-spacing:2px;color:#93a5c8;font-weight:bold;margin:24px 0 12px}
+.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.category{min-height:165px;border:1px solid var(--line);border-radius:18px;padding:18px;text-align:left;color:var(--text);cursor:pointer;background:linear-gradient(135deg,var(--c,#182746),#10172c);position:relative;overflow:hidden;transition:.2s}
+.category:before{content:"";position:absolute;inset:0;background:var(--art);background-size:cover;background-position:center;opacity:.9}
+.category:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,12,28,.85),rgba(7,12,28,.15))}
+.category>*{position:relative;z-index:1}.category:hover,.category.active{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 10px 25px #0005}
+.category .emoji{font-size:28px;margin-bottom:14px}.category h2{font-size:16px;margin:0 0 7px}.category p{font-size:11px;line-height:1.5;color:#d0daed;margin:0}.category .go{display:block;margin-top:14px;color:var(--cyan);font-size:10px;font-weight:bold;letter-spacing:1px}
+.panel{display:none;margin-top:22px;padding:17px;border:1px solid var(--line);border-radius:18px;background:rgba(13,19,38,.96)}.panel.show{display:block}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.panel-head h2{font-size:20px;margin:0}.close{background:#1b2745;color:#e5edff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.game-card{height:175px;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:15px;padding:0;text-align:left;color:white;cursor:pointer;background-color:var(--c,#17213c);background-size:cover;background-position:center;isolation:isolate}
+.game-card:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,8,20,.92),rgba(4,8,20,0) 70%);z-index:-1}.game-card:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,color-mix(in srgb,var(--c,#36ddf5) 25%,transparent),transparent 60%);z-index:-1}
+.game-card:hover{border-color:var(--c,var(--cyan));transform:translateY(-2px)}.game-card .card-info{position:absolute;left:13px;right:12px;bottom:12px}.game-card .game-emoji{font-size:22px;display:block;margin-bottom:7px}.game-card strong{font-size:14px;display:block}.game-card small{font-size:10px;color:#c1cce1;display:block;margin-top:4px}
+.details{display:none;margin-top:17px;border:1px solid rgba(54,221,245,.28);border-radius:16px;overflow:hidden;background:#101a31}.details.show{display:block}.detail-banner{min-height:145px;padding:20px;display:flex;align-items:flex-end;background-color:var(--c,#17213c);background-size:cover;background-position:center;position:relative}.detail-banner:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,9,22,.96),color-mix(in srgb,var(--c,#36ddf5) 45%,transparent))}.detail-banner h3{position:relative;margin:0;font-size:23px}.detail-body{padding:17px}.price{font-size:14px;color:#70e7f7;font-weight:bold;margin-bottom:12px}.detail-body h4{font-size:12px;color:#e9f1ff;margin:15px 0 5px}.detail-body p,.detail-body li{font-size:12px;color:var(--muted);line-height:1.65}.detail-body ul{padding-left:18px;margin:5px 0}.order{display:block;width:100%;margin-top:17px;padding:14px;border:0;border-radius:11px;background:linear-gradient(90deg,#13b9d4,#168bce);color:white;font-weight:900;letter-spacing:1px;text-align:center;text-decoration:none;font-size:13px}.order:hover{filter:brightness(1.1)}
+.play-link{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:13px 15px;border-radius:12px;border:1px solid var(--cyan);background:linear-gradient(90deg,rgba(54,221,245,.16),rgba(167,139,250,.14));color:var(--text);text-decoration:none;font-weight:900;font-size:14px;letter-spacing:.5px}.play-link span{font-size:11px;font-weight:normal;color:var(--cyan);letter-spacing:0}.play-link:hover{filter:brightness(1.15)}
+.level-tag{display:inline-block;margin-bottom:7px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#fff;background:color-mix(in srgb,var(--c,#13b9d4) 75%,#000);border:1px solid rgba(255,255,255,.3)}
+.price-tag{position:absolute;top:10px;right:10px;background:rgba(5,9,22,.78);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:bold;padding:4px 9px;border-radius:20px}
+.placeholder{padding:18px;border-radius:13px;background:#17213c;color:var(--muted);font-size:12px;line-height:1.7}
+.support{margin-top:14px;padding:13px;border-radius:12px;background:rgba(54,221,245,.07);color:#cbd8ee;font-size:11px;line-height:1.7}
+footer{text-align:center;color:#71809e;font-size:9px;letter-spacing:2px;margin-top:30px}
+@media(max-width:560px){.category-grid{gap:10px}.category{min-height:155px;padding:14px;border-radius:15px}.category h2{font-size:14px}.games{gap:9px}.game-card{height:150px}.game-card .card-info{left:10px;bottom:10px}.panel{padding:13px}.detail-banner{min-height:125px}}
+@media(max-width:350px){.category-grid,.games{grid-template-columns:1fr}.game-card{height:165px}}
+</style>
+</head>
+<body>
+<main class="page">
+<header><div class="brand"><div class="mark">R</div><div>REXWEB<small>CREATE • CONNECT • LAUNCH</small></div></div><div class="tag">TEMPLATE HUB</div></header>
+<section class="intro"><div class="eyebrow">YOUR DIGITAL STARTING POINT</div><h1>Explore <span>RexWeb</span> Templates</h1><p>Choose a category to explore ready-made resources and services for your next digital project.</p></section>
+<div class="section-label">CHOOSE A CATEGORY</div>
+<section class="category-grid">
+<button class="category" data-panel="games" data-scene="c_games" style="--c:#0e7490;--art: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80')"><div class="emoji">🎮</div><h2>Game Templates</h2><p>Browse games, learn how to play and order your HTML game file.</p><span class="go">EXPLORE GAMES →</span></button>
+<button class="category" data-panel="websites" data-scene="c_web" style="--c:#1d4ed8;--art: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80')"><div class="emoji">🌐</div><h2>Website Templates</h2><p>Website designs for businesses, schools, portfolios and shops.</p><span class="go">EXPLORE WEBSITES →</span></button>
+<button class="category" data-panel="tools" data-scene="c_tools" style="--c:#b45309;--art: url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80')"><div class="emoji">🛠️</div><h2>Online Tools Templates</h2><p>Calculators, converters and other useful interactive tools.</p><span class="go">EXPLORE TOOLS →</span></button>
+<button class="category" data-panel="webapp" data-scene="c_app" style="--c:#047857;--art: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80')"><div class="emoji">📱</div><h2>Order a Web-to-App Service</h2><p>Get help turning your website into an Android application.</p><span class="go">VIEW SERVICE →</span></button>
+</section>
+
+<section class="panel" id="games">
+<div class="panel-head"><h2>🎮 Available Game Templates</h2><button class="close">Close ✕</button></div>
+<a class="play-link" href="https://rexweb.web.app/games.html" target="_blank" rel="noopener">🎮 Play Games <span>rexweb.web.app/games.html ↗</span></a>
+<p style="color:var(--muted);font-size:12px;line-height:1.6">Select a game card to view its information, instructions, purchase details and order option.</p>
+<div class="games" id="gameGrid"></div>
+<div class="details" id="gameDetails">
+<div class="detail-banner" id="detailBanner"><h3 id="detailTitle"></h3></div>
+<div class="detail-body">
+<div class="price" id="detailPrice"></div>
+<h4>About this game</h4><p id="detailDescription"></p>
+<h4>How to play</h4><p id="detailHow"></p>
+<h4>What you receive after purchase</h4>
+<ul><li>The game's HTML file, ready to download.</li><li>Guidance on adding it to your website or loading it inside an app using a WebView.</li><li>Help understanding how to use the game if you need support.</li></ul>
+<div class="support">Need help after purchase? You can contact Vitalstar Lite for guidance on using the HTML file on your website or in your app.</div>
+<a class="order" id="orderButton" href="#" target="_blank" rel="noopener">ORDER NOW</a>
+</div></div></section>
+
+<section class="panel" id="websites"><div class="panel-head"><h2>🌐 Website Templates</h2><button class="close">Close ✕</button></div><div class="placeholder">Website template previews and listings will appear here. Each template can have its own image, description, price, included files, usage information and ORDER NOW option.</div></section>
+<section class="panel" id="tools"><div class="panel-head"><h2>🛠️ Online Tools Templates</h2><button class="close">Close ✕</button></div><div class="placeholder">Online tool previews and listings will appear here, with descriptions, features, prices, instructions and an ORDER NOW option.</div></section>
+<section class="panel" id="webapp"><div class="panel-head"><h2>📱 Web-to-App Service</h2><button class="close">Close ✕</button></div><div class="placeholder">Turn your website into an Android app. Service information, requirements, delivery details and an order option can be added here.</div></section>
+<footer>REXWEB • YOUR DIGITAL WORLD</footer>
+</main>
+<script>
+const games = [
+ {name:"Bubble Bash",price:2000,scene:"bubbles",color:"#0891b2",emoji:"🫧",image:"https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=900&q=80",description:"Pop colourful 3D bubbles, create chain combos and beat the countdown.",how:"Tap or click the bubbles to pop them. Make quick combinations and try to beat the countdown. The game listing describes a best score of 1700."},
+ {name:"Tic-Tac-Toe",price:2000,scene:"ttt",color:"#7c3aed",emoji:"⭕",image:"https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=900&q=80",description:"Challenge the computer on a floating 3D board. First to 3 rounds wins.",how:"Take turns placing your mark in an empty square. Get three marks in a row horizontally, vertically or diagonally to win a round. First to win 3 rounds wins."},
+ {name:"Pong",price:2500,scene:"pong",color:"#16a34a",emoji:"🏓",image:"https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80",description:"Keep the ball in play. The first player to 5 points wins.",how:"Move your paddle to bounce the ball back toward your opponent. Do not let the ball pass your side. The first to 5 points wins."},
+ {name:"Brick Breaker",price:2500,scene:"brick",color:"#dc2626",emoji:"🧱",image:"https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=900&q=80",description:"Smash every brick. You have three chances to miss.",how:"Move the paddle to keep the ball bouncing and break the bricks. Keep the ball from falling past your paddle. You have three chances."},
+ {name:"Dino Jump",price:2500,scene:"dino",color:"#65a30d",emoji:"🦖",image:"https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&fit=crop&w=900&q=80",description:"Jump through 4 levels. Each level ends with a bigger boss.",how:"Use the game controls to jump over obstacles and progress through all four levels. Watch out for the boss at the end of each level."},
+ {name:"Nexora Jet Strike",price:2500,scene:"jet",color:"#2563eb",emoji:"🚀",image:"https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=900&q=80",description:"Blast through 4 levels, each ending with a bigger boss. Your jet fires automatically.",how:"Move your jet to avoid enemy attacks and obstacles. Your weapons fire automatically. Survive each level and defeat the boss."},
+ {name:"Math Challenge",price:2000,scene:"math",color:"#d97706",emoji:"🧠",image:"https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=900&q=80",description:"Solve as many questions as you can in 60 seconds. Wrong answers cost 4 seconds.",how:"Read each maths question and choose or enter the correct answer before time runs out. Answer carefully because a wrong answer costs four seconds."},
+ {name:"Rock Paper Scissors",price:2000,scene:"rps",color:"#db2777",emoji:"✊",image:"https://images.unsplash.com/photo-1614294149010-950b698f72c0?auto=format&fit=crop&w=900&q=80",description:"Beat the computer. First to 5 wins.",how:"Choose rock, paper or scissors. Rock beats scissors, scissors beats paper, and paper beats rock. First to five points wins."},
+ {name:"Hangman",price:2000,scene:"hangman",color:"#475569",emoji:"🔤",image:"https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",description:"Guess the hidden word before the 3D gallows is finished.",how:"Guess one letter at a time. Correct letters appear in the hidden word; incorrect guesses add to the hangman drawing. Solve the word before you run out of chances."},
+ {name:"Dove Flight",price:2500,scene:"dove",color:"#0ea5e9",emoji:"🕊️",image:"https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=900&q=80",description:"Fly through pipes across 4 levels and dodge a bigger boss at the end of each.",how:"Tap, click or use the game's on-screen control to keep the dove flying. Pass through gaps, avoid obstacles and complete all four levels."},
+ {name:"Shadow Master",price:4000,scene:"shadow",color:"#3730a3",image:"",description:"Slip through the night as a ninja warrior, strike from the shadows and defeat your enemies.",how:"Move your shadow warrior, jump across rooftops and attack enemies using the game controls. Stay sharp, avoid danger and defeat every foe to become the Shadow Master."},
+ {name:"Mech Warrior",price:4000,scene:"mech",color:"#ea580c",image:"",description:"Pilot a powerful battle mech, blast enemy machines and survive the war zone.",how:"Steer your mech, fire your weapons and dodge incoming attacks. Destroy enemy machines and keep your armour from running out."},
+ {name:"War Tank 4000",price:4000,scene:"tank",color:"#3f6212",image:"",description:"Command a heavy battle tank, take down enemy forces and survive each battle.",how:"Drive your tank, aim and fire at enemy targets while avoiding their shots. Clear each battle to move on and keep your tank in one piece."},
+ {name:"Shadow Ninja",price:4000,scene:"shadow",color:"#7c3aed",image:"",description:"Master the art of stealth as a ninja, strike from the dark and take down every enemy.",how:"Move your ninja, jump and attack using the game controls (keyboard or touch buttons). Stay out of sight, avoid danger and defeat all enemies."},
+ {name:"Galaxy Blaster",price:4000,scene:"galaxy",color:"#06b6d4",image:"",description:"Fly your starship across the galaxy, blast enemy fleets and survive the attack.",how:"Steer your ship, fire at incoming enemies and dodge their shots. Keep your ship alive and score as high as you can."},
+ {name:"Mech Warriors",price:4000,scene:"mech",color:"#f97316",image:"",description:"Take control of giant battle mechs and destroy your rivals in all-out combat.",how:"Move your mech, fire your weapons and avoid enemy attacks. Wear down your opponents before they destroy you."},
+ {name:"Blade Masters",price:4000,scene:"blade",color:"#f43f5e",image:"",description:"Sword fighting action where only the sharpest warrior survives.",how:"Move, block and swing your blade using the controls. Time your attacks well and defeat your opponent to become the Blade Master."},
+ {name:"Tank Battle",price:4000,scene:"tank",color:"#84cc16",image:"",description:"Command your tank in intense battles and outgun the enemy forces.",how:"Drive your tank, aim and fire at enemy tanks while dodging their shots. Clear the battlefield to win."},
+ {name:"Alien Invasion",price:4000,scene:"alien",color:"#a855f7",image:"",description:"Aliens are attacking Earth. Stop the invasion before it is too late.",how:"Move your defender, shoot the alien invaders and avoid their attacks. Wipe them out before they reach you."},
+ {name:"Dragon Fury",price:4000,scene:"dragon",color:"#ef4444",image:"",description:"Unleash the fire of a mighty dragon and rule the skies.",how:"Control your dragon, breathe fire at enemies and avoid incoming danger. Survive and grow stronger as the battle goes on."},
+ {name:"Superhero Showdown",price:4000,scene:"hero",color:"#eab308",image:"",description:"Superpowered heroes face off in a head-to-head battle.",how:"Move your hero, use your attacks and special powers, and outfight your opponent to win the showdown."},
+ {name:"Zombie Survival",price:4000,scene:"zombie",color:"#22c55e",image:"",description:"The dead are walking. Stay alive for as long as you can.",how:"Move around, shoot or fight off the zombies and avoid getting caught. Survive each wave to keep going."},
+ {name:"Sky Combat",price:4000,scene:"sky",color:"#3b82f6",image:"",description:"Take to the skies in a fighter jet and win the dogfight.",how:"Steer your jet, fire at enemy aircraft and dodge incoming fire. Shoot down your rivals and stay in the air."}
+];
+
+/* ---------- Matching artwork (inline SVG, no external images) ---------- */
+function art(scene,color){
+ const W='#fff',f=(o)=>`fill="${W}" fill-opacity="${o}"`,st=(o,w=4)=>`fill="none" stroke="${W}" stroke-opacity="${o}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`;
+ const T=(x,y,t,sz,o)=>`<text x="${x}" y="${y}" font-family="Arial" font-weight="bold" font-size="${sz}" fill="${W}" fill-opacity="${o}" text-anchor="middle">${t}</text>`;
+ const scenes={
+  bubbles:[[70,90,46],[160,200,30],[250,70,34],[330,170,52],[230,230,22],[120,40,16],[380,60,18]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" ${f(.1)} stroke="${W}" stroke-opacity=".5" stroke-width="3"/><circle cx="${x-r*.35}" cy="${y-r*.35}" r="${r*.2}" ${f(.7)}/>`).join(''),
+  ttt:`<path d="M150 40V260M250 40V260M60 100H340M60 200H340" ${st(.45,6)}/><path d="M80 55l40 40M120 55l-40 40" ${st(.8,8)}/><circle cx="200" cy="150" r="22" ${st(.8,8)}/><path d="M270 215l40 40M310 215l-40 40" ${st(.8,8)}/><circle cx="100" cy="150" r="22" ${st(.5,6)}/>`,
+  pong:`<path d="M200 20V280" ${st(.4,4)} stroke-dasharray="14 14"/><rect x="30" y="100" width="14" height="80" rx="6" ${f(.85)}/><rect x="356" y="140" width="14" height="80" rx="6" ${f(.85)}/><circle cx="230" cy="130" r="12" ${f(.95)}/>${T(150,70,'3',44,.35)}${T(250,70,'5',44,.35)}`,
+  brick:[0,1,2,3].map(r=>[0,1,2,3,4,5].map(c=>`<rect x="${30+c*57}" y="${30+r*26}" width="52" height="20" rx="4" ${f(.25+.15*((r+c)%3))}/>`).join('')).join('')+`<circle cx="210" cy="190" r="10" ${f(.95)}/><rect x="150" y="250" width="110" height="14" rx="7" ${f(.85)}/>`,
+  dino:`<circle cx="320" cy="60" r="26" ${f(.3)}/><path d="M40 245H360" ${st(.6,4)}/><path d="M70 90q15-14 30 0q14-12 30 0" ${st(.35,5)}/><rect x="285" y="195" width="14" height="50" rx="6" ${f(.7)}/><rect x="270" y="210" width="12" height="20" rx="5" ${f(.7)}/><rect x="302" y="205" width="12" height="20" rx="5" ${f(.7)}/><path d="M90 245v-40h24v-20h34v-30h-18v-14h-30v28h-20v30h-14v46z" ${f(.85)}/><circle cx="140" cy="148" r="3" fill="#000" fill-opacity=".6"/>`,
+  jet:[[40,40],[90,200],[330,50],[360,230],[200,30],[300,140],[60,120]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.5" ${f(.7)}/>`).join('')+`<path d="M200 70L225 150L290 195V215L225 195L215 245H185L175 195L110 215V195L175 150Z" ${f(.85)}/><path d="M200 50V20M190 120V90M210 120V90" ${st(.8,4)}/><path d="M80 60l20 20l-20 20l-20-20z" ${f(.4)}/><path d="M320 100l16 16l-16 16l-16-16z" ${f(.4)}/>`,
+  math:T(70,100,'+',70,.55)+T(160,230,'−',80,.45)+T(260,110,'×',70,.55)+T(340,230,'÷',70,.45)+T(210,165,'= ?',64,.85)+T(40,250,'7',40,.3)+T(370,70,'9',40,.3),
+  rps:`<circle cx="90" cy="150" r="48" ${f(.8)}/><rect x="162" y="100" width="76" height="100" rx="8" ${f(.35)} stroke="${W}" stroke-opacity=".8" stroke-width="4"/><path d="M262 210L320 90M358 210L300 90" ${st(.85,10)}/><circle cx="310" cy="228" r="14" ${st(.8,6)}/><circle cx="310" cy="228" r="3" ${f(.9)}/>`,
+  hangman:`<path d="M60 255H210M110 255V45H230V80" ${st(.85,8)}/><circle cx="230" cy="105" r="24" ${st(.85,6)}/><path d="M230 130V190M230 145L205 175M230 145L255 175M230 190L210 230" ${st(.85,6)}/>`+[0,1,2,3,4].map(i=>`<path d="M${280+i*20} 255h14" ${st(.8,5)}/>`).join('')+T(320,248,'A',22,.9),
+  dove:`<rect x="260" y="0" width="52" height="95" rx="6" ${f(.3)}/><rect x="254" y="85" width="64" height="18" rx="6" ${f(.45)}/><rect x="260" y="205" width="52" height="95" rx="6" ${f(.3)}/><rect x="254" y="197" width="64" height="18" rx="6" ${f(.45)}/><rect x="60" y="215" width="40" height="85" rx="6" ${f(.2)}/><ellipse cx="150" cy="150" rx="40" ry="24" ${f(.9)}/><circle cx="184" cy="138" r="14" ${f(.9)}/><path d="M196 138l16 4l-16 4z" ${f(.9)}/><path d="M140 140q-20-60-65-70q10 45 40 78z" ${f(.7)}/><path d="M112 150L70 165L116 165z" ${f(.75)}/>`,
+
+  shadow:`<circle cx="300" cy="75" r="42" ${f(.85)}/><circle cx="318" cy="64" r="36" fill="#1e1b4b" fill-opacity=".55"/><path d="M0 260V215H70V190H130V215H200V175H260V205H330V185H400V260Z" fill="#0b1022" fill-opacity=".75"/><g fill="#0b1022"><circle cx="150" cy="105" r="17"/><path d="M130 125H170L182 185L168 235H152L150 200L148 235H132L118 185Z"/><path d="M168 135L222 112L226 122L174 152Z"/><path d="M122 120L90 105L84 115L116 138Z"/></g><path d="M130 100H172" ${st(.9,5)}/><path d="M222 112L262 98" ${st(.95,4)}/><path d="M60 60l4 10l10 4l-10 4l-4 10l-4-10l-10-4l10-4z" ${f(.7)}/>`,
+  mech:`<path d="M0 262H400" ${st(.5,4)}/><rect x="165" y="30" width="70" height="46" rx="10" ${f(.85)}/><rect x="180" y="45" width="40" height="12" rx="4" fill="#0b1022" fill-opacity=".7"/><rect x="140" y="82" width="120" height="85" rx="12" ${f(.7)}/><circle cx="200" cy="124" r="16" ${f(.2)} stroke="${W}" stroke-opacity=".9" stroke-width="4"/><rect x="90" y="86" width="42" height="26" rx="8" ${f(.85)}/><rect x="268" y="86" width="42" height="26" rx="8" ${f(.85)}/><rect x="96" y="112" width="28" height="70" rx="8" ${f(.6)}/><rect x="276" y="112" width="28" height="70" rx="8" ${f(.6)}/><rect x="300" y="170" width="70" height="16" rx="6" ${f(.9)}/><rect x="150" y="172" width="38" height="80" rx="8" ${f(.65)}/><rect x="212" y="172" width="38" height="80" rx="8" ${f(.65)}/><rect x="138" y="246" width="58" height="16" rx="6" ${f(.85)}/><rect x="204" y="246" width="58" height="16" rx="6" ${f(.85)}/><path d="M340 120l8 -8l8 8l-8 8z" ${f(.8)}/>`,
+  tank:`<path d="M0 255H400" ${st(.55,4)}/><circle cx="330" cy="70" r="26" ${f(.28)}/><path d="M70 85q15-14 30 0q14-12 30 0" ${st(.3,5)}/><rect x="80" y="205" width="200" height="40" rx="20" ${f(.75)}/>`+[105,145,185,225,260].map(x=>`<circle cx="${x}" cy="225" r="10" fill="#0b1022" fill-opacity=".55"/>`).join('')+`<rect x="105" y="168" width="140" height="40" rx="8" ${f(.9)}/><rect x="140" y="135" width="75" height="38" rx="10" ${f(.95)}/><rect x="212" y="145" width="120" height="12" rx="5" ${f(.95)}/><path d="M355 150l12-24l6 20l22-12l-12 24l16 8l-24 6l4 22l-18-16l-14 14l2-22z" ${f(.85)}/>`,
+
+  galaxy:[[40,40],[90,230],[350,50],[370,230],[200,25],[310,160],[60,130],[150,70]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.5" ${f(.75)}/>`).join('')+`<circle cx="285" cy="115" r="62" ${f(.22)} stroke="${W}" stroke-opacity=".6" stroke-width="4"/><ellipse cx="285" cy="115" rx="105" ry="22" ${st(.7,5)} transform="rotate(-18 285 115)"/><path d="M110 210L135 165L160 210L135 200Z" ${f(.9)}/><path d="M135 160V100" ${st(.9,5)}/><circle cx="135" cy="92" r="5" ${f(.95)}/>`,
+  blade:`<path d="M95 245L285 55" ${st(.9,12)}/><path d="M305 245L115 55" ${st(.65,12)}/><path d="M78 218L122 262M282 262L326 218" ${st(.9,12)}/><path d="M285 55l16-4l-4 16z" ${f(.9)}/><path d="M115 55l-16-4l4 16z" ${f(.7)}/><circle cx="200" cy="150" r="9" ${f(.9)}/>`,
+  alien:[[40,50],[330,40],[370,200],[60,230],[200,25],[110,90]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.5" ${f(.75)}/>`).join('')+`<ellipse cx="200" cy="120" rx="95" ry="28" ${f(.85)}/><path d="M150 110a50 48 0 0 1 100 0z" ${f(.4)} stroke="${W}" stroke-opacity=".85" stroke-width="4"/><circle cx="130" cy="125" r="6" fill="#0b1022" fill-opacity=".5"/><circle cx="200" cy="132" r="6" fill="#0b1022" fill-opacity=".5"/><circle cx="270" cy="125" r="6" fill="#0b1022" fill-opacity=".5"/><path d="M150 148L105 262H295L250 148Z" ${f(.18)}/><path d="M0 262H400" ${st(.5,4)}/><path d="M60 262v-24h12v24M80 262v-34h12v34M310 262v-30h12v30" ${f(.5)}/>`,
+  dragon:`<path d="M10 255Q100 235 160 185Q205 150 240 140" ${st(.8,16)}/><path d="M150 190L90 85L180 130L195 55L235 150Z" ${f(.4)} stroke="${W}" stroke-opacity=".8" stroke-width="4"/><path d="M235 120L300 105L335 125L305 150L250 160Z" ${f(.9)}/><path d="M270 105L282 80L292 106" ${f(.9)}/><circle cx="296" cy="122" r="4" fill="#0b1022"/><path d="M335 135q30-10 50 5q-25 8-52 22q14-10 2-27z" ${f(.8)}/><circle cx="365" cy="150" r="10" ${f(.55)}/><circle cx="385" cy="168" r="14" ${f(.35)}/>`,
+  hero:`<path d="M185 120L40 70L90 150L50 235L185 175Z" ${f(.4)} stroke="${W}" stroke-opacity=".75" stroke-width="4"/><circle cx="215" cy="85" r="22" ${f(.9)}/><path d="M190 112H245L255 185H185Z" ${f(.85)}/><path d="M245 125L325 100" ${st(.9,16)}/><circle cx="332" cy="98" r="14" ${f(.95)}/><path d="M195 120L160 160" ${st(.9,14)}/><path d="M192 185L180 250M246 185L262 250" ${st(.85,16)}/><path d="M220 125l10 18l20 2l-15 13l5 20l-20-10l-20 10l5-20l-15-13l20-2z" fill="#0b1022" fill-opacity=".55"/><path d="M355 40L330 90H350L335 135L375 80H353Z" ${f(.8)}/>`,
+  zombie:`<circle cx="315" cy="65" r="36" ${f(.5)}/><path d="M0 262H400" ${st(.55,4)}/><path d="M40 262V215q0-22 22-22t22 22v47zM310 262V225q0-18 18-18t18 18v37z" ${f(.4)}/><circle cx="170" cy="85" r="21" ${f(.9)}/><circle cx="163" cy="82" r="3.5" fill="#0b1022"/><circle cx="178" cy="82" r="3.5" fill="#0b1022"/><path d="M162 94h16" stroke="#0b1022" stroke-width="3"/><path d="M148 112H196L204 190H142Z" ${f(.8)}/><path d="M196 125L270 118M150 125L95 150" ${st(.85,14)}/><path d="M150 190L138 258M196 190L214 258" ${st(.85,15)}/>`,
+  sky:`<ellipse cx="80" cy="60" rx="50" ry="16" ${f(.3)}/><ellipse cx="320" cy="235" rx="60" ry="18" ${f(.3)}/><ellipse cx="260" cy="40" rx="36" ry="12" ${f(.25)}/><path d="M20 165H125" ${st(.35,6)}/><path d="M10 145H85" ${st(.25,5)}/><path d="M130 160Q160 140 260 150L355 168L260 180Q175 182 130 160Z" ${f(.9)}/><path d="M200 152L150 95H190L250 152Z" ${f(.75)}/><path d="M200 176L150 240H190L250 178Z" ${f(.7)}/><path d="M130 160L100 118H125L158 156Z" ${f(.75)}/><path d="M232 140Q262 128 292 150Z" fill="#0b1022" fill-opacity=".45"/><circle cx="370" cy="150" r="4" ${f(.9)}/>`,
+  /* categories */
+  c_games:`<rect x="90" y="100" width="220" height="110" rx="50" ${f(.2)} stroke="${W}" stroke-opacity=".75" stroke-width="5"/><path d="M140 140v30M125 155h30" ${st(.9,8)}/><circle cx="250" cy="142" r="9" ${f(.85)}/><circle cx="278" cy="165" r="9" ${f(.85)}/>`,
+  c_web:`<rect x="60" y="50" width="280" height="200" rx="16" ${f(.14)} stroke="${W}" stroke-opacity=".7" stroke-width="5"/><path d="M60 95H340" ${st(.6,4)}/><circle cx="85" cy="73" r="6" ${f(.8)}/><circle cx="107" cy="73" r="6" ${f(.6)}/><circle cx="129" cy="73" r="6" ${f(.4)}/><rect x="85" y="120" width="110" height="90" rx="8" ${f(.35)}/><path d="M215 125h95M215 150h95M215 175h60" ${st(.6,6)}/>`,
+  c_tools:`<rect x="110" y="40" width="180" height="230" rx="18" ${f(.14)} stroke="${W}" stroke-opacity=".7" stroke-width="5"/><rect x="130" y="62" width="140" height="50" rx="8" ${f(.4)}/>`+[0,1,2].map(r=>[0,1,2].map(c=>`<circle cx="${155+c*45}" cy="${150+r*38}" r="13" ${f(.55)}/>`).join('')).join(''),
+  c_app:`<rect x="130" y="25" width="140" height="250" rx="26" ${f(.14)} stroke="${W}" stroke-opacity=".75" stroke-width="5"/><rect x="185" y="38" width="30" height="6" rx="3" ${f(.7)}/>`+[0,1,2].map(r=>[0,1,2].map(c=>`<rect x="${152+c*38}" y="${70+r*38}" width="28" height="28" rx="8" ${f(.35+.1*((r+c)%3))}/>`).join('')).join('')+`<circle cx="200" cy="248" r="8" ${st(.7,3)}/>`
+ };
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${color}"/><stop offset="1" stop-color="#0b1022"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/>${scenes[scene]||''}</svg>`;
+ return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
+games.forEach(g=>g.image=art(g.scene,g.color));
+document.querySelectorAll('.category').forEach(c=>c.style.setProperty('--art',`url("${art(c.dataset.scene,getComputedStyle(c).getPropertyValue('--c').trim())}")`));
+const grid=document.getElementById('gameGrid');
+games.forEach((game,index)=>{
+ const card=document.createElement('button');card.className='game-card';card.type='button';
+ card.style.setProperty('--c',game.color);card.style.backgroundImage=`url("${game.image}")`;
+ card.innerHTML=`<span class="price-tag">₦${game.price.toLocaleString()}</span><span class="card-info">${game.emoji?`<span class="game-emoji">${game.emoji}</span>`:`<span class="level-tag">Advanced</span>`}<strong>${game.name}</strong><small>Tap to view details and order</small></span>`;
+ card.addEventListener('click',()=>showGame(index));grid.appendChild(card);
+});
+function showGame(index){
+ const g=games[index],details=document.getElementById('gameDetails');
+ document.getElementById('detailTitle').textContent=(g.emoji?g.emoji+' ':'')+g.name;
+ const banner=document.getElementById('detailBanner');banner.style.setProperty('--c',g.color);banner.style.backgroundImage=`url("${g.image}")`;
+ document.querySelector('#gameDetails .order').style.background=`linear-gradient(90deg,${g.color},#168bce)`;
+ details.style.borderColor=g.color;
+ document.getElementById('detailDescription').textContent=g.description;
+ document.getElementById('detailHow').textContent=g.how;
+ document.getElementById('detailPrice').textContent='Purchase price: ₦'+g.price.toLocaleString();
+ const message=`Hello Vitalstar Lite! I want to order the ${g.name} game template from RexWeb. The listed price is ₦${g.price.toLocaleString()}. Please confirm and send me the HTML file and usage/support details.`;
+ document.getElementById('orderButton').href='https://wa.me/2349132204427?text='+encodeURIComponent(message);
+ details.classList.add('show');details.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+const categoryButtons=document.querySelectorAll('.category'),panels=document.querySelectorAll('.panel');
+categoryButtons.forEach(button=>button.addEventListener('click',()=>{
+ const target=document.getElementById(button.dataset.panel),wasOpen=target.classList.contains('show');
+ panels.forEach(p=>p.classList.remove('show'));categoryButtons.forEach(b=>b.classList.remove('active'));
+ if(!wasOpen){target.classList.add('show');button.classList.add('active');target.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}));
+document.querySelectorAll('.panel .close').forEach(button=>button.addEventListener('click',()=>{
+ const panel=button.closest('.panel');panel.classList.remove('show');
+ const category=document.querySelector(`[data-panel="${panel.id}"]`);if(category)category.classList.remove('active');
+}));
+</script>
+</body>
+</html>
