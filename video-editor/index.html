@@ -317,7 +317,7 @@ function vfx(v,t){
   return o}
 function txa(c,t){const p=clamp((t-c.start)/.4,0,1);return c.anim==='fade'?{o:p,s:1}:c.anim==='pop'?{o:p,s:.6+.4*p}:{o:1,s:1}}
 function gain(c,t){let g=c.vol==null?1:c.vol;if(c.fi)g*=clamp((t-c.start)/c.fi,0,1);if(c.fo)g*=clamp((end(c)-t)/c.fo,0,1);return clamp(g,0,1)}
-let clipboard=null,saveT=0,lastDrag=0,scrubbing=false,ready=false,AG=null,adjDirty=false;
+let lastSeek=0,lastSeekA=0,clipboard=null,saveT=0,lastDrag=0,scrubbing=false,ready=false,AG=null,adjDirty=false;
 /* ---------- state / undo ---------- */
 const snap=()=>JSON.stringify({clips:S.clips,sel:S.sel});
 function edit(fn){S.hist.push(snap());if(S.hist.length>60)S.hist.shift();S.redo=[];fn();refresh()}
@@ -356,7 +356,7 @@ function sync(){
     if(m&&el.getAttribute('src')!==m.url)el.src=m.url;
     if(el===vid){
       const tg=v.inPt+(t-v.start)*v.speed;vid.playbackRate=v.speed;
-      if(!S.playing||Math.abs(vid.currentTime-tg)>.4){try{vid.currentTime=tg}catch(e){}}
+      if(!S.playing||(Math.abs(vid.currentTime-tg)>.5&&!vid.seeking&&performance.now()-lastSeek>800)){lastSeek=performance.now();try{vid.currentTime=tg}catch(e){}}
       if(S.playing){if(vid.paused)vid.play().catch(()=>{})}else vid.pause();
     }
     const q=vfx(v,t);
@@ -377,7 +377,7 @@ function sync(){
     const m=S.media.find(m=>m.id===a.mid);
     if(m&&aud.getAttribute('src')!==m.url)aud.src=m.url;
     const tg=a.inPt+(t-a.start)*a.speed;aud.playbackRate=a.speed;aud.volume=gain(a,t);
-    if(!S.playing||Math.abs(aud.currentTime-tg)>.4){try{aud.currentTime=tg}catch(e){}}
+    if(!S.playing||(Math.abs(aud.currentTime-tg)>.5&&!aud.seeking&&performance.now()-lastSeekA>800)){lastSeekA=performance.now();try{aud.currentTime=tg}catch(e){}}
     if(S.playing){if(aud.paused)aud.play().catch(()=>{})}else aud.pause();
   }else aud.pause();
   $('emptyState').style.display=(S.media.length||S.clips.length)?'none':'';
@@ -392,7 +392,7 @@ function ui(){
   const c=sel();$('timelineStatus').textContent=c?'Selected: '+c.name:'Select a clip to edit it.';
   $('undoBtn').disabled=!S.hist.length;$('redoBtn').disabled=!S.redo.length;
 }
-function refresh(){layout();renderTL();sync();ui();autosave()}
+function refresh(){layout();if(S.t>total())S.t=total();renderTL();sync();ui();autosave();if(S.playing){if(vid.style.display==='block'&&vid.paused)vid.play().catch(()=>{});if(aud.getAttribute('src')&&at('audio',S.t)&&aud.paused)aud.play().catch(()=>{})}}
 
 /* ---------- playback ---------- */
 function tick(now){
