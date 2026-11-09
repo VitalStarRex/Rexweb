@@ -122,6 +122,68 @@ h2.sec { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; colo
 .gfoot .btn { min-height: 52px; font-size: 16px; padding: 8px; border-radius: 12px; }
 @media (max-width: 420px) { .ghead { padding: 12px; } .gbody { padding: 10px 10px 4px; } .gname { font-size: 19px; } .gfoot .btn { font-size: 14px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .card:hover { transform: none; } }
+
+/* ===== game cards with CSS-art banners ===== */
+.cw{background:linear-gradient(165deg,var(--panel),var(--bg));border:1px solid var(--line);border-radius:18px;overflow:hidden;gap:0;transition:transform .15s,border-color .15s,box-shadow .15s}
+.cw:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 14px 30px -16px var(--glow)}
+.cw .card{border:0;border-radius:0;background:none;box-shadow:none;padding:0;gap:0;transform:none}
+.cw .card:hover{transform:none;box-shadow:none}
+.cbody{padding:12px 14px 10px;display:flex;flex-direction:column;gap:5px}
+.cbody b{font-size:16px}
+.cbody .d{font-size:12px;color:var(--muted);line-height:1.4}
+.cbody .bst{font-size:12px;color:var(--accent);margin-top:2px}
+.crow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 14px 14px}
+.price{font-size:20px;font-weight:700;color:#ffc83d;line-height:1}
+.price small{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.08em;margin-top:3px}
+.price.free{color:var(--green)}
+.cw .ord{padding:11px 14px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.art{position:relative;height:132px;overflow:hidden;isolation:isolate;display:block}
+.art::before,.art::after{content:"";position:absolute;z-index:-1}
+.art .aico{position:absolute;inset:0;display:grid;place-items:center;font-size:54px;filter:drop-shadow(0 6px 10px #000a)}
+.art .tg{position:absolute;top:9px;padding:3px 9px;border-radius:99px;background:#000a;font-size:12px;font-weight:700;backdrop-filter:blur(4px);color:#fff}
+.art .tg.l{left:9px;color:#ffc83d}.art .tg.r{right:9px}
+.art .tg.r.free{color:#43f5a5}
+.a-bubble{background:radial-gradient(circle at 25% 70%,#fff5 0 14px,#fff2 15px 16px,transparent 17px),radial-gradient(circle at 72% 30%,#fff5 0 20px,#fff2 21px 22px,transparent 23px),radial-gradient(circle at 50% 82%,#fff4 0 9px,transparent 10px),radial-gradient(circle at 88% 76%,#fff4 0 12px,transparent 13px),linear-gradient(#35e8ff,#1e5bd8 60%,#0a1f6b)}
+.a-snake{background:linear-gradient(#0f3a27 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,#0f3a27 1px,transparent 1px) 0 0/22px 22px,#06130d}
+.a-snake::before{left:34px;top:70px;width:132px;height:18px;background:repeating-linear-gradient(90deg,#43f5a5 0 18px,transparent 18px 22px);box-shadow:0 0 14px #43f5a5}
+.a-snake::after{right:40px;top:70px;width:16px;height:16px;background:#ff4d8d;box-shadow:0 0 14px #ff4d8d;border-radius:4px}
+.a-memory{background:linear-gradient(135deg,#2a1466,#5b2bd6)}
+.a-memory::before,.a-memory::after{top:22px;width:56px;height:80px;border-radius:9px;box-shadow:0 8px 18px #0006}
+.a-memory::before{left:24%;background:#35e8ff;rotate:-12deg}.a-memory::after{left:52%;background:#ff4d8d;rotate:10deg}
+.a-mole{background:radial-gradient(ellipse 40px 12px at 20% 78%,#1b0f05 98%,transparent),radial-gradient(ellipse 40px 12px at 50% 78%,#1b0f05 98%,transparent),radial-gradient(ellipse 40px 12px at 80% 78%,#1b0f05 98%,transparent),linear-gradient(#8fe07a,#2f8f3a)}
+.a-echo{background:conic-gradient(from 45deg,#35e8ff66 0 25%,#9b6cff66 0 50%,#43f5a566 0 75%,#ff9f4366 0),#0a1030}
+.a-echo::before{left:50%;top:50%;width:84px;height:84px;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,#fff 0,#35e8ff 35%,transparent 70%)}
+.a-nitro{background:linear-gradient(#2b1055 0,#d93f6b 45%,#ffb347 62%,#222 62%)}
+.a-nitro::before{left:50%;bottom:0;width:240px;height:52px;translate:-50% 0;background:#333;clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)}
+.a-nitro::after{left:0;right:0;bottom:50px;height:30px;background:#1a0b33;clip-path:polygon(0 100%,10% 30%,22% 70%,35% 20%,50% 80%,65% 35%,80% 75%,92% 25%,100% 100%)}
+.a-ttt{background:linear-gradient(90deg,transparent 33%,#35e8ff 33% 34.5%,transparent 34.5% 65.5%,#35e8ff 65.5% 67%,transparent 67%) center/108px 108px no-repeat,linear-gradient(transparent 33%,#35e8ff 33% 34.5%,transparent 34.5% 65.5%,#35e8ff 65.5% 67%,transparent 67%) center/108px 108px no-repeat,linear-gradient(135deg,#0d2a5a,#1a1060)}
+.a-pong{background:linear-gradient(90deg,transparent 49.5%,#35e8ff55 49.5% 50.5%,transparent 50.5%),linear-gradient(#0a1a3a,#0b2a55)}
+.a-pong::before{left:16px;top:44px;width:8px;height:50px;background:#35e8ff;box-shadow:0 0 12px #35e8ff;border-radius:4px}
+.a-pong::after{right:16px;top:26px;width:8px;height:50px;background:#9b6cff;box-shadow:0 0 12px #9b6cff;border-radius:4px}
+.a-breakout{background:linear-gradient(#0d1630,#14204a)}
+.a-breakout::before{left:12px;right:12px;top:12px;height:60px;background:repeating-linear-gradient(90deg,transparent 0 36px,#0d1630 36px 40px),linear-gradient(#ff718f 0 25%,#ffb347 0 50%,#ffe14d 0 75%,#43f5a5 0)}
+.a-breakout::after{left:50%;bottom:14px;width:72px;height:10px;translate:-50% 0;background:#35e8ff;box-shadow:0 0 12px #35e8ff;border-radius:5px}
+.a-runner{background:linear-gradient(#ff9f43 0,#ff5d7d 45%,#3a1560 72%,#1b2a49 72%)}
+.a-runner::before{right:30px;top:16px;width:56px;height:56px;border-radius:50%;background:#ffd27a;box-shadow:0 0 30px #ffb347}
+.a-runner::after{left:0;right:0;bottom:36px;height:6px;background:repeating-linear-gradient(90deg,#35e8ff 0 24px,transparent 24px 40px)}
+.a-shooter{background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 65% 20%,#fff 0 1px,transparent 2px),radial-gradient(circle at 85% 70%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 40% 82%,#fff 0 1px,transparent 2px),radial-gradient(ellipse at 70% 110%,#8b2bd6aa,transparent 60%),linear-gradient(#05030f,#0c1a4a)}
+.a-math{background:linear-gradient(#0f3a4a,#0a1f33)}
+.a-math::before{content:"+ − × ÷";left:16px;top:12px;font-size:30px;letter-spacing:12px;color:#35e8ff66;font-weight:700}
+.a-math::after{content:"7 × 6 = ?";right:14px;bottom:10px;font-size:22px;color:#43f5a599;font-weight:700}
+.a-rps{background:linear-gradient(#0003,#0008),linear-gradient(120deg,#ff4d6d 0 33%,#ffe14d 33% 66%,#35e8ff 66%)}
+.a-hangman{background:linear-gradient(#1a0f3a,#2b1466)}
+.a-hangman::before{left:34%;top:14px;width:64px;height:100px;border-left:6px solid #9b6cff;border-top:6px solid #9b6cff;box-shadow:0 0 12px #9b6cff88}
+.a-hangman::after{left:calc(34% + 58px);top:20px;width:3px;height:22px;background:#dfe6f5}
+.a-flappy{background:linear-gradient(#7fd8ff,#3a8de0)}
+.a-flappy::before{right:24%;bottom:0;width:36px;height:54px;background:#2fd6a3;border:3px solid #1fb98a}
+.a-flappy::after{right:24%;top:0;width:36px;height:36px;background:#2fd6a3;border:3px solid #1fb98a}
+
+/* fix: keep price and order button inside narrow cards */
+.cw{min-width:0}
+.crow{flex-direction:column;align-items:stretch;gap:10px}
+.crow .price{display:flex;align-items:baseline;gap:8px}
+.crow .price small{display:inline;margin:0}
+.cw .ord{justify-content:center;white-space:normal;text-align:center;width:100%}
 </style>
 </head>
 <body>
@@ -1471,15 +1533,18 @@ function buildMenu() {
   [['Free games', true], ['Premium games · ₦2,000 each', false]].forEach(function (s) {
     var h = document.createElement('h2'); h.className = 'sec sub'; h.textContent = s[0]; grid.appendChild(h);
     GAMES.filter(function (g) { return !!g.free === s[1]; }).forEach(function (g) {
+      pi++;
       var w = document.createElement('div'); w.className = 'cw';
       var b = document.createElement('button'); b.type = 'button'; b.className = 'card';
-      b.innerHTML = '<span class="ic">' + g.icon + '</span><b>' + g.name + '</b><span class="d">' + g.desc + '</span><span class="bst">' + (g.free ? 'Free · ' : '') + 'Best ' + (scores[g.id] || 0) + '</span>';
+      b.innerHTML = '<span class="art a-' + g.id + '"><span class="tg l">#' + pi + '</span><span class="tg r' + (g.free ? ' free' : '') + '">' + (g.free ? 'FREE' : '₦2,000') + '</span><span class="aico" aria-hidden="true">' + g.icon + '</span></span>' +
+        '<span class="cbody"><b>' + g.name + '</b><span class="d">' + g.desc + '</span><span class="bst">Play now · Best ' + (scores[g.id] || 0) + '</span></span>';
       b.addEventListener('click', function () { ensureAudio(); launch(g.id, false); });
       w.appendChild(b);
-      pi++;
-      var a = document.createElement('a'); a.className = 'ord'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = g.free ? 'Order · Free' : 'Order · ₦2,000';
+      var r = document.createElement('div'); r.className = 'crow';
+      r.innerHTML = '<div class="price' + (g.free ? ' free' : '') + '">' + (g.free ? 'FREE' : '₦2,000') + '<small>per game</small></div>';
+      var a = document.createElement('a'); a.className = 'ord'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Order on WhatsApp';
       a.href = 'https://wa.me/2349132204427?text=' + encodeURIComponent('Hello Vitalstar support, I want to purchase a game from Rexweb Nexora..\nName: ...\nID: #' + pi + ' (' + g.name + ')');
-      w.appendChild(a);
+      r.appendChild(a); w.appendChild(r);
       grid.appendChild(w);
     });
   });
