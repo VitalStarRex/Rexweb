@@ -160,36 +160,8 @@ html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
 .grid .tool>h3{display:none}
 .grid .tool.closed{display:none}
 .grid .tool:not(.closed){border-top:1px solid var(--line)}
-
-/* ---- landscape-style layout ---- */
-.rot,.rot body{max-width:none!important}
-.rot body{overflow-x:hidden;overflow-y:auto}
-.ctrl.ctrl{order:-3!important;position:sticky;top:0;z-index:30;margin:0 0 8px;padding:6px 8px;
-  grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px 6px}
-.ctrl>h3,.ctrl .hint{display:none!important}
-.ctrl.closed>.f{display:flex}
-.ctrl .f{gap:2px}
-.ctrl .f label{font-size:9px;letter-spacing:.08em}
-.ctrl select,.ctrl .btn,.ctrl input[type=range]{min-height:34px;height:34px;font-size:12px}
-.ctrl .row{gap:4px}.ctrl .row .btn{padding:0;min-width:0}.ctrl .oct{min-width:18px}
-.ctrl .f:has(#bFs){display:none!important}
-.ctrl .btn{padding:0 4px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctrl .f label{white-space:nowrap}
-.ctrl #bFs{display:none}
-.kb{height:clamp(100px,30vh,160px)}
-.rot .kb{height:clamp(100px,calc(100vw - 230px),160px)}
-@media(orientation:landscape) and (max-height:520px){
-  .kb{height:clamp(100px,calc(100dvh - 215px),160px)}
-}
-.w{padding-bottom:5px}
-.rrow .btn{flex:1 1 130px;padding:0 18px;min-height:44px}
-.tab{min-height:48px}
-.piano{margin-bottom:8px}
 </style>
 <script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script>
-<script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script><style>
-
-</style>
 </head>
 <body>
 <div class="app">
@@ -203,7 +175,7 @@ html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
     <div class="kbwrap" id="wrap"><div class="kb lab-k" id="kb"></div></div>
   </div>
 
-  <div class="panel ctrl">
+  <div class="panel ctrl closed">
     <h3><button type="button" class="tgl" aria-expanded="false"><span>⚙ Sound Settings</span><i>▾</i></button></h3>
     <div class="f"><label for="snd">Sound</label>
       <select id="snd">
@@ -935,18 +907,6 @@ document.addEventListener('click',function(e){
   if(!c&&p.classList.contains('tool'))document.querySelectorAll('.tool').forEach(function(o){if(o!==p){o.classList.add('closed');o.querySelector('.tgl').setAttribute('aria-expanded','false')}});
   b.setAttribute('aria-expanded',String(!c));
 });
-/* turn the phone itself to landscape: browsers only allow this after a tap, so do it on the first touch */
-var triedLand=false;
-function goLandscape(){
-  if(triedLand)return;triedLand=true;
-  if(innerWidth>innerHeight)return;
-  var fp;try{fp=de.requestFullscreen&&de.requestFullscreen()}catch(e){}
-  Promise.resolve(fp).then(function(){return screen.orientation.lock('landscape')}).catch(function(){
-    if(innerHeight>innerWidth)setRot(true);
-  });
-}
-window.addEventListener('pointerdown',goLandscape,{capture:true,once:true});
-window.addEventListener('keydown',goLandscape,{capture:true,once:true});
 })();
 </script>
 </body>
