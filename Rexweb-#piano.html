@@ -145,6 +145,21 @@ body{padding-top:max(6px,env(safe-area-inset-top))}
 .kb{height:clamp(130px,calc(100vh - 112px),300px);height:clamp(130px,calc(100dvh - 112px),300px)}
 .ctrl{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
 }
+
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
+.app,.piano,.panel,.grid,.ctrl{max-width:100%;min-width:0}
+.rrow{flex-wrap:wrap}.rrow .btn{white-space:normal}
+.tool select,.tool input,.tool .btn,.ctrl select{max-width:100%}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:10px 12px}
+.tab{all:unset;box-sizing:border-box;min-width:0;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--gold);font:600 10px var(--font);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;touch-action:manipulation;text-align:center}
+.tab b{font-size:20px;font-weight:400;line-height:1}
+.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab.on{background:var(--accent);color:#00141c;border-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab:active{opacity:.8}
+.grid .tool>h3{display:none}
+.grid .tool.closed{display:none}
+.grid .tool:not(.closed){border-top:1px solid var(--line)}
 </style>
 <script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script>
 </head>
@@ -184,6 +199,7 @@ body{padding-top:max(6px,env(safe-area-inset-top))}
   </div>
 
   <div class="grid">
+    <div class="tabs" role="tablist"><button type="button" class="tab" role="tab" aria-selected="false"><b>🎵</b><span>Songs</span></button><button type="button" class="tab" role="tab" aria-selected="false"><b>⏱</b><span>Metro</span></button><button type="button" class="tab" role="tab" aria-selected="false"><b>🎹</b><span>Notes</span></button><button type="button" class="tab" role="tab" aria-selected="false"><b>🎤</b><span>Voice</span></button><button type="button" class="tab" role="tab" aria-selected="false"><b>🥁</b><span>Drums</span></button></div>
     <div class="sec">Practice</div>
     <div class="panel tool closed">
       <h3><button type="button" class="tgl" aria-expanded="false"><span>🎵 Song Player</span><i>▾</i></button></h3>
@@ -224,6 +240,15 @@ body{padding-top:max(6px,env(safe-area-inset-top))}
         <audio id="rAud" controls></audio>
         <div class="rrow"><a class="btn on" id="rDl" href="#">⬇ Download</a><button class="btn" id="rDel" type="button">Delete</button></div>
       </div>
+    </div>
+    <div class="panel tool closed">
+      <h3><button type="button" class="tgl" aria-expanded="false"><span>🥁 Drum Rhythm</span><i>▾</i></button></h3>
+      <div class="rrow"><select id="dSty" aria-label="Drum style"></select><button class="btn on" id="dBtn" type="button">▶ Start</button></div>
+      <div class="rrow"><button class="btn" id="dDn" type="button" aria-label="Slower">−</button><span class="bpm" id="dBpm">100</span><button class="btn" id="dUp" type="button" aria-label="Faster">+</button></div>
+      <input id="dRng" type="range" min="40" max="220" value="100" aria-label="Drum tempo">
+      <div class="rrow"><span class="lbl">Volume</span><input id="dVol" type="range" min="0" max="100" value="70" style="flex:1"></div>
+      <div class="rrow"><button class="btn" id="dAuto" type="button" aria-pressed="false">Auto: off</button><button class="btn" id="dSync" type="button" aria-pressed="false">Sync song: off</button></div>
+      <p class="msg">Auto starts the drums when you play and stops them when you pause. Sync matches the Song Player's tempo.</p>
     </div>
   </div>
   <div class="foot">REXWEB NEXORA · PLAY ANYTHING</div>
@@ -357,7 +382,7 @@ function nlog(on,h,vel){
   nrec.ev.push({t:performance.now(),on:on,id:h.id,m:h.m,s:h.s,v:vel});
 }
 function noteOn(i,vel){
-  var m=12*(oct+1)+i+trans,h=mkVoice(m,AC.currentTime+LEAD,sound,vel);
+  var m=12*(oct+1)+i+trans,h=mkVoice(m,AC.currentTime+LEAD,sound,vel);autoDrum();
   voices[i]=h;nlog(1,h,vel);
 }
 function noteOff(i,fast){
@@ -442,7 +467,7 @@ window.addEventListener('keyup',function(e){
   if(i>=0&&i<COUNT)up(i);
 });
 window.addEventListener('blur',function(){releaseAll();spaceDown=false;releaseSustain()});
-document.addEventListener('visibilitychange',function(){if(document.hidden){releaseAll();spaceDown=false;releaseSustain();pbStop();mStop()}});
+document.addEventListener('visibilitychange',function(){if(document.hidden){releaseAll();spaceDown=false;releaseSustain();pbStop();mStop();dStop()}});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(b&&e.detail>0)b.blur()});
 
 /* ===== controls ===== */
@@ -561,7 +586,7 @@ function parseSong(sg){
 }
 var songSel=$('#song');
 SONGS.forEach(function(s,i){var o=document.createElement('option');o.value=i;o.textContent=s.n;songSel.appendChild(o)});
-function sUI(){$('#sPlay').textContent='▶ Play';$('#sPlay').classList.add('on');progReset($('#sProg'));$('#sMsg').textContent='Done. Pick another song or play it again.'}
+function sUI(){if(dr.sync&&dr.song)dStop();$('#sPlay').textContent='▶ Play';$('#sPlay').classList.add('on');progReset($('#sProg'));$('#sMsg').textContent='Done. Pick another song or play it again.'}
 $('#sSpd').addEventListener('input',function(e){$('#sSpdV').textContent=e.target.value+'%'});
 $('#sPlay').addEventListener('click',function(){
   if(pb.on){pbStop();return}
@@ -570,7 +595,7 @@ $('#sPlay').addEventListener('click',function(){
   releaseAll();setOct(sg.o);
   var sp=$('#sSpd').value/100,seq=parseSong(sg);
   var total=pbPlay(seq,sp,sUI,loopOn?function(){$('#sPlay').click()}:null);
-  $('#sPlay').textContent='■ Stop';$('#sPlay').classList.remove('on');
+  if(dr.sync&&!dr.on){dSetBpm(sg.bpm*sp);dStart(.15);dr.song=1}$('#sPlay').textContent='■ Stop';$('#sPlay').classList.remove('on');
   progress($('#sProg'),total);
   $('#sMsg').textContent='Playing "'+sg.n+'"... follow the gold keys.';
 });
@@ -773,7 +798,7 @@ function midiOn(m,v){
   if(!audio())return;
   if(mv[m])midiOff(m,1);
   var vel=Math.max(.2,v/127),h=mkVoice(m,AC.currentTime+LEAD,sound,vel);
-  mv[m]=h;nlog(1,h,vel);
+  mv[m]=h;nlog(1,h,vel);autoDrum();
   var k=kidx(m);if(k)k.classList.add('on');
   NOTEEL.textContent=NAMES[m%12]+(Math.floor(m/12)-1);
 }
@@ -824,6 +849,56 @@ $('#brt').addEventListener('input',function(e){tone=e.target.value/100});
 $('#vlc').addEventListener('change',function(e){fixV=e.target.value==='1';e.target.blur()});
 $('#sLoop').addEventListener('click',function(e){loopOn=!loopOn;var b=e.currentTarget;b.classList.toggle('on',loopOn);b.setAttribute('aria-pressed',String(loopOn));b.textContent='🔁 Loop: '+(loopOn?'on':'off')});
 
+
+/* ===== drums ===== */
+var STY={
+ 'Rock':{k:'x.......x.x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+ 'Pop':{k:'x.......x.......',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+ 'Disco':{k:'x...x...x...x...',s:'....x.......x...',o:'..x...x...x...x.'},
+ 'Funk':{k:'x..x..x.x.......',s:'....x..x.x..x..x',h:'xxxxxxxxxxxxxxxx'},
+ 'Hip-Hop':{k:'x.....x...x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+ 'Latin':{k:'x..x..x...x..x..',s:'..x..x..x..x..x.',h:'x.x.x.x.x.x.x.x.'},
+ 'Ballad':{k:'x...........x...',s:'........x.......',h:'x...x...x...x...'},
+ 'Waltz':{k:'x...........',s:'....x...x...',h:'x.x.x.x.x.x.'}
+};
+var dr={on:false,bpm:100,idx:0,next:0,timer:0,vol:.7,style:'Rock',auto:false,sync:false,as:0,song:0,last:0,g:null,nb:null};
+var dSel=$('#dSty');Object.keys(STY).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=k;dSel.appendChild(o)});
+function dBus(){if(dr.g)return;dr.g=AC.createGain();dr.g.gain.value=dr.vol;try{dr.g.connect(dest.src)}catch(e){dr.g.connect(AC.destination)}var n=AC.sampleRate*.4|0;dr.nb=AC.createBuffer(1,n,AC.sampleRate);var d=dr.nb.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1}
+function dTone(t,type,f0,f1,dur,v){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*.4);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(dr.g);o.start(t);o.stop(t+dur+.02)}
+function dNoise(t,type,f,dur,v){var s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=dr.nb;fl.type=type;fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(fl);fl.connect(g);g.connect(dr.g);s.start(t);s.stop(t+dur+.02)}
+function dStep(t,i){
+  var st=STY[dr.style],j=i%st.k.length;
+  if(st.k[j]==='x')dTone(t,'sine',150,45,.3,1);
+  if(st.s&&st.s[j]==='x'){dNoise(t,'bandpass',2200,.16,.8);dTone(t,'triangle',200,150,.1,.4)}
+  if(st.h&&st.h[j]==='x')dNoise(t,'highpass',7500,.05,j%4?.22:.4);
+  if(st.o&&st.o[j]==='x')dNoise(t,'highpass',7000,.22,.3);
+}
+function dSched(){
+  while(dr.next<AC.currentTime+.2){dStep(dr.next,dr.idx);dr.next+=60/dr.bpm/4;dr.idx++}
+  if(dr.as&&performance.now()-dr.last>6000)dStop();
+}
+function dUI(){$('#dBtn').textContent=dr.on?'■ Stop':'▶ Start';$('#dBtn').classList.toggle('on',!dr.on)}
+function dStart(lead){if(!audio())return;dBus();dr.on=true;dr.idx=0;dr.next=AC.currentTime+(lead||.06);clearInterval(dr.timer);dr.timer=setInterval(dSched,25);dSched();dUI()}
+function dStop(){if(!dr.on)return;dr.on=false;clearInterval(dr.timer);dr.as=0;dr.song=0;dUI()}
+function dSetBpm(n){dr.bpm=Math.max(40,Math.min(220,Math.round(n)));$('#dBpm').textContent=dr.bpm;$('#dRng').value=dr.bpm}
+function autoDrum(){if(!dr.auto)return;dr.last=performance.now();if(!dr.on){dStart();dr.as=1}}
+$('#dBtn').addEventListener('click',function(){if(dr.on)dStop();else{dr.as=0;dStart()}});
+dSel.addEventListener('change',function(e){dr.style=e.target.value;dr.idx=0;e.target.blur()});
+$('#dDn').addEventListener('click',function(){dSetBpm(dr.bpm-2)});
+$('#dUp').addEventListener('click',function(){dSetBpm(dr.bpm+2)});
+$('#dRng').addEventListener('input',function(e){dSetBpm(+e.target.value)});
+$('#dVol').addEventListener('input',function(e){dr.vol=e.target.value/100;if(dr.g)dr.g.gain.setTargetAtTime(dr.vol,AC.currentTime,.03)});
+function dTog(id,key,label){$(id).addEventListener('click',function(e){dr[key]=!dr[key];var b=e.currentTarget;b.classList.toggle('on',dr[key]);b.setAttribute('aria-pressed',String(dr[key]));b.textContent=label+(dr[key]?'on':'off')})}
+dTog('#dAuto','auto','Auto: ');dTog('#dSync','sync','Sync song: ');
+
+/* ===== tab bar: one row of buttons, panel opens below ===== */
+var TABS=document.querySelectorAll('.tab'),PN=document.querySelectorAll('.grid .tool');
+TABS.forEach(function(b,i){b.addEventListener('click',function(){
+  var open=!PN[i].classList.contains('closed');
+  PN.forEach(function(p){p.classList.add('closed')});
+  TABS.forEach(function(t){t.classList.remove('on');t.setAttribute('aria-selected','false')});
+  if(!open){PN[i].classList.remove('closed');b.classList.add('on');b.setAttribute('aria-selected','true')}
+})});
 
 /* ===== collapsible tools ===== */
 document.addEventListener('click',function(e){
