@@ -122,6 +122,8 @@ html{scroll-behavior:smooth;overscroll-behavior-y:none}
 .grid>.sec:first-child+.tool{border-top:0}
 .grid .tool:not(.closed){gap:12px;padding-bottom:16px}
 .grid .tool:not(.closed) .tgl{color:var(--accent)}
+button,select{-webkit-user-select:none;user-select:none}
+.tgl:active{opacity:.7}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script>
@@ -225,7 +227,7 @@ var SOUNDS=[
  {g:.36,atk:.002,dec:3.5,sus:0,rel:1.2,lp:9000,lpk:2,L:[[1,1,0,[1,.5]],[2.4,.6,0,[1]],[4.2,.35,0,[1]]]},
  {g:.5,atk:.002,dec:1.6,sus:0,rel:.5,lp:3000,lpk:3,nz:.03,L:[[1,1,0,[1,.35,.15,.07]]]}
 ];
-var WAVES={};
+var LITE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),WAVES={},MAXV=LITE?12:16,LEAD=.02;
 function wave(si,li,h){
   var k=si+'_'+li;
   if(!WAVES[k]){var re=new Float32Array(h.length+1),im=new Float32Array(h.length+1);for(var i=0;i<h.length;i++)im[i+1]=h[i];WAVES[k]=AC.createPeriodicWave(re,im)}
@@ -233,8 +235,8 @@ function wave(si,li,h){
 }
 
 function makeIR(sec){
-  var n=AC.sampleRate*sec|0,b=AC.createBuffer(2,n,AC.sampleRate);
-  for(var c=0;c<2;c++){var d=b.getChannelData(c);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.6)*Math.min(1,i/(AC.sampleRate*.004))}
+  var n=AC.sampleRate*sec|0,b=AC.createBuffer(1,n,AC.sampleRate);
+  for(var c=0;c<1;c++){var d=b.getChannelData(c);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.6)*Math.min(1,i/(AC.sampleRate*.004))}
   return b;
 }
 var rvOn=true;
@@ -248,18 +250,20 @@ function audio(){
   if(!AC){
     try{
       var C=window.AudioContext||window.webkitAudioContext;
-      try{AC=new C({latencyHint:'interactive'})}catch(e){AC=new C()}
+      try{AC=new C({latencyHint:'balanced'})}catch(e){AC=new C()}
       var comp=AC.createDynamicsCompressor();
       comp.threshold.value=-20;comp.knee.value=20;comp.ratio.value=8;comp.attack.value=.004;comp.release.value=.25;
       master=AC.createGain();master.gain.value=vol*.8;
-      bus=AC.createGain();dry=AC.createGain();wet=AC.createGain();conv=AC.createConvolver();conv.buffer=makeIR(.9);
+      bus=AC.createGain();dry=AC.createGain();wet=AC.createGain();conv=AC.createConvolver();conv.buffer=makeIR(.6);
       bus.connect(dry);dry.connect(master);bus.connect(conv);conv.connect(wet);wet.connect(master);
-      master.connect(comp);comp.connect(AC.destination);
-      dest=AC.createMediaStreamDestination();comp.connect(dest);
+      var hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=28;hp.Q.value=.5;
+      master.connect(hp);hp.connect(comp);comp.connect(AC.destination);
+      dest=AC.createMediaStreamDestination();dest.src=comp;
       clickBus=AC.createGain();clickBus.gain.value=.7;clickBus.connect(AC.destination);
       var n=AC.sampleRate*.05|0;noiseBuf=AC.createBuffer(1,n,AC.sampleRate);
       var d=noiseBuf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;
       wet.gain.value=rv*.9;dry.gain.value=1-rv*.3;setRev();
+      LEAD=Math.max(.015,Math.min(.05,(AC.baseLatency||0)+.01));
       SOUNDS.forEach(function(S,si){S.L.forEach(function(L,li){if(typeof L[3]!=='string')wave(si,li,L[3])})});
     }catch(e){AC=null}
   }
@@ -269,7 +273,7 @@ function audio(){
 
 /* ===== one note (used by keys, songs and playback) ===== */
 function mkVoice(midi,t,si,vel){
-  var S=SOUNDS[si],f=440*Math.pow(2,(midi-69)/12),ATK=Math.max(.006,SOUNDS[si].atk);
+  var S=SOUNDS[si],f=440*Math.pow(2,(midi-69)/12),ATK=Math.max(.01,SOUNDS[si].atk);
   var env=AC.createGain(),lp=AC.createBiquadFilter(),all=[];
   lp.type='lowpass';lp.Q.value=.5;
   var cut=Math.min(16000,S.lp+f*S.lpk);
@@ -291,7 +295,7 @@ function mkVoice(midi,t,si,vel){
     if(tc&&!S.sus)o.stop(t+ATK+tc*7);
     alive++;o.onended=ended;all.push(o);
   });
-  if(S.nz&&noiseBuf){
+  if(S.nz&&noiseBuf&&!LITE){
     var ns=AC.createBufferSource(),ng=AC.createGain(),nf=AC.createBiquadFilter();
     ns.buffer=noiseBuf;nf.type='bandpass';nf.frequency.value=Math.min(5000,f*3+400);nf.Q.value=.8;
     ng.gain.setValueAtTime(S.nz*vel*2,t);ng.gain.exponentialRampToValueAtTime(.0001,t+.045);
@@ -312,7 +316,7 @@ function mkVoice(midi,t,si,vel){
   };
   h.kill=function(){h.rel(0,true,true)};
   live.push(h);
-  while(live.length>14)live[0].kill();
+  while(live.length>MAXV)live[0].kill();
   return h;
 }
 
@@ -323,7 +327,7 @@ function nlog(on,h,vel){
   nrec.ev.push({t:performance.now(),on:on,id:h.id,m:h.m,s:h.s,v:vel});
 }
 function noteOn(i,vel){
-  var m=12*(oct+1)+i,h=mkVoice(m,AC.currentTime,sound,vel);
+  var m=12*(oct+1)+i,h=mkVoice(m,AC.currentTime+LEAD,sound,vel);
   voices[i]=h;nlog(1,h,vel);
 }
 function noteOff(i,fast){
@@ -331,7 +335,7 @@ function noteOff(i,fast){
   delete voices[i];h.rel(0,fast);nlog(0,h);
 }
 
-var kb=$('#kb');
+var kb=$('#kb'),NOTEEL=$('#note');
 function sus(){return sustainBtn||spaceDown}
 function pedal(){$('#ped').classList.toggle('on',sus())}
 function down(i,vel){
@@ -340,7 +344,7 @@ function down(i,vel){
   if(voices[i])noteOff(i,true);
   noteOn(i,vel||.8);
   keys[i].classList.add('on');
-  $('#note').textContent=NAMES[i%12]+(oct+Math.floor(i/12));
+  NOTEEL.textContent=NAMES[i%12]+(oct+Math.floor(i/12));
 }
 function up(i){
   if(!held[i])return;
@@ -377,8 +381,7 @@ function build(){
     (function(idx,e){
       e.addEventListener('pointerdown',function(ev){
         try{e.releasePointerCapture(ev.pointerId)}catch(_){}
-        var r=e.getBoundingClientRect();
-        down(idx,.55+.45*Math.min(1,Math.max(0,(ev.clientY-r.top)/r.height)));
+        down(idx,.55+.45*Math.min(1,Math.max(0,ev.offsetY/(e._h||e.offsetHeight||1))));
       });
       e.addEventListener('pointerenter',function(ev){if(ev.buttons)down(idx,.8)});
       ['pointerup','pointerleave','pointercancel'].forEach(function(n){e.addEventListener(n,function(){up(idx)})});
@@ -387,8 +390,10 @@ function build(){
   }
 }
 build();
+function measure(){keys.forEach(function(k){k._h=k.offsetHeight})}
+measure();
 var rt=0;
-window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(wantCount()!==COUNT)build()},150)});
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(wantCount()!==COUNT)build();measure()},150)});
 
 /* computer keyboard */
 window.addEventListener('keydown',function(e){
@@ -452,7 +457,7 @@ function pbPlay(seq,speed,ui,done){
   function pump(){
     var lim=AC.currentTime+1;
     while(i<seq.length&&t0+seq[i].at/speed<lim){
-      var e=seq[i++],now=AC.currentTime,st=Math.max(now,t0+e.at/speed),en=Math.max(st+.05,t0+(e.at+e.dur)/speed);
+      var e=seq[i++],now=AC.currentTime,st=Math.max(now+LEAD,t0+e.at/speed),en=Math.max(st+.05,t0+(e.at+e.dur)/speed);
       var v=mkVoice(e.m,st,e.s,e.v||.75);v.rel(en,false);pb.vs.push(v);
       pb.timers.push(setTimeout(function(m){hl(m,true)}.bind(null,e.m),Math.max(0,(st-now)*1000)));
       pb.timers.push(setTimeout(function(m){hl(m,false)}.bind(null,e.m),Math.max(0,(en-now)*1000)));
@@ -525,7 +530,7 @@ function click(t,acc){
   o.connect(g);g.connect(clickBus);o.start(t);o.stop(t+.08);
 }
 function sched(){
-  while(mt.next<AC.currentTime+.12){
+  while(mt.next<AC.currentTime+.2){
     var b=mt.idx%mt.beats;
     click(mt.next,b===0);mt.q.push({t:mt.next,i:b});
     mt.next+=60/mt.bpm;mt.idx++;
@@ -625,7 +630,7 @@ function begin(){
   chunks=[];var m=pickMime();
   try{rec=new MediaRecorder(dest.stream,m?{mimeType:m}:undefined)}catch(e){rmsg('Recording is not supported on this browser.');cleanMic();return}
   rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};
-  rec.onstop=finish;rec.start();t0=Date.now();
+  rec.onstop=finish;try{dest.src.connect(dest)}catch(e){}rec.start();t0=Date.now();
   $('#rBtn').textContent='■ Stop';$('#rBtn').classList.add('live');
   var buf=analyser?new Uint8Array(analyser.fftSize):null;
   tInt=setInterval(function(){
@@ -640,6 +645,7 @@ function cleanMic(){
   analyser=null;$('#rLvl').style.width='0';
 }
 function finish(){
+  try{dest.src.disconnect(dest)}catch(e){}
   clearInterval(tInt);cleanMic();
   $('#rBtn').textContent='● Record';$('#rBtn').classList.remove('live');
   var type=(rec&&rec.mimeType)||'audio/webm',blob=new Blob(chunks,{type:type});
