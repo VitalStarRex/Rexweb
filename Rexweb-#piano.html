@@ -435,7 +435,7 @@ transition:transform .05s var(--ease),box-shadow .05s}
         <button class="btn ib sq" id="oUp" type="button" aria-label="Octave up">▶</button>
         <span class="oct" id="oVal" title="Starting octave">4</span>
       </div>
-      <div class="ks"><span class="gl">Key<br>Height</span><button class="btn ib sq" id="hDn" type="button" aria-label="Shorter keys">−</button><span class="oct" id="hVal">100%</span><button class="btn ib sq" id="hUp" type="button" aria-label="Taller keys">+</button></div>
+      <div class="ks"><span class="gl">Key<br>Height</span><button class="btn ib sq" id="hDn" type="button" aria-label="Shorter keys">−</button><span class="oct" id="hVal">60%</span><button class="btn ib sq" id="hUp" type="button" aria-label="Taller keys">+</button></div>
       <div class="ks"><span class="gl">Key<br>Size</span><button class="btn ib sq" id="kDn" type="button" aria-label="Smaller keys">−</button><button class="btn ib sq" id="kUp" type="button" aria-label="Wider keys">+</button></div>
     </div>
 
@@ -502,7 +502,7 @@ var BLACK={1:1,3:1,6:1,8:1,10:1};
 var KEYMAP=['a','w','s','e','d','f','t','g','y','h','u','j','k','o','l','p',';',"'"];
 
 var AC=null,master,bus,dry,wet,conv,dest,noiseBuf,clickBus;
-var COUNT=25,oct=4,sound=0,vol=0.7,rv=0.25,sustainBtn=false,spaceDown=false,kw=60,WH=10;
+var COUNT=25,oct=4,sound=0,vol=0.7,rv=0.25,sustainBtn=false,spaceDown=false,kw=0,WH=18;
 var voices={},held={},sustained={},keys=[],live=[],vid=0;
 
 /* ===== sound bank (light on the phone: 1-3 oscillators per note) ===== */
@@ -661,6 +661,7 @@ function releaseAll(){
 var SEMW=[0,2,4,5,7,9,11];
 function wantCount(){
   var wr=$('#wrap'),w=(wr&&wr.clientWidth)||window.innerWidth;
+  if(!kw)kw=w/18;
   WH=Math.max(8,Math.min(22,Math.round(w/kw)));
   return 12*Math.floor((WH-1)/7)+SEMW[(WH-1)%7]+1;
 }
@@ -1199,11 +1200,11 @@ mini.addEventListener('pointermove',function(e){if(e.buttons)miniPick(e)});
 miniUpd();
 
 /* key height: scales the keyboard height in every view (saved on this device) */
-var kh=.7;try{kh=parseFloat(localStorage.getItem('nx_kh'))||.7}catch(e){}
+var kh=.6;try{kh=parseFloat(localStorage.getItem('nx_kh2'))||.6}catch(e){}
 function setKh(n,save){
   kh=Math.max(.5,Math.min(1.8,Math.round(n*10)/10));
   de.style.setProperty('--kh',kh);$('#hVal').textContent=Math.round(kh*100)+'%';
-  if(save!==false)try{localStorage.setItem('nx_kh',kh)}catch(e){}
+  if(save!==false)try{localStorage.setItem('nx_kh2',kh)}catch(e){}
   setTimeout(measure,30);
 }
 $('#hDn').addEventListener('click',function(){setKh(kh-.1)});
