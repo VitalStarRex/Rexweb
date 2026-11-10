@@ -37,7 +37,7 @@ box-shadow:0 40px 70px -30px #000,inset 0 1px 0 #ffffff3d,inset 0 -2px 0 #000}
 .ped.on{color:#00141c;background:var(--gold);border-color:var(--gold)}
 .felt{height:9px;margin:0 -1px;border-radius:3px 3px 0 0;background:linear-gradient(#8a1426,#4b0914);box-shadow:inset 0 -3px 4px #0009,0 -1px 0 #000}
 .kbwrap{overflow:hidden;background:#000;padding:0 1px 5px;touch-action:none;border-radius:0 0 8px 8px}
-.kb{position:relative;display:flex;height:clamp(108px,19vh,170px);width:100%;user-select:none;-webkit-user-select:none}
+.kb{position:relative;display:flex;height:clamp(190px,34vh,320px);width:100%;user-select:none;-webkit-user-select:none}
 .w{position:relative;flex:1 1 0;min-width:0;height:100%;border:0;border-right:1px solid #aaa592;border-radius:0 0 6px 6px;
 background:linear-gradient(180deg,#d9d4c3 0,#fffefb 7%,#f8f5ec 72%,#e4dfce 100%);
 box-shadow:inset 0 -7px 8px -5px #0003,0 4px 0 #8d8877;display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;font:700 12px var(--font);color:#6a6f85;cursor:pointer;touch-action:none;transition:transform .03s}
@@ -134,7 +134,7 @@ button,select{-webkit-user-select:none;user-select:none}
 .rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;transform-origin:0 0;transform:translateX(100vw) rotate(90deg);overflow:auto;padding-top:6px}
 .rot .piano{padding:6px 10px 8px;border-radius:14px}
 .rot .sub,.rot .hint{display:none}
-.rot .kb{height:clamp(96px,calc(100vw - 262px),200px)}
+.rot .kb{height:clamp(130px,calc(100vw - 230px),280px)}
 .rot .ctrl{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(orientation:landscape) and (max-height:520px){
 body{padding-top:max(6px,env(safe-area-inset-top))}
@@ -142,7 +142,7 @@ body{padding-top:max(6px,env(safe-area-inset-top))}
 .piano{order:-2;padding:6px 10px 8px;border-radius:14px}
 .top{padding:0 6px 4px}.sub,.hint{display:none}
 .felt{height:6px}
-.kb{height:clamp(96px,calc(100vh - 252px),200px);height:clamp(96px,calc(100dvh - 252px),200px)}
+.kb{height:clamp(130px,calc(100vh - 220px),280px);height:clamp(130px,calc(100dvh - 220px),280px)}
 .ctrl{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
 }
 
@@ -275,13 +275,13 @@ html:not(.rot) .bar2 .mnav{order:9;flex-basis:100%}
 @media(min-width:560px){.bar2{flex-wrap:nowrap}.bar2 .mnav{min-width:150px}}
 .bar2 .land{flex:none;padding:0 12px}
 @media(orientation:landscape) and (max-height:520px){
-.kb{height:clamp(96px,calc(100vh - 290px),200px);height:clamp(96px,calc(100dvh - 290px),200px)}
+.kb{height:clamp(130px,calc(100vh - 250px),280px);height:clamp(130px,calc(100dvh - 250px),280px)}
 .g{gap:4px;padding:5px 8px}
 .sl{font-size:9px}.sl input[type=range]{height:18px}
 .sl input[type=range]::-webkit-slider-thumb{width:18px;height:18px;margin-top:-5px}
 .gr select{min-height:26px;font-size:11px}
 }
-.rot .kb{height:clamp(96px,calc(100vw - 290px),200px)}
+.rot .kb{height:clamp(130px,calc(100vw - 250px),280px)}
 .rot .g{gap:4px}
 .rot .sl{font-size:9px}.rot .sl input[type=range]{height:18px}
 .rot .gr select{min-height:26px;font-size:11px}
@@ -307,13 +307,22 @@ html:not(.rot) .sl span{width:52px}
 .gR .gr .gl,.gL .gr .gl{display:none}
 .g{padding:5px 6px}
 }
+.lsm{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;background:#02040cf2;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.lsm.show{display:flex}
+.lsb{width:min(92vw,460px);text-align:center;padding:34px 24px 28px;border:1px solid #e8c46a88;border-radius:24px;background:linear-gradient(165deg,#13204a,#060a18);box-shadow:0 30px 80px #000,0 0 40px #35e8ff33}
+.lsp{font-size:84px;line-height:1;display:inline-block;animation:turn 2.4s ease-in-out infinite}
+.lsb h2{margin:14px 0 8px;font-size:clamp(24px,7vw,32px);letter-spacing:.06em;color:var(--gold)}
+.lsb p{margin:0 0 24px;font-size:clamp(15px,4vw,18px);line-height:1.45;color:var(--muted)}
+.lsok{all:unset;box-sizing:border-box;width:100%;min-height:64px;padding:12px 16px;border-radius:16px;cursor:pointer;touch-action:manipulation;font:700 clamp(16px,4.6vw,20px) var(--font);color:#00141c;text-align:center;background:linear-gradient(180deg,#c9fbff 0,#35e8ff 48%,#10aec9 52%,#5cf0ff 100%);box-shadow:0 0 22px #35e8ffaa,inset 0 1px 0 #fff}
+.lsok:active{transform:scale(.97)}
+.lsok:focus-visible{outline:3px solid #fff;outline-offset:3px}
 </style>
 <script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script>
 </head>
 <body>
 <div class="app">
 
-  <div class="rotate" id="rotBan"><span class="ph" aria-hidden="true">📱</span><span class="rt"><b>Play in landscape</b>Wider keys and more room for your fingers.</span><button class="btn on" id="bRot" type="button">⟳ Landscape</button></div>
+  <div class="lsm" id="lsm" role="dialog" aria-modal="true" aria-labelledby="lsT"><div class="lsb"><div class="lsp" aria-hidden="true">📱</div><h2 id="lsT">Play in landscape</h2><p>Turn your phone sideways for wider keys and more room for your fingers.</p><button type="button" class="lsok" id="lsOk">OK — Turn on landscape mode</button></div></div>
 
   <div class="piano">
     <div class="top">
@@ -367,7 +376,6 @@ html:not(.rot) .sl span{width:52px}
         <span class="oct" id="oVal" title="Starting octave">4</span>
       </div>
       <div class="ks"><span class="gl">Key<br>Size</span><button class="btn ib sq" id="kDn" type="button" aria-label="Smaller keys">−</button><button class="btn ib sq" id="kUp" type="button" aria-label="Wider keys">+</button></div>
-      <button class="btn land" id="bFs" type="button">⟳ Landscape</button>
     </div>
 
     <div class="felt"></div>
@@ -379,7 +387,7 @@ html:not(.rot) .sl span{width:52px}
     <div class="sec">Practice</div>
     <div class="panel tool closed">
       <h3><button type="button" class="tgl" aria-expanded="false"><span>🎵 Song Player</span><i>▾</i></button></h3>
-      <div class="rrow"><button class="btn" id="sLoop" type="button" aria-pressed="false">🔁 Loop: off</button><select id="sRep" aria-label="Repeat the song"><option value="1">Play once</option><option value="2" selected>Play 2× (longer)</option><option value="3">Play 3×</option><option value="4">Play 4×</option></select></div>
+      <div class="rrow"><button class="btn" id="sLoop" type="button" aria-pressed="false">🔁 Loop: off</button><select id="sRep" aria-label="Repeat the song"><option value="1" selected>Play once (full song)</option><option value="2">Play 2×</option><option value="3">Play 3×</option><option value="4">Play 4×</option></select></div>
       <div class="prog"><i id="sProg"></i></div>
       <p class="msg" id="sMsg">Pick a song in Music Control at the top and press Play. Gold keys show you what to press. Uses the sound you chose.</p>
     </div>
@@ -436,9 +444,7 @@ var AC=null,master,bus,dry,wet,conv,dest,noiseBuf,clickBus;
 var COUNT=25,oct=4,sound=0,vol=0.7,rv=0.25,sustainBtn=false,spaceDown=false,kw=60,WH=10;
 var voices={},held={},sustained={},keys=[],live=[],vid=0;
 
-/* ===== sound bank (light on the phone: 1-3 oscillators per note) =====
-   L = layers [pitch multiple, loudness, detune cents, harmonic strengths (or a wave name)]
-   dec = decay seconds (0 = held while key down), sus = level it decays to, rel = release time, nz = hammer noise */
+/* ===== sound bank (light on the phone: 1-3 oscillators per note) ===== */
 var SOUNDS=[
  {g:.5,atk:.003,dec:3.2,sus:0,rel:.3,lp:1600,lpk:6,nz:.05,L:[[1,1,0,[1,.55,.32,.2,.12,.08,.05]]]},
  {g:.42,atk:.003,dec:2.2,sus:0,rel:.22,lp:3200,lpk:8,nz:.09,L:[[1,1,0,[1,.8,.6,.45,.3,.22,.15]]]},
@@ -709,49 +715,59 @@ function progress(el,sec){
 }
 function progReset(el){el.style.transition='none';el.style.width='0'}
 
-/* ===== song player ===== */
+/* ===== song player: 50 songs, each one played through from start to finish ===== */
 var SONGS=[
- {n:'Twinkle, Twinkle Little Star',o:4,bpm:100,s:'C4 C4 G4 G4 A4 A4 G4/2 F4 F4 E4 E4 D4 D4 C4/2 G4 G4 F4 F4 E4 E4 D4/2 G4 G4 F4 F4 E4 E4 D4/2 C4 C4 G4 G4 A4 A4 G4/2 F4 F4 E4 E4 D4 D4 C4/2'},
- {n:'Ode to Joy',o:4,bpm:110,s:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4/1.5 D4/.5 D4/2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4/1.5 C4/.5 C4/2 D4 D4 E4 C4 D4 E4/.5 F4/.5 E4 C4 D4 E4/.5 F4/.5 E4 D4 C4 D4 G3/2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4/1.5 C4/.5 C4/2'},
- {n:'Happy Birthday',o:3,bpm:90,s:'G3/.75 G3/.25 A3 G3 C4 B3/2 G3/.75 G3/.25 A3 G3 D4 C4/2 G3/.75 G3/.25 G4 E4 C4 B3 A3 F4/.75 F4/.25 E4 C4 D4 C4/2'},
- {n:'Jingle Bells',o:4,bpm:130,s:'E4 E4 E4/2 E4 E4 E4/2 E4 G4 C4/1.5 D4/.5 E4/4 F4 F4 F4/1.5 F4/.5 F4 E4 E4 E4/.5 E4/.5 E4 D4 D4 E4 D4/2 G4/2'},
- {n:'Mary Had a Little Lamb',o:4,bpm:120,s:'E4 D4 C4 D4 E4 E4 E4/2 D4 D4 D4/2 E4 G4 G4/2 E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4/4'},
- {n:'Fur Elise (intro)',o:4,bpm:140,s:'E5/.5 D#5/.5 E5/.5 D#5/.5 E5/.5 B4/.5 D5/.5 C5/.5 A4/1.5 C4/.5 E4/.5 A4/.5 B4/1.5 E4/.5 G#4/.5 B4/.5 C5/1.5 E4/.5 E5/.5 D#5/.5 E5/.5 D#5/.5 E5/.5 B4/.5 D5/.5 C5/.5 A4/1.5 C4/.5 E4/.5 A4/.5 B4/1.5 E4/.5 C5/.5 B4/.5 A4/2'}
+ {n:'1. Twinkle, Twinkle Little Star',o:4,bpm:100,s:'C4 C4 G4 G4 A4 A4 G4/2 F4 F4 E4 E4 D4 D4 C4/2 G4 G4 F4 F4 E4 E4 D4/2 G4 G4 F4 F4 E4 E4 D4/2 C4 C4 G4 G4 A4 A4 G4/2 F4 F4 E4 E4 D4 D4 C4/2'},
+ {n:'2. Ode to Joy',o:4,bpm:110,s:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4/1.5 D4/.5 D4/2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4/1.5 C4/.5 C4/2 D4 D4 E4 C4 D4 E4/.5 F4/.5 E4 C4 D4 E4/.5 F4/.5 E4 D4 C4 D4 G3/2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4/1.5 C4/.5 C4/2'},
+ {n:'3. Happy Birthday',o:3,bpm:90,s:'G3/.75 G3/.25 A3 G3 C4 B3/2 G3/.75 G3/.25 A3 G3 D4 C4/2 G3/.75 G3/.25 G4 E4 C4 B3 A3 F4/.75 F4/.25 E4 C4 D4 C4/2'},
+ {n:'4. Jingle Bells',o:4,bpm:130,s:'E4 E4 E4/2 E4 E4 E4/2 E4 G4 C4/1.5 D4/.5 E4/4 F4 F4 F4/1.5 F4/.5 F4 E4 E4 E4/.5 E4/.5 E4 D4 D4 E4 D4/2 G4/2 E4 E4 E4/2 E4 E4 E4/2 E4 G4 C4/1.5 D4/.5 E4/4 F4 F4 F4/1.5 F4/.5 F4 E4 E4 E4/.5 E4/.5 G4 G4 F4 D4 C4/4'},
+ {n:'5. Mary Had a Little Lamb',o:4,bpm:120,s:'E4 D4 C4 D4 E4 E4 E4/2 D4 D4 D4/2 E4 G4 G4/2 E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4/4'},
+ {n:'6. Amazing Grace',o:4,bpm:90,s:'D4 G4/2 B4/.5 G4/.5 B4/2 A4 G4/2 E4 D4/2 D4 G4/2 B4/.5 G4/.5 B4/2 A4 D5/3 D5 B4/2 D5/.5 B4/.5 D5/2 B4 G4/2 E4 D4/2 D4 G4/2 B4/.5 G4/.5 B4/2 A4 G4/3'},
+ {n:'7. When the Saints Go Marching In',o:4,bpm:120,s:'C4 E4 F4 G4/4 C4 E4 F4 G4/4 C4 E4 F4 G4/2 E4/2 C4/2 E4/2 D4/4 E4 E4 D4 C4/2 C4/2 E4/2 G4/2 G4 F4/4 E4 F4 G4 E4/2 C4/2 D4/2 D4 C4/4'},
+ {n:'8. London Bridge',o:4,bpm:120,s:'G4/1.5 A4/.5 G4 F4 E4 F4 G4/2 D4 E4 F4/2 E4 F4 G4/2 G4/1.5 A4/.5 G4 F4 E4 F4 G4/2 D4 G4 E4 C4/2'},
+ {n:'9. Row, Row, Row Your Boat',o:4,bpm:110,s:'C4/1.5 C4/1.5 C4 D4/.5 E4/1.5 E4 D4/.5 E4 F4/.5 G4/3 C5/.5 C5/.5 C5/.5 G4/.5 G4/.5 G4/.5 E4/.5 E4/.5 E4/.5 C4/.5 C4/.5 C4/.5 G4 F4/.5 E4 D4/.5 C4/3'},
+ {n:'10. Silent Night',o:4,bpm:70,s:'G4/1.5 A4/.5 G4 E4/3 G4/1.5 A4/.5 G4 E4/3 D5/2 D5 B4/3 C5/2 C5 G4/3 A4/2 A4 C5/1.5 B4/.5 A4 G4/1.5 A4/.5 G4 E4/3 D5/2 D5 F5/1.5 D5/.5 B4 C5/3 E5/3 C5 G4 E4 G4/1.5 F4/.5 D4 C4/3'},
+ {n:'11. Frère Jacques',o:4,bpm:120,s:'C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4/2 E4 F4 G4/2 G4/.5 A4/.5 G4/.5 F4/.5 E4 C4 G4/.5 A4/.5 G4/.5 F4/.5 E4 C4 C4 G3 C4/2 C4 G3 C4/2'},
+ {n:'12. Old MacDonald Had a Farm',o:4,bpm:120,s:'G4 G4 G4 D4 E4 E4 D4/2 B4 B4 A4 A4 G4/3 D4 G4 G4 G4 D4 E4 E4 D4/2 B4 B4 A4 A4 G4/3 D4/.5 D4/.5 G4 G4 G4 D4/.5 D4/.5 G4 G4 G4 G4/.5 G4/.5 G4 G4 G4 D4 E4 E4 D4/2 B4 B4 A4 A4 G4/3'},
+ {n:'13. Yankee Doodle',o:4,bpm:130,s:'C4 C4 D4 E4 C4 E4 D4 G3 C4 C4 D4 E4 C4/2 B3/2 C4 C4 D4 E4 F4 E4 D4 C4 B3 G3 A3 B3 C4/2 C4/2'},
+ {n:'14. Auld Lang Syne',o:4,bpm:100,s:'D4 G4/1.5 G4/.5 G4 B4 A4/1.5 G4/.5 A4 B4/1.5 G4/.5 G4 B4 D5/2 E5/2 E5/1.5 D5/.5 B4 B4 G4/1.5 A4/.5 G4 A4 B4/1.5 G4/.5 E4 E4 D4 G4/2'},
+ {n:'15. Hot Cross Buns',o:4,bpm:120,s:'E4 D4 C4/2 E4 D4 C4/2 C4/.5 C4/.5 C4/.5 C4/.5 D4/.5 D4/.5 D4/.5 D4/.5 E4 D4 C4/2'},
+ {n:'16. Baa Baa Black Sheep',o:4,bpm:110,s:'C4 C4 G4 G4 A4/.5 A4/.5 A4/.5 A4/.5 G4/2 F4 F4 E4 E4 D4 D4 C4/2 G4 F4 F4 E4 E4 D4 D4 C4/2 G4 F4 F4 E4 E4 D4 D4 C4/2'},
+ {n:'17. Itsy Bitsy Spider',o:4,bpm:120,s:'G3 C4 C4 C4 D4/.5 E4/1.5 E4 E4 D4 C4 D4 E4 C4/2 E4/.5 E4/.5 E4 F4/.5 G4/1.5 G4 G4 F4 E4 F4 G4 E4/2'},
+ {n:"18. Brahms' Lullaby",o:4,bpm:90,s:'E4/.5 E4/.5 G4 E4/.5 E4/.5 G4 E4/.5 G4/.5 C5 B4 A4/.5 A4/.5 G4/2 D4/.5 E4/.5 F4 D4/.5 E4/.5 F4 D4/.5 F4/.5 B4 A4 G4/.5 G4/.5 C5/2'},
+ {n:'19. Joy to the World',o:4,bpm:120,s:'C5 B4/1.5 A4/.5 G4/1.5 F4/.5 E4 D4 C4/2 G4 A4/1.5 A4/.5 B4/1.5 B4/.5 C5/2 C5 C5 B4 A4 G4 G4/1.5 F4/.5 E4 C5 C5 B4 A4 G4 G4/1.5 F4/.5 E4 E4 E4 E4 E4 E4/.5 F4/.5 G4/1.5 F4/.5 E4 D4 D4 D4 D4/.5 E4/.5 F4/1.5 E4/.5 D4 C4/3'},
+ {n:'20. Canon in D (melody)',o:5,bpm:80,s:'F#5/2 E5/2 D5/2 C#5/2 B4/2 A4/2 B4/2 C#5/2 D5/2 C#5/2 B4/2 A4/2 G4/2 F#4/2 G4/2 E4/2'},
+ {n:'21. C Major Scale',o:4,bpm:110,s:'C4 D4 E4 F4 G4 A4 B4 C5 B4 A4 G4 F4 E4 D4 C4/2'},
+ {n:'22. Camptown Races',o:4,bpm:130,s:'G4 G4 E4 G4 A4 G4 E4 C4 D4 E4 D4/2 G4 G4 E4 G4 A4 G4 E4 D4 E4 D4 C4/2'},
+ {n:'23. Greensleeves',o:4,bpm:120,s:'A3 C4/2 D4 E4/1.5 F4/.5 E4 D4/2 B3 G3/1.5 A3/.5 B3 C4/2 A3 A3/1.5 G#3/.5 A3 B3/2 G#3 E3/2 A3 C4/2 D4 E4/1.5 F4/.5 E4 D4/2 B3 G3/1.5 A3/.5 B3 C4 B3 A3 G#3/1.5 F#3/.5 G#3 A3/3'},
+ {n:"24. Beethoven's 5th (theme)",o:4,bpm:110,s:'G4/.5 G4/.5 G4/.5 D#4/3 F4/.5 F4/.5 F4/.5 D4/3 G4/.5 G4/.5 G4/.5 D#4/3 G#4/.5 G#4/.5 G#4/.5 F4/3'},
+ {n:'25. Eine Kleine Nachtmusik',o:4,bpm:120,s:'G4/1.5 D4/.5 G4/1.5 D4/.5 G4 D4 G4 B4 D5/2 C5/1.5 A4/.5 C5/1.5 A4/.5 C5 A4 F#4 A4 D4/2 G4/1.5 D4/.5 G4/1.5 D4/.5 G4 D4 G4 B4 D5/2 C5/1.5 A4/.5 C5/1.5 A4/.5 C5 A4 F#4 A4 D4/2'},
+ {n:'26. Minuet in G',o:4,bpm:120,s:'D5 G4/.5 A4/.5 B4/.5 C5/.5 D5 G4 G4 E5 C5/.5 D5/.5 E5/.5 F#5/.5 G5 G4 G4 C5 D5/.5 C5/.5 B4/.5 A4/.5 B4 C5/.5 B4/.5 A4/.5 G4/.5 F#4 G4/.5 A4/.5 B4/.5 G4/.5 B4 A4/3'},
+ {n:'27. Deck the Halls',o:4,bpm:120,s:'C5/1.5 B4/.5 A4 G4 F4 G4 A4 F4 G4/.5 A4/.5 B4/.5 G4/.5 A4/1.5 G4/.5 F4 E4 D4/2 C5/1.5 B4/.5 A4 G4 F4 G4 A4 F4 G4/.5 A4/.5 B4/.5 G4/.5 A4/1.5 G4/.5 F4 E4 C4/2'},
+ {n:'28. O Come, All Ye Faithful',o:4,bpm:100,s:'G4 G4 D4 G4 A4 D4/2 D4 B4 A4 B4 C5 B4/2 G4 G4 F#4 G4 F#4 E4 D4 G4 A4 G4/3'},
+ {n:'29. We Wish You a Merry Christmas',o:4,bpm:120,s:'D4 G4 G4/.5 A4/.5 G4/.5 F#4/.5 E4 E4 E4 A4 A4/.5 B4/.5 A4/.5 G4/.5 F#4 D4 D4 B4 B4/.5 C5/.5 B4/.5 A4/.5 G4 E4 D4/.5 D4/.5 E4 A4 F#4 G4/2'},
+ {n:'30. God Save the King',o:4,bpm:90,s:'C4 C4 D4 B3/1.5 C4/.5 D4 E4 E4 F4 E4/1.5 D4/.5 C4 D4 C4/1.5 B3/.5 C4/3'},
+ {n:'31. C Major Arpeggio',o:4,bpm:120,s:'C4 E4 G4 C5 G4 E4 C4/2 D4 F4 A4 D5 A4 F4 D4/2'},
+ {n:'32. Chromatic Scale',o:4,bpm:130,s:'C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4 B4 C5'},
+ {n:'33. Fur Elise',o:4,bpm:140,s:'E5/.5 D#5/.5 E5/.5 D#5/.5 E5/.5 B4/.5 D5/.5 C5/.5 A4/1.5 C4/.5 E4/.5 A4/.5 B4/1.5 E4/.5 G#4/.5 B4/.5 C5/1.5 E4/.5 E5/.5 D#5/.5 E5/.5 D#5/.5 E5/.5 B4/.5 D5/.5 C5/.5 A4/1.5 C4/.5 E4/.5 A4/.5 B4/1.5 E4/.5 C5/.5 B4/.5 A4/2'},
+ {n:'34. Au Clair de la Lune',o:4,bpm:100,s:'C4 C4 C4 D4 E4/2 D4/2 C4 E4 D4 D4 C4/4 C4 C4 C4 D4 E4/2 D4/2 C4 E4 D4 D4 C4/4 D4 D4 D4 D4 A4/2 A4/2 D4 C4 B3 A3 G3/4 C4 C4 C4 D4 E4/2 D4/2 C4 E4 D4 D4 C4/4'},
+ {n:'35. Lightly Row',o:4,bpm:110,s:'G4 E4 E4/2 F4 D4 D4/2 C4 D4 E4 F4 G4 G4 G4/2 G4 E4 E4 E4 F4 D4 D4 D4 C4 E4 G4 G4 C4/4'},
+ {n:'36. Hanon Exercise No. 1',o:3,bpm:140,s:'C3/.5 E3/.5 F3/.5 G3/.5 A3/.5 G3/.5 F3/.5 E3/.5 D3/.5 F3/.5 G3/.5 A3/.5 B3/.5 A3/.5 G3/.5 F3/.5 E3/.5 G3/.5 A3/.5 B3/.5 C4/.5 B3/.5 A3/.5 G3/.5 F3/.5 A3/.5 B3/.5 C4/.5 D4/.5 C4/.5 B3/.5 A3/.5 C4/2'},
+ {n:'37. G Major Scale',o:4,bpm:110,s:'G3 A3 B3 C4 D4 E4 F#4 G4 F#4 E4 D4 C4 B3 A3 G3/2'},
+ {n:'38. A Minor Scale',o:4,bpm:110,s:'A3 B3 C4 D4 E4 F4 G4 A4 G4 F4 E4 D4 C4 B3 A3/2'},
+ {n:'39. Pentatonic Scale',o:4,bpm:120,s:'C4 D4 E4 G4 A4 C5 A4 G4 E4 D4 C4/2'},
+ {n:'40. Blues Scale',o:4,bpm:110,s:'C4 D#4 F4 F#4 G4 A#4 C5 A#4 G4 F#4 F4 D#4 C4/2'},
+ {n:'41. G Major Arpeggio',o:4,bpm:120,s:'G3 B3 D4 G4 D4 B3 G3/2 A3 C4 E4 A4 E4 C4 A3/2'},
+ {n:'42. F Major Arpeggio',o:4,bpm:120,s:'F3 A3 C4 F4 C4 A3 F3/2 G3 B3 D4 G4 D4 B3 G3/2'},
+ {n:'43. Octave Jumps',o:3,bpm:120,s:'C3 C4 D3 D4 E3 E4 F3 F4 G3 G4 A3 A4 B3 B4 C4 C5/2'},
+ {n:'44. Broken Chords',o:4,bpm:120,s:'C4 E4 G4 E4 C4 E4 G4 E4 F4 A4 C5 A4 F4 A4 C5 A4 G4 B4 D5 B4 G4 B4 D5 B4 C4 E4 G4 C5/2'},
+ {n:'45. Thirds Exercise',o:4,bpm:120,s:'C4 E4 D4 F4 E4 G4 F4 A4 G4 B4 A4 C5 B4 D5 C5/2'},
+ {n:'46. Chromatic Scale Down',o:4,bpm:130,s:'C5 B4 A#4 A4 G#4 G4 F#4 F4 E4 D#4 D4 C#4 C4/2'},
+ {n:'47. Triad Climb',o:4,bpm:110,s:'C4 E4 G4 D4 F4 A4 E4 G4 B4 F4 A4 C5 G4 B4 D5 A4 C5 E5 C5/2'},
+ {n:'48. Whole Tone Scale',o:4,bpm:110,s:'C4 D4 E4 F#4 G#4 A#4 C5 A#4 G#4 F#4 E4 D4 C4/2'},
+ {n:'49. A Minor Arpeggio',o:4,bpm:120,s:'A3 C4 E4 A4 E4 C4 A3/2 D4 F4 A4 D5 A4 F4 D4/2'},
+ {n:'50. Harmonic Minor Scale',o:4,bpm:110,s:'A3 B3 C4 D4 E4 F4 G#4 A4 G#4 F4 E4 D4 C4 B3 A3/2'}
 ];
-SONGS.push(
- {n:'Amazing Grace',o:4,bpm:90,s:'D4 G4/2 B4/.5 G4/.5 B4/2 A4 G4/2 E4 D4/2 D4 G4/2 B4/.5 G4/.5 B4/2 A4 D5/3'},
- {n:'When the Saints Go Marching In',o:4,bpm:120,s:'C4 E4 F4 G4/4 C4 E4 F4 G4/4 C4 E4 F4 G4/2 E4/2 C4/2 E4/2 D4/4 E4 E4 D4 C4/2 C4/2 E4/2 G4/2 G4 F4/4 E4 F4 G4 E4/2 C4/2 D4/2 D4 C4/4'},
- {n:'London Bridge',o:4,bpm:120,s:'G4/1.5 A4/.5 G4 F4 E4 F4 G4/2 D4 E4 F4/2 E4 F4 G4/2 G4/1.5 A4/.5 G4 F4 E4 F4 G4/2 D4 G4 E4 C4/2'},
- {n:'Row, Row, Row Your Boat',o:4,bpm:110,s:'C4/1.5 C4/1.5 C4 D4/.5 E4/1.5 E4 D4/.5 E4 F4/.5 G4/3 C5/.5 C5/.5 C5/.5 G4/.5 G4/.5 G4/.5 E4/.5 E4/.5 E4/.5 C4/.5 C4/.5 C4/.5 G4 F4/.5 E4 D4/.5 C4/3'},
- {n:'Silent Night',o:4,bpm:70,s:'G4/1.5 A4/.5 G4 E4/3 G4/1.5 A4/.5 G4 E4/3 D5/2 D5 B4/3 C5/2 C5 G4/3 A4/2 A4 C5/1.5 B4/.5 A4 G4/1.5 A4/.5 G4 E4/3 D5/2 D5 F5/1.5 D5/.5 B4 C5/3 E5/3 C5 G4 E4 G4/1.5 F4/.5 D4 C4/3'}
-);
-SONGS.push(
- {n:'Frère Jacques',o:4,bpm:120,s:'C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4/2 E4 F4 G4/2 G4/.5 A4/.5 G4/.5 F4/.5 E4 C4 G4/.5 A4/.5 G4/.5 F4/.5 E4 C4 C4 G3 C4/2 C4 G3 C4/2'},
- {n:'Old MacDonald Had a Farm',o:4,bpm:120,s:'G4 G4 G4 D4 E4 E4 D4/2 B4 B4 A4 A4 G4/3 D4 G4 G4 G4 D4 E4 E4 D4/2 B4 B4 A4 A4 G4/3'},
- {n:'Yankee Doodle',o:4,bpm:130,s:'C4 C4 D4 E4 C4 E4 D4 G3 C4 C4 D4 E4 C4/2 B3/2 C4 C4 D4 E4 F4 E4 D4 C4 B3 G3 A3 B3 C4/2 C4/2'},
- {n:'Oh! Susanna',o:4,bpm:120,s:'C4/.5 D4/.5 E4 G4 G4 A4/.5 G4/.5 E4 C4 D4/.5 E4/.5 E4 E4 D4 C4/.5 D4/.5 E4 G4 G4 A4/.5 G4/.5 E4 C4 D4/.5 E4/.5 E4 D4 D4 C4/2'},
- {n:'Auld Lang Syne',o:4,bpm:100,s:'D4 G4/1.5 G4/.5 G4 B4 A4/1.5 G4/.5 A4 B4/1.5 G4/.5 G4 B4 D5/2 E5/2 E5/1.5 D5/.5 B4 B4 G4/1.5 A4/.5 G4 A4 B4/1.5 G4/.5 E4 E4 D4 G4/2'},
- {n:'Hot Cross Buns',o:4,bpm:120,s:'E4 D4 C4/2 E4 D4 C4/2 C4/.5 C4/.5 C4/.5 C4/.5 D4/.5 D4/.5 D4/.5 D4/.5 E4 D4 C4/2'},
- {n:'Baa Baa Black Sheep',o:4,bpm:110,s:'C4 C4 G4 G4 A4/.5 A4/.5 A4/.5 A4/.5 G4/2 F4 F4 E4 E4 D4 D4 C4/2'},
- {n:'Itsy Bitsy Spider',o:4,bpm:120,s:'G3 C4 C4 C4 D4/.5 E4/1.5 E4 E4 D4 C4 D4 E4 C4/2'},
- {n:"Brahms' Lullaby",o:4,bpm:90,s:'E4/.5 E4/.5 G4 E4/.5 E4/.5 G4 E4/.5 G4/.5 C5 B4 A4/.5 A4/.5 G4/2'},
- {n:'Joy to the World',o:4,bpm:120,s:'C5 B4/1.5 A4/.5 G4/1.5 F4/.5 E4 D4 C4/2 G4 A4/1.5 A4/.5 B4/1.5 B4/.5 C5/2'},
- {n:'Canon in D (melody)',o:5,bpm:80,s:'F#5/2 E5/2 D5/2 C#5/2 B4/2 A4/2 B4/2 C#5/2 D5/2 C#5/2 B4/2 A4/2 G4/2 F#4/2 G4/2 E4/2'},
- {n:'C Major Scale (practice)',o:4,bpm:110,s:'C4 D4 E4 F4 G4 A4 B4 C5 B4 A4 G4 F4 E4 D4 C4/2'}
-);
-SONGS.push(
- {n:'Camptown Races',o:4,bpm:130,s:'G4 G4 E4 G4 A4 G4 E4 C4 D4 E4 D4/2'},
- {n:'Greensleeves',o:4,bpm:120,s:'A3 C4/2 D4 E4/1.5 F4/.5 E4 D4/2 B3 G3/1.5 A3/.5 B3 C4/2 A3 A3/1.5 G#3/.5 A3 B3/2 G#3 E3/2'},
- {n:"Beethoven's 5th (motif)",o:4,bpm:110,s:'G4/.5 G4/.5 G4/.5 D#4/3 F4/.5 F4/.5 F4/.5 D4/3'},
- {n:'Eine Kleine Nachtmusik',o:4,bpm:120,s:'G4/1.5 D4/.5 G4/1.5 D4/.5 G4 D4 G4 B4 D5/2'},
- {n:'Minuet in G',o:4,bpm:120,s:'D5 G4/.5 A4/.5 B4/.5 C5/.5 D5 G4 G4 E5 C5/.5 D5/.5 E5/.5 F#5/.5 G5 G4 G4'},
- {n:'Deck the Halls',o:4,bpm:120,s:'C5/1.5 B4/.5 A4 G4 F4 G4 A4 F4 G4/.5 A4/.5 B4/.5 G4/.5 A4/1.5 G4/.5 F4 E4 F4/2'},
- {n:'O Come, All Ye Faithful',o:4,bpm:100,s:'G4 G4 D4 G4 A4 D4/2 D4 B4 A4 B4 C5 B4/2'},
- {n:'We Wish You a Merry Christmas',o:4,bpm:120,s:'D4 G4 G4/.5 A4/.5 G4/.5 F#4/.5 E4 E4 E4 A4 A4/.5 B4/.5 A4/.5 G4/.5 F#4 D4 D4 B4 B4/.5 C5/.5 B4/.5 A4/.5 G4 E4 D4/.5 D4/.5 E4 A4 F#4 G4/2'},
- {n:'God Save the King',o:4,bpm:90,s:'C4 C4 D4 B3/1.5 C4/.5 D4 E4 E4 F4 E4/1.5 D4/.5 C4 D4 C4/1.5 B3/.5 C4/3'},
- {n:'Arpeggio (practice)',o:4,bpm:120,s:'C4 E4 G4 C5 G4 E4 C4/2 D4 F4 A4 D5 A4 F4 D4/2'},
- {n:'Chromatic Scale (practice)',o:4,bpm:130,s:'C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4 B4 C5'}
-);
 var SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function parseSong(sg){
   var a=[],t=0,b=60/sg.bpm;
@@ -1005,20 +1021,22 @@ $('#bMidi').addEventListener('click',function(){
 /* ===== landscape / full screen ===== */
 var de=document.documentElement;
 function rotOn(){return document.documentElement.classList.contains('rot')}
-function setRot(on){de.classList.toggle('rot',on);$('#bFs').textContent=on||document.fullscreenElement?'⟳ Exit landscape':'⟳ Landscape';releaseAll();setTimeout(function(){build();measure()},60)}
+function setRot(on){de.classList.toggle('rot',on);releaseAll();setTimeout(function(){build();measure()},60)}
 window.addEventListener('resize',function(){if(rotOn()&&innerWidth>innerHeight)setRot(false)});
-$('#bFs').addEventListener('click',function(){
-  if(document.fullscreenElement||rotOn()){setRot(false);if(document.fullscreenElement)document.exitFullscreen();return}
+function goLandscape(){
   var fp;try{fp=de.requestFullscreen&&de.requestFullscreen()}catch(e){}
   Promise.resolve(fp).then(function(){return screen.orientation.lock('landscape')}).catch(function(){if(innerHeight>innerWidth)setRot(true)});
-});
+}
 document.addEventListener('fullscreenchange',function(){
-  var on=!!document.fullscreenElement;$('#bFs').textContent=on?'⟳ Exit landscape':'⟳ Landscape';
-  if(!on){try{screen.orientation.unlock()}catch(e){}}
+  if(!document.fullscreenElement){try{screen.orientation.unlock()}catch(e){}}
   setTimeout(function(){build();measure()},120);
 });
+/* big pop-up: stays until the player presses OK */
+var lsm=$('#lsm');
+if(innerHeight>innerWidth&&innerWidth<=900){lsm.classList.add('show');$('#lsOk').focus()}
+$('#lsOk').addEventListener('click',function(){lsm.classList.remove('show');goLandscape()});
+lsm.addEventListener('keydown',function(e){if(e.key==='Escape')e.preventDefault();if(e.key==='Tab'){e.preventDefault();$('#lsOk').focus()}});
 window.addEventListener('orientationchange',function(){releaseAll();setTimeout(function(){if(wantCount()!==COUNT)build();measure()},250)});
-$('#bRot').addEventListener('click',function(){$('#bFs').click()});
 
 /* ===== transpose, chords, brightness, velocity, loop ===== */
 var trans=0,chord=0,ext={},fixV=false,loopOn=false,tone=1,CH=[0,[4,7],[3,7],[12],[7,12]];
@@ -1031,7 +1049,7 @@ $('#vlc').addEventListener('change',function(e){fixV=e.target.value==='1';e.targ
 $('#sLoop').addEventListener('click',function(e){loopOn=!loopOn;var b=e.currentTarget;b.classList.toggle('on',loopOn);b.setAttribute('aria-pressed',String(loopOn));b.textContent='🔁 Loop: '+(loopOn?'on':'off')});
 
 
-/* ===== drums ===== */
+/* ===== drums: 20 rhythms (16 steps = one bar of 16th notes; k=kick s=snare h=hi-hat o=open hat) ===== */
 var STY={
  'Rock':{k:'x.......x.x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
  'Pop':{k:'x.......x.......',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
@@ -1040,10 +1058,22 @@ var STY={
  'Hip-Hop':{k:'x.....x...x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
  'Latin':{k:'x..x..x...x..x..',s:'..x..x..x..x..x.',h:'x.x.x.x.x.x.x.x.'},
  'Ballad':{k:'x...........x...',s:'........x.......',h:'x...x...x...x...'},
- 'Waltz':{k:'x...........',s:'....x...x...',h:'x.x.x.x.x.x.'}
+ 'Waltz':{k:'x...........',s:'....x...x...',h:'x.x.x.x.x.x.'},
+ 'Reggae':{k:'........x.......',s:'........x.......',h:'x.x.x.x.x.x.x.x.'},
+ 'Blues':{k:'x.....x.x.....x.',s:'....x.......x...',h:'x.xxx.xxx.xxx.xx'},
+ 'Jazz Swing':{k:'x.......x.......',s:'..x.....x.....x.',h:'x.x..xx.x.x..xx.'},
+ 'Bossa Nova':{k:'x..x....x..x....',s:'..x..x...x..x...',h:'x.x.x.x.x.x.x.x.'},
+ 'Samba':{k:'x..xx..xx..xx..x',s:'..x...x...x...x.',h:'xxxxxxxxxxxxxxxx'},
+ 'Metal':{k:'xxx.xxx.xxx.xxx.',s:'....x.......x...',o:'x.......x.......'},
+ 'Punk':{k:'x...x...x...x...',s:'..x...x...x...x.',h:'xxxxxxxxxxxxxxxx'},
+ 'House':{k:'x...x...x...x...',s:'....x.......x...',o:'..x...x...x...x.'},
+ 'Techno':{k:'x...x...x...x...',h:'xxxxxxxxxxxxxxxx',o:'..x...x...x...x.'},
+ 'Country':{k:'x...x...x...x...',s:'..x...x...x...x.',h:'x.x.x.x.x.x.x.x.'},
+ 'R&B':{k:'x..x......x..x..',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+ 'March':{k:'x...x...x...x...',s:'x.xxx.x.x.xxx.x.',h:'x...x...x...x...'}
 };
 var dr={on:false,bpm:100,idx:0,next:0,timer:0,vol:.7,style:'Rock',auto:false,sync:false,as:0,song:0,last:0,g:null,nb:null};
-var dSel=$('#dSty');Object.keys(STY).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=k;dSel.appendChild(o)});
+var dSel=$('#dSty');Object.keys(STY).forEach(function(k,i){var o=document.createElement('option');o.value=k;o.textContent=(i+1)+'. '+k;dSel.appendChild(o)});
 function dBus(){if(dr.g)return;dr.g=AC.createGain();dr.g.gain.value=dr.vol;try{dr.g.connect(dest.src)}catch(e){dr.g.connect(AC.destination)}var n=AC.sampleRate*.4|0;dr.nb=AC.createBuffer(1,n,AC.sampleRate);var d=dr.nb.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1}
 function dTone(t,type,f0,f1,dur,v){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*.4);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(dr.g);o.start(t);o.stop(t+dur+.02)}
 function dNoise(t,type,f,dur,v){var s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=dr.nb;fl.type=type;fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(fl);fl.connect(g);g.connect(dr.g);s.start(t);s.stop(t+dur+.02)}
@@ -1072,7 +1102,7 @@ $('#dVol').addEventListener('input',function(e){dr.vol=e.target.value/100;if(dr.
 function dTog(id,key,label){$(id).addEventListener('click',function(e){dr[key]=!dr[key];var b=e.currentTarget;b.classList.toggle('on',dr[key]);b.setAttribute('aria-pressed',String(dr[key]));b.textContent=label+(dr[key]?'on':'off')})}
 dTog('#dAuto','auto','Auto: ');dTog('#dSync','sync','Sync song: ');
 
-/* ===== NEW: top console (instruments, sliders, mini keyboard, key size) ===== */
+/* ===== top console (instruments, sliders, mini keyboard, key size) ===== */
 var INST=document.querySelectorAll('.ib[data-s]');
 function setSound(n){
   sound=n;$('#snd').value=String(n);
