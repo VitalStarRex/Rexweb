@@ -289,6 +289,24 @@ html:not(.rot) .bar2 .mnav{order:9;flex-basis:100%}
 .gR .gr{gap:5px}
 .gR .gr .ib{padding:0 4px;font-size:11px}
 .gR .gr select#vlc{flex:1.4;padding:0 4px}
+
+/* fixes: portrait + narrow landscape */
+@media(max-width:700px) and (orientation:portrait){
+html:not(.rot) .gM,html:not(.rot) .gR{grid-column:1/-1}
+html:not(.rot) .gR{border-left:0;border-top:1px solid #213263}
+html:not(.rot) .gM{border-bottom:0}
+html:not(.rot) .sl b{display:block}
+html:not(.rot) .sl span{width:52px}
+}
+@media(max-width:760px) and (orientation:landscape){
+.bar1{grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr) minmax(0,1.2fr)}
+.gh .gl{display:none}
+.gh{justify-content:space-around}
+.insts{gap:4px}
+.ib{padding:0 3px;font-size:11px}
+.gR .gr .gl,.gL .gr .gl{display:none}
+.g{padding:5px 6px}
+}
 </style>
 <script>(function(){var seed={};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script>
 </head>
