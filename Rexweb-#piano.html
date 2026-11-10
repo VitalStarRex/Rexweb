@@ -935,8 +935,18 @@ document.addEventListener('click',function(e){
   if(!c&&p.classList.contains('tool'))document.querySelectorAll('.tool').forEach(function(o){if(o!==p){o.classList.add('closed');o.querySelector('.tgl').setAttribute('aria-expanded','false')}});
   b.setAttribute('aria-expanded',String(!c));
 });
-/* start in landscape by default */
-if(innerHeight>innerWidth)setRot(true);
+/* turn the phone itself to landscape: browsers only allow this after a tap, so do it on the first touch */
+var triedLand=false;
+function goLandscape(){
+  if(triedLand)return;triedLand=true;
+  if(innerWidth>innerHeight)return;
+  var fp;try{fp=de.requestFullscreen&&de.requestFullscreen()}catch(e){}
+  Promise.resolve(fp).then(function(){return screen.orientation.lock('landscape')}).catch(function(){
+    if(innerHeight>innerWidth)setRot(true);
+  });
+}
+window.addEventListener('pointerdown',goLandscape,{capture:true,once:true});
+window.addEventListener('keydown',goLandscape,{capture:true,once:true});
 })();
 </script>
 </body>
