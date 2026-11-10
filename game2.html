@@ -11,26 +11,26 @@ header{padding:34px 18px 24px;text-align:center}
 h1{margin:10px 0 8px;font-size:clamp(2rem,6vw,3.5rem);line-height:1.05;text-transform:uppercase;letter-spacing:.04em;text-shadow:0 0 28px #42eaff55}
 header p{margin:0 auto;max-width:620px;color:#b8c4df;line-height:1.6}
 .wrap{width:min(1180px,100%);margin:auto;padding:0 16px 36px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{--accent:#42eaff;position:relative;isolation:isolate;display:flex;min-height:150px;overflow:hidden;border:1px solid color-mix(in srgb,var(--accent),transparent 35%);border-radius:16px;background:#10172a;box-shadow:0 8px 30px #0006;transition:transform .2s,border-color .2s,box-shadow .2s;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{--accent:#42eaff;position:relative;isolation:isolate;display:flex;min-height:190px;overflow:hidden;border:1px solid color-mix(in srgb,var(--accent),transparent 35%);border-radius:20px;background:#10172a;box-shadow:0 8px 30px #0006;transition:transform .2s,border-color .2s,box-shadow .2s;color:#fff}
 .card:before{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--bg);background-size:cover,cover;background-position:center;transition:transform .35s}
 .card:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#050815f2 0%,#050815b0 55%,#05081540 100%)}
 .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 12px 32px #0008}
 .card:hover:before{transform:scale(1.06)}
 .tg{position:absolute;top:8px;padding:3px 9px;border-radius:99px;background:#000a;font-size:.72rem;font-weight:800;backdrop-filter:blur(4px)}
 .tg.l{left:8px;color:var(--accent)}.tg.r{right:8px;color:#ffc83d}
-.content{align-self:end;padding:12px;width:100%}
-.icon{font-size:1.5rem;filter:drop-shadow(0 0 10px var(--accent))}
-h2{font-size:1rem;margin:4px 0 10px;line-height:1.2}
+.content{align-self:end;padding:17px;width:100%}
+.icon{font-size:2rem;filter:drop-shadow(0 0 10px var(--accent))}
+h2{font-size:1.15rem;margin:8px 0 12px;line-height:1.2}
 .btns{display:flex;gap:6px}
 .play,.ord{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:6px 6px;border-radius:999px;font-size:.74rem;font-weight:900;letter-spacing:.03em;text-decoration:none;white-space:nowrap}
 .play{background:var(--accent);color:#07101b}
 .ord{background:#25d366;color:#05260f}
 .play:focus-visible,.ord:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .note{text-align:center;color:#93a2c4;font-size:.82rem;line-height:1.6;margin:22px auto 0}
-@media(min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card{min-height:170px}.content{padding:16px}}
+@media(min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{min-height:230px}.content{padding:20px}}
 @media(min-width:1040px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:340px){.btns{flex-direction:column}}
+@media(max-width:380px){.grid{grid-template-columns:1fr}.card{min-height:175px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
 </style></head><body>
 <header><div class="brand">REXWEB NEXORA</div><h1>Game Universe</h1><p>Choose your battle. Ten standalone arcade adventures, built for keyboard and mobile touch controls.</p></header>
