@@ -224,10 +224,10 @@ var SOUNDS=[
  {g:.22,atk:.35,dec:0,sus:1,rel:.7,lp:900,lpk:2.5,L:[[1,.6,-7,'sawtooth'],[1,.6,7,'sawtooth']]},
  {g:.22,atk:.01,dec:.8,sus:.7,rel:.12,lp:2200,lpk:4,L:[[1,.6,-9,'sawtooth'],[1,.6,9,'sawtooth'],[.5,.4,0,'sawtooth']]},
  {g:.5,atk:.002,dec:.9,sus:0,rel:.5,lp:7000,lpk:2,L:[[1,1,0,[1,.2]],[6.3,.15,0,[1]]]},
- {g:.36,atk:.002,dec:3.5,sus:0,rel:1.2,lp:9000,lpk:2,L:[[1,1,0,[1,.5]],[2.4,.6,0,[1]],[4.2,.35,0,[1]]]},
+ {g:.36,atk:.002,dec:2.4,sus:0,rel:.6,lp:6500,lpk:2,L:[[1,1,0,[1,.5]],[2.4,.6,0,[1]],[4.2,.3,0,[1]]]},
  {g:.5,atk:.002,dec:1.6,sus:0,rel:.5,lp:3000,lpk:3,nz:.03,L:[[1,1,0,[1,.35,.15,.07]]]}
 ];
-var LITE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),WAVES={},MAXV=LITE?12:16,LEAD=.02;
+var LITE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),WAVES={},MAXV=LITE?12:16,LEAD=.02,dying=[];
 function wave(si,li,h){
   var k=si+'_'+li;
   if(!WAVES[k]){var re=new Float32Array(h.length+1),im=new Float32Array(h.length+1);for(var i=0;i<h.length;i++)im[i+1]=h[i];WAVES[k]=AC.createPeriodicWave(re,im)}
@@ -247,6 +247,7 @@ function setRev(){
   if(want!==rvOn){rvOn=want;try{if(want)bus.connect(conv);else bus.disconnect(conv)}catch(e){}}
 }
 function audio(){
+  if(AC&&AC.state==='closed')AC=null;
   if(!AC){
     try{
       var C=window.AudioContext||window.webkitAudioContext;
@@ -282,7 +283,7 @@ function mkVoice(midi,t,si,vel){
   if(tc)lp.frequency.setTargetAtTime(cut*.55,t,tc*.6);
   env.gain.setValueAtTime(1,t);
   var alive=0;
-  function ended(){if(--alive<=0){try{env.disconnect();lp.disconnect()}catch(e){}}}
+  function ended(){if(--alive<=0){try{env.disconnect();lp.disconnect()}catch(e){}var q=live.indexOf(h);if(q>=0)live.splice(q,1);q=dying.indexOf(h);if(q>=0)dying.splice(q,1)}}
   S.L.forEach(function(L,li){
     var ff=f*L[0];if(ff>AC.sampleRate*.45)return;
     var o=AC.createOscillator(),g=AC.createGain(),pk=L[1]*vel*S.g;
@@ -306,6 +307,7 @@ function mkVoice(midi,t,si,vel){
   h.rel=function(tt,fast,force){
     if(h.done&&!force)return;
     h.done=true;
+    if(!fast&&!tt){dying.push(h);while(dying.length>8)dying.shift().kill()}
     var i=live.indexOf(h);if(i>=0)live.splice(i,1);
     var now=AC.currentTime,at=Math.max(tt||now,now),r=fast?.04:S.rel;
     env.gain.cancelScheduledValues(at);
@@ -342,7 +344,8 @@ function down(i,vel){
   if(held[i]||!audio())return;
   held[i]=true;delete sustained[i];
   if(voices[i])noteOff(i,true);
-  noteOn(i,vel||.8);
+  if(AC.state==='running')noteOn(i,vel||.8);
+  else{var pr=AC.resume();if(pr&&pr.then)pr.then(function(){if(held[i]&&!voices[i]&&AC.state==='running')noteOn(i,vel||.8)}).catch(function(){})}
   keys[i].classList.add('on');
   NOTEEL.textContent=NAMES[i%12]+(oct+Math.floor(i/12));
 }
@@ -350,7 +353,8 @@ function up(i){
   if(!held[i])return;
   delete held[i];
   keys[i].classList.remove('on');
-  if(sus())sustained[i]=true;else noteOff(i,false);
+  var v=voices[i];
+  if(sus()&&v&&SOUNDS[v.s].sus===0)sustained[i]=true;else noteOff(i,false);
 }
 function releaseSustain(){
   pedal();
@@ -684,7 +688,7 @@ $('#rDel').addEventListener('click',function(){
 });
 
 /* wake the audio engine on the very first touch or key so the first note is not late */
-['pointerdown','keydown'].forEach(function(n){window.addEventListener(n,audio,{once:true,capture:true})});
+['pointerdown','touchstart','keydown'].forEach(function(n){window.addEventListener(n,function(){if(!AC||AC.state==='closed')audio();else if(AC.state!=='running'){try{AC.resume()}catch(e){}}},{capture:true,passive:true})});
 
 /* ===== collapsible tools ===== */
 document.addEventListener('click',function(e){
