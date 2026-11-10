@@ -4,1165 +4,187 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#050b19" id="themeColor">
-
 <title>RexWeb Nexora | Your Digital World</title>
 <meta name="description" content="Explore digital tools, website templates, ebooks, games, and creative resources at RexWeb Nexora.">
-
 <style>
-:root {
-  --bg: #030918;
-  --surface: #071327;
-  --card: #081629;
-  --text: #f4f7ff;
-  --muted: #b5c4dd;
-  --border: #1e3b60;
-  --blue: #00c8ff;
-  --purple: #8650ff;
-  --pink: #ff43c6;
-  --green: #00e7b0;
-  --orange: #ff9b43;
-  --shadow: 0 12px 35px rgba(0,0,0,.25);
-}
-
-html[data-theme="light"] {
-  --bg: #f2f6ff;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --text: #101b32;
-  --muted: #52627c;
-  --border: #d4e0f4;
-  --shadow: 0 12px 35px rgba(24,48,90,.09);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 100px;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  transition: background .3s, color .3s;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  font: inherit;
-  cursor: pointer;
-}
-
-.container {
-  width: min(1200px, 92%);
-  margin: auto;
-  max-width: 100%;
-}
-
-/* HEADER */
-
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
-}
-
-.topbar {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.brand-logo {
-  width: 43px;
-  height: 43px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #00c8ff, #7250ff);
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 25px;
-  font-weight: 900;
-  box-shadow: 0 0 22px #087bff35;
-}
-
-.brand-name {
-  font-size: 23px;
-  font-weight: 900;
-  letter-spacing: -.8px;
-}
-
-.brand-name span {
-  color: var(--blue);
-}
-
-.brand small {
-  display: block;
-  color: var(--muted);
-  font-size: 10px;
-  margin-top: 3px;
-  letter-spacing: 1px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.theme-btn,
-.menu-btn,
-.search-btn {
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
-}
-
-.theme-btn:hover,
-.menu-btn:hover,
-.search-btn:hover {
-  border-color: var(--blue);
-}
-
-/* SEARCH */
-
-.search-box {
-  display: none;
-  padding: 0 0 10px;
-}
-
-.search-box.open {
-  display: block;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-  color: var(--text);
-  outline: none;
-}
-
-.search-box input:focus {
-  border-color: var(--blue);
-}
-
-/* HERO QUOTE */
-
-.quote-hero {
-  position: relative;
-  isolation: isolate;
-  min-height: 370px;
-  margin: 24px auto 8px;
-  padding: 55px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  border: 1px solid rgba(100, 160, 255, .25);
-  border-radius: 22px;
-  background:
-    linear-gradient(
-      115deg,
-      rgba(3, 9, 28, .91),
-      rgba(9, 20, 55, .72) 55%,
-      rgba(28, 10, 67, .76)
-    ),
-    url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85")
-    center/cover no-repeat;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
-}
-
-.quote-hero::before,
-.quote-hero::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  filter: blur(75px);
-  pointer-events: none;
-}
-
-.quote-hero::before {
-  top: -125px;
-  left: -65px;
-  background: rgba(0, 200, 255, .36);
-}
-
-.quote-hero::after {
-  right: -80px;
-  bottom: -145px;
-  background: rgba(134, 80, 255, .4);
-}
-
-.quote-content {
-  width: 100%;
-  max-width: 800px;
-}
-
-.quote-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 9px 15px;
-  margin-bottom: 22px;
-  color: #b8eaff;
-  background: rgba(255, 255, 255, .08);
-  border: 1px solid rgba(160, 210, 255, .3);
-  border-radius: 30px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-}
-
-.quote-content h1 {
-  color: #fff;
-  font-size: clamp(35px, 6vw, 64px);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  margin-bottom: 20px;
-  text-shadow: 0 4px 25px rgba(0, 0, 0, .28);
-}
-
-.quote-content h1 span {
-  display: inline-block;
-  background: linear-gradient(90deg, #65e0ff, #b5a2ff, #ffb7ec);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.quote-content p {
-  max-width: 620px;
-  margin: 0 auto;
-  color: rgba(255, 255, 255, .86);
-  font-size: clamp(14px, 2vw, 17px);
-  line-height: 1.8;
-}
-
-/* SECTION */
-
-.section {
-  padding: 30px 0 12px;
-}
-
-/* FEATURE CARDS — FOUR COLUMNS, TWO ROWS FOR EIGHT CARDS */
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  align-items: stretch;
-}
-
-.feature-card {
-  min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--card);
-  transition: transform .25s, border-color .25s, box-shadow .25s;
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent, var(--blue));
-  box-shadow: var(--shadow);
-}
-
-.card-image {
-  height: 140px;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #102d52, #261052);
-}
-
-.card-image img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  transition: transform .4s;
-}
-
-.feature-card:hover .card-image img {
-  transform: scale(1.06);
-}
-
-.card-image::after {
-  content: "";
-  position: absolute;
-  inset: 45% 0 0;
-  background: linear-gradient(transparent, rgba(3,9,24,.85));
-  pointer-events: none;
-}
-
-.card-icon {
-  position: absolute;
-  z-index: 2;
-  left: 14px;
-  bottom: -1px;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--accent, var(--blue));
-  color: white;
-  border: 2px solid var(--card);
-  font-size: 20px;
-}
-
-.card-body {
-  padding: 13px 14px 15px;
-}
-
-.card-body h3 {
-  font-size: 16px;
-  margin-bottom: 6px;
-}
-
-.card-body p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.5;
-  min-height: 36px;
-}
-
-.card-link {
-  display: inline-block;
-  margin-top: 10px;
-  color: var(--accent, var(--blue));
-  font-size: 12px;
-  font-weight: 900;
-}
-
-/* FEATURE BANNER */
-
-.cta-banner {
-  margin: 32px 0;
-  padding: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background:
-    radial-gradient(ellipse at 10% 120%, #6240ff26, transparent 45%),
-    var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.cta-main {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.rocket {
-  font-size: 40px;
-}
-
-.cta-banner h2 {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
-.cta-banner p {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.stats {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.stat strong {
-  display: block;
-  font-size: 19px;
-  margin-bottom: 2px;
-}
-
-.stat span {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 11px 17px;
-  border: 1px solid var(--blue);
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 800;
-  transition: .2s;
-}
-
-.btn-primary {
-  color: #03111f;
-  background: linear-gradient(135deg, #00c8ff, #65e0ff);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 200, 255, .25);
-}
-
-/* FOOTER */
-
-footer {
-  margin-top: 30px;
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.footer-inner {
-  padding: 22px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.footer-inner p {
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.footer-links a {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.footer-links a:hover {
-  color: var(--blue);
-}
-
-/* SLIDE MENU */
-
-.menu-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  background: rgba(0,0,0,.65);
-  opacity: 0;
-  visibility: hidden;
-  transition: .25s;
-}
-
-.menu-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.side-menu {
-  position: fixed;
-  top: 0;
-  right: -340px;
-  width: min(320px, 85vw);
-  height: 100dvh;
-  z-index: 2001;
-  padding: 20px;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  transition: right .3s ease;
-  overflow-y: auto;
-}
-
-.side-menu.open {
-  right: 0;
-}
-
-.menu-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-
-.menu-top h2 {
-  font-size: 18px;
-}
-
-.close-menu {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  width: 34px;
-  height: 34px;
-  color: var(--text);
-  font-size: 20px;
-}
-
-.side-menu > p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-  margin-bottom: 15px;
-}
-
-.side-menu a {
-  display: block;
-  padding: 10px 12px;
-  margin-bottom: 6px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.side-menu a:hover {
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-body.menu-open {
-  overflow: hidden;
-}
-
-/* RESPONSIVE — KEEP FOUR COLUMNS ON TABLETS AND DESKTOP */
-
-@media (max-width: 1000px) {
-  .cards-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .card-image {
-    height: 120px;
-  }
-
-  .card-body {
-    padding: 11px;
-  }
-
-  .card-body h3 {
-    font-size: 14px;
-  }
-
-  .card-body p {
-    font-size: 11px;
-  }
-}
-
-/* MOBILE — TWO CARDS PER ROW */
-
-@media (max-width: 650px) {
-  .topbar {
-    min-height: 60px;
-  }
-
-  .brand-name {
-    font-size: 21px;
-  }
-
-  .header-actions {
-    gap: 7px;
-  }
-
-  .theme-btn,
-  .menu-btn,
-  .search-btn {
-    width: 35px;
-    height: 35px;
-  }
-
-  .quote-hero {
-    min-height: 310px;
-    margin: 16px auto 4px;
-    padding: 42px 18px;
-    border-radius: 17px;
-  }
-
-  .quote-content h1 {
-    letter-spacing: -1px;
-    margin-bottom: 15px;
-  }
-
-  .quote-label {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    margin-bottom: 18px;
-  }
-
-  .quote-content p {
-    font-size: 13px;
-    line-height: 1.7;
-  }
-
-  .section {
-    padding-top: 22px;
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .card-image {
-    height: 120px;
-  }
-
-  .card-body {
-    padding: 11px;
-  }
-
-  .card-body h3 {
-    font-size: 14px;
-  }
-
-  .card-body p {
-    font-size: 11px;
-  }
-
-  .cta-banner {
-    padding: 16px;
-  }
-
-  .rocket {
-    font-size: 32px;
-  }
-
-  .stats {
-    gap: 16px;
-  }
-}
-
-/* SMALL PHONES — STILL TWO CARDS PER ROW */
-
-@media (max-width: 360px) {
-  .brand-logo {
-    width: 36px;
-    height: 36px;
-  }
-
-  .brand-name {
-    font-size: 18px;
-  }
-
-  .brand small {
-    font-size: 9px;
-  }
-
-  .header-actions {
-    gap: 5px;
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .card-image {
-    height: 110px;
-  }
-
-  .card-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 17px;
-  }
-}
+:root{--bg:#030918;--surface:#071327;--card:#081629;--text:#f4f7ff;--muted:#b5c4dd;--border:#1e3b60;--blue:#00c8ff;--purple:#8650ff;--pink:#ff43c6;--green:#00e7b0;--orange:#ff9b43;--shadow:0 12px 35px rgba(0,0,0,.25)}
+html[data-theme="light"]{--bg:#f2f6ff;--surface:#fff;--card:#fff;--text:#101b32;--muted:#52627c;--border:#d4e0f4;--shadow:0 12px 35px rgba(24,48,90,.09)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;max-width:100vw;overflow-x:hidden}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;transition:background .3s,color .3s}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.container{width:min(1200px,92%);margin:auto;max-width:100%}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000;width:100%}
+.topbar{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand-logo{width:43px;height:43px;border-radius:12px;background:linear-gradient(135deg,#00c8ff,#7250ff);display:grid;place-items:center;color:#fff;font-size:25px;font-weight:900;box-shadow:0 0 22px #087bff35}
+.brand-name{font-size:23px;font-weight:900;letter-spacing:-.8px}
+.brand-name span{color:var(--blue)}
+.brand small{display:block;color:var(--muted);font-size:10px;margin-top:3px;letter-spacing:1px}
+.header-actions{display:flex;align-items:center;gap:12px}
+.theme-btn,.menu-btn,.search-btn{width:38px;height:38px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;display:grid;place-items:center;font-size:19px}
+.theme-btn:hover,.menu-btn:hover,.search-btn:hover{border-color:var(--blue)}
+.search-box{display:none;padding:0 0 10px}
+.search-box.open{display:block}
+.search-box input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);outline:none}
+.search-box input:focus{border-color:var(--blue)}
+.quote-hero{position:relative;isolation:isolate;min-height:370px;margin:24px auto 8px;padding:55px 30px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:1px solid rgba(100,160,255,.25);border-radius:22px;background:linear-gradient(115deg,rgba(3,9,28,.91),rgba(9,20,55,.72) 55%,rgba(28,10,67,.76)),url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.quote-hero::before,.quote-hero::after{content:"";position:absolute;z-index:-1;width:240px;height:240px;border-radius:50%;filter:blur(75px);pointer-events:none}
+.quote-hero::before{top:-125px;left:-65px;background:rgba(0,200,255,.36)}
+.quote-hero::after{right:-80px;bottom:-145px;background:rgba(134,80,255,.4)}
+.quote-content{width:100%;max-width:800px}
+.quote-label{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 15px;margin-bottom:22px;color:#b8eaff;background:rgba(255,255,255,.08);border:1px solid rgba(160,210,255,.3);border-radius:30px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;backdrop-filter:blur(8px)}
+.quote-content h1{color:#fff;font-size:clamp(35px,6vw,64px);font-weight:900;line-height:1.1;letter-spacing:-2px;margin-bottom:20px;text-shadow:0 4px 25px rgba(0,0,0,.28)}
+.quote-content h1 span{display:inline-block;background:linear-gradient(90deg,#65e0ff,#b5a2ff,#ffb7ec);-webkit-background-clip:text;background-clip:text;color:transparent}
+.quote-content p{max-width:620px;margin:0 auto;color:rgba(255,255,255,.86);font-size:clamp(14px,2vw,17px);line-height:1.8}
+.section{padding:30px 0 12px}
+.cards-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:stretch}
+.feature-card{min-width:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card);transition:transform .25s,border-color .25s,box-shadow .25s}
+.feature-card:hover{transform:translateY(-4px);border-color:var(--accent,var(--blue));box-shadow:var(--shadow)}
+.card-image{height:140px;position:relative;overflow:hidden;background:linear-gradient(135deg,#102d52,#261052)}
+.card-image img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .4s}
+.feature-card:hover .card-image img{transform:scale(1.06)}
+.card-image::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,rgba(3,9,24,.85));pointer-events:none}
+.card-icon{position:absolute;z-index:2;left:14px;bottom:-1px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:var(--accent,var(--blue));color:#fff;border:2px solid var(--card);font-size:20px}
+.card-body{padding:13px 14px 15px}
+.card-body h3{font-size:16px;margin-bottom:6px}
+.card-body p{color:var(--muted);font-size:12px;line-height:1.5;min-height:36px}
+.card-link{display:inline-block;margin-top:10px;color:var(--accent,var(--blue));font-size:12px;font-weight:900}
+.cta-banner{margin:32px 0;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border:1px solid var(--border);border-radius:12px;background:radial-gradient(ellipse at 10% 120%,#6240ff26,transparent 45%),var(--surface);box-shadow:var(--shadow)}
+.cta-main{display:flex;align-items:center;gap:14px}
+.rocket{font-size:40px}
+.cta-banner h2{font-size:18px;margin-bottom:5px}
+.cta-banner p{font-size:12px;color:var(--muted);line-height:1.5}
+.stats{display:flex;gap:20px;flex-wrap:wrap}
+.stat strong{display:block;font-size:19px;margin-bottom:2px}
+.stat span{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 17px;border:1px solid var(--blue);border-radius:9px;font-size:12px;font-weight:800;transition:.2s}
+.btn-primary{color:#03111f;background:linear-gradient(135deg,#00c8ff,#65e0ff)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,255,.25)}
+footer{margin-top:30px;border-top:1px solid var(--border);background:var(--surface)}
+.footer-inner{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.footer-inner p{font-size:12px;line-height:1.7;color:var(--muted)}
+.footer-links{display:flex;flex-wrap:wrap;gap:15px}
+.footer-links a{color:var(--muted);font-size:12px}
+.footer-links a:hover{color:var(--blue)}
+.menu-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.65);opacity:0;visibility:hidden;transition:.25s}
+.menu-overlay.open{opacity:1;visibility:visible}
+.side-menu{position:fixed;top:0;right:-340px;width:min(320px,85vw);height:100dvh;z-index:2001;padding:20px;background:var(--surface);border-left:1px solid var(--border);transition:right .3s ease;overflow-y:auto}
+.side-menu.open{right:0}
+.menu-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.menu-top h2{font-size:18px}
+.close-menu{background:var(--card);border:1px solid var(--border);border-radius:8px;width:34px;height:34px;color:var(--text);font-size:20px}
+.side-menu>p{color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:15px}
+.side-menu a{display:block;padding:10px 12px;margin-bottom:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:bold}
+.side-menu a:hover{border-color:var(--blue);color:var(--blue)}
+body.menu-open{overflow:hidden}
+@media(max-width:1000px){.cards-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.card-image{height:120px}.card-body{padding:11px}.card-body h3{font-size:14px}.card-body p{font-size:11px}}
+@media(max-width:650px){.topbar{min-height:60px}.brand-name{font-size:21px}.header-actions{gap:7px}.theme-btn,.menu-btn,.search-btn{width:35px;height:35px}.quote-hero{min-height:310px;margin:16px auto 4px;padding:42px 18px;border-radius:17px}.quote-content h1{letter-spacing:-1px;margin-bottom:15px}.quote-label{font-size:9px;letter-spacing:1.5px;margin-bottom:18px}.quote-content p{font-size:13px;line-height:1.7}.section{padding-top:22px}.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-image{height:120px}.card-body{padding:11px}.card-body h3{font-size:14px}.card-body p{font-size:11px}.cta-banner{padding:16px}.rocket{font-size:32px}.stats{gap:16px}}
+@media(max-width:360px){.brand-logo{width:36px;height:36px}.brand-name{font-size:18px}.brand small{font-size:9px}.header-actions{gap:5px}.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card-image{height:110px}.card-icon{width:34px;height:34px;font-size:17px}}
 </style>
 </head>
-
 <body>
-
-<!-- HEADER -->
-
 <header>
   <div class="container topbar">
-
-    <a href="index.html" class="brand" aria-label="RexWeb Nexora Home">
-      <div class="brand-logo">R</div>
-      <div>
-        <div class="brand-name">Rex<span>Web</span></div>
-        <small>Explore · Create · Grow</small>
-      </div>
-    </a>
-
+    <a href="index.html" class="brand" aria-label="RexWeb Nexora Home"><div class="brand-logo">R</div><div><div class="brand-name">Rex<span>Web</span></div><small>Explore · Create · Grow</small></div></a>
     <div class="header-actions">
-      <button class="theme-btn" id="themeToggle"
-        aria-label="Switch colour theme" title="Switch theme">☀️</button>
-
-      <button class="search-btn" id="searchToggle"
-        aria-label="Open search" title="Search">⌕</button>
-
-      <button class="menu-btn" id="menuToggle"
-        aria-label="Open menu" aria-expanded="false" title="Menu">☰</button>
+      <button class="theme-btn" id="themeToggle" aria-label="Switch colour theme" title="Switch theme">☀️</button>
+      <button class="search-btn" id="searchToggle" aria-label="Open search" title="Search">⌕</button>
+      <button class="menu-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false" title="Menu">☰</button>
     </div>
   </div>
-
-  <div class="container search-box" id="searchBox">
-    <input type="search" id="siteSearch"
-      placeholder="Search digital tools, games, templates..."
-      aria-label="Search RexWeb Nexora">
-  </div>
+  <div class="container search-box" id="searchBox"><input type="search" id="siteSearch" placeholder="Search digital tools, games, templates..." aria-label="Search RexWeb Nexora"></div>
 </header>
-
-<!-- HERO QUOTE WITH BACKGROUND IMAGE -->
 
 <section class="quote-hero container" aria-label="Welcome to RexWeb Nexora">
   <div class="quote-content">
     <div class="quote-label">✦ Welcome to RexWeb Nexora ✦</div>
-
-    <h1>
-      Dream Bigger.<br>
-      <span>Build Beyond Limits.</span>
-    </h1>
-
-    <p>
-      Your ideas deserve a world of possibilities.
-      Discover the tools, creativity, and digital experiences
-      to turn your next big idea into reality.
-    </p>
+    <h1>Dream Bigger.<br><span>Build Beyond Limits.</span></h1>
+    <p>Your ideas deserve a world of possibilities. Discover the tools, creativity, and digital experiences to turn your next big idea into reality.</p>
   </div>
 </section>
-
-<!-- FEATURE CARDS — EIGHT CARDS IN TWO ROWS ON DESKTOP -->
 
 <section class="section container" id="explore">
-
   <div class="cards-grid" id="featureGrid">
 
-    <!-- DIGITAL TOOLS -->
+    <article class="feature-card" style="--accent:#00c8ff"><a href="tools.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=80" alt="Laptop displaying digital tools and a development workspace" loading="lazy"><div class="card-icon">🛠️</div></div><div class="card-body"><h3>Digital Tools</h3><p>Useful online utilities to make your digital life easier.</p><span class="card-link">Explore Tools →</span></div></a></article>
 
-    <article class="feature-card" style="--accent:#00c8ff">
-      <a href="tools.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=80"
-            alt="Laptop displaying digital tools and a development workspace"
-            loading="lazy">
-          <div class="card-icon">🛠️</div>
-        </div>
+    <article class="feature-card" style="--accent:#a56aff"><a href="templates.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=700&q=80" alt="Website templates displayed on a computer screen" loading="lazy"><div class="card-icon">💻</div></div><div class="card-body"><h3>Web Templates</h3><p>Modern, responsive templates for your next website project.</p><span class="card-link">Browse Templates →</span></div></a></article>
 
-        <div class="card-body">
-          <h3>Digital Tools</h3>
-          <p>Useful online utilities to make your digital life easier.</p>
-          <span class="card-link">Explore Tools →</span>
-        </div>
-      </a>
-    </article>
+    <article class="feature-card" style="--accent:#8a5bff"><a href="Rex-editor.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=700&q=80" alt="Code on a screen representing the RexWeb CodeX editor" loading="lazy"><div class="card-icon">⌨️</div></div><div class="card-body"><h3>RexWeb CodeX</h3><p>Create and edit HTML, CSS, and JS right in your browser.</p><span class="card-link">Open CodeX →</span></div></a></article>
 
-    <!-- WEB TEMPLATES -->
+    <!-- PIANO (replaces Digital Ebooks) -->
+    <article class="feature-card" style="--accent:#00e7b0"><a href="Rexweb-%23piano.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=700&q=80" alt="Piano keys" loading="lazy" onerror="this.style.display='none'"><div class="card-icon">🎹</div></div><div class="card-body"><h3>Piano</h3><p>Play a piano in your browser and record your voice with it.</p><span class="card-link">Play Piano →</span></div></a></article>
 
-    <article class="feature-card" style="--accent:#a56aff">
-      <a href="templates.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=700&q=80"
-            alt="Website templates displayed on a computer screen"
-            loading="lazy">
-          <div class="card-icon">💻</div>
-        </div>
+    <article class="feature-card" style="--accent:#ff9b43"><a href="games.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=700&q=80" alt="Gaming equipment and a colourful gaming setup" loading="lazy"><div class="card-icon">🎮</div></div><div class="card-body"><h3>Gaming Zone</h3><p>Discover browser games, explore different genres, and play.</p><span class="card-link">Play Games →</span></div></a></article>
 
-        <div class="card-body">
-          <h3>Web Templates</h3>
-          <p>Modern, responsive templates for your next website project.</p>
-          <span class="card-link">Browse Templates →</span>
-        </div>
-      </a>
-    </article>
+    <article class="feature-card" style="--accent:#00c8ff"><a href="marketplace.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=700&q=80" alt="Shopping bags and products in a retail marketplace" loading="lazy"><div class="card-icon">🛍️</div></div><div class="card-body"><h3>Marketplace</h3><p>Browse digital products, creative resources, and downloads.</p><span class="card-link">Visit Marketplace →</span></div></a></article>
 
-    <!-- REXWEB CODEX -->
+    <article class="feature-card" style="--accent:#ff5555"><a href="video-editor/index.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=700&q=80" alt="Video editing timeline and production suite" loading="lazy"><div class="card-icon">🎬</div></div><div class="card-body"><h3>Video Editor</h3><p>Edit, trim, and enhance your videos directly in your browser.</p><span class="card-link">Explore Video Editor →</span></div></a></article>
 
-    <article class="feature-card" style="--accent:#8a5bff">
-      <a href="Rex-editor.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=700&q=80"
-            alt="Code on a screen representing the RexWeb CodeX editor"
-            loading="lazy">
-          <div class="card-icon">⌨️</div>
-        </div>
-
-        <div class="card-body">
-          <h3>RexWeb CodeX</h3>
-          <p>Create and edit HTML, CSS, and JS right in your browser.</p>
-          <span class="card-link">Open CodeX →</span>
-        </div>
-      </a>
-    </article>
-
-    <!-- DIGITAL EBOOKS -->
-
-    <article class="feature-card" style="--accent:#00e7b0">
-      <a href="ebooks.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=700&q=80"
-            alt="Bookshelves filled with books in a library"
-            loading="lazy">
-          <div class="card-icon">📖</div>
-        </div>
-
-        <div class="card-body">
-          <h3>Digital Ebooks</h3>
-          <p>Explore ebooks, educational resources, and more.</p>
-          <span class="card-link">Explore Ebooks →</span>
-        </div>
-      </a>
-    </article>
-
-    <!-- GAMING ZONE -->
-
-    <article class="feature-card" style="--accent:#ff9b43">
-      <a href="games.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=700&q=80"
-            alt="Gaming equipment and a colourful gaming setup"
-            loading="lazy">
-          <div class="card-icon">🎮</div>
-        </div>
-
-        <div class="card-body">
-          <h3>Gaming Zone</h3>
-          <p>Discover browser games, explore different genres, and play.</p>
-          <span class="card-link">Play Games →</span>
-        </div>
-      </a>
-    </article>
-
-    <!-- MARKETPLACE -->
-
-    <article class="feature-card" style="--accent:#00c8ff">
-      <a href="marketplace.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=700&q=80"
-            alt="Shopping bags and products in a retail marketplace"
-            loading="lazy">
-          <div class="card-icon">🛍️</div>
-        </div>
-
-        <div class="card-body">
-          <h3>Marketplace</h3>
-          <p>Browse digital products, creative resources, and downloads.</p>
-          <span class="card-link">Visit Marketplace →</span>
-        </div>
-      </a>
-    </article>
-
-    <!-- VIDEO EDITOR -->
-
-    <article class="feature-card" style="--accent:#ff5555">
-      <a href="video-editor/index.html">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=700&q=80"
-            alt="Video editing timeline and production suite"
-            loading="lazy">
-          <div class="card-icon">🎬</div>
-        </div>
-
-        <div class="card-body">
-          <h3>Video Editor</h3>
-          <p>Edit, trim, and enhance your videos directly in your browser.</p>
-          <span class="card-link">Explore Video Editor →</span>
-        </div>
-      </a>
-    </article>
-
-    <!-- COMMUNITY -->
-
-    <article class="feature-card" style="--accent:#ff43c6">
-      <a href="https://vitalstar.web.app/">
-        <div class="card-image">
-          <img
-            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80"
-            alt="Friends enjoying time together as a community"
-            loading="lazy">
-          <div class="card-icon">👥</div>
-        </div>
-
-        <div class="card-body">
-          <h3>Community</h3>
-          <p>Connect, share ideas, discover people, and grow together.</p>
-          <span class="card-link">Discover Community →</span>
-        </div>
-      </a>
-    </article>
+    <article class="feature-card" style="--accent:#ff43c6"><a href="https://vitalstar.web.app/"><div class="card-image"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80" alt="Friends enjoying time together as a community" loading="lazy"><div class="card-icon">👥</div></div><div class="card-body"><h3>Community</h3><p>Connect, share ideas, discover people, and grow together.</p><span class="card-link">Discover Community →</span></div></a></article>
 
   </div>
 </section>
-
-<!-- CALL TO ACTION -->
 
 <div class="container">
   <section class="cta-banner">
-
-    <div class="cta-main">
-      <div class="rocket">🚀</div>
-      <div>
-        <h2>Your Next Adventure Starts Here.</h2>
-        <p>Explore. Create. Discover. All in one place.</p>
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <strong>7+</strong>
-        <span>Digital Categories</span>
-      </div>
-
-      <div class="stat">
-        <strong>∞</strong>
-        <span>Possibilities</span>
-      </div>
-    </div>
-
-    <a class="btn btn-primary" href="#explore">
-      Explore Now →
-    </a>
-
+    <div class="cta-main"><div class="rocket">🚀</div><div><h2>Your Next Adventure Starts Here.</h2><p>Explore. Create. Discover. All in one place.</p></div></div>
+    <div class="stats"><div class="stat"><strong>7+</strong><span>Digital Categories</span></div><div class="stat"><strong>∞</strong><span>Possibilities</span></div></div>
+    <a class="btn btn-primary" href="#explore">Explore Now →</a>
   </section>
 </div>
 
-<!-- FOOTER -->
-
 <footer>
   <div class="container footer-inner">
-
     <div>
-      <a href="index.html" class="brand">
-        <div class="brand-logo">R</div>
-        <div>
-          <div class="brand-name">Rex<span>Web</span></div>
-          <small>Explore · Create · Grow</small>
-        </div>
-      </a>
-
-      <p style="margin-top:10px">
-        © <span id="year"></span> RexWeb Nexora. All rights reserved.
-      </p>
+      <a href="index.html" class="brand"><div class="brand-logo">R</div><div><div class="brand-name">Rex<span>Web</span></div><small>Explore · Create · Grow</small></div></a>
+      <p style="margin-top:10px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
     </div>
-
-    <nav class="footer-links" aria-label="Footer navigation">
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms &amp; Conditions</a>
-      <a href="Rex-editor.html">CodeX</a>
-    </nav>
-
+    <nav class="footer-links" aria-label="Footer navigation"><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms &amp; Conditions</a><a href="Rex-editor.html">CodeX</a></nav>
   </div>
 </footer>
 
-<!-- SLIDE-OUT MENU -->
-
 <div class="menu-overlay" id="menuOverlay"></div>
-
-<aside class="side-menu" id="sideMenu"
-  aria-label="Additional navigation" aria-hidden="true" inert>
-
-  <div class="menu-top">
-    <h2>🚀 RexWeb Menu</h2>
-    <button class="close-menu" id="closeMenu"
-      aria-label="Close menu">×</button>
-  </div>
-
+<aside class="side-menu" id="sideMenu" aria-label="Additional navigation" aria-hidden="true" inert>
+  <div class="menu-top"><h2>🚀 RexWeb Menu</h2><button class="close-menu" id="closeMenu" aria-label="Close menu">×</button></div>
   <p>Explore more of the RexWeb Nexora universe.</p>
-
   <a href="index.html">🏠 Home</a>
   <a href="tools.html">🛠️ Digital Tools</a>
   <a href="templates.html">💻 Web Templates</a>
   <a href="Rex-editor.html">⌨️ RexWeb CodeX</a>
-  <a href="ebooks.html">📚 Digital Ebooks</a>
+  <a href="Rexweb-%23piano.html">🎹 Piano</a>
   <a href="games.html">🎮 Gaming Zone</a>
   <a href="marketplace.html">🛍️ Marketplace</a>
   <a href="video-editor/index.html">🎬 Video Editor</a>
-
   <hr style="border:0;border-top:1px solid var(--border);margin:15px 0">
-
   <a href="about.html">ℹ️ About RexWeb</a>
   <a href="contact.html">✉️ Contact</a>
   <a href="login.html">🔐 Login</a>
   <a href="register.html">👤 Register</a>
   <a href="privacy.html">🔒 Privacy Policy</a>
   <a href="terms.html">📄 Terms &amp; Conditions</a>
-
 </aside>
 
 <script>
-/* THEME SWITCH */
-
-const root = document.documentElement;
-const themeToggle = document.getElementById("themeToggle");
-const themeColor = document.getElementById("themeColor");
-
-function applyTheme(theme) {
-  root.setAttribute("data-theme", theme);
-
-  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
-
-  themeToggle.setAttribute(
-    "aria-label",
-    theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
-  );
-
-  themeColor.content = theme === "dark" ? "#050b19" : "#f2f6ff";
-
-  try {
-    localStorage.setItem("rexweb-theme", theme);
-  } catch (error) {}
-}
-
-let savedTheme = "dark";
-
-try {
-  savedTheme = localStorage.getItem("rexweb-theme") || "dark";
-} catch (error) {}
-
+const root=document.documentElement,themeToggle=document.getElementById("themeToggle"),themeColor=document.getElementById("themeColor");
+function applyTheme(t){root.setAttribute("data-theme",t);themeToggle.textContent=t==="dark"?"☀️":"🌙";themeToggle.setAttribute("aria-label",t==="dark"?"Switch to light theme":"Switch to dark theme");themeColor.content=t==="dark"?"#050b19":"#f2f6ff";try{localStorage.setItem("rexweb-theme",t)}catch(e){}}
+let savedTheme="dark";try{savedTheme=localStorage.getItem("rexweb-theme")||"dark"}catch(e){}
 applyTheme(savedTheme);
-
-themeToggle.addEventListener("click", () => {
-  const currentTheme = root.getAttribute("data-theme");
-
-  applyTheme(currentTheme === "dark" ? "light" : "dark");
-});
-
-/* SLIDE MENU */
-
-const menuToggle = document.getElementById("menuToggle");
-const closeMenu = document.getElementById("closeMenu");
-const sideMenu = document.getElementById("sideMenu");
-const menuOverlay = document.getElementById("menuOverlay");
-
-function openMenu() {
-  sideMenu.classList.add("open");
-  menuOverlay.classList.add("open");
-
-  sideMenu.setAttribute("aria-hidden", "false");
-  sideMenu.inert = false;
-
-  menuToggle.setAttribute("aria-expanded", "true");
-  document.body.classList.add("menu-open");
-
-  closeMenu.focus();
-}
-
-function hideMenu() {
-  sideMenu.classList.remove("open");
-  menuOverlay.classList.remove("open");
-
-  sideMenu.setAttribute("aria-hidden", "true");
-  sideMenu.inert = true;
-
-  menuToggle.setAttribute("aria-expanded", "false");
-  document.body.classList.remove("menu-open");
-}
-
-menuToggle.addEventListener("click", openMenu);
-closeMenu.addEventListener("click", hideMenu);
-menuOverlay.addEventListener("click", hideMenu);
-
-sideMenu.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", hideMenu);
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    hideMenu();
-  }
-});
-
-/* SEARCH */
-
-const searchToggle = document.getElementById("searchToggle");
-const searchBox = document.getElementById("searchBox");
-const siteSearch = document.getElementById("siteSearch");
-
-searchToggle.addEventListener("click", () => {
-  searchBox.classList.toggle("open");
-
-  if (searchBox.classList.contains("open")) {
-    siteSearch.focus();
-  } else {
-    siteSearch.value = "";
-    filterCards("");
-  }
-});
-
-function filterCards(query) {
-  const cards = document.querySelectorAll(".feature-card");
-  const normalizedQuery = query.trim().toLowerCase();
-
-  cards.forEach(card => {
-    const text = card.textContent.toLowerCase();
-
-    card.style.display = text.includes(normalizedQuery) ? "" : "none";
-  });
-}
-
-siteSearch.addEventListener("input", event => {
-  filterCards(event.target.value);
-});
-
-/* FOOTER YEAR */
-
-document.getElementById("year").textContent =
-  new Date().getFullYear();
+themeToggle.addEventListener("click",()=>applyTheme(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+const menuToggle=document.getElementById("menuToggle"),closeMenu=document.getElementById("closeMenu"),sideMenu=document.getElementById("sideMenu"),menuOverlay=document.getElementById("menuOverlay");
+function openMenu(){sideMenu.classList.add("open");menuOverlay.classList.add("open");sideMenu.setAttribute("aria-hidden","false");sideMenu.inert=false;menuToggle.setAttribute("aria-expanded","true");document.body.classList.add("menu-open");closeMenu.focus()}
+function hideMenu(){sideMenu.classList.remove("open");menuOverlay.classList.remove("open");sideMenu.setAttribute("aria-hidden","true");sideMenu.inert=true;menuToggle.setAttribute("aria-expanded","false");document.body.classList.remove("menu-open")}
+menuToggle.addEventListener("click",openMenu);closeMenu.addEventListener("click",hideMenu);menuOverlay.addEventListener("click",hideMenu);
+sideMenu.querySelectorAll("a").forEach(l=>l.addEventListener("click",hideMenu));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")hideMenu()});
+const searchToggle=document.getElementById("searchToggle"),searchBox=document.getElementById("searchBox"),siteSearch=document.getElementById("siteSearch");
+searchToggle.addEventListener("click",()=>{searchBox.classList.toggle("open");if(searchBox.classList.contains("open")){siteSearch.focus()}else{siteSearch.value="";filterCards("")}});
+function filterCards(q){const n=q.trim().toLowerCase();document.querySelectorAll(".feature-card").forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(n)?"":"none"})}
+siteSearch.addEventListener("input",e=>filterCards(e.target.value));
+document.getElementById("year").textContent=new Date().getFullYear();
 </script>
-
 </body>
 </html>
