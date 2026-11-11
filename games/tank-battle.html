@@ -113,7 +113,7 @@ h1{margin:0 0 10px;font:400 clamp(38px,11vw,58px)/.95 var(--display);letter-spac
     <div id="lvStrip"></div>
     <p id="lvInfo" style="font-size:13px;margin:0;min-height:1.2em"></p>
     <p class="lbl" style="margin:10px 0 0">Arena - coins per clear</p>
-    <div class="seg" id="arenaSeg" role="group" aria-label="Arena"><button data-a="clear" aria-pressed="false">Clear +3</button><button data-a="normal" aria-pressed="true">Normal +2</button><button data-a="heavy" aria-pressed="false">Rocks +1</button></div>
+    <div class="seg" id="arenaSeg" role="group" aria-label="Arena"><button data-a="clear" aria-pressed="false">Clear</button><button data-a="normal" aria-pressed="true">Normal</button><button data-a="heavy" aria-pressed="false">Rocks</button></div>
     <p id="arenaInfo" style="font-size:13px;margin:6px 0 0;min-height:1.2em"></p>
     <button id="go">ROLL OUT</button>
     <button id="openSet">Settings</button>
@@ -247,6 +247,8 @@ const ARENA={
   heavy:{coins:1,rocks:60,cf:.6,desc:'Rocks everywhere. Lots of cover, so the easiest arena.'}
 };
 let arena='normal',arDone={},paused=false,rockMeshes=[];
+function lvReward(n){return n+ARENA[arena].coins-1}
+function lvFirst(){return !arDone[LM()+'_'+arena+'_'+curLv]}
 try{const v=localStorage.getItem('nexoraArenaSel');if(ARENA[v])arena=v}catch(_){}
 try{arDone=JSON.parse(localStorage.getItem('nexoraAr')||'{}')||{}}catch(_){arDone={}}
 function buildRocks(){
@@ -643,8 +645,8 @@ function killEnemy(e){
   combo=gameT-lastKill<4?combo+1:1;lastKill=gameT;const cm=1+Math.min(4,combo-1)*.25;
   score+=Math.round(e.pts*DIFF[diff].sm*cm);$('score').textContent=score;$('cmb').textContent=combo>1?'x'+cm.toFixed(2):'';
   if(Math.random()<(p.hp<40?.45:.22)*DIFF[diff].drop)dropPickup(e.x,e.z,'rep');else if(Math.random()<.07)dropPickup(e.x,e.z,Math.random()<.5?'shield':'rapid');
-  if(!e.boss&&Math.random()<(e.sc>1?.1:.03)*ARENA[arena].cf)dropPickup(e.x+rnd(-2,2),e.z+rnd(-2,2),'coin');
-  if(e.boss)for(let q=0;q<4;q++)dropPickup(e.x+rnd(-4,4),e.z+rnd(-4,4),'coin');
+  if(!e.boss&&lvFirst()&&Math.random()<(e.sc>1?.1:.03)*ARENA[arena].cf)dropPickup(e.x+rnd(-2,2),e.z+rnd(-2,2),'coin');
+  if(e.boss&&lvFirst())for(let q=0;q<4;q++)dropPickup(e.x+rnd(-4,4),e.z+rnd(-4,4),'coin');
   scene.remove(e.g);scene.remove(e.bar);disposeTank(e);enemies.splice(j,1);
 }
 const mines=[],mineG=new THREE.CylinderGeometry(.9,1.1,.35,10),mineM=new THREE.MeshLambertMaterial({color:0x2a2a2a,emissive:0x661100});
@@ -779,9 +781,9 @@ function setDiff(){best=0;try{best=+localStorage.getItem(bestKey())||0}catch(_){
 function saveBest(){if(score>best){best=score;try{localStorage.setItem(bestKey(),String(best))}catch(_){}}}
 function applyArena(){
   Array.prototype.forEach.call($('arenaSeg').children,b=>b.setAttribute('aria-pressed',b.dataset.a===arena));
-  $('arenaInfo').textContent=ARENA[arena].desc+' Reward: '+ARENA[arena].coins+' coins for a first clear.';
+  $('arenaInfo').textContent=ARENA[arena].desc+' First clear of a level pays its level number + '+(ARENA[arena].coins-1)+' coins. Replays pay nothing.';
 }
-Array.prototype.forEach.call($('arenaSeg').children,b=>b.addEventListener('click',()=>{arena=b.dataset.a;try{localStorage.setItem('nexoraArenaSel',arena)}catch(_){}buildRocks();applyArena();setDiff()}));
+Array.prototype.forEach.call($('arenaSeg').children,b=>b.addEventListener('click',()=>{arena=b.dataset.a;try{localStorage.setItem('nexoraArenaSel',arena)}catch(_){}buildRocks();applyArena();setDiff();renderLevels()}));
 /* ---------- coins & shop (coins are rare) ---------- */
 let coins=0,lastCr=0,combo=0,lastKill=-9;const shop={arm:0,col:'olive',own:{olive:1},gren:0};
 try{const q=JSON.parse(localStorage.getItem('nexoraShop')||'{}');coins=+q.coins||0;shop.arm=Math.min(25,+q.arm||0);shop.gren=Math.max(0,+q.gren||0);shop.own=Object.assign({olive:1},q.own||{});if(shop.own[q.col])shop.col=q.col}catch(_){}
@@ -804,7 +806,7 @@ function renderLevels(){
   S.innerHTML='';
   for(let i=1;i<=50;i++){
     const b=document.createElement('button'),lock=i>pr;b.className='lv';
-    b.innerHTML=lock?'\uD83D\uDD12':i+(lvDone[m][i]?'<small>\u2713</small>':'');
+    const cl=arDone[m+'_'+arena+'_'+i];b.innerHTML=lock?'\uD83D\uDD12':i+(cl?'<small>\u2713</small>':'<small style="color:#ffd23a">+'+lvReward(i)+'</small>');
     b.setAttribute('aria-pressed',i===selLv);b.setAttribute('aria-disabled',lock);
     b.addEventListener('click',()=>{if(lock){$('lvInfo').textContent='Clear level '+(i-1)+' to unlock level '+i+'.';return}$('lvInfo').textContent='';selLv=i;const sl=S.scrollLeft;renderLevels();S.scrollLeft=sl;setDiff(diff)});
     S.appendChild(b);
@@ -829,8 +831,8 @@ $('lvStrip').addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.delta
 })();
 /* ---------- 35 paints, 25 armor levels, grenades, level backdrops ---------- */
 const shade=h=>{const r=(h>>16&255)*.42|0,g=(h>>8&255)*.42|0,b=(h&255)*.42|0;return r<<16|g<<8|b};
-const COLS=[['olive','Olive',0x667f3c],['desert','Desert',0xc2a15a],['navy','Navy',0x3f5878],['crimson','Crimson',0x9a3a32],['stealth','Stealth',0x2f3238],['gold','Gold',0xd4a634],['forest','Forest',0x2f5d34],['jungle','Jungle',0x3f7a3a],['sand','Sand',0xdbc48a],['snow','Snow',0xe6ecef],['arctic','Arctic',0xa9c4d6],['sky','Sky',0x5aa0d8],['ocean','Ocean',0x2a6f97],['teal','Teal',0x2a8c86],['mint','Mint',0x6fd0a8],['lime','Lime',0x9ad43a],['lemon','Lemon',0xe8d94a],['amber','Amber',0xe8a02a],['orange','Orange',0xe8742a],['rust','Rust',0xb4532a],['brick','Brick',0x8e3b2b],['red','Red',0xd03a30],['rose','Rose',0xe06a8a],['pink','Pink',0xf08cb8],['magenta','Magenta',0xb8349a],['purple','Purple',0x7a45b0],['violet','Violet',0x5b4ac0],['indigo','Indigo',0x3a3f9a],['slate','Slate',0x5c6b7a],['steel','Steel',0x8a97a3],['silver','Silver',0xc4c9cc],['charcoal','Charcoal',0x3a3d42],['midnight','Midnight',0x1c2540],['chocolate','Chocolate',0x5c3b26],['copper','Copper',0xb8733a]].map((c,i)=>[c[0],c[1],c[2],shade(c[2]),i?5+i*2:0]);
-const armCost=n=>Math.round(5+n*1.5+n*n*.06),GCOST=3;
+const COLS=[['olive','Olive',0x667f3c],['desert','Desert',0xc2a15a],['navy','Navy',0x3f5878],['crimson','Crimson',0x9a3a32],['stealth','Stealth',0x2f3238],['gold','Gold',0xd4a634],['forest','Forest',0x2f5d34],['jungle','Jungle',0x3f7a3a],['sand','Sand',0xdbc48a],['snow','Snow',0xe6ecef],['arctic','Arctic',0xa9c4d6],['sky','Sky',0x5aa0d8],['ocean','Ocean',0x2a6f97],['teal','Teal',0x2a8c86],['mint','Mint',0x6fd0a8],['lime','Lime',0x9ad43a],['lemon','Lemon',0xe8d94a],['amber','Amber',0xe8a02a],['orange','Orange',0xe8742a],['rust','Rust',0xb4532a],['brick','Brick',0x8e3b2b],['red','Red',0xd03a30],['rose','Rose',0xe06a8a],['pink','Pink',0xf08cb8],['magenta','Magenta',0xb8349a],['purple','Purple',0x7a45b0],['violet','Violet',0x5b4ac0],['indigo','Indigo',0x3a3f9a],['slate','Slate',0x5c6b7a],['steel','Steel',0x8a97a3],['silver','Silver',0xc4c9cc],['charcoal','Charcoal',0x3a3d42],['midnight','Midnight',0x1c2540],['chocolate','Chocolate',0x5c3b26],['copper','Copper',0xb8733a]].map((c,i)=>[c[0],c[1],c[2],shade(c[2]),i?15+i*6:0]);
+const armCost=n=>Math.round((5+n*1.5+n*n*.06)*3),GCOST=9;
 const BX={1:[0],2:[-.55,.55],3:[-.7,0,.7],4:[-.8,-.27,.27,.8]};
 const WNAMES=['Rocket','Twin Rockets','Triple Spread','Seeker Barrage','Quad Blast'];
 function weaponFor(a){
@@ -938,7 +940,7 @@ saveShop();applyCol();applyTank();
 function showMenu(mode){
   const over=mode==='over',won=mode==='won';
   $('title').innerHTML=won?'VICTORY':over?'DESTROYED':'NEXORA<br>WAR TANK';
-  $('sub').textContent=won?('Level '+curLv+' cleared. Final score '+score+'.'+(justUnlocked?' Level '+Math.min(50,curLv+1)+' unlocked!':'')+(won&&lastCr?' +'+lastCr+' coins.':'')):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
+  $('sub').textContent=won?('Level '+curLv+' cleared. Final score '+score+'.'+(justUnlocked?' Level '+Math.min(50,curLv+1)+' unlocked!':'')+(won?(lastCr?' +'+lastCr+' coins.':' Already cleared: no coins.'):'')):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
   $('how').textContent=touchMode?'Drag on the left to drive. Hold the FIRE pad to shoot. In Fire pad aiming, drag it to aim. Grab green crates to repair. Drag the right side to orbit, pinch to zoom.'
     :'WASD or arrow keys to drive. Move the mouse to aim. Click or Space to fire. Grab green crates to repair. Right-drag or Q/E to orbit, scroll to zoom.';
   setDiff();applyAim();applyArena();$('pauseBtn').hidden=true;$('pauseOv').hidden=true;paused=false;
@@ -976,7 +978,7 @@ function gameOver(){
   setTimeout(()=>{if(state==='over')showMenu('over')},1400);
 }
 function victory(){
-  {const key=LM()+'_'+arena+'_'+curLv,first=!arDone[key];lastCr=first?ARENA[arena].coins+Math.floor(curLv/12):(arena==='clear'?1:0);arDone[key]=1;try{localStorage.setItem('nexoraAr',JSON.stringify(arDone))}catch(_){}}coins+=lastCr;saveShop();
+  {const key=LM()+'_'+arena+'_'+curLv,first=!arDone[key];lastCr=first?lvReward(curLv):0;arDone[key]=1;try{localStorage.setItem('nexoraAr',JSON.stringify(arDone))}catch(_){}}coins+=lastCr;saveShop();
   justUnlocked='';{const m0=LM();if(curLv>=lvProg[m0]&&curLv<50){lvProg[m0]=curLv+1;justUnlocked='1'}lvDone[m0][curLv]=1;saveLv();selLv=Math.min(50,curLv+1)}
   state='won';score+=Math.round(500*DIFF[diff].sm);$('score').textContent=score;saveBest();sfx('pick');say('VICTORY');
   for(let i=0;i<6;i++)setTimeout(()=>explode(p.x+rnd(-14,14),p.z+rnd(-14,14),false),i*260);
