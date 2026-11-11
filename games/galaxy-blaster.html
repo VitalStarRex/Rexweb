@@ -315,12 +315,20 @@ for(let i=0;i<10*n*FX;i++)blob(p,fm[0],.22,new T.Vector3(rnd(-1,1),rnd(-1,1),rnd
 for(let i=0;i<5*n*FX;i++)blob(p,SMK,rnd(1,1.6)*n,new T.Vector3(rnd(-4,4),rnd(1,6),rnd(-4,4)),rnd(.9,1.5),{rise:3});
 if(deb)for(let i=0;i<6;i++){const m=new T.Mesh(gD,mD);m.position.copy(p);scene.add(m);db.push({m,v:new T.Vector3(rnd(-9,9),rnd(3,13),rnd(-6,10)),r:rnd(-9,9),life:1.8,tr:0})}
 boomSfx(n);shake=Math.max(shake,.5*n)}
-function dmgEnemy(e,d){e.hp-=d;if(e.hp>0){e.fl=.08;sfx(500,.06,'square',.03);return}
+function dmgEnemy(e,d){if(S.win)return;e.hp-=d;if(e.hp>0){e.fl=.08;sfx(500,.06,'square',.03);return}
 boom(e.m.position,e.ace?1.5:1,true);scene.remove(e.m);en.splice(en.indexOf(e),1);S.chain=(S.ct>0?S.chain:0)+1;S.ct=3;const mul=Math.min(5,1+Math.floor(S.chain/3));S.score+=Math.round((e.ace?300:100)*D().sc*mul);S.kills++;if(Math.random()<(e.ace?.5:.14))drop(e.m.position);
+if(S.kills>=50){ui();win();return}
 const w=1+Math.floor(S.kills/10);if(w>S.wave){S.wave=w;toast('Wave '+w);applyTheme();S.mis=Math.min(4,S.mis+1)}ui()}
 function hurt(d){if(S.over)return;vib(40);S.chain=0;S.hp-=d*D().dmg;shake=.6;sfx(90,.3,'sawtooth',.1,.4);const h=$('hit');h.classList.remove('on');void h.offsetWidth;h.classList.add('on');ui();
 if(S.hp<=0){S.over=true;S.run=false;me.visible=false;boom(me.position,2,true);setTimeout(endGame,1300)}}
-function endGame(){vib([80,40,120]);$('nb').textContent=S.score>best&&S.score>0?'NEW BEST!':'';if(S.score>best){best=S.score;try{localStorage.setItem('airstrike-best',best)}catch(e){}}
+function win(){if(S.over)return;S.over=S.win=true;S.run=false;S.zoom=0;
+en.slice().forEach(e=>{boom(e.m.position,1,true);scene.remove(e.m)});en=[];
+eb.forEach(b=>scene.remove(b.m));eb=[];
+S.score+=Math.round(S.hp)*10;ui();toast('MISSION COMPLETE');vib([60,40,60]);
+[523,659,784,1047].forEach((f,i)=>setTimeout(()=>sfx(f,.3,'triangle',.08,1),i*140));
+setTimeout(()=>sfx(200,1.6,'sawtooth',.08,6),900);
+setTimeout(endGame,3200)}
+function endGame(){$('over').querySelector('h1').innerHTML=S.win?'Mission<br>complete':'Shot<br>down';vib([80,40,120]);$('nb').textContent=S.score>best&&S.score>0?'NEW BEST!':'';if(S.score>best){best=S.score;try{localStorage.setItem('airstrike-best',best)}catch(e){}}
 $('fs').textContent=S.score;$('bs').textContent=best;$('over').classList.remove('hide');$('hud').style.display=$('msl').style.display=$('key').style.display='none';$('cmb').textContent='';$('lock').style.display='none'}
 
 /* input */
@@ -394,6 +402,7 @@ if(d.life<=0){scene.remove(d.m);db.splice(i,1)}}
 const lk=S.run?nearest():null,L=$('lock');
 if(lk){vec.copy(lk.m.position).project(cam);if(vec.z<1){L.style.display='block';L.style.transform=`translate(${(vec.x*.5+.5)*VW()}px,${(-vec.y*.5+.5)*VH()}px)`}else L.style.display='none'}else L.style.display='none';
 shake*=Math.pow(.02,dt);const sk=CFG.shake?shake:0;cam.position.set(me.position.x*.45+rnd(-1,1)*sk,me.position.y*.35+3.4+rnd(-1,1)*sk,11);cam.lookAt(me.position.x*.25,me.position.y*.2,-22);
+if(S.win){S.zoom+=dt;const z=S.zoom;me.position.set(P.x,P.y+z*z*7,-z*z*110);me.rotation.set(Math.min(.6,z*.6),0,z*4);me.userData.glow.scale.y=4}
 renderer.render(scene,cam)}
 const CFG=Object.assign({vol:.7,shake:true,hq:true,music:true,mvol:.6,diff:1,land:false,scene:'sunset'},(()=>{try{return JSON.parse(localStorage.getItem('airstrike-cfg'))||{}}catch(e){return{}}})());
 let paused=false;
