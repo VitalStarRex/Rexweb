@@ -7,7 +7,7 @@
 <title>RexWeb Nexora | Your Digital World</title>
 <meta name="description" content="Explore digital tools, website templates, ebooks, games, and creative resources at RexWeb Nexora.">
 <style>
-:root{--bg:#030918;--surface:#071327;--card:#081629;--text:#f4f7ff;--muted:#b5c4dd;--border:#1e3b60;--blue:#00c8ff;--purple:#8650ff;--pink:#ff43c6;--green:#00e7b0;--orange:#ff9b43;--shadow:0 12px 35px rgba(0,0,0,.25)}
+:root{--bg:#030918;--surface:#071327;--card:#081629;--text:#f4f7ff;--muted:#b5c4dd;--border:#1e3b60;--blue:#00c8ff;--purple:#8650ff;--pink:#123b78;--green:#00e7b0;--orange:#ff9b43;--shadow:0 12px 35px rgba(0,0,0,.25)}
 html[data-theme="light"]{--bg:#f2f6ff;--surface:#fff;--card:#fff;--text:#101b32;--muted:#52627c;--border:#d4e0f4;--shadow:0 12px 35px rgba(24,48,90,.09)}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;max-width:100vw;overflow-x:hidden}
@@ -30,11 +30,16 @@ header{background:var(--surface);border-bottom:1px solid var(--border);position:
 .search-box.open{display:block}
 .search-box input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);outline:none}
 .search-box input:focus{border-color:var(--blue)}
-.quote-hero{position:relative;isolation:isolate;min-height:370px;margin:24px auto 8px;padding:55px 30px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:1px solid rgba(100,160,255,.25);border-radius:22px;background:linear-gradient(115deg,rgba(3,9,28,.91),rgba(9,20,55,.72) 55%,rgba(28,10,67,.76)),url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.quote-hero{position:relative;isolation:isolate;min-height:185px;margin:24px auto 8px;padding:55px 30px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:1px solid rgba(100,160,255,.25);border-radius:22px;background:linear-gradient(115deg,rgba(3,9,28,.91),rgba(9,20,55,.72) 55%,rgba(28,10,67,.76)),url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;box-shadow:0 18px 50px rgba(0,0,0,.25)}
 .quote-hero::before,.quote-hero::after{content:"";position:absolute;z-index:-1;width:240px;height:240px;border-radius:50%;filter:blur(75px);pointer-events:none}
 .quote-hero::before{top:-125px;left:-65px;background:rgba(0,200,255,.36)}
 .quote-hero::after{right:-80px;bottom:-145px;background:rgba(134,80,255,.4)}
-.quote-content{width:100%;max-width:800px}
+.quote-content{display:none}
+.tank-stage{position:absolute;z-index:1;top:0;left:50%;transform:translateX(-50%);width:min(300px,78%);height:112px;overflow:hidden;pointer-events:none;mask-image:linear-gradient(to bottom,#000 72%,transparent 100%)}
+.tank-stage canvas{display:block;width:100%;height:100%}
+.tank-play{position:absolute;z-index:3;top:112px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:7px 15px;border:1px solid rgba(115,220,255,.75);border-radius:999px;background:linear-gradient(135deg,rgba(0,200,255,.95),rgba(112,75,255,.95));color:#fff;font-size:11px;font-weight:900;letter-spacing:.7px;white-space:nowrap;box-shadow:0 5px 20px rgba(0,160,255,.3);transition:transform .2s,box-shadow .2s}
+.tank-play:hover{transform:translateX(-50%) translateY(-2px);box-shadow:0 8px 25px rgba(0,160,255,.45)}
+.tank-play:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .quote-label{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 15px;margin-bottom:22px;color:#b8eaff;background:rgba(255,255,255,.08);border:1px solid rgba(160,210,255,.3);border-radius:30px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;backdrop-filter:blur(8px)}
 .quote-content h1{color:#fff;font-size:clamp(35px,6vw,64px);font-weight:900;line-height:1.1;letter-spacing:-2px;margin-bottom:20px;text-shadow:0 4px 25px rgba(0,0,0,.28)}
 .quote-content h1 span{display:inline-block;background:linear-gradient(90deg,#65e0ff,#b5a2ff,#ffb7ec);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -81,8 +86,261 @@ footer{margin-top:30px;border-top:1px solid var(--border);background:var(--surfa
 .side-menu a:hover{border-color:var(--blue);color:var(--blue)}
 body.menu-open{overflow:hidden}
 @media(max-width:1000px){.cards-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.card-image{height:120px}.card-body{padding:11px}.card-body h3{font-size:14px}.card-body p{font-size:11px}}
-@media(max-width:650px){.topbar{min-height:60px}.brand-name{font-size:21px}.header-actions{gap:7px}.theme-btn,.menu-btn,.search-btn{width:35px;height:35px}.quote-hero{min-height:310px;margin:16px auto 4px;padding:42px 18px;border-radius:17px}.quote-content h1{letter-spacing:-1px;margin-bottom:15px}.quote-label{font-size:9px;letter-spacing:1.5px;margin-bottom:18px}.quote-content p{font-size:13px;line-height:1.7}.section{padding-top:22px}.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-image{height:120px}.card-body{padding:11px}.card-body h3{font-size:14px}.card-body p{font-size:11px}.cta-banner{padding:16px}.rocket{font-size:32px}.stats{gap:16px}}
+@media(max-width:650px){.topbar{min-height:60px}.brand-name{font-size:21px}.header-actions{gap:7px}.theme-btn,.menu-btn,.search-btn{width:35px;height:35px}.quote-hero{min-height:175px;margin:16px auto 4px;padding:42px 18px;border-radius:17px}.quote-content{padding-top:138px}.tank-stage{height:105px;width:min(280px,82%)}.tank-play{top:105px;padding:6px 13px;font-size:10px}.quote-content h1{letter-spacing:-1px;margin-bottom:15px}.quote-label{font-size:9px;letter-spacing:1.5px;margin-bottom:18px}.quote-content p{font-size:13px;line-height:1.7}.section{padding-top:22px}.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-image{height:120px}.card-body{padding:11px}.card-body h3{font-size:14px}.card-body p{font-size:11px}.cta-banner{padding:16px}.rocket{font-size:32px}.stats{gap:16px}}
 @media(max-width:360px){.brand-logo{width:36px;height:36px}.brand-name{font-size:18px}.brand small{font-size:9px}.header-actions{gap:5px}.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card-image{height:110px}.card-icon{width:34px;height:34px;font-size:17px}}
+
+/* Whole-page motion system */
+body{background-image:radial-gradient(ellipse at 8% 18%,rgba(0,200,255,.075),transparent 32%),radial-gradient(ellipse at 92% 42%,rgba(134,80,255,.08),transparent 35%);background-attachment:fixed}
+body::before,body::after{content:"";position:fixed;z-index:-1;width:260px;height:260px;border-radius:50%;filter:blur(85px);opacity:.24;pointer-events:none;animation:ambientDrift 16s ease-in-out infinite alternate}
+body::before{top:18%;left:-130px;background:#00c8ff}
+body::after{right:-140px;bottom:8%;background:#8650ff;animation-delay:-8s}
+@keyframes ambientDrift{0%{transform:translate3d(0,0,0) scale(.85)}100%{transform:translate3d(65px,-45px,0) scale(1.2)}}
+header{animation:headerDrop .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes headerDrop{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.brand-logo{animation:logoGlow 3s ease-in-out infinite alternate}
+@keyframes logoGlow{from{box-shadow:0 0 10px #087bff25;transform:rotate(-4deg)}to{box-shadow:0 0 25px #00c8ff70;transform:rotate(4deg)}}
+.quote-hero{animation:heroEnter 1s .12s cubic-bezier(.2,.8,.2,1) both}
+@keyframes heroEnter{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.quote-content>*{animation:heroText .8s both}
+.quote-label{animation-delay:.35s}
+.quote-content h1{animation-delay:.5s}
+.quote-content p{animation-delay:.68s}
+@keyframes heroText{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.tank-play{animation:playPulse 2.4s ease-in-out infinite}
+@keyframes playPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,200,255,.25)}50%{box-shadow:0 0 0 9px rgba(0,200,255,0)}}
+.feature-card{opacity:0;transform:translateY(26px) scale(.985);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s}
+.feature-card.in-view{opacity:1;transform:translateY(0) scale(1)}
+.feature-card:nth-child(2){transition-delay:.07s}.feature-card:nth-child(3){transition-delay:.14s}.feature-card:nth-child(4){transition-delay:.21s}
+.feature-card:nth-child(5){transition-delay:.07s}.feature-card:nth-child(6){transition-delay:.14s}.feature-card:nth-child(7){transition-delay:.21s}.feature-card:nth-child(8){transition-delay:.28s}
+.card-image img{transform:scale(1.015);transition:transform .8s cubic-bezier(.2,.8,.2,1),filter .5s}
+.feature-card:hover .card-image img{transform:scale(1.12);filter:saturate(1.2)}
+.card-icon{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.feature-card:hover .card-icon{transform:translateY(-5px) rotate(-9deg) scale(1.08)}
+.cta-banner{animation:bannerFloat 6s ease-in-out infinite}
+@keyframes bannerFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.rocket{display:inline-block;animation:rocketBob 2.5s ease-in-out infinite}
+@keyframes rocketBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+.btn{position:relative;overflow:hidden}
+.btn::after{content:"";position:absolute;top:-80%;left:-45%;width:35%;height:260%;background:rgba(255,255,255,.38);transform:rotate(25deg);transition:left .65s ease}
+.btn:hover::after{left:130%}
+footer{animation:footerFade .9s .2s both}
+@keyframes footerFade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}.feature-card{opacity:1;transform:none}}
+
+
+
+/* Navy and electric-blue visual system */
+:root {
+  --pink: #123b78;
+  --navy-ink: #06142b;
+  --navy-mid: #0b2852;
+  --electric: #36a5ff;
+}
+body {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(24,82,155,.13), transparent 34%),
+    radial-gradient(ellipse at 92% 22%, rgba(20,54,112,.12), transparent 32%),
+    var(--bg);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+header {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+.brand-logo {
+  background: linear-gradient(145deg, #0b2852, #1684e8 72%, #8bd4ff);
+  box-shadow: 0 0 22px rgba(35,139,255,.24);
+}
+.quote-hero {
+  border-color: rgba(66,157,255,.48);
+  background:
+    linear-gradient(115deg, rgba(3,10,26,.94), rgba(7,30,67,.84) 55%, rgba(8,48,91,.76)),
+    url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+  box-shadow: 0 18px 55px rgba(0,20,55,.38), inset 0 1px rgba(165,218,255,.12);
+}
+.quote-hero::before { background: rgba(25,126,255,.30); }
+.quote-hero::after { background: rgba(16,62,145,.34); }
+.hero-gear {
+  position: absolute;
+  z-index: 5;
+  top: 10px;
+  right: 13px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(117,190,255,.58);
+  border-radius: 12px;
+  color: #d9efff;
+  background: linear-gradient(145deg, rgba(8,37,78,.94), rgba(14,83,151,.82));
+  box-shadow: 0 0 14px rgba(34,139,255,.28), inset 0 1px rgba(255,255,255,.16);
+  font-size: 25px;
+  line-height: 1;
+  animation: rexGearSpin .62s linear infinite;
+  transform-origin: center;
+  pointer-events: none;
+}
+@keyframes rexGearSpin { to { transform: rotate(360deg); } }
+.tank-play {
+  border-color: rgba(132,205,255,.82);
+  background: linear-gradient(135deg, #0c3d7a, #087fd5 62%, #40b8ff);
+  box-shadow: 0 6px 22px rgba(0,115,220,.34);
+}
+.tank-play:hover { box-shadow: 0 9px 28px rgba(0,145,255,.48); }
+.feature-card {
+  border-color: rgba(45,104,174,.48);
+  background: linear-gradient(155deg, #0b1b35, #071326 72%);
+  box-shadow: 0 8px 24px rgba(0,0,0,.17), inset 0 1px rgba(145,195,255,.06);
+}
+.feature-card::before {
+  background: conic-gradient(
+    from 0deg, transparent 0deg 250deg,
+    #102d5c 270deg, #176bce 300deg,
+    #d8efff 307deg, #176bce 314deg,
+    #102d5c 330deg, transparent 350deg 360deg
+  );
+}
+.feature-card::after, .feature-card > a, .feature-card .card-body {
+  background: #08172d !important;
+}
+.feature-card:hover {
+  border-color: #368fe8;
+  box-shadow: 0 12px 32px rgba(0,74,160,.22), 0 0 18px rgba(38,132,230,.13);
+}
+.feature-card .card-link { color: #65baff; }
+.card-icon {
+  box-shadow: 0 4px 14px rgba(0,0,0,.28), 0 0 12px rgba(40,135,235,.16);
+}
+.btn-primary {
+  color: #fff;
+  border-color: #398fe6;
+  background: linear-gradient(135deg, #0b3268, #087ed0 65%, #45b8ff);
+}
+.btn-primary:hover { box-shadow: 0 8px 24px rgba(0,115,220,.32); }
+.theme-btn:hover, .menu-btn:hover, .search-btn:hover,
+.search-box input:focus, .side-menu a:hover {
+  border-color: #398fe6;
+}
+::selection { color: #fff; background: #155ca8; }
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid #69bdff;
+  outline-offset: 3px;
+}
+@media (max-width: 650px) {
+  .hero-gear { top: 8px; right: 9px; width: 34px; height: 34px; font-size: 22px; }
+  .quote-hero { box-shadow: 0 12px 32px rgba(0,20,55,.32); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-gear { animation: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+
+
+/* Purple page background only — keep feature cards and panels navy */
+html, body {
+  background-color: #180b2b !important;
+}
+body {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(126, 54, 190, .30), transparent 38%),
+    radial-gradient(ellipse at 90% 28%, rgba(86, 35, 145, .26), transparent 36%),
+    linear-gradient(180deg, #1c0d32 0%, #160a27 52%, #10071e 100%) !important;
+}
+
+
+/* Pure black page background only; keep navy cards and their styling */
+html, body {
+  background-color: #000 !important;
+}
+body {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(30, 30, 42, .22), transparent 38%),
+    radial-gradient(ellipse at 90% 28%, rgba(24, 24, 36, .18), transparent 36%),
+    #000 !important;
+}
+
+</style>
+<style>
+
+/* EmmyHenz-inspired card finish: dark panels, fine magenta neon edge */
+:root { scroll-behavior: smooth; }
+.feature-card {
+  --card: #09090c;
+  position: relative;
+  isolation: isolate;
+  padding: 1.5px;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 15px;
+  background: #09090c !important;
+  box-shadow: 0 0 12px rgba(24, 91, 175, .14);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1),
+              box-shadow .45s ease, opacity .7s ease;
+}
+.feature-card::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -100%;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 250deg,
+    #102d5c 270deg,
+    #176bce 300deg,
+    #d8efff 307deg,
+    #176bce 314deg,
+    #102d5c 330deg,
+    transparent 350deg 360deg
+  );
+  animation: emmyBorderSweep 5.5s linear infinite;
+  filter: blur(.25px);
+}
+.feature-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 1.5px;
+  border-radius: 13.5px;
+  background: #09090c;
+}
+.feature-card > a {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 13px;
+  background: #09090c !important;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 8px rgba(24, 105, 210, .28),
+              0 0 22px rgba(24, 105, 210, .16);
+}
+.feature-card:hover::before { animation-duration: 2.7s; }
+.feature-card .card-body { background: #09090c; }
+.feature-card .card-body h3 { color: #fff; }
+.feature-card .card-body p { color: #a5a2b1; }
+.feature-card .card-link { color: #5baeff; }
+@keyframes emmyBorderSweep {
+  to { transform: rotate(360deg); }
+}
+
+/* Gentle reveal while scrolling; no abrupt jumps */
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+.feature-card {
+  transition-property: opacity, transform, box-shadow;
+  transition-duration: .75s, .55s, .4s;
+  transition-timing-function: ease, cubic-bezier(.2,.8,.2,1), ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .feature-card::before { animation: none; }
+}
+
 </style>
 </head>
 <body>
@@ -97,94 +355,119 @@ body.menu-open{overflow:hidden}
   </div>
   <div class="container search-box" id="searchBox"><input type="search" id="siteSearch" placeholder="Search digital tools, games, templates..." aria-label="Search RexWeb Nexora"></div>
 </header>
-
 <section class="quote-hero container" aria-label="Welcome to RexWeb Nexora">
-  <div class="quote-content">
-    <div class="quote-label">✦ Welcome to RexWeb Nexora ✦</div>
-    <h1>Dream Bigger.<br><span>Build Beyond Limits.</span></h1>
-    <p>Your ideas deserve a world of possibilities. Discover the tools, creativity, and digital experiences to turn your next big idea into reality.</p>
-  </div>
+  <div class="hero-gear" aria-hidden="true" title="RexWeb settings">⚙</div>
+  <div class="tank-stage" id="tankStage" aria-hidden="true"></div>
+  <a class="tank-play" href="https://rexweb.web.app/games/tank-battle.html" aria-label="Play Nexora War Tank">▶ PLAY TANK BATTLE</a>
 </section>
-
 <section class="section container" id="explore">
   <div class="cards-grid" id="featureGrid">
-
     <article class="feature-card" style="--accent:#00c8ff"><a href="tools.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=80" alt="Laptop displaying digital tools and a development workspace" loading="lazy"><div class="card-icon">🛠️</div></div><div class="card-body"><h3>Digital Tools</h3><p>Useful online utilities to make your digital life easier.</p><span class="card-link">Explore Tools →</span></div></a></article>
-
     <article class="feature-card" style="--accent:#a56aff"><a href="templates.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=700&q=80" alt="Website templates displayed on a computer screen" loading="lazy"><div class="card-icon">💻</div></div><div class="card-body"><h3>Web Templates</h3><p>Modern, responsive templates for your next website project.</p><span class="card-link">Browse Templates →</span></div></a></article>
-
     <article class="feature-card" style="--accent:#8a5bff"><a href="Rex-editor.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=700&q=80" alt="Code on a screen representing the RexWeb CodeX editor" loading="lazy"><div class="card-icon">⌨️</div></div><div class="card-body"><h3>RexWeb CodeX</h3><p>Create and edit HTML, CSS, and JS right in your browser.</p><span class="card-link">Open CodeX →</span></div></a></article>
-
-    <!-- PIANO (replaces Digital Ebooks) -->
     <article class="feature-card" style="--accent:#00e7b0"><a href="Rexweb-%23piano.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=700&q=80" alt="Piano keys" loading="lazy" onerror="this.style.display='none'"><div class="card-icon">🎹</div></div><div class="card-body"><h3>Piano</h3><p>Play a piano in your browser and record your voice with it.</p><span class="card-link">Play Piano →</span></div></a></article>
-
     <article class="feature-card" style="--accent:#ff9b43"><a href="games.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=700&q=80" alt="Gaming equipment and a colourful gaming setup" loading="lazy"><div class="card-icon">🎮</div></div><div class="card-body"><h3>Gaming Zone</h3><p>Discover browser games, explore different genres, and play.</p><span class="card-link">Play Games →</span></div></a></article>
-
     <article class="feature-card" style="--accent:#00c8ff"><a href="marketplace.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=700&q=80" alt="Shopping bags and products in a retail marketplace" loading="lazy"><div class="card-icon">🛍️</div></div><div class="card-body"><h3>Marketplace</h3><p>Browse digital products, creative resources, and downloads.</p><span class="card-link">Visit Marketplace →</span></div></a></article>
-
     <article class="feature-card" style="--accent:#ff5555"><a href="video-editor/index.html"><div class="card-image"><img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=700&q=80" alt="Video editing timeline and production suite" loading="lazy"><div class="card-icon">🎬</div></div><div class="card-body"><h3>Video Editor</h3><p>Edit, trim, and enhance your videos directly in your browser.</p><span class="card-link">Explore Video Editor →</span></div></a></article>
-
-    <article class="feature-card" style="--accent:#ff43c6"><a href="https://vitalstar.web.app/"><div class="card-image"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80" alt="Friends enjoying time together as a community" loading="lazy"><div class="card-icon">👥</div></div><div class="card-body"><h3>Community</h3><p>Connect, share ideas, discover people, and grow together.</p><span class="card-link">Discover Community →</span></div></a></article>
-
+    <article class="feature-card" style="--accent:#123b78"><a href="https://vitalstar.web.app/"><div class="card-image"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80" alt="Friends enjoying time together as a community" loading="lazy"><div class="card-icon">👥</div></div><div class="card-body"><h3>Community</h3><p>Connect, share ideas, discover people, and grow together.</p><span class="card-link">Discover Community →</span></div></a></article>
   </div>
 </section>
-
-<div class="container">
-  <section class="cta-banner">
-    <div class="cta-main"><div class="rocket">🚀</div><div><h2>Your Next Adventure Starts Here.</h2><p>Explore. Create. Discover. All in one place.</p></div></div>
-    <div class="stats"><div class="stat"><strong>7+</strong><span>Digital Categories</span></div><div class="stat"><strong>∞</strong><span>Possibilities</span></div></div>
-    <a class="btn btn-primary" href="#explore">Explore Now →</a>
-  </section>
-</div>
-
-<footer>
-  <div class="container footer-inner">
-    <div>
-      <a href="index.html" class="brand"><div class="brand-logo">R</div><div><div class="brand-name">Rex<span>Web</span></div><small>Explore · Create · Grow</small></div></a>
-      <p style="margin-top:10px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p>
-    </div>
-    <nav class="footer-links" aria-label="Footer navigation"><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms &amp; Conditions</a><a href="Rex-editor.html">CodeX</a></nav>
-  </div>
-</footer>
-
+<div class="container"><section class="cta-banner">
+  <div class="cta-main"><div class="rocket">🚀</div><div><h2>Your Next Adventure Starts Here.</h2><p>Explore. Create. Discover. All in one place.</p></div></div>
+  <div class="stats"><div class="stat"><strong>7+</strong><span>Digital Categories</span></div><div class="stat"><strong>∞</strong><span>Possibilities</span></div></div>
+  <a class="btn btn-primary" href="#explore">Explore Now →</a>
+</section></div>
+<footer><div class="container footer-inner">
+  <div><a href="index.html" class="brand"><div class="brand-logo">R</div><div><div class="brand-name">Rex<span>Web</span></div><small>Explore · Create · Grow</small></div></a><p style="margin-top:10px">© <span id="year"></span> RexWeb Nexora. All rights reserved.</p></div>
+  <nav class="footer-links" aria-label="Footer navigation"><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms &amp; Conditions</a><a href="Rex-editor.html">CodeX</a></nav>
+</div></footer>
 <div class="menu-overlay" id="menuOverlay"></div>
 <aside class="side-menu" id="sideMenu" aria-label="Additional navigation" aria-hidden="true" inert>
   <div class="menu-top"><h2>🚀 RexWeb Menu</h2><button class="close-menu" id="closeMenu" aria-label="Close menu">×</button></div>
   <p>Explore more of the RexWeb Nexora universe.</p>
-  <a href="index.html">🏠 Home</a>
-  <a href="tools.html">🛠️ Digital Tools</a>
-  <a href="templates.html">💻 Web Templates</a>
-  <a href="Rex-editor.html">⌨️ RexWeb CodeX</a>
-  <a href="Rexweb-%23piano.html">🎹 Piano</a>
-  <a href="games.html">🎮 Gaming Zone</a>
-  <a href="marketplace.html">🛍️ Marketplace</a>
-  <a href="video-editor/index.html">🎬 Video Editor</a>
+  <a href="index.html">🏠 Home</a><a href="tools.html">🛠️ Digital Tools</a><a href="templates.html">💻 Web Templates</a><a href="Rex-editor.html">⌨️ RexWeb CodeX</a><a href="Rexweb-%23piano.html">🎹 Piano</a><a href="games.html">🎮 Gaming Zone</a><a href="marketplace.html">🛍️ Marketplace</a><a href="video-editor/index.html">🎬 Video Editor</a>
   <hr style="border:0;border-top:1px solid var(--border);margin:15px 0">
-  <a href="about.html">ℹ️ About RexWeb</a>
-  <a href="contact.html">✉️ Contact</a>
-  <a href="login.html">🔐 Login</a>
-  <a href="register.html">👤 Register</a>
-  <a href="privacy.html">🔒 Privacy Policy</a>
-  <a href="terms.html">📄 Terms &amp; Conditions</a>
+  <a href="about.html">ℹ️ About RexWeb</a><a href="contact.html">✉️ Contact</a><a href="login.html">🔐 Login</a><a href="register.html">👤 Register</a><a href="privacy.html">🔒 Privacy Policy</a><a href="terms.html">📄 Terms &amp; Conditions</a>
 </aside>
-
 <script>
 const root=document.documentElement,themeToggle=document.getElementById("themeToggle"),themeColor=document.getElementById("themeColor");
 function applyTheme(t){root.setAttribute("data-theme",t);themeToggle.textContent=t==="dark"?"☀️":"🌙";themeToggle.setAttribute("aria-label",t==="dark"?"Switch to light theme":"Switch to dark theme");themeColor.content=t==="dark"?"#050b19":"#f2f6ff";try{localStorage.setItem("rexweb-theme",t)}catch(e){}}
-let savedTheme="dark";try{savedTheme=localStorage.getItem("rexweb-theme")||"dark"}catch(e){}
-applyTheme(savedTheme);
+let savedTheme="dark";try{savedTheme=localStorage.getItem("rexweb-theme")||"dark"}catch(e){}applyTheme(savedTheme);
 themeToggle.addEventListener("click",()=>applyTheme(root.getAttribute("data-theme")==="dark"?"light":"dark"));
 const menuToggle=document.getElementById("menuToggle"),closeMenu=document.getElementById("closeMenu"),sideMenu=document.getElementById("sideMenu"),menuOverlay=document.getElementById("menuOverlay");
 function openMenu(){sideMenu.classList.add("open");menuOverlay.classList.add("open");sideMenu.setAttribute("aria-hidden","false");sideMenu.inert=false;menuToggle.setAttribute("aria-expanded","true");document.body.classList.add("menu-open");closeMenu.focus()}
 function hideMenu(){sideMenu.classList.remove("open");menuOverlay.classList.remove("open");sideMenu.setAttribute("aria-hidden","true");sideMenu.inert=true;menuToggle.setAttribute("aria-expanded","false");document.body.classList.remove("menu-open")}
-menuToggle.addEventListener("click",openMenu);closeMenu.addEventListener("click",hideMenu);menuOverlay.addEventListener("click",hideMenu);
-sideMenu.querySelectorAll("a").forEach(l=>l.addEventListener("click",hideMenu));
-document.addEventListener("keydown",e=>{if(e.key==="Escape")hideMenu()});
+menuToggle.addEventListener("click",openMenu);closeMenu.addEventListener("click",hideMenu);menuOverlay.addEventListener("click",hideMenu);sideMenu.querySelectorAll("a").forEach(l=>l.addEventListener("click",hideMenu));document.addEventListener("keydown",e=>{if(e.key==="Escape")hideMenu()});
 const searchToggle=document.getElementById("searchToggle"),searchBox=document.getElementById("searchBox"),siteSearch=document.getElementById("siteSearch");
-searchToggle.addEventListener("click",()=>{searchBox.classList.toggle("open");if(searchBox.classList.contains("open")){siteSearch.focus()}else{siteSearch.value="";filterCards("")}});
+searchToggle.addEventListener("click",()=>{searchBox.classList.toggle("open");if(searchBox.classList.contains("open"))siteSearch.focus();else{siteSearch.value="";filterCards("")}});
 function filterCards(q){const n=q.trim().toLowerCase();document.querySelectorAll(".feature-card").forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(n)?"":"none"})}
-siteSearch.addEventListener("input",e=>filterCards(e.target.value));
-document.getElementById("year").textContent=new Date().getFullYear();
+siteSearch.addEventListener("input",e=>filterCards(e.target.value));document.getElementById("year").textContent=new Date().getFullYear();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Rexweb Tank animation, adapted to render only inside the hero's small top stage. */
+(function(){
+const stage=document.getElementById("tankStage");
+if(!stage||!window.THREE)return;
+const R=Math.random,PI=Math.PI,sc=new THREE.Scene();sc.fog=new THREE.Fog(0xf0855d,40,200);
+const cam=new THREE.PerspectiveCamera(55,1,.1,400);
+const rn=new THREE.WebGLRenderer({antialias:true,alpha:true});
+rn.setPixelRatio(Math.min(devicePixelRatio,1.5));rn.setClearColor(0x000000,0);stage.appendChild(rn.domElement);
+function rs(){const w=stage.clientWidth,h=stage.clientHeight;rn.setSize(w,h,false);cam.aspect=w/h;cam.fov=innerWidth<650?70:55;cam.updateProjectionMatrix()}new ResizeObserver(rs).observe(stage);rs();
+sc.add(new THREE.HemisphereLight(0xffd8c4,0xc2603a,.95));const sun=new THREE.DirectionalLight(0xfff0d0,.85);sun.position.set(-30,40,20);sc.add(sun);
+const M=c=>new THREE.MeshLambertMaterial({color:c,flatShading:true});
+function bx(w,h,d,m,x,y,z,p){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);p.add(o);return o}
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(700,700),M(0xff7d52));gnd.rotation.x=-PI/2;sc.add(gnd);
+for(let i=0;i<14;i++){const a=R()*6.28,r=130+R()*50,h=new THREE.Mesh(new THREE.SphereGeometry(1,6,4),M(i%2?0xe8683e:0xd45a3c));h.scale.set(25+R()*25,5+R()*7,15+R()*14);h.position.set(Math.cos(a)*r,-1,Math.sin(a)*r);sc.add(h)}
+const rockC=[0x4b2433,0x6b3038,0xc4624a,0x8a3f3a];
+function blob(x,z,r){const b=new THREE.Mesh(new THREE.CircleGeometry(r,12),new THREE.MeshBasicMaterial({color:0x7a2a18,transparent:true,opacity:.28,fog:true}));b.rotation.x=-PI/2;b.position.set(x+.4*r,.03,z+.2*r);b.scale.set(1.3,1,1);sc.add(b)}
+for(let i=0;i<80;i++){const a=R()*6.28,r=10+Math.pow(R(),.7)*120,k=new THREE.Mesh(new THREE.IcosahedronGeometry(1,0),M(rockC[i%4])),s=.5+R()*1.6;k.scale.set(s*1.2,s*.8,s);k.position.set(Math.cos(a)*r,s*.3,Math.sin(a)*r);k.rotation.set(R(),R()*6,R());sc.add(k);if(i%2===0)blob(k.position.x,k.position.z,s*1.8)}
+const cm=M(0x6f8a2a);for(let i=0;i<90;i++){const a=R()*6.28,r=9+R()*115,g=new THREE.Group(),h=1.4+R()*2.2;bx(.45,h,.45,cm,0,h/2,0,g);if(R()<.6){bx(.9,.3,.3,cm,.5,h*.55,0,g);bx(.3,.9,.3,cm,.9,h*.55+.35,0,g)}g.position.set(Math.cos(a)*r,0,Math.sin(a)*r);g.rotation.y=R()*6;sc.add(g);blob(g.position.x,g.position.z,1.1)}
+function labelTex(){const c=document.createElement("canvas");c.width=256;c.height=64;const x=c.getContext("2d");x.fillStyle="#ece5c8";x.font='900 46px Impact,"Arial Black",sans-serif';x.textAlign="center";x.textBaseline="middle";x.fillText("NEXORA",128,34);return new THREE.CanvasTexture(c)}
+const LT=labelTex();
+function mkTank(col,dark,isP){const g=new THREE.Group(),body=M(col),dk=M(dark);bx(3.3,.75,.7,dk,0,.45,1.2,g);bx(3.3,.75,.7,dk,0,.45,-1.2,g);bx(3,.7,1.9,body,0,.95,0,g);const sl=bx(.9,.55,1.9,body,1.6,.82,0,g);sl.rotation.z=-.45;const tur=new THREE.Group();tur.position.set(-.1,1.55,0);g.add(tur);bx(1.8,.65,1.5,body,0,0,0,tur);bx(.5,.3,.5,dk,-.4,.45,0,tur);const bar=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,2.2,8),dk);bar.rotation.z=PI/2;bar.position.set(1.9,.05,0);tur.add(bar);if(isP){for(const s of[1,-1]){const p=new THREE.Mesh(new THREE.PlaneGeometry(1.9,.48),new THREE.MeshBasicMaterial({map:LT,transparent:true}));p.position.set(-.2,.98,.96*s);if(s<0)p.rotation.y=PI;g.add(p)}}else bx(.5,.7,1.92,M(0xf0c36a),.3,.95,0,g);const sh=new THREE.Mesh(new THREE.CircleGeometry(2.4,14),new THREE.MeshBasicMaterial({color:0x7a2a18,transparent:true,opacity:.3}));sh.rotation.x=-PI/2;sh.position.y=.03;sh.scale.set(1.35,1,.9);g.add(sh);sc.add(g);return{g,tur,bar,body,dk,col,dark,isP,hp:isP?99:2,cd:1+R()*1.5,rec:0,dead:false,dT:0,sp:0,ph:R()*6,aimed:false}}
+const P=mkTank(0x6f8a2a,0x2f3a14,true),E=[];function setE(e,far){e.dead=false;e.hp=2;e.tur.visible=true;e.body.color.set(e.col);e.dk.color.set(e.dark);e.a=R()*6.28;e.rr=far?65:20+R()*6;e.rt=14+R()*7;e.w=(R()<.5?-1:1)*(.12+R()*.1);e.cd=1.5+R()*2;e.g.position.set(P.g.position.x+Math.cos(e.a)*e.rr,0,P.g.position.z+Math.sin(e.a)*e.rr)}
+for(let i=0;i<3;i++){const e=mkTank(i%2?0xd9541e:0xe46a24,0x4a2418,false);setE(e,false);e.g.rotation.y=R()*6;E.push(e)}P.g.position.set(7,0,0);
+const parts=[],shells=[],debs=[],sg=new THREE.IcosahedronGeometry(1,0);let shake=0;
+function pt(p,v,life,s0,s1,c0,c1,gr){const m=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:c0,transparent:true,depthWrite:false}));m.position.copy(p);sc.add(m);parts.push({m,v,l:life,L:life,s0,s1,c0:new THREE.Color(c0),c1:new THREE.Color(c1),gr})}
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function megaBoom(p,s){pt(p,V(0,0,0),.2,2.5*s,8*s,0xfff6d0,0xffb040,0);for(let i=0;i<26*s;i++){const a=R()*6.28,u=R()*8*s;pt(p,V(Math.cos(a)*u,2+R()*10*s,Math.sin(a)*u),.7+R()*.8,1.2*s,(2+R()*2)*s,0xfff0b0,0xc2300f,2.5)}for(let i=0;i<16*s;i++)pt(p,V((R()-.5)*3,5+R()*7*s,(R()-.5)*3),2+R()*1.6,1*s,(3+R()*2)*s,0x2c2422,0xb08a70,.3);for(let i=0;i<30*s;i++){const a=R()*6.28,u=10+R()*18;pt(p,V(Math.cos(a)*u*.7,4+R()*14,Math.sin(a)*u*.7),.7+R()*.9,.16,.05,0xfff0b0,0xff7a20,-18)}for(let i=0;i<18*s;i++){const a=R()*6.28,u=10+R()*8*s;pt(V(p.x,.4,p.z),V(Math.cos(a)*u,.6,Math.sin(a)*u),1.2,.9*s,2.8*s,0xf6c690,0xe08a5c,0)}const rg=new THREE.Mesh(new THREE.RingGeometry(.85,1,40),new THREE.MeshBasicMaterial({color:0xffe2b0,transparent:true,side:2,depthWrite:false}));rg.rotation.x=-PI/2;rg.position.set(p.x,.2,p.z);sc.add(rg);rings.push({m:rg,l:.7,L:.7,r:12*s});const sk=new THREE.Mesh(new THREE.CircleGeometry(2.2*s,16),new THREE.MeshBasicMaterial({color:0x2a1410,transparent:true,opacity:.5,depthWrite:false}));sk.rotation.x=-PI/2;sk.position.set(p.x,.05,p.z);sc.add(sk);scorch.push({m:sk,l:14});shake=Math.min(2.2,shake+.5*s)}
+const rings=[],scorch=[],bl=new THREE.PointLight(0xffa040,0,80,1);sc.add(bl);let ts=1;
+const mg={b:new THREE.CylinderGeometry(.12,.12,1.2,8),n:new THREE.ConeGeometry(.12,.4,8),f:new THREE.BoxGeometry(.35,.02,.3)};
+function mkMissile(){const g=new THREE.Group(),w=new THREE.MeshLambertMaterial({color:0xe8e2d0}),r=new THREE.MeshLambertMaterial({color:0xc4351f}),b=new THREE.Mesh(mg.b,w);b.rotation.z=PI/2;g.add(b);const n=new THREE.Mesh(mg.n,r);n.rotation.z=-PI/2;n.position.x=.8;g.add(n);for(const a of[0,PI/2]){const f=new THREE.Mesh(mg.f,r);f.position.x=-.5;f.rotation.x=a;g.add(f)}g.scale.setScalar(1.6);return g}
+function ad(a){while(a>PI)a-=2*PI;while(a<-PI)a+=2*PI;return a}
+function fire(T,tg){T.g.updateMatrixWorld(true);const m=T.tur.localToWorld(V(3.1,.05,0)),er=T.isP?.8:3.4,off=V((R()-.5)*er*2,0,(R()-.5)*er*2),v=V(Math.cos(T.g.rotation.y+T.tur.rotation.y),.9,-Math.sin(T.g.rotation.y+T.tur.rotation.y)).normalize(),s=mkMissile();s.position.copy(m);sc.add(s);shells.push({m:s,v,tg,off,tm:T.isP,l:0,sp:14});T.rec=.8;pt(m,V(0,0,0),.1,.6,1.8,0xfff2b0,0xffc060,0);for(let i=0;i<5;i++)pt(m,V(v.x*.1+(R()-.5)*2,R()*1.5,v.z*.1+(R()-.5)*2),.9,.5,1.8,0x6a5a52,0xb08a74,-.3);for(let i=0;i<10;i++)pt(m,V(-v.x*(2+R()*5)+(R()-.5)*3,R()*2,-v.z*(2+R()*5)+(R()-.5)*3),1.4,.8,3.2,0xe9e1d6,0xa89888,0);shake=Math.min(1.5,shake+(T.isP?.15:.05))}
+function kill(e){e.dead=true;e.dT=0;e.tur.visible=false;e.body.color.set(0x2a2522);e.dk.color.set(0x15110f);const p=e.g.position.clone();p.y=1.4;megaBoom(p,2.6);ts=.3;e.s1=0;e.s2=0;for(let i=0;i<9;i++){const d=new THREE.Mesh(new THREE.BoxGeometry(.3+R()*.6,.3,.4+R()*.4),M(i?0x2b2420:0x4a4a30));d.position.copy(p);sc.add(d);debs.push({m:d,v:V((R()-.5)*14,6+R()*9,(R()-.5)*14),w:V(R()*6,R()*6,R()*6),l:4})}}
+function move(T,x,z,dt,t){const g=T.g,vx=x-g.position.x,vz=z-g.position.z;T.sp=Math.hypot(vx,vz)/Math.max(dt,.001);g.position.x=x;g.position.z=z;if(T.sp>.3)g.rotation.y+=ad(Math.atan2(-vz,vx)-g.rotation.y)*Math.min(1,dt*3);g.position.y=Math.sin(t*14+T.ph)*.03*Math.min(1,T.sp/3);if(T.sp>.5&&R()<.4)pt(V(x-Math.cos(g.rotation.y)*1.8+(R()-.5)*2,.2,z+Math.sin(g.rotation.y)*1.8+(R()-.5)*2),V((R()-.5),.8,(R()-.5)),1,.4,1.5,0xf6c690,0xff9a6a,0)}
+function aim(T,tg,dt){let want=0;if(tg){const dx=tg.g.position.x-T.g.position.x,dz=tg.g.position.z-T.g.position.z;want=ad(Math.atan2(-dz,dx)-T.g.rotation.y)}const d=ad(want-T.tur.rotation.y);T.tur.rotation.y+=d*Math.min(1,dt*3.5);T.aimed=!!tg&&Math.abs(d)<.1;T.rec*=Math.pow(.01,dt);T.bar.position.x=1.9-T.rec}
+let t=0,last=performance.now();const lk=V(7,1.2,0);let raf;
+function frame(n){const rdt=Math.min(.05,(n-last)/1000);last=n;ts+=(1-ts)*Math.min(1,rdt*1.1);const dt=rdt*ts;t+=dt;const pa=t*.12;move(P,Math.cos(pa)*7,Math.sin(pa*1.3)*5,dt,t);let near=null,nd=1e9,cx=0,cz=0,cn=0;
+for(const e of E){if(e.dead){e.dT+=dt;if(R()<.5)pt(V(e.g.position.x+(R()-.5)*2,1.2,e.g.position.z+(R()-.5)*2),V(0,2,0),.5,.6,1.2,0xffd070,0xd2431a,0);if(R()<.3)pt(V(e.g.position.x,1.6,e.g.position.z),V((R()-.5),2.5,(R()-.5)),1.8,.8,2.8,0x2a2220,0x8a6a5a,0);if(!e.s1&&e.dT>.55){e.s1=1;megaBoom(V(e.g.position.x,1.2,e.g.position.z),1.1)}if(!e.s2&&e.dT>1.3){e.s2=1;megaBoom(V(e.g.position.x+1,1.5,e.g.position.z),.8)}if(e.dT>4)setE(e,true);continue}e.rr=Math.max(e.rt,e.rr-8*dt);e.a+=e.w*dt;move(e,P.g.position.x+Math.cos(e.a)*e.rr,P.g.position.z+Math.sin(e.a)*e.rr,dt,t);const d=e.g.position.distanceTo(P.g.position);if(e.rr<=e.rt+6){cx+=e.g.position.x;cz+=e.g.position.z;cn++;if(d<nd){nd=d;near=e}}aim(e,P,dt);e.cd-=dt;if(e.aimed&&e.cd<=0&&e.rr<=e.rt+6){fire(e,P);e.cd=2.6+R()*1.4}}
+aim(P,near,dt);P.cd-=dt;if(P.aimed&&P.cd<=0){fire(P,near);P.cd=2.3+R()*.8}
+for(let i=shells.length-1;i>=0;i--){const s=shells[i];s.l+=dt;const tp=s.tg.g.position.clone().add(s.off);tp.y+=1.2;s.tp=tp.clone();const ds=tp.sub(s.m.position).normalize();s.v.lerp(ds,Math.min(1,dt*(1.5+s.l*4))).normalize();s.sp=Math.min(52,14+s.l*70);s.m.position.addScaledVector(s.v,s.sp*dt);s.m.quaternion.setFromUnitVectors(V(1,0,0),s.v);pt(s.m.position,V((R()-.5)*.6,.3+R()*.5,(R()-.5)*.6),1.6,.35,2,0xf4efe6,0x9a8478,.2);pt(s.m.position.clone().addScaledVector(s.v,-.8),V(0,0,0),.14,.55,.12,0xfff0a0,0xff6a10,0);const p=s.m.position;let done=s.l>5||p.y<.15||p.distanceTo(s.tp)<1.2,hit=null;if(!done)for(const T of s.tm?E:[P]){if(T.dead)continue;if(Math.hypot(p.x-T.g.position.x,p.z-T.g.position.z)<1.9&&p.y<2.8){hit=T;done=true}}if(done){megaBoom(p.clone(),hit?1.5:1);if(hit&&!hit.isP&&--hit.hp<=0)kill(hit);sc.remove(s.m);shells.splice(i,1)}}
+for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.l-=dt;if(p.l<=0){sc.remove(p.m);p.m.material.dispose();parts.splice(i,1);continue}const k=p.l/p.L;p.m.position.addScaledVector(p.v,dt);p.v.y+=p.gr*dt;p.m.scale.setScalar(p.s0+(p.s1-p.s0)*(1-k));p.m.material.color.lerpColors(p.c0,p.c1,1-k);p.m.material.opacity=Math.min(1,k*1.6)}
+for(let i=debs.length-1;i>=0;i--){const d=debs[i];d.l-=dt;d.v.y-=18*dt;d.m.position.addScaledVector(d.v,dt);if(d.m.position.y<.2){d.m.position.y=.2;d.v.set(0,0,0);d.w.set(0,0,0)}d.m.rotation.x+=d.w.x*dt;d.m.rotation.y+=d.w.y*dt;d.m.rotation.z+=d.w.z*dt;if(d.l<=0){sc.remove(d.m);debs.splice(i,1)}}
+for(let i=rings.length-1;i>=0;i--){const q=rings[i];q.l-=dt;const k=Math.max(0,q.l/q.L);q.m.scale.setScalar(1+(q.r-1)*(1-k*k));q.m.material.opacity=k*.8;if(q.l<=0){sc.remove(q.m);rings.splice(i,1)}}
+for(let i=scorch.length-1;i>=0;i--){const q=scorch[i];q.l-=dt;q.m.material.opacity=Math.min(.5,q.l/6);if(q.l<=0){sc.remove(q.m);scorch.splice(i,1)}}
+bl.intensity*=Math.pow(.0005,dt);const a=t*.1,r=15+3*Math.sin(t*.23),pp=P.g.position,tx=cn?pp.x*.55+cx/cn*.45:pp.x,tz=cn?pp.z*.55+cz/cn*.45:pp.z;lk.lerp(V(tx,1.3,tz),Math.min(1,dt*1.5));shake*=Math.pow(.02,dt);cam.position.set(pp.x+Math.cos(a)*r+(R()-.5)*shake,4.2+1.8*Math.sin(t*.31)+(R()-.5)*shake,pp.z+Math.sin(a)*r+(R()-.5)*shake);cam.lookAt(lk);rn.render(sc,cam);raf=requestAnimationFrame(frame)}
+document.addEventListener("visibilitychange",()=>{if(document.hidden){cancelAnimationFrame(raf)}else{last=performance.now();raf=requestAnimationFrame(frame)}});
+requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* Reveal sections and cards as the visitor scrolls */
+(function(){
+  const cards=[...document.querySelectorAll(".feature-card")];
+  if(!("IntersectionObserver" in window)){cards.forEach(c=>c.classList.add("in-view"));return;}
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target);}
+    });
+  },{threshold:.12,rootMargin:"0px 0px -35px 0px"});
+  cards.forEach(card=>observer.observe(card));
+})();
+</script>
+
 </body>
 </html>
