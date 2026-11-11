@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Maxi War Tank</title>
+<title>Nexora War Tank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&display=swap">
 <style>
@@ -24,17 +24,17 @@ body{margin:0;background:#e9c98f;color:var(--hud);font:600 15px/1.3 var(--body);
 #zone{position:fixed;left:0;top:0;width:55%;height:100%;z-index:5}
 #base{position:fixed;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,241,210,.55);background:rgba(36,23,14,.28);z-index:6;pointer-events:none}
 #knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,241,210,.8)}
-#fire{position:fixed;right:max(22px,calc(env(safe-area-inset-right,0px) + 14px));bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:98px;height:98px;border-radius:50%;border:3px solid #fff1d2;background:rgba(228,71,44,.82);color:#fff1d2;font:400 20px var(--display);letter-spacing:.06em;z-index:6;touch-action:none}
-#fire:active{background:rgba(255,122,47,.95)}
+#fire{position:fixed;right:max(22px,calc(env(safe-area-inset-right,0px) + 14px));bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:150px;height:150px;border-radius:50%;border:3px solid #fff1d2;background:rgba(228,71,44,.82);color:#fff1d2;font:400 20px var(--display);letter-spacing:.06em;z-index:6;touch-action:none}
+#fire:active{background:rgba(255,122,47,.95)}#fire span{position:relative;pointer-events:none;opacity:.9}#fk{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;background:rgba(255,241,210,.38);border:2px solid rgba(255,241,210,.7);pointer-events:none}
 #orbit{position:fixed;left:55%;top:0;right:0;bottom:0;z-index:5}
 #stage{position:fixed;overflow:hidden;left:0;top:0;width:100%;height:100%}
 .seg{display:flex;gap:6px;margin:10px 0 0}
 .seg button,.seg1{font:700 14px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--hud);background:rgba(255,241,210,.08);border:1px solid rgba(255,241,210,.4);border-radius:999px;padding:8px 14px;cursor:pointer}
-.seg button{flex:1}
+.seg button{flex:1}#diff{flex-wrap:wrap}#diff button{flex:1 1 28%;padding:8px 6px}
 .seg button[aria-pressed="true"]{background:var(--sand);color:var(--ink);border-color:var(--sand)}
 .seg button:focus-visible,.seg1:focus-visible{outline:3px solid #fff1d2;outline-offset:2px}
 .seg1{margin-top:8px}
-#dd{font-size:15px;min-height:1.3em}
+#dd{font-size:15px;min-height:1.3em}#am{font-size:13px;margin:4px 0 0;opacity:.85}#stage.short #am{font-size:11px;margin:2px 0 0}
 #stage.short .card{padding:12px 16px 14px;width:min(560px,100%)}
 #stage.short h1{font-size:34px;margin-bottom:4px}
 #stage.short .card p{font-size:14px;margin:4px 0}
@@ -85,13 +85,13 @@ h1{margin:0 0 10px;font:400 clamp(38px,11vw,58px)/.95 var(--display);letter-spac
 <div id="banner"></div>
 <div id="zone"></div>
 <div id="base" hidden><div id="knob"></div></div>
-<button id="fire" hidden>FIRE</button>
+<button id="fire" hidden><i id="fk"></i><span>FIRE</span></button>
 <div id="orbit"></div>
 
 <div id="menu" class="overlay">
   <div class="card" id="mainCard">
     <p class="kick">DESERT ASSAULT</p>
-    <h1 id="title">MAXI<br>WAR TANK</h1>
+    <h1 id="title">NEXORA<br>WAR TANK</h1>
     <p id="sub">Enemy armor is rolling in over the dunes. Hold the desert as long as you can.</p>
     <p id="how"></p>
     <p id="best"></p>
@@ -102,7 +102,7 @@ h1{margin:0 0 10px;font:400 clamp(38px,11vw,58px)/.95 var(--display);letter-spac
     <p class="kick">SETTINGS</p>
     <div class="grid">
       <div class="row" style="grid-column:1/-1"><span class="lbl">Difficulty</span>
-        <div class="seg" id="diff" role="group" aria-label="Difficulty"><button data-d="easy" aria-pressed="false">Easy</button><button data-d="normal" aria-pressed="true">Normal</button><button data-d="hard" aria-pressed="false">Hard</button></div>
+        <div class="seg" id="diff" role="group" aria-label="Difficulty"><button data-d="easy" aria-pressed="false">Easy</button><button data-d="normal" aria-pressed="true">Normal</button><button data-d="hard" aria-pressed="false">Hard</button><button data-d="expert" aria-pressed="false">Expert</button><button data-d="insane" aria-pressed="false">Insane</button></div>
         <p id="dd"></p></div>
       <div class="row"><span class="lbl">Time of day</span>
         <div class="seg" id="tod" role="group" aria-label="Time of day"><button data-t="Morning" aria-pressed="true">Morning</button><button data-t="Midday" aria-pressed="false">Midday</button><button data-t="Dusk" aria-pressed="false">Dusk</button></div></div>
@@ -110,6 +110,8 @@ h1{margin:0 0 10px;font:400 clamp(38px,11vw,58px)/.95 var(--display);letter-spac
         <div class="seg" id="camv" role="group" aria-label="Camera"><button data-v="chase" aria-pressed="true">Chase</button><button data-v="over" aria-pressed="false">Overhead</button></div></div>
       <div class="row"><span class="lbl">Sound</span>
         <div class="seg" id="sndv" role="group" aria-label="Sound"><button data-s="on" aria-pressed="true">On</button><button data-s="off" aria-pressed="false">Off</button></div></div>
+      <div class="row"><span class="lbl">Aiming (touch)</span>
+        <div class="seg" id="aimm" role="group" aria-label="Aiming"><button data-a="manual" aria-pressed="false">Fire pad</button><button data-a="auto" aria-pressed="true">Auto</button></div><p id="am"></p></div>
       <div class="row"><span class="lbl">Screen</span>
         <div class="seg" id="scr" role="group" aria-label="Screen"><button data-r="land" aria-pressed="false">Landscape</button><button data-r="auto" aria-pressed="true">Upright</button></div></div>
     </div>
@@ -236,6 +238,22 @@ function makeTank(body,dark,scale){
 const PLAYER_R=2.1;
 const p={x:0,z:0,h:0,aim:0,hp:100,rl:0,rec:0,...makeTank(0x667f3c,0x2c381a,1.15)};
 p.g.visible=true;
+/* NEXORA lettering on the player tank: both side skirts and the turret roof */
+(function(){
+  const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d'),tex=new THREE.CanvasTexture(c);
+  function draw(){
+    x.clearRect(0,0,512,128);x.font='400 104px "Black Ops One",Impact,"Arial Black",sans-serif';x.textAlign='center';x.textBaseline='middle';
+    x.lineJoin='round';x.lineWidth=8;x.strokeStyle='#1f2a12';x.strokeText('NEXORA',256,68);
+    x.fillStyle='#fff1d2';x.fillText('NEXORA',256,68);tex.needsUpdate=true;
+  }
+  draw();
+  try{if(document.fonts&&document.fonts.load)document.fonts.load('104px "Black Ops One"').then(draw).catch(()=>{})}catch(_){}
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+  const sideG=new THREE.PlaneGeometry(3.2,.8);
+  [[1,Math.PI/2],[-1,-Math.PI/2]].forEach(([s,ry])=>{const m=new THREE.Mesh(sideG,mat);m.position.set(s*2.02,1.15,0);m.rotation.y=ry;p.g.add(m)});
+  const roof=new THREE.Mesh(new THREE.PlaneGeometry(1.7,.425),mat);
+  roof.rotation.set(-Math.PI/2,0,Math.PI);roof.position.set(0,.9,.7);p.tur.add(roof);
+})();
 
 const barGeo=new THREE.PlaneGeometry(2.8,.28);
 const barBg=new THREE.MeshBasicMaterial({color:0x1a110a,transparent:true,opacity:.6,depthTest:false});
@@ -550,13 +568,36 @@ zone.addEventListener('pointermove',e=>{
 });
 function stickEnd(e){if(e.pointerId!==stick.id)return;stick.on=false;stick.x=stick.y=0;base.hidden=true}
 zone.addEventListener('pointerup',stickEnd);zone.addEventListener('pointercancel',stickEnd);
-fireBtn.addEventListener('pointerdown',e=>{e.preventDefault();firing=true;try{fireBtn.setPointerCapture(e.pointerId)}catch(_){}});
-fireBtn.addEventListener('pointerup',()=>{firing=false});fireBtn.addEventListener('pointercancel',()=>{firing=false});
+/* FIRE pad (Mini Militia style): hold to shoot, drag to aim */
+let aimAng=null,aimV=null,fid=-1;const fk=$('fk');
+let aimMode='auto',doneAuto={},justPad=false;
+try{doneAuto=JSON.parse(localStorage.getItem('maxiTankAuto')||'{}')||{}}catch(_){doneAuto={}}
+const padOpen=()=>['easy','normal','hard','expert','insane'].every(d=>doneAuto[d]);
+try{if(localStorage.getItem('maxiTankAim')==='manual'&&padOpen())aimMode='manual'}catch(_){}
+function applyAim(){
+  const open=padOpen();
+  Array.prototype.forEach.call($('aimm').children,b=>{const m=b.dataset.a,l=m==='manual'&&!open;b.setAttribute('aria-pressed',m===aimMode);b.setAttribute('aria-disabled',l);b.style.opacity=l?'.5':'';b.textContent=m==='auto'?'Auto':(l?'\uD83D\uDD12 ':'')+'Fire pad'});
+  fk.style.display=aimMode==='auto'?'none':'';
+  $('am').textContent=open?'':'Fire pad unlocks after you clear every level on Auto aim ('+['easy','normal','hard','expert','insane'].filter(d=>doneAuto[d]).length+'/5).';
+}
+Array.prototype.forEach.call($('aimm').children,b=>b.addEventListener('click',()=>{if(b.dataset.a==='manual'&&!padOpen()){applyAim();return}aimMode=b.dataset.a;try{localStorage.setItem('maxiTankAim',aimMode)}catch(_){}applyAim()}));
+applyAim();
+function fireDrag(e){
+  const r=fireBtn.getBoundingClientRect(),c=pt({clientX:r.left+r.width/2,clientY:r.top+r.height/2}),q=pt(e);
+  let dx=q.x-c.x,dy=q.y-c.y;const d=Math.hypot(dx,dy),R=48;
+  if(d>12)aimV={x:dx/d,y:dy/d};
+  if(d>R){dx*=R/d;dy*=R/d}
+  fk.style.transform='translate('+dx+'px,'+dy+'px)';
+}
+fireBtn.addEventListener('pointerdown',e=>{e.preventDefault();firing=true;fid=e.pointerId;touchMode=true;try{fireBtn.setPointerCapture(e.pointerId)}catch(_){}fireDrag(e)});
+fireBtn.addEventListener('pointermove',e=>{if(e.pointerId===fid&&firing)fireDrag(e)});
+function fireEnd(e){if(e.pointerId!==fid)return;firing=false;fid=-1;aimV=null;fk.style.transform='translate(0,0)'}
+fireBtn.addEventListener('pointerup',fireEnd);fireBtn.addEventListener('pointercancel',fireEnd);
 Array.prototype.forEach.call($('sndv').children,b=>b.addEventListener('click',()=>{
   muted=b.dataset.s==='off';Array.prototype.forEach.call($('sndv').children,x=>x.setAttribute('aria-pressed',x===b));
   if(amb)amb.master.gain.value=muted?0:1;
 }));
-if(touchMode)fireBtn.hidden=false;
+fireBtn.hidden=false;
 
 const ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),-1.5),hitPt=new THREE.Vector3();
 
@@ -601,26 +642,32 @@ Array.prototype.forEach.call($('camv').children,b=>b.addEventListener('click',()
 const DIFF={
   easy:{hp:.7,dmg:.6,rate:1.5,spd:.85,spread:1.7,cnt:-1,drop:1.6,heal:25,sm:.8,desc:'Weaker, slower enemies and extra repair crates.'},
   normal:{hp:1,dmg:1,rate:1,spd:1,spread:1,cnt:0,drop:1,heal:15,sm:1,desc:'A fair fight. Balanced armor and firepower.'},
-  hard:{hp:1.4,dmg:1.4,rate:.75,spd:1.12,spread:.6,cnt:2,drop:.7,heal:8,sm:1.5,desc:'Tougher, faster enemies that hit hard. Fewer repair crates.'}
+  hard:{hp:1.4,dmg:1.4,rate:.75,spd:1.12,spread:.6,cnt:2,drop:.7,heal:8,sm:1.5,desc:'Tougher, faster enemies that hit hard. Fewer repair crates.'},
+  expert:{hp:1.8,dmg:1.7,rate:.65,spd:1.2,spread:.45,cnt:3,drop:.55,heal:5,sm:2,desc:'Big armored squads with sharp aim. Repairs are rare.'},
+  insane:{hp:2.4,dmg:2.2,rate:.5,spd:1.3,spread:.3,cnt:4,drop:.4,heal:0,sm:3,desc:'Relentless, deadly armor. No healing between waves.'}
 };
 let diff='normal',best=0;
+const ORDER=['easy','normal','hard','expert','insane'];let done={},justUnlocked='';
+try{done=JSON.parse(localStorage.getItem('maxiTankDone')||'{}')||{}}catch(_){done={}}
+const unlocked=d=>{const i=ORDER.indexOf(d);return i<=0||!!done[ORDER[i-1]]};
 try{const v=localStorage.getItem('maxiTankDiff');if(DIFF[v])diff=v}catch(_){}
+if(!unlocked(diff))diff='easy';
 const bestKey=()=>'maxiTankBest_'+diff;
 function setDiff(d){
   diff=d;try{localStorage.setItem('maxiTankDiff',d)}catch(_){}
   best=0;try{best=+localStorage.getItem(bestKey())||0}catch(_){}
-  document.querySelectorAll('#diff button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===d));
+  document.querySelectorAll('#diff button').forEach(b=>{const dn=b.dataset.d,u=unlocked(dn);b.setAttribute('aria-pressed',dn===d);b.setAttribute('aria-disabled',!u);b.style.opacity=u?'':'.5';b.textContent=(u?'':'\uD83D\uDD12 ')+dn[0].toUpperCase()+dn.slice(1)});
   $('dd').textContent=DIFF[d].desc;$('best').textContent=best?('Best score on '+d+': '+best):'';
 }
 function saveBest(){if(score>best){best=score;try{localStorage.setItem(bestKey(),String(best))}catch(_){}}}
-document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>setDiff(b.dataset.d)));
+document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.d;if(!unlocked(d)){setDiff(diff);$('dd').textContent='Locked. Complete '+ORDER[ORDER.indexOf(d)-1]+' to unlock.';return}setDiff(d)}));
 function showMenu(mode){
   const over=mode==='over',won=mode==='won';
-  $('title').innerHTML=won?'VICTORY':over?'DESTROYED':'MAXI<br>WAR TANK';
-  $('sub').textContent=won?('Desert secured. All 4 waves cleared on '+diff+'. Final score '+score+'.'):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
-  $('how').textContent=touchMode?'Drag on the left to drive. Your gun locks onto the nearest enemy. Tap FIRE to shoot. Grab green crates to repair. Drag the right side to orbit, pinch to zoom.'
+  $('title').innerHTML=won?'VICTORY':over?'DESTROYED':'NEXORA<br>WAR TANK';
+  $('sub').textContent=won?('Desert secured. All 4 waves cleared on '+diff+'. Final score '+score+'.'+(justUnlocked?' '+justUnlocked[0].toUpperCase()+justUnlocked.slice(1)+' unlocked!':'')+(justPad?' Fire pad aiming unlocked!':'')):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
+  $('how').textContent=touchMode?'Drag on the left to drive. Hold the FIRE pad to shoot. In Fire pad aiming, drag it to aim. Grab green crates to repair. Drag the right side to orbit, pinch to zoom.'
     :'WASD or arrow keys to drive. Move the mouse to aim. Click or Space to fire. Grab green crates to repair. Right-drag or Q/E to orbit, scroll to zoom.';
-  setDiff(diff);
+  setDiff(diff);applyAim();
   $('go').textContent=won?'PLAY AGAIN':over?'TRY AGAIN':'ROLL OUT';
   NOROT=scrPref==='auto';Array.prototype.forEach.call($('scr').children,x=>x.setAttribute('aria-pressed',x.dataset.r===scrPref));resize();$('rotPop').hidden=true;$('mainCard').hidden=false;$('setCard').hidden=true;$('menu').hidden=false;
 }
@@ -652,6 +699,8 @@ function gameOver(){
   setTimeout(()=>{if(state==='over')showMenu('over')},1400);
 }
 function victory(){
+  const ni=ORDER.indexOf(diff)+1;justUnlocked=(ni<ORDER.length&&!done[diff])?ORDER[ni]:'';done[diff]=true;try{localStorage.setItem('maxiTankDone',JSON.stringify(done))}catch(_){}
+  justPad=false;if(touchMode&&aimMode==='auto'){const was=padOpen();doneAuto[diff]=true;try{localStorage.setItem('maxiTankAuto',JSON.stringify(doneAuto))}catch(_){}justPad=!was&&padOpen()}
   state='won';score+=Math.round(500*DIFF[diff].sm);$('score').textContent=score;saveBest();sfx('pick');say('VICTORY');
   for(let i=0;i<6;i++)setTimeout(()=>explode(p.x+rnd(-14,14),p.z+rnd(-14,14),false),i*260);
   setTimeout(()=>{if(state==='won')showMenu('won')},2300);
@@ -677,15 +726,22 @@ function updatePlayer(dt){
     if(Math.random()<.5)burst(p.x-Math.sin(p.h)*2,.3,p.z-Math.cos(p.h)*2,1,'sand',2,.9,.6,1.5);
   }
   let target=p.aim;
+  let lock=true;
   if(touchMode){
-    let bd=75,be=null;for(const e of enemies){const d=Math.hypot(e.x-p.x,e.z-p.z);if(d<bd){bd=d;be=e}}
-    target=be?Math.atan2(be.x-p.x,be.z-p.z):p.h;
+    if(aimMode==='auto'){
+      let bd=75,be=null;for(const e of enemies){const d=Math.hypot(e.x-p.x,e.z-p.z);if(d<bd){bd=d;be=e}}
+      target=be?Math.atan2(be.x-p.x,be.z-p.z):p.h;
+    }else{
+      if(aimV){const cs=Math.cos(view.th),sn=Math.sin(view.th);aimAng=Math.atan2(aimV.x*cs+aimV.y*sn,-aimV.x*sn+aimV.y*cs)}
+      target=aimAng==null?p.h:aimAng;
+      lock=Math.abs(angDiff(target,p.aim))<.3;
+    }
   }else{
     ray.setFromCamera(mouse,cam);if(ray.ray.intersectPlane(plane,hitPt))target=Math.atan2(hitPt.x-p.x,hitPt.z-p.z);
   }
   p.aim+=clamp(angDiff(target,p.aim),-6*dt,6*dt);
   p.rl=Math.max(0,p.rl-dt);
-  if(firing&&p.rl<=0){shoot(p,true,64,1,0);p.rl=.75}
+  if(firing&&lock&&p.rl<=0){shoot(p,true,64,1,0);p.rl=.75}
   place(p);
 }
 function updateEnemies(dt){
