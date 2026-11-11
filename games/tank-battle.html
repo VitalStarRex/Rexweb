@@ -631,7 +631,7 @@ function spawnEnemy(key,px,pz){
   const lt=(curLv-1)/49,lf=1+lt*(boss?.4:.8),m=makeTank(T.body,T.dark,T.sc*lf);   /* higher level = bigger enemies */
   let x,z;
   if(px!=null){x=px;z=pz}else{let t=0;do{const a=rnd(0,TAU),r=rnd(58,82);x=Math.cos(a)*r;z=Math.sin(a)*r}while(Math.hypot(x-p.x,z-p.z)<45&&t++<20)}
-  const D=DIFF[diff],hp=Math.max(1,Math.round((T.hp+Math.floor(wave/4))*D.hp));
+  const D=DIFF[diff],hp=Math.max(1,Math.round((T.hp+Math.floor(wave/4))*D.hp*(boss?1.5+lt*6:1)));   /* bosses: up to 7.5x health at level 50 */
   const mesh=(geo,mat,px,py,pz,par)=>{const q=new THREE.Mesh(geo,mat);q.position.set(px,py,pz);q.castShadow=true;(par||m.tur).add(q);return q};
   if(T.kind==='shield')mesh(new THREE.BoxGeometry(2.8,1.4,.3),m.mD,0,1.2,2.9,m.g);
   if(T.kind==='artillery')m.barrel.scale.y=1.4;
@@ -645,7 +645,7 @@ function spawnEnemy(key,px,pz){
   }
   const bar=new THREE.Group(),bg=new THREE.Mesh(barGeo,barBg),fg=new THREE.Mesh(barGeo,barFg);
   bg.renderOrder=10;fg.renderOrder=11;fg.position.z=.01;bar.add(bg,fg);scene.add(bar);if(boss)bar.scale.setScalar(1.8);
-  enemies.push({...m,...T,r:T.r*lf,sz:lf,ss:T.ss*(1+lt*.3),vol:(T.vol||1)+(boss?0:(curLv>=20?1:0)+(curLv>=40?1:0)),dmg:Math.max(1,Math.round(T.dmg*D.dmg)),rate:T.rate*D.rate,speed:T.speed*D.spd,spread:T.spread*D.spread,x,z,h:rnd(0,TAU),aim:0,hp,max:hp,cool:rnd(1,2.5),strafe:Math.random()<.5?1:-1,sw:rnd(2,5),rec:0,bar,fg,mt:rnd(2,4),sp:6,bt:4,dt2:3,dsh:0});
+  enemies.push({...m,...T,arm:boss?1/(1+lt*1.2):T.arm,r:T.r*lf,sz:lf,ss:T.ss*(1+lt*.3),vol:(T.vol||1)+(boss?0:(curLv>=20?1:0)+(curLv>=40?1:0)),dmg:Math.max(1,Math.round(T.dmg*D.dmg)),rate:T.rate*D.rate,speed:T.speed*D.spd,spread:T.spread*D.spread,x,z,h:rnd(0,TAU),aim:0,hp,max:hp,cool:rnd(1,2.5),strafe:Math.random()<.5?1:-1,sw:rnd(2,5),rec:0,bar,fg,mt:rnd(2,4),sp:6,bt:4,dt2:3,dsh:0});
 }
 function startWave(n){
   wave=n;$('wave').textContent=n+'/'+WN;
@@ -859,7 +859,7 @@ $('lvStrip').addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.delta
 /* ---------- 35 paints (3-50 coins), 24 armor levels (3-50 coins), grenades (10 coins), level backdrops ---------- */
 const shade=h=>{const r=(h>>16&255)*.42|0,g=(h>>8&255)*.42|0,b=(h&255)*.42|0;return r<<16|g<<8|b};
 const COLS=[['olive','Olive',0x667f3c],['desert','Desert',0xc2a15a],['navy','Navy',0x3f5878],['crimson','Crimson',0x9a3a32],['stealth','Stealth',0x2f3238],['gold','Gold',0xd4a634],['forest','Forest',0x2f5d34],['jungle','Jungle',0x3f7a3a],['sand','Sand',0xdbc48a],['snow','Snow',0xe6ecef],['arctic','Arctic',0xa9c4d6],['sky','Sky',0x5aa0d8],['ocean','Ocean',0x2a6f97],['teal','Teal',0x2a8c86],['mint','Mint',0x6fd0a8],['lime','Lime',0x9ad43a],['lemon','Lemon',0xe8d94a],['amber','Amber',0xe8a02a],['orange','Orange',0xe8742a],['rust','Rust',0xb4532a],['brick','Brick',0x8e3b2b],['red','Red',0xd03a30],['rose','Rose',0xe06a8a],['pink','Pink',0xf08cb8],['magenta','Magenta',0xb8349a],['purple','Purple',0x7a45b0],['violet','Violet',0x5b4ac0],['indigo','Indigo',0x3a3f9a],['slate','Slate',0x5c6b7a],['steel','Steel',0x8a97a3],['silver','Silver',0xc4c9cc],['charcoal','Charcoal',0x3a3d42],['midnight','Midnight',0x1c2540],['chocolate','Chocolate',0x5c3b26],['copper','Copper',0xb8733a]].map((c,i)=>[c[0],c[1],c[2],shade(c[2]),i?Math.round(3+(i-1)*47/33):0]);
-const armCost=n=>Math.round(3+(n-1)*47/23),GCOST=10;
+const armCost=n=>Math.round(7+(n-1)*73/23),GCOST=10;
 const BX={1:[0],2:[-.55,.55],3:[-.7,0,.7],4:[-.8,-.27,.27,.8]};
 const WNAMES=['Rocket','Twin Rockets','Triple Spread','Seeker Barrage','Quad Blast'];
 function weaponFor(a){
