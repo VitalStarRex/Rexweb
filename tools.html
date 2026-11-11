@@ -1175,5 +1175,257 @@ item.appendChild(span);item.appendChild(copyBtn);container.appendChild(item);
 $("year").textContent=new Date().getFullYear();
 </script>
 
+<script>
+/* RexWeb Nexora – upgrades & fixes. Load AFTER the main <script> (just before </body>). */
+(()=>{
+const $=id=>document.getElementById(id), show=(id,t)=>$(id).textContent=t;
+const wait=(fn,ms)=>setTimeout(fn,ms);
+
+/* ================= SCIENTIFIC CALCULATOR ================= */
+let angleMode="deg", hist=[];
+function factorialX(n){if(!Number.isInteger(n)||n<0||n>170)throw Error("Factorial needs a whole number from 0 to 170.");let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
+window.sciCalc=function(src){
+  const s=src.replace(/\s/g,"").replace(/π/g,"pi").replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-");
+  if(!s)throw Error("Enter an expression.");
+  if(s.length>200)throw Error("Expression too long.");
+  const re=/\d+\.?\d*(?:e[+-]\d+)?|\.\d+|asin|acos|atan|sin|cos|tan|sqrt|abs|log|ln|pi|ans|e|[()+\-*\/%^!]/iy,tokens=[];
+  for(let pos=0;pos<s.length;){re.lastIndex=pos;const m=re.exec(s);if(!m)throw Error('Unknown symbol near "'+s[pos]+'".');tokens.push(m[0].toLowerCase());pos=re.lastIndex;}
+  const FN=["asin","acos","atan","sin","cos","tan","sqrt","abs","log","ln"];
+  let i=0;const peek=()=>tokens[i];
+  const startsFactor=t=>t&&(/^[\d.]/.test(t)||t==="("||FN.includes(t)||["pi","e","ans"].includes(t));
+  const k=angleMode==="deg"?Math.PI/180:1;
+  const close=()=>{if(i>=tokens.length)return;if(tokens[i++]!==")")throw Error("Check brackets.");};
+  function expr(){let x=term();while(peek()==="+"||peek()==="-"){const op=tokens[i++],y=term();x=op==="+"?x+y:x-y;}return x;}
+  function term(){let x=unary();for(;;){const t=peek();
+    if(t==="*"||t==="/"){i++;const y=unary();if(t==="/"&&y===0)throw Error("Cannot divide by zero.");x=t==="*"?x*y:x/y;}
+    else if(startsFactor(t))x*=unary();else break;}return x;}
+  function unary(){if(peek()==="-"){i++;return -unary();}if(peek()==="+"){i++;return unary();}return power();}
+  function power(){let x=post();if(peek()==="^"){i++;x=Math.pow(x,unary());}return x;}
+  function post(){let x=atom();for(;;){if(peek()==="!"){i++;x=factorialX(x);}else if(peek()==="%"){i++;x/=100;}else break;}return x;}
+  function atom(){
+    const t=tokens[i++];
+    if(t===undefined)throw Error("Expression is incomplete.");
+    if(t==="(" ){const x=expr();close();return x;}
+    if(/^[\d.]/.test(t))return Number(t);
+    if(t==="pi")return Math.PI;if(t==="e")return Math.E;if(t==="ans")return lastAnswer;
+    if(FN.includes(t)){
+      if(tokens[i++]!=="(")throw Error("Use "+t+"(value).");
+      const x=expr();close();
+      switch(t){
+        case"sin":return Math.sin(x*k);
+        case"cos":return Math.cos(x*k);
+        case"tan":if(Math.abs(Math.cos(x*k))<1e-12)throw Error("tan is undefined here.");return Math.tan(x*k);
+        case"asin":case"acos":if(Math.abs(x)>1)throw Error(t+" needs a value from -1 to 1.");return (t==="asin"?Math.asin(x):Math.acos(x))/k;
+        case"atan":return Math.atan(x)/k;
+        case"sqrt":if(x<0)throw Error("Square root needs a non-negative number.");return Math.sqrt(x);
+        case"abs":return Math.abs(x);
+        case"log":if(x<=0)throw Error("Log needs a positive number.");return Math.log10(x);
+        case"ln":if(x<=0)throw Error("Natural log needs a positive number.");return Math.log(x);
+      }
+    }
+    throw Error("Check the expression near \""+t+"\".");
+  }
+  const r=expr();
+  if(i<tokens.length)throw Error("Check the expression.");
+  if(!Number.isFinite(r))throw Error("Result is too large or undefined.");
+  return r;
+};
+const disp=$("calcDisplay"),grid=disp.parentElement.querySelector(".calc-buttons");
+[["asin","asin("],["acos","acos("],["atan","atan("],["abs","abs("]].forEach(([l,v])=>{
+  const b=document.createElement("button");b.textContent=l;b.dataset.calc=v;grid.prepend(b);});
+const bar=document.createElement("div");bar.className="row";
+bar.innerHTML='<button class="btn alt" id="angleToggle" type="button">Mode: DEG</button><button class="btn alt" id="histClear" type="button">Clear history</button>';
+disp.insertAdjacentElement("afterend",bar);
+const histBox=document.createElement("div");histBox.className="row";histBox.id="calcHist";
+$("calcResult").insertAdjacentElement("afterend",histBox);
+function renderHist(){
+  histBox.innerHTML="";
+  hist.forEach(([e,v])=>{const b=document.createElement("button");b.type="button";b.className="btn alt";b.textContent=e+" = "+v;b.style.cssText="font-size:11px;font-weight:normal";b.onclick=()=>{disp.value=String(v);};histBox.appendChild(b);});
+}
+$("angleToggle").onclick=function(){angleMode=angleMode==="deg"?"rad":"deg";this.textContent="Mode: "+angleMode.toUpperCase();
+  grid.closest(".tool-content").querySelector(".desc").textContent="Scientific functions, powers, roots, trigonometry. % divides by 100. Implicit multiplication works (2π, 3(4+1)). Current angle mode: "+angleMode.toUpperCase()+".";};
+$("histClear").onclick=()=>{hist=[];renderHist();};
+grid.querySelectorAll("[data-calc]").forEach(b=>b.onclick=()=>{disp.value+=b.dataset.calc;});
+$("calcEquals").onclick=()=>{
+  const src=disp.value;
+  try{const r=sciCalc(src),v=Math.abs(r)<1e-12?0:Number(r.toPrecision(12));
+    lastAnswer=v;disp.value=String(v);show("calcResult",src+" = "+v);hist.unshift([src,v]);hist=hist.slice(0,5);renderHist();}
+  catch(e){show("calcResult",e.message||"Invalid expression.");}
+};
+disp.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey)return;
+  if(e.key==="Enter"||e.key==="="){e.preventDefault();$("calcEquals").click();}
+  else if(e.key==="Backspace"){e.preventDefault();$("calcBack").click();}
+  else if(e.key==="Escape"||e.key==="Delete"){e.preventDefault();$("calcClear").click();}
+  else if(/^[0-9.+\-*\/()^!%]$/.test(e.key)){e.preventDefault();disp.value+=e.key;}
+});
+
+/* ================= IMAGE FORMAT CONVERTER ================= */
+const sel=$("targetFormat");
+[...sel.options].forEach(o=>{if(o.value==="image/heic")o.remove();});
+sel.closest(".tool-content").querySelector(".desc").textContent="Convert images to PNG, JPEG, WEBP, AVIF, BMP, ICO, GIF, TIFF or SVG (SVG embeds your image as a raster inside an SVG wrapper). AVIF depends on your browser.";
+const q=document.createElement("div");
+q.innerHTML='<label>Quality (JPEG / WEBP / AVIF): <span id="imgQVal">92</span>%</label><input type="range" id="imgQ" min="10" max="100" value="92">';
+sel.insertAdjacentElement("afterend",q);
+$("imgQ").oninput=()=>show("imgQVal",$("imgQ").value);
+
+const u8=b=>b.arrayBuffer();
+function encBMP(d,w,h){const rs=(w*3+3)&~3,size=54+rs*h,b=new DataView(new ArrayBuffer(size));
+  b.setUint8(0,66);b.setUint8(1,77);b.setUint32(2,size,true);b.setUint32(10,54,true);b.setUint32(14,40,true);
+  b.setInt32(18,w,true);b.setInt32(22,h,true);b.setUint16(26,1,true);b.setUint16(28,24,true);b.setUint32(34,rs*h,true);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const s=((h-1-y)*w+x)*4,o=54+y*rs+x*3;b.setUint8(o,d[s+2]);b.setUint8(o+1,d[s+1]);b.setUint8(o+2,d[s]);}
+  return new Blob([b],{type:"image/bmp"});}
+function encTIFF(d,w,h){const n=w*h*3,off=128,b=new DataView(new ArrayBuffer(off+n));
+  b.setUint16(0,0x4949);b.setUint16(2,42,true);b.setUint32(4,8,true);b.setUint16(8,9,true);
+  let p=10;const E=(tag,type,cnt,val)=>{b.setUint16(p,tag,true);b.setUint16(p+2,type,true);b.setUint32(p+4,cnt,true);
+    if(type===3&&cnt===1)b.setUint16(p+8,val,true);else b.setUint32(p+8,val,true);p+=12;};
+  E(256,4,1,w);E(257,4,1,h);E(258,3,3,122);E(259,3,1,1);E(262,3,1,2);E(273,4,1,off);E(277,3,1,3);E(278,4,1,h);E(279,4,1,n);
+  [8,8,8].forEach((v,j)=>b.setUint16(122+j*2,v,true));
+  for(let i=0,o=off;i<w*h;i++){b.setUint8(o++,d[i*4]);b.setUint8(o++,d[i*4+1]);b.setUint8(o++,d[i*4+2]);}
+  return new Blob([b],{type:"image/tiff"});}
+function encGIF(d,w,h){
+  const o=[71,73,70,56,57,97,w&255,w>>8,h&255,h>>8,0xF7,0,0];
+  for(let i=0;i<256;i++)o.push(i<216?(Math.floor(i/36)%6)*51:0,i<216?(Math.floor(i/6)%6)*51:0,i<216?(i%6)*51:0);
+  o.push(0x2C,0,0,0,0,w&255,w>>8,h&255,h>>8,0,8);
+  const px=new Uint8Array(w*h);
+  for(let i=0;i<px.length;i++)px[i]=36*Math.round(d[i*4]/51)+6*Math.round(d[i*4+1]/51)+Math.round(d[i*4+2]/51);
+  let bits=0,nb=0,cs=9,next=258;const dict=new Map(),out=[];
+  const emit=c=>{bits|=c<<nb;nb+=cs;while(nb>=8){out.push(bits&255);bits>>>=8;nb-=8;}};
+  emit(256);let cur=px[0];
+  for(let i=1;i<px.length;i++){const key=cur*256+px[i];
+    if(dict.has(key))cur=dict.get(key);
+    else{emit(cur);dict.set(key,next++);
+      if(next>(1<<cs)-1&&cs<12)cs++;
+      if(next===4096){emit(256);dict.clear();cs=9;next=258;}
+      cur=px[i];}}
+  emit(cur);emit(257);if(nb>0)out.push(bits&255);
+  for(let i=0;i<out.length;i+=255){const c=out.slice(i,i+255);o.push(c.length,...c);}
+  o.push(0,0x3B);return new Blob([new Uint8Array(o)],{type:"image/gif"});}
+async function toBlobAsync(c,type,qual){return new Promise(r=>c.toBlob(r,type,qual));}
+
+$("convertImgBtn").onclick=async()=>{
+  const f=$("convImageFile").files[0],target=sel.value,qual=$("imgQ").value/100;
+  if(!f){show("convImgResult","Please upload an image first.");return;}
+  const url=URL.createObjectURL(f);
+  try{
+    const img=new Image();img.src=url;await img.decode();
+    const w=img.naturalWidth||512,h=img.naturalHeight||512;
+    if(w*h>50e6)throw Error("Image is too large (over 50 megapixels).");
+    const c=document.createElement("canvas");c.width=w;c.height=h;
+    const ctx=c.getContext("2d",{willReadFrequently:true});
+    if(["image/jpeg","image/bmp","image/gif","image/tiff"].includes(target)){ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);}
+    ctx.drawImage(img,0,0,w,h);
+    let blob,ext;
+    if(target==="image/bmp"){blob=encBMP(ctx.getImageData(0,0,w,h).data,w,h);ext="bmp";}
+    else if(target==="image/tiff"){blob=encTIFF(ctx.getImageData(0,0,w,h).data,w,h);ext="tiff";}
+    else if(target==="image/gif"){blob=encGIF(ctx.getImageData(0,0,w,h).data,w,h);ext="gif";}
+    else if(target==="image/x-icon"){
+      const sc=Math.min(1,256/Math.max(w,h)),iw=Math.max(1,Math.round(w*sc)),ih=Math.max(1,Math.round(h*sc));
+      const c2=document.createElement("canvas");c2.width=iw;c2.height=ih;c2.getContext("2d").drawImage(c,0,0,iw,ih);
+      const png=new Uint8Array(await u8(await toBlobAsync(c2,"image/png"))),hd=new DataView(new ArrayBuffer(22));
+      hd.setUint16(2,1,true);hd.setUint16(4,1,true);hd.setUint8(6,iw>=256?0:iw);hd.setUint8(7,ih>=256?0:ih);
+      hd.setUint16(10,1,true);hd.setUint16(12,32,true);hd.setUint32(14,png.length,true);hd.setUint32(18,22,true);
+      blob=new Blob([hd,png],{type:"image/x-icon"});ext="ico";}
+    else if(target==="image/svg+xml"){
+      const png=c.toDataURL("image/png");
+      blob=new Blob([`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image width="${w}" height="${h}" xlink:href="${png}"/></svg>`],{type:"image/svg+xml"});ext="svg";}
+    else{
+      blob=await toBlobAsync(c,target,qual);
+      if(!blob||blob.type!==target)throw Error("Your browser can't encode "+target.split("/")[1].toUpperCase()+". Try PNG, JPEG or WEBP.");
+      ext=target==="image/jpeg"?"jpg":target.split("/")[1];}
+    const base=f.name.replace(/\.[^.]+$/,"")||"converted-image",dl=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=dl;a.download=base+"."+ext;document.body.appendChild(a);a.click();a.remove();wait(()=>URL.revokeObjectURL(dl),2000);
+    show("convImgResult",`Converted ${w}×${h} to ${ext.toUpperCase()} (${(blob.size/1024).toFixed(1)} KB) and downloaded.`);
+  }catch(e){show("convImgResult",e.message||"The image could not be converted.");}
+  finally{URL.revokeObjectURL(url);}
+};
+
+/* ================= OTHER FIXES ================= */
+/* Stopwatch: timestamp based (no drift), consistent format */
+const sw={t:null,start:0,acc:0,laps:[]};
+const p2=n=>String(n).padStart(2,"0");
+const fmt=ms=>{const t=Math.floor(ms/100);return `${p2(Math.floor(t/36000))}:${p2(Math.floor(t/600)%60)}:${p2(Math.floor(t/10)%60)}.${t%10}`;};
+const elapsed=()=>sw.acc+(sw.t?Date.now()-sw.start:0);
+show("stopwatchDisplay","00:00:00.0");
+$("swStart").onclick=()=>{if(sw.t)return;sw.start=Date.now();sw.t=setInterval(()=>show("stopwatchDisplay",fmt(elapsed())),100);};
+$("swPause").onclick=()=>{if(!sw.t)return;sw.acc=elapsed();clearInterval(sw.t);sw.t=null;show("stopwatchDisplay",fmt(sw.acc));};
+$("swLap").onclick=()=>{if(!elapsed())return;sw.laps.push(`Lap ${sw.laps.length+1}: ${fmt(elapsed())}`);show("swLaps",sw.laps.join("\n"));};
+$("swReset").onclick=()=>{clearInterval(sw.t);sw.t=null;sw.acc=0;sw.laps=[];show("stopwatchDisplay","00:00:00.0");show("swLaps","No laps recorded.");};
+
+/* Percentage: clean floating-point output */
+$("calcPercent1").onclick=()=>{const x=parseFloat($("p1").value),y=parseFloat($("p2").value);
+  if(isNaN(x)||isNaN(y)){show("percentResult1","Enter valid numbers.");return;}
+  show("percentResult1",`${x}% of ${y} = ${Number((x/100*y).toPrecision(12))}`);};
+$("calcPercent2").onclick=()=>{const x=parseFloat($("p3").value),y=parseFloat($("p4").value);
+  if(isNaN(x)||isNaN(y)){show("percentResult2","Enter valid numbers.");return;}
+  if(x===0){show("percentResult2","Initial value can't be 0.");return;}
+  const c=(y-x)/Math.abs(x)*100;show("percentResult2",`Change: ${c.toFixed(2)}% (${c>=0?"Increase":"Decrease"})`);};
+
+/* Number base: BigInt (no more 2^53 limit) */
+$("convertBase").onclick=()=>{
+  const raw=$("baseInput").value.trim().replace(/^0[xbo]/i,""),base=+$("baseFrom").value;
+  const neg=/^-/.test(raw),digits=raw.replace(/^[+-]/,"").toLowerCase();
+  const ok={2:/^[01]+$/,8:/^[0-7]+$/,10:/^\d+$/,16:/^[0-9a-f]+$/}[base];
+  if(!digits||!ok.test(digits)){show("baseResult","Enter a valid whole number for the selected base.");return;}
+  let n=0n;for(const ch of digits)n=n*BigInt(base)+BigInt(parseInt(ch,16));
+  if(neg)n=-n;
+  show("baseResult",`Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHexadecimal: ${n.toString(16).toUpperCase()}`);};
+
+/* HTML entities: quotes + emoji (astral characters) */
+$("encodeEntity").onclick=()=>show("entityResult",[...$("entityInput").value].map(c=>{const n=c.codePointAt(0);return(n>126||'<>&"\''.includes(c))?"&#"+n+";":c;}).join(""));
+
+/* Text counter: copying no longer wipes the stats */
+$("copyText").onclick=async()=>{await copyValue($("wordInput").value,"wordResult");wait(()=>$("wordInput").dispatchEvent(new Event("input")),1200);};
+
+/* Password: always includes each selected character type */
+$("generatePass").onclick=()=>{
+  const sets=[ "abcdefghijkmnopqrstuvwxyz","ABCDEFGHJKLMNPQRSTUVWXYZ"];
+  if($("passNumbers").checked)sets.push("23456789");
+  if($("passSymbols").checked)sets.push("!@#$%^&*()-_=+?");
+  const all=sets.join(""),len=+$("passLength").value,r=new Uint32Array(len*2);crypto.getRandomValues(r);
+  const out=sets.map((s,i)=>s[r[i]%s.length]);
+  for(let i=out.length;i<len;i++)out.push(all[r[i]%all.length]);
+  for(let i=out.length-1;i>0;i--){const j=r[len+i]%(i+1);[out[i],out[j]]=[out[j],out[i]];}
+  show("passResult",out.join(""));};
+
+/* HTML formatter: void tags & doctype/comments don't add indentation */
+$("formatHtml").onclick=()=>{
+  const src=$("htmlInput").value;if(!src.trim()){show("htmlResult","Paste HTML first.");return;}
+  const VOID=/^<(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)\b/i;
+  let d=0;const out=[];
+  for(const t of src.replace(/>\s*</g,">\n<").split("\n").map(x=>x.trim()).filter(Boolean)){
+    if(/^<\//.test(t))d=Math.max(0,d-1);
+    out.push("  ".repeat(d)+t);
+    if(/^<[a-z][^>]*>$/i.test(t)&&!VOID.test(t)&&!/\/>$/.test(t)&&!/<\/[^>]+>/.test(t))d++;}
+  show("htmlResult",out.join("\n"));};
+
+/* Palette: real HSL shades + complementary */
+const toHex=(h,s,l)=>{h=((h%360)+360)%360;s/=100;l/=100;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))));};
+  return"#"+[f(0),f(8),f(4)].map(v=>v.toString(16).padStart(2,"0")).join("").toUpperCase();};
+$("generatePalette").onclick=()=>{
+  const hx=$("paletteBase").value,r=parseInt(hx.slice(1,3),16)/255,g=parseInt(hx.slice(3,5),16)/255,b=parseInt(hx.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,dl=mx-mn;
+  let h=0,s=dl?dl/(1-Math.abs(2*l-1)):0;
+  if(dl){h=mx===r?((g-b)/dl)%6:mx===g?(b-r)/dl+2:(r-g)/dl+4;h*=60;}
+  const S=Math.round(s*100),L=Math.round(l*100);
+  const cols=[toHex(h,S,Math.max(15,L-25)),toHex(h,S,Math.max(20,L-12)),hx.toUpperCase(),toHex(h,S,Math.min(88,L+15)),toHex(h+180,S,L),toHex(h+30,S,L),toHex(h-30,S,L)];
+  const box=$("paletteBoxes");box.innerHTML="";
+  cols.forEach(c=>{const d=document.createElement("button");d.type="button";d.title="Copy "+c;
+    d.style.cssText=`flex:1;min-width:36px;height:50px;background:${c};border-radius:6px;border:1px solid var(--border);`;
+    d.onclick=()=>copyValue(c,"paletteResult");box.appendChild(d);});
+  show("paletteResult","Shades, base, complementary & analogous: "+cols.join(", ")+"\nTap a swatch to copy.");};
+
+/* Stylish text: wrong glyph for gothic M */
+sMaps.gothic.M="𝔐";
+
+/* Security: fullscreen preview iframe was unsandboxed (uploaded code could reach the site) */
+$("fullscreenFrame").setAttribute("sandbox","allow-scripts allow-modals allow-forms");
+
+/* Distinct icon for image converter (was identical to Text Reverser) */
+document.querySelectorAll(".tool-card").forEach(c=>{if(c.querySelector("h3").textContent==="Image Format Converter")c.querySelector(".tool-icon").textContent="🖼️";});
+})();
+
+</script>
+
 </body>
 </html>
