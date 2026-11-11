@@ -834,7 +834,7 @@ function fireWeapon(){
   p.rlMax=p.rapid>0?W.rl*.5:W.rl;p.rl=p.rlMax;
 }
 let shopTab='arm';
-const shMsg=t=>{$('shopMsg').textContent=t};
+const shMsg=t=>{const e=$('shopMsg');e.textContent=t;e.style.color=/^Insufficient/.test(t)?'#ff7a5a':''};
 function renderShop(){
   $('coinLine').textContent='Coins: '+coins;
   Array.prototype.forEach.call($('shopTabs').children,b=>b.setAttribute('aria-pressed',b.dataset.k===shopTab));
@@ -846,11 +846,11 @@ function renderShop(){
     shMsg('Tap a colour to buy or equip it.');
     const g=grid(5);
     COLS.forEach(c=>{const own=shop.own[c[0]],eq=shop.col===c[0],hx='#'+c[2].toString(16).padStart(6,'0');
-      chip(g,'<span style="display:block;height:22px;border-radius:5px;margin-bottom:3px;background:'+hx+';'+(eq?'outline:3px solid #fff1d2':'')+'"></span>'+(eq?'ON':own?'✓':c[4]),'',()=>{if(own)shop.col=c[0];else if(coins>=c[4]){coins-=c[4];shop.own[c[0]]=1;shop.col=c[0]}else{shMsg(c[1]+' costs '+c[4]+' coins.');return}saveShop();applyCol();renderShop()})})
+      chip(g,'<span style="display:block;height:22px;border-radius:5px;margin-bottom:3px;background:'+hx+';'+(eq?'outline:3px solid #fff1d2':'')+'"></span>'+(eq?'ON':own?'✓':c[4]),'',()=>{if(own)shop.col=c[0];else if(coins>=c[4]){coins-=c[4];shop.own[c[0]]=1;shop.col=c[0]}else{shMsg('Insufficient coins. '+c[1]+' costs '+c[4]+'.');return}saveShop();applyCol();renderShop()})})
   }else{
     shMsg('You have '+shop.gren+' grenades. Each costs '+GCOST+' coins. Throw with G or the GRENADE button.');
     const g=grid(3);
-    [[1,'Buy 1'],[10,'Buy 10'],[0,'Buy max']].forEach(([q,l])=>{const n=q||Math.floor(coins/GCOST);chip(g,l+'<br>'+n*GCOST+' coins','',()=>{if(n<1||coins<n*GCOST){shMsg('Not enough coins.');return}coins-=n*GCOST;shop.gren+=n;saveShop();renderShop()})})
+    [[1,'Buy 1'],[10,'Buy 10'],[0,'Buy max']].forEach(([q,l])=>{const n=q||Math.floor(coins/GCOST);chip(g,l+'<br>'+n*GCOST+' coins','',()=>{if(n<1||coins<n*GCOST){shMsg('Insufficient coins. A grenade costs '+GCOST+'.');return}coins-=n*GCOST;shop.gren+=n;saveShop();renderShop()})})
   }
 }
 Array.prototype.forEach.call($('shopTabs').children,b=>b.addEventListener('click',()=>{shopTab=b.dataset.k;renderShop()}));
@@ -920,7 +920,7 @@ function armorList(L){
     const sp=document.createElement('span');sp.innerHTML='<b>'+TN[n]+'</b><br><small style="opacity:.85">'+W.name+' x'+W.cnt+' | dmg '+W.dmg+' | reload '+W.rl+'s'+(W.homing?' | seeking':'')+(W.splash?' | blast':'')+' | '+n*2+'% less damage taken</small>';
     const b=document.createElement('button');b.className='seg1';b.style.margin='0';b.style.flex='0 0 auto';b.textContent=cur?'In use':own?'Owned':'Buy '+c;
     if(next)b.style.borderColor='var(--accent)';
-    b.addEventListener('click',()=>{if(own)return;if(!next){shMsg('Buy '+TN[shop.arm+1]+' first.');return}if(coins<c){shMsg(TN[n]+' costs '+c+' coins.');return}coins-=c;shop.arm++;shop.armBy[LM()]=shop.arm;saveShop();applyTank();renderShop()});
+    b.addEventListener('click',()=>{if(own)return;if(!next){shMsg('Buy '+TN[shop.arm+1]+' first.');return}if(coins<c){shMsg('Insufficient coins. '+TN[n]+' costs '+c+'.');return}coins-=c;shop.arm++;shop.armBy[LM()]=shop.arm;saveShop();applyTank();renderShop()});
     d.append(sp,b);L.appendChild(d);
   }
 }
