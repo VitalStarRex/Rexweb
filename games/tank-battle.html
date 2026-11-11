@@ -1,4 +1,7 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var seed={"maxiTankDiff":"normal","rexweb-theme":"dark","nexoraShop":"{\"coins\":0,\"armBy\":{\"auto\":0,\"fire\":0},\"col\":\"olive\",\"own\":{\"olive\":1},\"gren\":0}"};function mk(init,cb){var d={};for(var k in init)d[k]=String(init[k]);return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v);cb&&cb("set",k,d[k])},removeItem:function(k){delete d[k];cb&&cb("del",k)},clear:function(){d={};cb&&cb("clear")},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}function ok(n){try{window[n].getItem("x");return true}catch(e){return false}}if(!ok("localStorage")){try{Object.defineProperty(window,"localStorage",{value:mk(seed,function(o,k,v){try{parent.postMessage({rexs:1,o:o,k:k,v:v},"*")}catch(e){}}),configurable:true})}catch(e){}}if(!ok("sessionStorage")){try{Object.defineProperty(window,"sessionStorage",{value:mk({}),configurable:true})}catch(e){}}})();</script><script>(function(){function s(a){return Array.prototype.map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")}function p(t,m){parent.postMessage({rexc:1,t:t,m:m},"*")}["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){p(k,s(arguments));o.apply(console,arguments)}});window.addEventListener("error",function(e){p("error",e.message+(e.lineno?" (line "+e.lineno+")":""))});window.addEventListener("unhandledrejection",function(e){p("error","Promise: "+(e.reason&&e.reason.message||e.reason))})})();</script><style>
+
+</style>
+</head><body>
 <title>Nexora War Tank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&display=swap">
@@ -966,7 +969,9 @@ function gameOver(){
   setTimeout(()=>{if(state==='over')showMenu('over')},1400);
 }
 function victory(){
-  lastCr=lvDone[LM()][curLv]?0:lvReward(curLv);coins+=lastCr;saveShop();
+  const replayed=!!lvDone[LM()][curLv];
+  lastCr=replayed?500000:lvReward(curLv);
+  coins+=lastCr;saveShop();
   justPad=curLv===50&&LM()==='auto'&&!lvDone.auto[50];justUnlocked='';{const m0=LM();if(curLv>=lvProg[m0]&&curLv<50){lvProg[m0]=curLv+1;justUnlocked='1'}lvDone[m0][curLv]=1;saveLv();selLv=Math.min(50,curLv+1)}
   state='won';score+=Math.round(500*DIFF[diff].sm);$('score').textContent=score;saveBest();sfx('pick');say('VICTORY');
   for(let i=0;i<6;i++)setTimeout(()=>explode(p.x+rnd(-14,14),p.z+rnd(-14,14),false),i*260);
