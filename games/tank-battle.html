@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Nexora War Tank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&display=swap">
 <style>
-:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 :root{--ink:#24170e;--sand:#f1d9a6;--hud:#fff1d2;--accent:#ff7a2f;--danger:#e4472c;--ok:#7cc45a;--panel:rgba(36,23,14,.74);--display:'Black Ops One',Impact,sans-serif;--body:'Rajdhani',system-ui,sans-serif;color-scheme:dark}
 html,body{height:100%}
 body{margin:0;background:#e9c98f;color:var(--hud);font:600 15px/1.3 var(--body);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
@@ -31,9 +25,7 @@ body{margin:0;background:#e9c98f;color:var(--hud);font:600 15px/1.3 var(--body);
 #base{position:fixed;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,241,210,.55);background:rgba(36,23,14,.28);z-index:6;pointer-events:none}
 #knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,241,210,.8)}
 #fire{position:fixed;right:max(22px,calc(env(safe-area-inset-right,0px) + 14px));bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:150px;height:150px;border-radius:50%;border:3px solid #fff1d2;background:rgba(228,71,44,.82);color:#fff1d2;font:400 20px var(--display);letter-spacing:.06em;z-index:6;touch-action:none}
-#fire:active{background:rgba(255,122,47,.95)}
-#fire span{position:relative;pointer-events:none;opacity:.9}
-#fk{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;background:rgba(255,241,210,.38);border:2px solid rgba(255,241,210,.7);pointer-events:none}
+#fire:active{background:rgba(255,122,47,.95)}#fire span{position:relative;pointer-events:none;opacity:.9}#fk{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;background:rgba(255,241,210,.38);border:2px solid rgba(255,241,210,.7);pointer-events:none}
 #gren{position:fixed;right:calc(env(safe-area-inset-right,0px) + 190px);bottom:calc(env(safe-area-inset-bottom,0px) + 44px);width:84px;height:84px;border-radius:50%;border:3px solid #fff1d2;background:rgba(36,23,14,.75);color:#fff1d2;font:400 12px/1.15 var(--display);z-index:6;touch-action:none;padding:0}
 #orbit{position:fixed;left:55%;top:0;right:0;bottom:0;z-index:5}
 #stage{position:fixed;overflow:hidden;left:0;top:0;width:100%;height:100%}
@@ -50,9 +42,7 @@ body{margin:0;background:#e9c98f;color:var(--hud);font:600 15px/1.3 var(--body);
 .lv small{display:block;font:700 11px var(--body);color:var(--ok)}
 .lv[aria-pressed="true"]{background:var(--sand);color:var(--ink);border-color:var(--sand)}
 .lv[aria-disabled="true"]{opacity:.45}
-#dd{font-size:15px;min-height:1.3em}
-#am{font-size:13px;margin:4px 0 0;opacity:.85}
-#stage.short #am{font-size:11px;margin:2px 0 0}
+#dd{font-size:15px;min-height:1.3em}#am{font-size:13px;margin:4px 0 0;opacity:.85}#stage.short #am{font-size:11px;margin:2px 0 0}
 #stage.short .card{padding:12px 16px 14px;width:min(560px,100%)}
 #stage.short h1{font-size:34px;margin-bottom:4px}
 #stage.short .card p{font-size:14px;margin:4px 0}
@@ -70,7 +60,7 @@ body{margin:0;background:#e9c98f;color:var(--hud);font:600 15px/1.3 var(--body);
 #stage.short #dd{font-size:12px;margin:2px 0 0;min-height:0}
 #stage.short #openSet,#stage.short #back{padding:8px;margin-top:6px;font-size:14px}
 #views{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:7;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 150px)}
-#views button{font:700 13px var(--body);letter-spacing:.06em;color:var(--hud);background:rgba(36,23,14,.55);border:1px solid rgba(255,241,210,.35);border-radius:999px;padding:7px 13px;cursor:pointer}
+#views button{font:700 13px var(--body);letter-spacing:.06em;color:var(--hud);background:rgba(36,23,14,.55);border:1px solid rgba(255,241,210,.35);border-radius:999px;padding:7px 13px;cursor:pointer;}
 #views button[aria-pressed="true"]{background:rgba(255,241,210,.92);color:var(--ink)}
 .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(180deg,rgba(36,23,14,.25),rgba(36,23,14,.7))}
 .card{max-height:100%;overflow-y:auto;touch-action:pan-y;width:min(440px,100%);box-sizing:border-box;padding:22px 22px 24px;background:rgba(36,23,14,.86);border:1px solid rgba(255,241,210,.22);border-top:4px solid var(--accent)}
@@ -89,99 +79,81 @@ h1{margin:0 0 10px;font:400 clamp(38px,11vw,58px)/.95 var(--display);letter-spac
 #quit{background:transparent;color:var(--hud);border:1px solid rgba(255,241,210,.45);font-size:16px}
 @media (prefers-reduced-motion:reduce){#banner.show{animation:none;opacity:1}}
 </style>
-</head>
-<body>
-<div id="stage">
-  <canvas id="c"></canvas>
-  <div id="hud" style="display:none">
-    <div class="panel">
-      <div class="lbl">Armor</div>
-      <div class="bar"><i id="hp" style="width:100%"></i></div>
-      <div id="rlwrap"><i id="rl" style="width:0%"></i></div>
-    </div>
-    <div class="stats">
-      <div class="panel">
-        <div class="lbl">Wave <span id="wave">1/4</span> &nbsp; Score <span id="score">0</span> <small id="cmb" style="color:var(--accent)"></small></div>
-      </div>
-      <canvas id="radar" width="104" height="104"></canvas>
-    </div>
+
+<div id="stage"><canvas id="c"></canvas>
+<div id="hit"></div>
+<div id="hud">
+  <div class="panel">
+    <span class="lbl">Armor</span>
+    <div class="bar"><i id="hp"></i></div>
+    <div id="rlwrap"><i id="rl"></i></div>
   </div>
-  <div id="hit"></div>
-  <div id="banner"></div>
-  <div id="zone" hidden></div>
-  <div id="base" hidden><div id="knob"></div></div>
-  <button id="fire" hidden><span>FIRE</span><div id="fk"></div></button>
-  <button id="gren" hidden>GRENADE x0</button>
-  <div id="orbit" hidden></div>
-  <button id="pauseBtn" hidden aria-label="Pause">II</button>
-  <div id="views" hidden>
-    <button data-v="iso" aria-pressed="true">Iso</button>
-    <button data-v="top" aria-pressed="false">Top</button>
-    <button data-v="fp" aria-pressed="false">First Person</button>
+  <div class="stats">
+    <div class="panel"><span class="lbl">Wave</span> <b id="wave">1/4</b>&nbsp;&nbsp;<span class="lbl">Score</span> <b id="score">0</b></div>
+    <div class="panel" style="padding:4px 10px"><span class="lbl">Coins</span> <b id="coinN">0</b> <b id="cmb" style="color:var(--accent)"></b></div>
+    <canvas id="radar" width="208" height="208"></canvas>
   </div>
-  <div id="menu" class="overlay">
-    <div class="card" id="mainCard">
-      <p class="kick">DESERT ASSAULT</p>
-      <h1 id="title">NEXORA<br>WAR TANK</h1>
-      <p id="sub">Enemy armor is rolling in over the dunes. Hold the desert as long as you can.</p>
-      <p id="how"></p>
-      <div class="row" style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span class="lbl" id="lvLbl">Level - Auto aim</span>
-          <div style="display:flex;gap:4px">
-            <button id="lvL" class="seg1" style="margin:0;padding:4px 8px">&#x2039;</button>
-            <button id="lvR" class="seg1" style="margin:0;padding:4px 8px">&#x203a;</button>
-          </div>
-        </div>
-        <div id="lvStrip" role="region" aria-label="Levels"></div>
-        <div id="lvInfo" style="font-size:13px;color:#ff7a5a;margin-top:4px"></div>
-      </div>
-      <button id="go">ROLL OUT</button>
-      <button id="openSet">Settings</button>
-      <button id="openShop">Shop (<span id="coinN">0</span> coins)</button>
-      <p id="best" style="font-size:13px;opacity:.7;margin-top:8px;text-align:center"></p>
-    </div>
-    <div class="card" id="setCard" hidden>
-      <p class="kick">PREFERENCES</p>
-      <h1>SETTINGS</h1>
-      <div class="row"><span class="lbl">Camera</span><div class="seg" id="camv" role="group" aria-label="Camera"><button data-v="chase" aria-pressed="true">Chase</button><button data-v="over" aria-pressed="false">Overhead</button></div></div>
-      <div class="row"><span class="lbl">Sound</span><div class="seg" id="sndv" role="group" aria-label="Sound"><button data-s="on" aria-pressed="true">On</button><button data-s="off" aria-pressed="false">Off</button></div></div>
-      <div class="row"><span class="lbl">Aiming (touch)</span><div class="seg" id="aimm" role="group" aria-label="Aiming"><button data-a="manual" aria-pressed="false">Fire pad</button><button data-a="auto" aria-pressed="true">Auto</button></div><p id="am"></p></div>
-      <div class="row"><span class="lbl">Screen</span><div class="seg" id="scr" role="group" aria-label="Screen"><button data-r="land" aria-pressed="false">Landscape</button><button data-r="auto" aria-pressed="true">Upright</button></div></div>
-      <button id="back">Back</button>
-    </div>
-    <div class="card" id="shopCard" hidden>
-      <p class="kick">ARMORY & STORE</p>
-      <h1>SHOP</h1>
-      <div id="coinLine" style="font-weight:700;color:var(--accent);margin-bottom:8px">Coins: 0</div>
-      <div class="seg" id="shopTabs" role="tablist" style="margin-bottom:10px">
-        <button data-k="arm" aria-pressed="true">Armor</button>
-        <button data-k="col" aria-pressed="false">Paint</button>
-        <button data-k="gren" aria-pressed="false">Grenades</button>
-      </div>
-      <div id="shopMsg" style="font-size:13px;min-height:2.6em;margin-bottom:6px"></div>
-      <div id="shopList"></div>
-      <button id="sBack">Back</button>
-    </div>
+</div>
+<div id="banner"></div>
+<button id="pauseBtn" hidden aria-label="Pause">II</button>
+<div id="zone"></div>
+<div id="base" hidden><div id="knob"></div></div>
+<button id="fire" hidden><i id="fk"></i><span>FIRE</span></button>
+<button id="gren" hidden>GRENADE x0</button>
+<div id="orbit"></div>
+
+<div id="menu" class="overlay">
+  <div class="card" id="mainCard">
+    <p class="kick">DESERT ASSAULT</p>
+    <h1 id="title">NEXORA<br>WAR TANK</h1>
+    <p id="sub">Enemy armor is rolling in over the dunes. Hold the desert as long as you can.</p>
+    <p id="how"></p>
+    <p id="best"></p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 2px"><p class="lbl" id="lvLbl" style="margin:0"></p><span style="display:flex;gap:6px"><button class="seg1 lvA" id="lvL" aria-label="Scroll levels left">&#8249;</button><button class="seg1 lvA" id="lvR" aria-label="Scroll levels right">&#8250;</button></span></div>
+    <div id="lvStrip"></div>
+    <p id="lvInfo" style="font-size:13px;margin:0;min-height:1.2em"></p>
+    
+    <button id="go">ROLL OUT</button>
+    <button id="openSet">Settings</button>
+    <button id="openShop">Shop</button>
   </div>
-  <div id="rotPop" class="overlay" hidden>
-    <div class="card">
-      <p class="kick">SCREEN</p>
-      <h1>LANDSCAPE VIEW</h1>
-      <p>This game plays in landscape. Tap OK to switch the screen to landscape view.</p>
-      <button id="rotOk">OK</button>
+  <div class="card" id="setCard" hidden>
+    <p class="kick">SETTINGS</p>
+    <div class="grid">
+      
+      
+      <div class="row"><span class="lbl">Camera</span>
+        <div class="seg" id="camv" role="group" aria-label="Camera"><button data-v="chase" aria-pressed="true">Chase</button><button data-v="over" aria-pressed="false">Overhead</button></div></div>
+      <div class="row"><span class="lbl">Sound</span>
+        <div class="seg" id="sndv" role="group" aria-label="Sound"><button data-s="on" aria-pressed="true">On</button><button data-s="off" aria-pressed="false">Off</button></div></div>
+      <div class="row"><span class="lbl">Aiming (touch)</span>
+        <div class="seg" id="aimm" role="group" aria-label="Aiming"><button data-a="manual" aria-pressed="false">Fire pad</button><button data-a="auto" aria-pressed="true">Auto</button></div><p id="am"></p></div>
+      <div class="row"><span class="lbl">Screen</span>
+        <div class="seg" id="scr" role="group" aria-label="Screen"><button data-r="land" aria-pressed="false">Landscape</button><button data-r="auto" aria-pressed="true">Upright</button></div></div>
     </div>
+    <button id="back">Back</button>
   </div>
-  <div id="pauseOv" class="overlay" hidden>
-    <div class="card" style="text-align:center">
-      <p class="kick">GAME</p>
-      <h1>PAUSED</h1>
-      <button id="resume">RESUME</button>
-      <button id="quit">QUIT TO MENU</button>
-    </div>
+  <div class="card" id="shopCard" hidden>
+    <p class="kick">SHOP</p>
+    <p id="coinLine" style="font-size:15px"></p>
+    <div class="seg" id="shopTabs"><button data-k="arm" aria-pressed="true">Armor</button><button data-k="col" aria-pressed="false">Paint</button><button data-k="gr" aria-pressed="false">Grenades</button></div>
+    <p id="shopMsg" style="font-size:13px;margin:6px 0 0;min-height:1.3em"></p>
+    <div id="shopList"></div>
+    <button id="sBack">Back</button>
   </div>
 </div>
 
+<div id="pauseOv" class="overlay" hidden><div class="card" style="text-align:center"><p class="kick">PAUSED</p><h1 style="font-size:clamp(34px,10vw,50px)">PAUSED</h1><button id="resume">RESUME</button><button id="quit">QUIT TO MENU</button></div></div>
+<div id="rotPop" class="overlay" hidden role="alertdialog" aria-modal="true" aria-labelledby="rotT">
+  <div class="card">
+    <p class="kick">SCREEN</p>
+    <h1 id="rotT" style="font-size:clamp(30px,9vw,44px)">LANDSCAPE VIEW</h1>
+    <p>This game plays in landscape. Tap OK to switch the screen to landscape view.</p>
+    <button id="rotOk">OK</button>
+  </div>
+</div>
+
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
@@ -190,7 +162,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const TAU=Math.PI*2;
 const angDiff=(a,b)=>{let d=a-b;while(d>Math.PI)d-=TAU;while(d<-Math.PI)d+=TAU;return d};
-if(typeof THREE==='undefined'){$('mainCard').innerHTML='<p>The 3D engine could not load. Check your connection and reload the page.</p>';return}
+if(typeof THREE==='undefined'){$('menu').querySelector('.card').innerHTML='<p>The 3D engine could not load. Check your connection and reload the page.</p>';return}
 
 /* ---------- renderer / scene ---------- */
 const canvas=$('c');
@@ -318,7 +290,7 @@ p.g.visible=true;
   [[1,Math.PI/2],[-1,-Math.PI/2]].forEach(([s,ry])=>{const m=new THREE.Mesh(sideG,mat);m.position.set(s*2.02,1.15,0);m.rotation.y=ry;p.g.add(m)});
   const roof=new THREE.Mesh(new THREE.PlaneGeometry(1.7,.425),mat);
   roof.rotation.set(-Math.PI/2,0,Math.PI);roof.position.set(0,.9,.7);p.tur.add(roof);
-  /* extra lettering so NEXORA shows from every camera angle */
+  /* extra lettering so NEXORA shows from every camera angle: rear deck, back plate, both turret sides */
   const deck=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.6),mat);
   deck.rotation.set(-Math.PI/2,0,Math.PI);deck.position.set(0,1.53,-1.75);p.g.add(deck);
   const back=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.6),mat);
@@ -352,6 +324,7 @@ function route(n,wet,vol,dist){
   const g=AC.createGain();g.gain.value=vol;n.connect(g);g.connect(dist?sfxDist:sfxDry);
   if(wet>.3)g.connect(sfxRev);
 }
+/* filtered noise voice with a frequency sweep */
 function noiseV(t,dur,type,f0,f1,q,peak,att,wet,vol,dist){
   if(vc>14)return;vc++;
   const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
@@ -374,20 +347,20 @@ function sfx(k,vol,big){
     const t=AC.currentTime;
     if(k==='shot'||k==='eshot'){
       const e=k==='eshot';
-      toneV(t,'sine',e?120:155,36,.3,.95,.25,vol);
-      toneV(t,'sawtooth',e?200:260,60,.12,.18,.1,vol);
-      noiseV(t,.08,'highpass',1400,1400,.7,.75,.002,.35,vol,true);
-      noiseV(t,.4,'bandpass',500,3400,1.1,.6,.05,.5,vol*(e?.75:1),false);
-      noiseV(t+.03,.95,'lowpass',3800,800,.5,.28,.12,.55,vol,false);
+      toneV(t,'sine',e?120:155,36,.3,.95,.25,vol);               /* launch thump */
+      toneV(t,'sawtooth',e?200:260,60,.12,.18,.1,vol);          /* body of the blast */
+      noiseV(t,.08,'highpass',1400,1400,.7,.75,.002,.35,vol,true); /* muzzle crack */
+      noiseV(t,.4,'bandpass',500,3400,1.1,.6,.05,.5,vol*(e?.75:1),false); /* missile whoosh */
+      noiseV(t+.03,.95,'lowpass',3800,800,.5,.28,.12,.55,vol,false);       /* rocket motor hiss fading away */
     }else if(k==='boom'){
       const D=big?2.5:1.7;
-      toneV(t,'sine',big?72:92,20,D*.75,.8,.4,vol);
+      toneV(t,'sine',big?72:92,20,D*.75,.8,.4,vol);             /* sub-bass punch */
       toneV(t,'triangle',150,30,D*.35,.5,.2,vol);
-      noiseV(t,.16,'highpass',700,700,.6,.5,.001,.3,vol,true);
-      noiseV(t,D,'lowpass',2800,80,.8,.6,.004,.6,vol,true);
-      noiseV(t+.08,D*1.5,'lowpass',280,45,.6,.5,.14,.85,vol,false);
+      noiseV(t,.16,'highpass',700,700,.6,.5,.001,.3,vol,true);   /* initial crack */
+      noiseV(t,D,'lowpass',2800,80,.8,.6,.004,.6,vol,true);     /* fireball roar */
+      noiseV(t+.08,D*1.5,'lowpass',280,45,.6,.5,.14,.85,vol,false); /* low rumble tail */
       const n=big?4:2;
-      for(let i=0;i<n;i++)noiseV(t+.2+Math.random()*1.1,.05,'bandpass',rnd(1500,5500),rnd(900,2000),3,.2*(1-i/n*.5),.001,.45,vol,false);
+      for(let i=0;i<n;i++)noiseV(t+.2+Math.random()*1.1,.05,'bandpass',rnd(1500,5500),rnd(900,2000),3,.2*(1-i/n*.5),.001,.45,vol,false); /* debris patter */
     }else if(k==='hit'){
       toneV(t,'square',880,620,.1,.16,.2,vol);
       toneV(t,'triangle',430,300,.22,.22,.3,vol);
@@ -452,18 +425,19 @@ function updateParts(dt){
     b.m.rotation.x+=b.sx*dt;b.m.rotation.z+=b.sz*dt;
     if(b.m.position.y<.2){b.m.position.y=.2;b.vy=Math.abs(b.vy)*.3;b.vx*=.6;b.vz*=.6;b.sx*=.5;b.sz*=.5}
     if(b.t>b.life-.4)b.m.scale.setScalar(Math.max(.01,(b.life-b.t)/.4)*b.sc);
+    else if(false)burst(b.m.position.x,b.m.position.y,b.m.position.z,1,'smoke',.4,.7,.6,.3);
   }
   boomI=Math.max(0,boomI-dt*7);boomLight.intensity=boomI;
 }
 function explode(x,z,big,silent){
   const k=big?1.7:1;
-  burst(x,2,z,1,'fire',0,9*k,.16,0);
-  burst(x,1.2,z,Math.round(7*k),'fire',7*k,3.5*k,.9,7*k);
-  burst(x,1.5,z,Math.round(4*k),'hot',5*k,3.2*k,.75,6*k);
-  burst(x,2,z,Math.round(6*k),'smoke',4*k,3*k,2.6,5*k);
-  burst(x,1,z,Math.round(3*k),'smoke',1.5,3.5*k,3,10*k);
-  burst(x,1.5,z,Math.round(10*k),'spark',17*k,.55,1,11*k);
-  burst(x,.4,z,Math.round(8*k),'sand',15*k,2.4*k,1.1,1.5);
+  burst(x,2,z,1,'fire',0,9*k,.16,0);                                         /* white-hot flash */
+  burst(x,1.2,z,Math.round(7*k),'fire',7*k,3.5*k,.9,7*k);                       /* fireball */
+  burst(x,1.5,z,Math.round(4*k),'hot',5*k,3.2*k,.75,6*k);                      /* orange core */
+  burst(x,2,z,Math.round(6*k),'smoke',4*k,3*k,2.6,5*k);                       /* billowing smoke */
+  burst(x,1,z,Math.round(3*k),'smoke',1.5,3.5*k,3,10*k);                       /* rising column */
+  burst(x,1.5,z,Math.round(10*k),'spark',17*k,.55,1,11*k);                     /* sparks */
+  burst(x,.4,z,Math.round(8*k),'sand',15*k,2.4*k,1.1,1.5);                    /* dust kicked up */
   const nd=Math.min(Math.round(4*k),Math.max(0,24-debris.length));
   for(let i=0;i<nd;i++){
     const m=new THREE.Mesh(debG,debM[i&1]),sc=rnd(.6,1.6)*k;m.scale.setScalar(sc);m.position.set(x,1.5,z);scene.add(m);
@@ -724,7 +698,7 @@ zone.addEventListener('pointermove',e=>{
 });
 function stickEnd(e){if(e.pointerId!==stick.id)return;stick.on=false;stick.x=stick.y=0;base.hidden=true}
 zone.addEventListener('pointerup',stickEnd);zone.addEventListener('pointercancel',stickEnd);
-
+/* FIRE pad (Mini Militia style): hold to shoot, drag to aim */
 let aimAng=null,aimV=null,fid=-1;const fk=$('fk');
 let aimMode='auto',doneAuto={};
 try{doneAuto=JSON.parse(localStorage.getItem('maxiTankAuto')||'{}')||{}}catch(_){doneAuto={}}
@@ -733,7 +707,7 @@ const padOpen=()=>autoInfo().has50;
 try{if(localStorage.getItem('maxiTankAim')==='manual'&&padOpen())aimMode='manual'}catch(_){}
 function applyAim(){
   const open=padOpen();
-  Array.prototype.forEach.call($('aimm').children,b=>{const m=b.dataset.a,l=m==='manual'&&!open;b.setAttribute('aria-pressed',m===aimMode);b.setAttribute('aria-disabled',l);b.style.opacity=l?'.5':'';b.textContent=m==='auto'?'Auto':(l?'🔒 ':'')+'Fire pad'});
+  Array.prototype.forEach.call($('aimm').children,b=>{const m=b.dataset.a,l=m==='manual'&&!open;b.setAttribute('aria-pressed',m===aimMode);b.setAttribute('aria-disabled',l);b.style.opacity=l?'.5':'';b.textContent=m==='auto'?'Auto':(l?'\uD83D\uDD12 ':'')+'Fire pad'});
   fk.style.display=aimMode==='auto'?'none':'';
   $('am').textContent=open?'Touchpad aiming unlocked.':'Touchpad aim unlocks when you clear level 50 on Auto aim ('+autoInfo().n+'/50 cleared).';
 }
@@ -794,24 +768,23 @@ const DIFF={
 };
 let diff='lvl',best=0,justUnlocked='',justPad=false;
 const bestKey=()=>'nexoraBest_'+LM()+'_'+selLv;
-function setDiff(){best=0;try{best=+localStorage.getItem(bestKey())||0}catch(_)}$('best').textContent=best?('Best score on level '+selLv+': '+best):''
-function saveBest(){if(score>best){best=score;try{localStorage.setItem(bestKey(),String(best))}catch(_):}}
-
-/* ---------- coins & shop (replaying completed level gives 5,000 gold/coins) ---------- */
+function setDiff(){best=0;try{best=+localStorage.getItem(bestKey())||0}catch(_){}$('best').textContent=best?('Best score on level '+selLv+': '+best):''}
+function saveBest(){if(score>best){best=score;try{localStorage.setItem(bestKey(),String(best))}catch(_){}}}
+/* ---------- coins & shop (coins are rare) ---------- */
 let coins=0,lastCr=0,combo=0,lastKill=-9;const shop={arm:0,armBy:{auto:0,fire:0},col:'olive',own:{olive:1},gren:0};
 try{const q=JSON.parse(localStorage.getItem('nexoraShop')||'{}');coins=+q.coins||0;shop.armBy={auto:Math.min(25,+((q.armBy&&q.armBy.auto!=null)?q.armBy.auto:q.arm)||0),fire:Math.min(25,+(q.armBy&&q.armBy.fire)||0)};shop.gren=Math.max(0,+q.gren||0);shop.own=Object.assign({olive:1},q.own||{});if(shop.own[q.col])shop.col=q.col}catch(_){}
 shop.arm=shop.armBy[aimMode==='manual'?'fire':'auto'];
 const shieldM=new THREE.Mesh(new THREE.SphereGeometry(3.2,16,12),new THREE.MeshBasicMaterial({color:0x4aa8ff,transparent:true,opacity:.22,depthWrite:false}));shieldM.position.y=1.3;shieldM.visible=false;p.g.add(shieldM);
-function saveShop(){try{localStorage.setItem('nexoraShop',JSON.stringify({coins,armBy:shop.armBy,col:shop.col,own:shop.own,gren:shop.gren}))}catch(_)}$('coinN').textContent=coins}
+function saveShop(){try{localStorage.setItem('nexoraShop',JSON.stringify({coins,armBy:shop.armBy,col:shop.col,own:shop.own,gren:shop.gren}))}catch(_){}$('coinN').textContent=coins}
 function applyCol(){const c=COLS.find(x=>x[0]===shop.col)||COLS[0];p.mB.color.setHex(c[2]);p.mD.color.setHex(c[3])}
-
+/* ---------- 50 levels per aim mode ---------- */
 let curLv=1,WN=4,selLv=1,lvProg={auto:1,fire:1},lvDone={auto:{},fire:{}};
 try{const q=JSON.parse(localStorage.getItem('nexoraLv')||'{}');if(q.p)lvProg=Object.assign(lvProg,q.p);if(q.d)lvDone=Object.assign(lvDone,q.d)}catch(_){}
 lvDone.auto=lvDone.auto||{};lvDone.fire=lvDone.fire||{};
 const LM=()=>aimMode==='manual'?'fire':'auto';
-function saveLv(){try{localStorage.setItem('nexoraLv',JSON.stringify({p:lvProg,d:lvDone}))}catch(_)}
+function saveLv(){try{localStorage.setItem('nexoraLv',JSON.stringify({p:lvProg,d:lvDone}))}catch(_){}}
 function lvParams(n){const t=(n-1)/49,L=(a,b)=>a+(b-a)*t;
-return{hp:L(.9,6),dmg:L(.8,3.4),rate:L(1.3,.3),spd:L(.9,1.45),spread:L(1.4,.2),cnt:Math.round(L(0,6)),drop:L(1.4,.3),heal:Math.round(L(15,0)),sm:L(.8,4),desc:''}}
+  return{hp:L(.9,6),dmg:L(.8,3.4),rate:L(1.3,.3),spd:L(.9,1.45),spread:L(1.4,.2),cnt:Math.round(L(0,6)),drop:L(1.4,.3),heal:Math.round(L(15,0)),sm:L(.8,4),desc:''}}
 DIFF.lvl=lvParams(1);
 selLv=Math.min(50,lvProg[LM()]);
 function renderLevels(){
@@ -820,7 +793,7 @@ function renderLevels(){
   S.innerHTML='';
   for(let i=1;i<=50;i++){
     const b=document.createElement('button'),lock=i>pr;b.className='lv';
-    const cl=lvDone[m][i];b.innerHTML=lock?'🔒':i+(cl?'<small>✓</small>':'<small style="color:#ffd23a">+'+lvReward(i)+'</small>');
+    const cl=lvDone[m][i];b.innerHTML=lock?'\uD83D\uDD12':i+(cl?'<small>\u2713</small>':'<small style="color:#ffd23a">+'+lvReward(i)+'</small>');
     b.setAttribute('aria-pressed',i===selLv);b.setAttribute('aria-disabled',lock);
     b.addEventListener('click',()=>{if(lock){$('lvInfo').textContent='Clear level '+(i-1)+' to unlock level '+i+'.';return}$('lvInfo').textContent='';selLv=i;const sl=S.scrollLeft;renderLevels();S.scrollLeft=sl;setDiff(diff)});
     S.appendChild(b);
@@ -829,6 +802,7 @@ function renderLevels(){
   $('go').textContent='PLAY LEVEL '+selLv;applyTheme(selLv);
 }
 $('lvStrip').addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.currentTarget.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+/* drag-to-scroll for touch and mouse, plus arrow buttons */
 (function(){
   const S=$('lvStrip');let d=null;
   S.addEventListener('pointerdown',e=>{d={id:e.pointerId,x:pt(e).x,s:S.scrollLeft,drag:false}});
@@ -842,7 +816,7 @@ $('lvStrip').addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.delta
   $('lvL').addEventListener('click',()=>S.scrollTo({left:S.scrollLeft-200,behavior:'smooth'}));
   $('lvR').addEventListener('click',()=>S.scrollTo({left:S.scrollLeft+200,behavior:'smooth'}));
 })();
-
+/* ---------- 35 paints, 25 armor levels, grenades, level backdrops ---------- */
 const shade=h=>{const r=(h>>16&255)*.42|0,g=(h>>8&255)*.42|0,b=(h&255)*.42|0;return r<<16|g<<8|b};
 const COLS=[['olive','Olive',0x667f3c],['desert','Desert',0xc2a15a],['navy','Navy',0x3f5878],['crimson','Crimson',0x9a3a32],['stealth','Stealth',0x2f3238],['gold','Gold',0xd4a634],['forest','Forest',0x2f5d34],['jungle','Jungle',0x3f7a3a],['sand','Sand',0xdbc48a],['snow','Snow',0xe6ecef],['arctic','Arctic',0xa9c4d6],['sky','Sky',0x5aa0d8],['ocean','Ocean',0x2a6f97],['teal','Teal',0x2a8c86],['mint','Mint',0x6fd0a8],['lime','Lime',0x9ad43a],['lemon','Lemon',0xe8d94a],['amber','Amber',0xe8a02a],['orange','Orange',0xe8742a],['rust','Rust',0xb4532a],['brick','Brick',0x8e3b2b],['red','Red',0xd03a30],['rose','Rose',0xe06a8a],['pink','Pink',0xf08cb8],['magenta','Magenta',0xb8349a],['purple','Purple',0x7a45b0],['violet','Violet',0x5b4ac0],['indigo','Indigo',0x3a3f9a],['slate','Slate',0x5c6b7a],['steel','Steel',0x8a97a3],['silver','Silver',0xc4c9cc],['charcoal','Charcoal',0x3a3d42],['midnight','Midnight',0x1c2540],['chocolate','Chocolate',0x5c3b26],['copper','Copper',0xb8733a]].map((c,i)=>[c[0],c[1],c[2],shade(c[2]),i?Math.round(5+(i-1)*45/33):0]);
 const armCost=n=>Math.round(10+(n-1)*70/24),GCOST=5;
@@ -851,7 +825,7 @@ const WNAMES=['Rocket','Twin Rockets','Triple Spread','Seeker Barrage','Quad Bla
 function weaponFor(a){
   const tier=Math.floor(a/5),k=a%5;
   return{name:WNAMES[tier],cnt:[1,2,3,3,4][tier],fan:[0,0,.17,.15,.14][tier],dmg:+(1+a*.24).toFixed(2),rl:+Math.max(.26,.78-a*.021).toFixed(2),spd:64+a*.9,
-  homing:tier===3?1.6+k*.3:tier===4?2.8:0,splash:tier===4?4+k*.9:0,col:tier?[0,0x7fd4ff,0xffd23a,0xff7a3a,0xd27dff][tier]:0,sc:1.3+a*.025};
+    homing:tier===3?1.6+k*.3:tier===4?2.8:0,splash:tier===4?4+k*.9:0,col:tier?[0,0x7fd4ff,0xffd23a,0xff7a3a,0xd27dff][tier]:0,sc:1.3+a*.025};
 }
 function fireWeapon(){
   const W=weaponFor(shop.arm),bx=BX[W.cnt];
@@ -868,18 +842,18 @@ function renderShop(){
   const grid=n=>{const g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:repeat('+n+',1fr);gap:6px;margin-top:8px';L.appendChild(g);return g};
   const chip=(g,html,css,fn)=>{const b=document.createElement('button');b.className='seg1';b.style.cssText='margin:0;padding:6px 2px;border-radius:8px;font-size:12px;line-height:1.2;'+css;b.innerHTML=html;b.addEventListener('click',fn);g.appendChild(b)};
   if(shopTab==='arm'){armorList(L);return}
-  if(shopTab==='col'){
+  if(shopTab==='col'){}else if(shopTab==='col'){
     shMsg('Tap a colour to buy or equip it.');
     const g=grid(5);
     COLS.forEach(c=>{const own=shop.own[c[0]],eq=shop.col===c[0],hx='#'+c[2].toString(16).padStart(6,'0');
-    chip(g,'<span style="display:block;height:22px;border-radius:5px;margin-bottom:3px;background:'+hx+';'+(eq?'outline:3px solid #fff1d2':'')+'"></span>'+(eq?'ON':own?'✓':c[4]),'',()=>{if(own)shop.col=c[0];else if(coins>=c[4]){coins-=c[4];shop.own[c[0]]=1;shop.col=c[0]}else{shMsg('Insufficient coins. '+c[1]+' costs '+c[4]+'.');return}saveShop();applyCol();renderShop()})})
+      chip(g,'<span style="display:block;height:22px;border-radius:5px;margin-bottom:3px;background:'+hx+';'+(eq?'outline:3px solid #fff1d2':'')+'"></span>'+(eq?'ON':own?'✓':c[4]),'',()=>{if(own)shop.col=c[0];else if(coins>=c[4]){coins-=c[4];shop.own[c[0]]=1;shop.col=c[0]}else{shMsg('Insufficient coins. '+c[1]+' costs '+c[4]+'.');return}saveShop();applyCol();renderShop()})})
   }else{
     shMsg('You have '+shop.gren+' grenades. Each costs '+GCOST+' coins. Throw with G or the GRENADE button.');
     const g=grid(3);
-    [[1,'Buy 1'],[10,'Buy 10'],[0,'Buy max']].forEach(([q,l])=>{const n=q||Math.floor(coins/GCOST);chip(g,l+'<br>'+n*GCOST+' coins','',function(){if(n<1||coins<n*GCOST){shMsg('Insufficient coins. A grenade costs '+GCOST+'.');return}coins-=n*GCOST;shop.gren+=n;saveShop();renderShop()})})
+    [[1,'Buy 1'],[10,'Buy 10'],[0,'Buy max']].forEach(([q,l])=>{const n=q||Math.floor(coins/GCOST);chip(g,l+'<br>'+n*GCOST+' coins','',()=>{if(n<1||coins<n*GCOST){shMsg('Insufficient coins. A grenade costs '+GCOST+'.');return}coins-=n*GCOST;shop.gren+=n;saveShop();renderShop()})})
   }
 }
-Array.prototype.forEach.call($('shopTabs').children,b=>b.addEventListener('click',()=>{$('shopTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');shopTab=b.dataset.k;renderShop()}));
+Array.prototype.forEach.call($('shopTabs').children,b=>b.addEventListener('click',()=>{shopTab=b.dataset.k;renderShop()}));
 const grens=[],grG=new THREE.SphereGeometry(.5,8,6),grM=new THREE.MeshLambertMaterial({color:0x2a3320,flatShading:true});let gCd=0;
 function throwGren(){
   if(state!=='play'||shop.gren<1||gCd>0)return;
@@ -908,6 +882,7 @@ function applyTheme(n){
   groundM.color.set(t[1]).offsetHSL(0,0,dl*.5);mesaM.color.set(t[2]);rockM.color.set(t[3]);
   sun.color.set(t[4]);sun.intensity=t[5];hemi.intensity=t[6];hemi.color.copy(sky).lerp(new THREE.Color(0xffffff),.6);
 }
+/* armor tiers are named tanks */
 const TN=['Nexora Scout','Dune Runner','Sand Viper','Scorpion','Cobra','Hornet','Mamba','Jackal','Falcon','Raptor','Wolverine','Bulldog','Rhino','Mammoth','Warhog','Centurion','Gladiator','Titan','Behemoth','Leviathan','Colossus','Dreadnought','Juggernaut','Annihilator','Nexora Supreme'];
 function syncArm(){shop.arm=shop.armBy[LM()];applyTank()}
 function applyTank(){p.g.scale.setScalar(1.15+shop.arm*.012);const l=document.querySelector('#hud .lbl');if(l)l.textContent=TN[shop.arm];buildUpg()}
@@ -918,18 +893,18 @@ function buildUpg(){
   const a=shop.arm,W=weaponFor(a),G=new THREE.Group(),T=new THREE.Group();p.g.add(G);p.tur.add(T);p.upg=G;p.upT=T;
   const ac=W.col||0xc8c0a0;p.accM=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:.55,flatShading:true});
   const bx=(par,m,w,h,d,x,y,z,r)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);if(r)q.rotation.set(r[0],r[1],r[2]);par.add(q);return q};
-  for(let i=0;i<Math.min(a,10);i++)bx(G,p.mD,.22,.5,.85,(i%2?-1:1)*2.1,.45,-2+Math.floor(i/2));
-  if(a>=2)bx(G,p.mD,2.8,.45,.5,0,.5,2.7);
-  if(a>=4)[-1,1].forEach(sx=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.7,8),p.mD);c.rotation.x=Math.PI/2;c.position.set(sx*1.0,1.7,-2.4);G.add(c)});
-  if(a>=5)[-1,1].forEach(sx=>bx(G,p.accM,.12,.12,4,sx*1.25,1.53,0));
-  if(a>=6)bx(T,p.mB,2.2,.5,.5,0,.4,1.3,[-.4,0,0]);
-  if(a>=8)bx(T,p.mB,1.8,.6,.8,0,.5,-1.5);
+  for(let i=0;i<Math.min(a,10);i++)bx(G,p.mD,.22,.5,.85,(i%2?-1:1)*2.1,.45,-2+Math.floor(i/2));      /* side armor plates */
+  if(a>=2)bx(G,p.mD,2.8,.45,.5,0,.5,2.7);                                                           /* front plow */
+  if(a>=4)[-1,1].forEach(sx=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.7,8),p.mD);c.rotation.x=Math.PI/2;c.position.set(sx*1.0,1.7,-2.4);G.add(c)}); /* exhausts */
+  if(a>=5)[-1,1].forEach(sx=>bx(G,p.accM,.12,.12,4,sx*1.25,1.53,0));                                /* glow strips */
+  if(a>=6)bx(T,p.mB,2.2,.5,.5,0,.4,1.3,[-.4,0,0]);                                                  /* turret wedge */
+  if(a>=8)bx(T,p.mB,1.8,.6,.8,0,.5,-1.5);                                                           /* turret bustle */
   if(a>=11)for(let i=0;i<Math.min(15,a-10);i++)bx(G,p.accM,.14,.14,.14,(i%2?-1:1)*1.22,1.56,1.6-Math.floor(i/2)*.28);
-  if(a>=12)bx(T,p.mD,.2,.2,1.2,.5,1.3,.1);
-  if(a>=14)[-1,1].forEach(sx=>{bx(T,p.mD,.6,.5,1.2,sx*1.4,.9,-.2);bx(T,p.accM,.5,.1,1,sx*1.4,1.2,-.2)});
-  if(a>=16)[-1,1].forEach(sx=>{bx(T,p.mD,.06,2,.06,sx*.8,1.8,-.8);bx(T,p.accM,.1,.1,.1,sx*.8,2.8,-.8)});
-  if(a>=18)[-1,1].forEach(sx=>bx(G,p.mD,.15,1.2,1.2,sx*1.3,2,-1.2));
-  if(a>=20)[-1,1].forEach(sx=>{bx(G,p.mD,.5,.5,2,sx*1.9,1.75,.2);bx(G,p.accM,.4,.4,.3,sx*1.9,1.75,1.35)});
+  if(a>=12)bx(T,p.mD,.2,.2,1.2,.5,1.3,.1);                                                          /* MG */
+  if(a>=14)[-1,1].forEach(sx=>{bx(T,p.mD,.6,.5,1.2,sx*1.4,.9,-.2);bx(T,p.accM,.5,.1,1,sx*1.4,1.2,-.2)}); /* pods */
+  if(a>=16)[-1,1].forEach(sx=>{bx(T,p.mD,.06,2,.06,sx*.8,1.8,-.8);bx(T,p.accM,.1,.1,.1,sx*.8,2.8,-.8)}); /* antennas */
+  if(a>=18)[-1,1].forEach(sx=>bx(G,p.mD,.15,1.2,1.2,sx*1.3,2,-1.2));                                /* wings */
+  if(a>=20)[-1,1].forEach(sx=>{bx(G,p.mD,.5,.5,2,sx*1.9,1.75,.2);bx(G,p.accM,.4,.4,.3,sx*1.9,1.75,1.35)}); /* missile racks */
   if(a>=22){const r=new THREE.Mesh(new THREE.TorusGeometry(1.7,.08,6,24),p.accM);r.rotation.x=Math.PI/2;r.position.y=.1;T.add(r)}
   if(a>=24)[[-.8,-.8],[.8,-.8],[-.8,.2],[.8,.2]].forEach(q=>{const c=new THREE.Mesh(new THREE.ConeGeometry(.15,.8,6),p.accM);c.position.set(q[0],1.3,q[1]);T.add(c)});
   p.barrel.visible=p.brake.visible=W.cnt===1;p.ex=[];
@@ -953,9 +928,9 @@ saveShop();applyCol();applyTank();
 function showMenu(mode){
   const over=mode==='over',won=mode==='won';
   $('title').innerHTML=won?'VICTORY':over?'DESTROYED':'NEXORA<br>WAR TANK';
-  $('sub').textContent=won?('Level '+curLv+' cleared. Final score '+score+'.'+(justUnlocked?' Level '+Math.min(50,curLv+1)+' unlocked!':'')+(justPad?' Touchpad aim unlocked! Switch it on in Settings.':'')+(won?(lastCr?' +'+lastCr+' coins/gold.':' Already cleared: replay reward +5,000 gold/coins!'):'')):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
+  $('sub').textContent=won?('Level '+curLv+' cleared. Final score '+score+'.'+(justUnlocked?' Level '+Math.min(50,curLv+1)+' unlocked!':'')+(justPad?' Touchpad aim unlocked! Switch it on in Settings.':'')+(won?(lastCr?' +'+lastCr+' coins.':' Already cleared: no coins.'):'')):over?('You reached wave '+wave+' and scored '+score+'.'):'Enemy armor is rolling in over the dunes. Hold the desert as long as you can.';
   $('how').textContent=touchMode?'Drag on the left to drive. Hold the FIRE pad to shoot. In Fire pad aiming, drag it to aim. Grab green crates to repair. Drag the right side to orbit, pinch to zoom.'
-  :'WASD or arrow keys to drive. Move the mouse to aim. Click or Space to fire. Grab green crates to repair. Right-drag or Q/E to orbit, scroll to zoom.';
+    :'WASD or arrow keys to drive. Move the mouse to aim. Click or Space to fire. Grab green crates to repair. Right-drag or Q/E to orbit, scroll to zoom.';
   setDiff();applyAim();$('pauseBtn').hidden=true;$('pauseOv').hidden=true;paused=false;
   $('go').textContent=won?'PLAY AGAIN':over?'TRY AGAIN':'ROLL OUT';
   NOROT=scrPref==='auto';Array.prototype.forEach.call($('scr').children,x=>x.setAttribute('aria-pressed',x.dataset.r===scrPref));resize();$('rotPop').hidden=true;$('mainCard').hidden=false;$('setCard').hidden=true;$('shopCard').hidden=true;$('menu').hidden=false;renderLevels();
@@ -970,6 +945,7 @@ function reset(){
   p.x=0;p.z=0;p.h=0;p.aim=0;p.hp=100;p.rl=0;p.shield=0;p.rapid=0;combo=0;$('cmb').textContent='';p.g.visible=true;score=0;$('score').textContent=0;waveWait=0;tgt.set(0,0,0);
   startWave(1);state='play';$('menu').hidden=true;$('pauseBtn').hidden=false;paused=false;
 }
+/* ROLL OUT: if the phone is held upright, ask to switch to landscape first. OK is the only option. */
 $('go').addEventListener('click',()=>{
   audio();startAmbient();
   if(window.innerHeight>window.innerWidth&&NOROT){$('rotPop').hidden=false;$('rotOk').focus()}
@@ -990,12 +966,7 @@ function gameOver(){
   setTimeout(()=>{if(state==='over')showMenu('over')},1400);
 }
 function victory(){
-  // MODIFIED: Replaying any completed level now awards 5,000 gold/coins
-  const alreadyCleared = !!lvDone[LM()][curLv];
-  lastCr = alreadyCleared ? 5000 : lvReward(curLv);
-  coins += lastCr;
-  saveShop();
-  
+  lastCr=lvDone[LM()][curLv]?0:lvReward(curLv);coins+=lastCr;saveShop();
   justPad=curLv===50&&LM()==='auto'&&!lvDone.auto[50];justUnlocked='';{const m0=LM();if(curLv>=lvProg[m0]&&curLv<50){lvProg[m0]=curLv+1;justUnlocked='1'}lvDone[m0][curLv]=1;saveLv();selLv=Math.min(50,curLv+1)}
   state='won';score+=Math.round(500*DIFF[diff].sm);$('score').textContent=score;saveBest();sfx('pick');say('VICTORY');
   for(let i=0;i<6;i++)setTimeout(()=>explode(p.x+rnd(-14,14),p.z+rnd(-14,14),false),i*260);
@@ -1009,9 +980,9 @@ function doPause(on){
 }
 $('pauseBtn').addEventListener('click',()=>doPause(true));
 $('resume').addEventListener('click',()=>doPause(false));
-$('quit').addEventListener('click',()=>{$('pauseBtn').hidden=true;doPause(false);clearField();state='menu';showMenu(false)});
+$('quit').addEventListener('click',()=>{doPause(false);clearField();state='menu';showMenu(false)});
 window.addEventListener('keydown',e=>{if(e.code==='KeyP'||e.code==='Escape')doPause(!paused)});
-function vib(n){try{if(touchMode&&navigator.vibrate)navigator.vibrate(n)}catch(_)}
+function vib(n){try{if(touchMode&&navigator.vibrate)navigator.vibrate(n)}catch(_){}}
 function hurtPlayer(d){
   if(p.shield>0){sfx('hit',.5);return}
   d*=1-.02*shop.arm;
@@ -1145,6 +1116,7 @@ function frame(now){
   if(paused){last=now;renderer.render(scene,cam);requestAnimationFrame(frame);return}
   const raw=Math.min(.05,Math.max(.001,(now-last)/1000));last=now;
   fa=fa?fa+(raw-fa)*.15:raw;const dt=raw>fa*1.8?raw:fa;gameT+=dt;
+  /* adaptive resolution: trade a little sharpness for steady frames */
   fcd-=raw;
   if(raw>.024)slow+=raw;else slow=Math.max(0,slow-raw*.5);
   if(raw<.0185)fast+=raw;else fast=0;
@@ -1155,7 +1127,7 @@ function frame(now){
   if(state==='play'){
     updatePlayer(dt);updateEnemies(dt);updatePickups(dt);
     if(!enemies.length){waveWait+=dt;if(waveWait>2.5){waveWait=0;if(wave>=WN){victory()}else{p.hp=Math.min(100,p.hp+DIFF[diff].heal);score+=200*wave;$('score').textContent=score;startWave(wave+1)}}}
-  }else if(state==='over'){}
+  }else if(state==='over'){/* enemies freeze */}
   else{p.aim=p.h=gameT*.3;place(p,dt)}
   if(combo&&gameT-lastKill>4){combo=0;$('cmb').textContent=''}
   updateGrens(dt);updateMines(dt);updateShells(dt);updateParts(dt);ambientTick(dt);
@@ -1173,6 +1145,7 @@ function frame(now){
   renderer.render(scene,cam);
   requestAnimationFrame(frame);
 }
+/* pre-compile shaders and upload textures so the first shot or explosion doesn't hitch */
 (function(){
   const tmp=[];
   Object.keys(PT).forEach(k=>{const m=getSprite(k);m.position.set(0,2,8);scene.add(m);tmp.push([m,k])});
@@ -1189,5 +1162,5 @@ showMenu(false);
 requestAnimationFrame(frame);
 })();
 </script>
-</body>
-</html>
+
+</body></html>
