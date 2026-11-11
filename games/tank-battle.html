@@ -628,7 +628,7 @@ function pickType(){
 function disposeTank(e){e.g.traverse(o=>{if(o.geometry)o.geometry.dispose()});e.mB.dispose();e.mD.dispose()}
 function spawnEnemy(key,px,pz){
   key=key||pickType();const T=ET[key],boss=!!T.boss;
-  const m=makeTank(T.body,T.dark,T.sc);
+  const lt=(curLv-1)/49,lf=1+lt*(boss?.4:.8),m=makeTank(T.body,T.dark,T.sc*lf);   /* higher level = bigger enemies */
   let x,z;
   if(px!=null){x=px;z=pz}else{let t=0;do{const a=rnd(0,TAU),r=rnd(58,82);x=Math.cos(a)*r;z=Math.sin(a)*r}while(Math.hypot(x-p.x,z-p.z)<45&&t++<20)}
   const D=DIFF[diff],hp=Math.max(1,Math.round((T.hp+Math.floor(wave/4))*D.hp));
@@ -645,7 +645,7 @@ function spawnEnemy(key,px,pz){
   }
   const bar=new THREE.Group(),bg=new THREE.Mesh(barGeo,barBg),fg=new THREE.Mesh(barGeo,barFg);
   bg.renderOrder=10;fg.renderOrder=11;fg.position.z=.01;bar.add(bg,fg);scene.add(bar);if(boss)bar.scale.setScalar(1.8);
-  enemies.push({...m,...T,dmg:Math.max(1,Math.round(T.dmg*D.dmg)),rate:T.rate*D.rate,speed:T.speed*D.spd,spread:T.spread*D.spread,x,z,h:rnd(0,TAU),aim:0,hp,max:hp,cool:rnd(1,2.5),strafe:Math.random()<.5?1:-1,sw:rnd(2,5),rec:0,bar,fg,mt:rnd(2,4),sp:6,bt:4,dt2:3,dsh:0});
+  enemies.push({...m,...T,r:T.r*lf,sz:lf,ss:T.ss*(1+lt*.3),vol:(T.vol||1)+(boss?0:(curLv>=20?1:0)+(curLv>=40?1:0)),dmg:Math.max(1,Math.round(T.dmg*D.dmg)),rate:T.rate*D.rate,speed:T.speed*D.spd,spread:T.spread*D.spread,x,z,h:rnd(0,TAU),aim:0,hp,max:hp,cool:rnd(1,2.5),strafe:Math.random()<.5?1:-1,sw:rnd(2,5),rec:0,bar,fg,mt:rnd(2,4),sp:6,bt:4,dt2:3,dsh:0});
 }
 function startWave(n){
   wave=n;$('wave').textContent=n+'/'+WN;
