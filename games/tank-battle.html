@@ -969,9 +969,7 @@ function gameOver(){
   setTimeout(()=>{if(state==='over')showMenu('over')},1400);
 }
 function victory(){
-  const replayed=!!lvDone[LM()][curLv];
-  lastCr=replayed?500000:lvReward(curLv);
-  coins+=lastCr;saveShop();
+  lastCr=lvDone[LM()][curLv]?0:lvReward(curLv);coins+=lastCr;saveShop();
   justPad=curLv===50&&LM()==='auto'&&!lvDone.auto[50];justUnlocked='';{const m0=LM();if(curLv>=lvProg[m0]&&curLv<50){lvProg[m0]=curLv+1;justUnlocked='1'}lvDone[m0][curLv]=1;saveLv();selLv=Math.min(50,curLv+1)}
   state='won';score+=Math.round(500*DIFF[diff].sm);$('score').textContent=score;saveBest();sfx('pick');say('VICTORY');
   for(let i=0;i<6;i++)setTimeout(()=>explode(p.x+rnd(-14,14),p.z+rnd(-14,14),false),i*260);
