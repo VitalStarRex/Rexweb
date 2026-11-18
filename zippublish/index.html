@@ -1,65 +1,222 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Site Publisher</title>
+<title>Zip Viewer</title>
 <style>
-*{box-sizing:border-box}body{font:16px system-ui,sans-serif;margin:0;background:#f6f7f9;color:#1b1f24}
-main{max-width:640px;margin:0 auto;padding:20px}
-h1{font-size:22px}
-#drop{border:2px dashed #8a94a3;border-radius:12px;padding:32px 16px;text-align:center;background:#fff;cursor:pointer}
+*{box-sizing:border-box}
+body{margin:0;font:15px system-ui,sans-serif;background:#f6f7f9;color:#1b1f24}
+header{padding:12px 14px;background:#111827;color:#fff;display:flex;gap:10px;align-items:center}
+header h1{font-size:18px;margin:0;flex:1}
+button,.btn{border:0;border-radius:8px;padding:9px 13px;font-size:14px;background:#2563eb;color:#fff;cursor:pointer}
+button.g{background:#e5e7eb;color:#1b1f24}
+#drop{margin:14px;padding:34px 14px;border:2px dashed #8a94a3;border-radius:12px;text-align:center;background:#fff}
 #drop.over{border-color:#2563eb;background:#eff6ff}
-#tok{width:100%;padding:10px;margin:12px 0;border:1px solid #cbd2db;border-radius:8px;display:none}
-#msg{min-height:22px;margin:10px 0;font-size:14px}.err{color:#b91c1c}.ok{color:#15803d}
-progress{width:100%;display:none}
-.f{background:#fff;border-radius:10px;padding:12px;margin:10px 0;box-shadow:0 1px 2px #0001}
-.f b{word-break:break-all}.m{font-size:13px;color:#5b6573;margin:4px 0 8px}
-button{border:0;border-radius:8px;padding:8px 12px;font-size:14px;background:#2563eb;color:#fff;margin-right:6px}
-button.d{background:#e5e7eb;color:#b91c1c}
-</style></head><body><main>
-<h1>🌐 Site Publisher</h1>
-<input id="tok" type="password" placeholder="Upload token">
-<div id="drop">Tap to choose or drop a website .zip here (needs index.html)<input id="file" type="file" accept=".zip" multiple hidden></div>
-<progress id="pg" max="100" value="0"></progress>
-<div id="msg"></div>
-<div id="list"></div>
-</main>
+#app{display:none}
+#bar{display:flex;gap:8px;padding:10px 14px;align-items:center}
+#q{flex:1;padding:10px;border:1px solid #cbd2db;border-radius:8px;font-size:15px;min-width:0}
+#list{margin:0 14px 14px;background:#fff;border-radius:10px;max-height:38vh;overflow:auto}
+.row{padding:11px 12px;border-bottom:1px solid #eef0f3;display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+.row:hover,.row.sel{background:#eff6ff}.row span:first-child{word-break:break-all}.row span:last-child{color:#6b7280;white-space:nowrap;font-size:13px}
+#view{margin:0 14px 20px;background:#fff;border-radius:10px;display:none;overflow:hidden}
+#vh{padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid #eef0f3}
+#vn{flex:1;font-weight:600;word-break:break-all;min-width:100%}
+pre{margin:0;padding:12px;overflow:auto;max-height:60vh;font:13px ui-monospace,Menlo,monospace;white-space:pre;tab-size:2}
+iframe{width:100%;height:65vh;border:0;background:#fff;display:block}
+#img{max-width:100%;display:block;margin:12px auto}
+.note{padding:16px;color:#6b7280}
+.tab.on{background:#111827;color:#fff}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:20px;display:none}
+</style></head><body>
+<header><h1>📂 Zip Viewer</h1><button class="g" id="again" style="display:none">New zip</button></header>
+
+<div id="drop">Tap to choose a .zip file<br><small>or drop it here. Nothing is uploaded; it all stays on your phone.</small>
+<input id="file" type="file" accept=".zip,application/zip" hidden></div>
+
+<div id="app">
+  <div id="bar"><input id="q" placeholder="Search files…"><button id="site">▶ Preview site</button></div>
+  <div id="list"></div>
+  <div id="view">
+    <div id="vh"><div id="vn"></div>
+      <button class="tab g" id="tCode">Code</button><button class="tab g" id="tPrev">Preview</button>
+      <button id="copy">Copy code</button><button class="g" id="dl">Download</button></div>
+    <pre id="code"></pre><iframe id="frame" sandbox="allow-scripts"></iframe>
+    <img id="img" alt=""><div class="note" id="note"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
 <script>
-const $=s=>document.querySelector(s);
-const tok=$('#tok');tok.value=localStorage.tok||'';
-tok.oninput=()=>localStorage.tok=tok.value;
-const msg=(t,c)=>{$('#msg').textContent=t;$('#msg').className=c||''};
-const size=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.ceil(n/1024)+' KB';
-async function refresh(){
-  const r=await (await fetch('/api/files')).json();
-  tok.style.display=r.auth?'block':'none';
-  $('#list').innerHTML=r.files.map(f=>`<div class="f"><b>${esc(f.name)}</b>
-  <div class="m">${size(f.size)} · ${new Date(f.time*1000).toLocaleString()}</div>
-  <button onclick="copy('${f.url}')">Copy link</button>
-  <a href="${f.url}" target="_blank"><button>Open site</button></a>
-  <button class="d" onclick="del('${f.id}')">Delete</button></div>`).join('')||'<p>No files yet.</p>';
+/* ---------- minimal zip reader (no libraries) ---------- */
+async function inflateRaw(bytes) {
+  const ds = new DecompressionStream('deflate-raw');
+  const w = ds.writable.getWriter(); w.write(bytes); w.close();
+  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
 }
-const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function copy(u){navigator.clipboard.writeText(location.origin+u);msg('Link copied','ok')}
-async function del(id){
-  if(!confirm('Delete this file?'))return;
-  const r=await fetch('/api/files/'+id,{method:'DELETE',headers:{'X-Token':tok.value}});
-  r.ok?refresh():msg((await r.json()).error,'err');
+async function unzip(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--)
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('This is not a valid zip file.');
+  const count = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true);
+  const dec = new TextDecoder(), out = [];
+  for (let n = 0; n < count; n++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('Zip is damaged.');
+    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true);
+    const csize = dv.getUint32(p + 20, true), size = dv.getUint32(p + 24, true);
+    const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+    const off = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nl));
+    p += 46 + nl + el + cl;
+    if (name.endsWith('/') || name.startsWith('__MACOSX/') || name.endsWith('.DS_Store')) continue;
+    out.push({
+      name, size, method,
+      async read() {
+        const lnl = dv.getUint16(off + 26, true), lel = dv.getUint16(off + 28, true);
+        const start = off + 30 + lnl + lel, data = u8.subarray(start, start + csize);
+        if (method === 0) return data.slice();
+        if (method === 8) return inflateRaw(data);
+        throw new Error('Unsupported compression method ' + method);
+      }
+    });
+  }
+  return out;
 }
-function up(file){return new Promise(res=>{
-  const x=new XMLHttpRequest();x.open('PUT','/api/upload');
-  x.setRequestHeader('X-Filename',encodeURIComponent(file.name));x.setRequestHeader('X-Token',tok.value);
-  $('#pg').style.display='block';
-  x.upload.onprogress=e=>$('#pg').value=e.loaded/e.total*100;
-  x.onload=()=>{$('#pg').style.display='none';
-    const j=JSON.parse(x.responseText);
-    x.status==201?msg('Published: '+location.origin+j.url,'ok'):msg(j.error,'err');res()};
-  x.onerror=()=>{msg('Network error','err');res()};
-  x.send(file)})}
-async function handle(files){for(const f of files)await up(f);refresh()}
-$('#drop').onclick=()=>$('#file').click();
-$('#file').onchange=e=>handle(e.target.files);
-$('#drop').ondragover=e=>{e.preventDefault();$('#drop').classList.add('over')};
-$('#drop').ondragleave=()=>$('#drop').classList.remove('over');
-$('#drop').ondrop=e=>{e.preventDefault();$('#drop').classList.remove('over');handle(e.dataTransfer.files)};
-refresh();
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const TEXT = /\.(html?|css|js|mjs|json|txt|md|xml|svg|csv|ts|tsx|jsx|php|py|java|c|cpp|h|cs|go|rb|rs|sh|yml|yaml|toml|ini|env|log|sql|vue|svelte|htaccess|webmanifest|map)$/i;
+const MIME = { html:'text/html', htm:'text/html', css:'text/css', js:'text/javascript', mjs:'text/javascript', json:'application/json',
+  svg:'image/svg+xml', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp', ico:'image/x-icon',
+  woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf', mp4:'video/mp4', webm:'video/webm', mp3:'audio/mpeg', wav:'audio/wav', pdf:'application/pdf' };
+const ext = n => (n.split('.').pop() || '').toLowerCase();
+const mime = n => MIME[ext(n)] || 'application/octet-stream';
+const isText = n => TEXT.test(n) || /^[^.]+$/.test(n.split('/').pop());
+const fmt = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n > 1024 ? Math.round(n / 1024) + ' KB' : n + ' B';
+function toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 1500); }
+function resolve(base, ref) {
+  ref = ref.split('#')[0].split('?')[0];
+  try { ref = decodeURIComponent(ref); } catch (e) {}
+  const parts = ref.startsWith('/') ? [] : base.split('/').slice(0, -1);
+  for (const seg of ref.split('/')) { if (seg === '..') parts.pop(); else if (seg && seg !== '.') parts.push(seg); }
+  return parts.join('/');
+}
+const isExternal = r => /^([a-z][a-z0-9+.-]*:|\/\/|#|data:|mailto:|tel:|javascript:)/i.test(r.trim());
+
+/* ---------- state ---------- */
+let files = [], byName = {}, cache = {}, current = null, currentBytes = null, blobUrls = {};
+
+async function bytesOf(f) { return cache[f.name] || (cache[f.name] = await f.read()); }
+
+async function loadZip(file) {
+  try {
+    files = await unzip(await file.arrayBuffer());
+  } catch (e) { return alert(e.message); }
+  if (!files.length) return alert('The zip is empty.');
+  files.sort((a, b) => a.name.localeCompare(b.name));
+  byName = {}; cache = {}; blobUrls = {}; current = null;
+  files.forEach(f => byName[f.name] = f);
+  $('#drop').style.display = 'none'; $('#app').style.display = 'block'; $('#again').style.display = '';
+  $('#view').style.display = 'none'; $('#q').value = '';
+  $('#site').style.display = files.some(f => /\.html?$/i.test(f.name)) ? '' : 'none';
+  renderList();
+}
+
+function renderList() {
+  const q = $('#q').value.toLowerCase();
+  $('#list').innerHTML = '';
+  files.filter(f => f.name.toLowerCase().includes(q)).forEach(f => {
+    const r = document.createElement('div'); r.className = 'row' + (current === f.name ? ' sel' : '');
+    r.innerHTML = '<span></span><span>' + fmt(f.size) + '</span>'; r.firstChild.textContent = f.name;
+    r.onclick = () => openFile(f.name); $('#list').appendChild(r);
+  });
+}
+
+async function openFile(name, mode) {
+  const f = byName[name]; if (!f) return;
+  current = name; renderList();
+  const b = await bytesOf(f); currentBytes = b;
+  $('#view').style.display = 'block'; $('#vn').textContent = name;
+  const html = /\.html?$/i.test(name), text = isText(name), img = /^image\//.test(mime(name)) && ext(name) !== 'svg';
+  $('#tPrev').style.display = html || ext(name) === 'svg' ? '' : 'none';
+  $('#tCode').style.display = text ? '' : 'none';
+  $('#copy').style.display = text ? '' : 'none';
+  $('#code').style.display = $('#frame').style.display = $('#img').style.display = $('#note').style.display = 'none';
+  if (img) { $('#img').src = URL.createObjectURL(new Blob([b], { type: mime(name) })); $('#img').style.display = 'block'; }
+  else if (text) {
+    $('#code').textContent = new TextDecoder().decode(b);
+    if (mode === 'preview' && (html || ext(name) === 'svg')) showPreview(name); else showCode();
+  } else { $('#note').textContent = 'This file type cannot be shown. Use Download.'; $('#note').style.display = 'block'; }
+  $('#view').scrollIntoView({ behavior: 'smooth' });
+}
+function showCode() { $('#frame').style.display = 'none'; $('#code').style.display = 'block'; tabs('tCode'); }
+function tabs(id) { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === id)); }
+
+/* ---------- live preview ---------- */
+async function blobFor(name, stack = []) {
+  if (blobUrls[name]) return blobUrls[name];
+  const f = byName[name]; if (!f || stack.includes(name)) return null;
+  let b = await bytesOf(f);
+  if (ext(name) === 'css') b = new TextEncoder().encode(await rewriteCss(new TextDecoder().decode(b), name, [...stack, name]));
+  return blobUrls[name] = URL.createObjectURL(new Blob([b], { type: mime(name) }));
+}
+async function rewriteCss(css, base, stack) {
+  const re = /url\(\s*(['"]?)([^'")]+)\1\s*\)|@import\s+(['"])([^'"]+)\3/g; let out = '', last = 0, m;
+  while ((m = re.exec(css))) {
+    const ref = m[2] || m[4]; out += css.slice(last, m.index); last = re.lastIndex;
+    if (isExternal(ref)) { out += m[0]; continue; }
+    const u = await blobFor(resolve(base, ref), stack);
+    out += u ? (m[2] ? 'url("' + u + '")' : '@import "' + u + '"') : m[0];
+  }
+  return out + css.slice(last);
+}
+async function buildHtml(name) {
+  const doc = new DOMParser().parseFromString(new TextDecoder().decode(await bytesOf(byName[name])), 'text/html');
+  for (const el of doc.querySelectorAll('[src],link[href],[poster]')) {
+    for (const attr of ['src', 'href', 'poster']) {
+      const v = el.getAttribute(attr); if (!v || isExternal(v) || (attr === 'href' && el.tagName !== 'LINK')) continue;
+      const u = await blobFor(resolve(name, v)); if (u) el.setAttribute(attr, u);
+    }
+  }
+  for (const st of doc.querySelectorAll('style')) st.textContent = await rewriteCss(st.textContent, name, [name]);
+  for (const el of doc.querySelectorAll('[style]')) el.setAttribute('style', await rewriteCss(el.getAttribute('style'), name, [name]));
+  for (const a of doc.querySelectorAll('a[href]')) {
+    const v = a.getAttribute('href'); if (isExternal(v)) { if (!v.startsWith('#')) a.target = '_blank'; continue; }
+    const t = resolve(name, v); if (byName[t]) { a.setAttribute('data-nav', t); a.setAttribute('href', '#'); }
+  }
+  const s = doc.createElement('script');
+  s.textContent = "document.addEventListener('click',e=>{const a=e.target.closest('a[data-nav]');if(a){e.preventDefault();parent.postMessage({nav:a.dataset.nav},'*')}})";
+  doc.body.appendChild(s);
+  return '<!DOCTYPE html>' + doc.documentElement.outerHTML;
+}
+async function showPreview(name) {
+  tabs('tPrev'); $('#code').style.display = 'none';
+  const fr = $('#frame'); fr.style.display = 'block';
+  if (ext(name) === 'svg') fr.srcdoc = '<body style="margin:0">' + new TextDecoder().decode(await bytesOf(byName[name]));
+  else fr.srcdoc = await buildHtml(name);
+}
+window.addEventListener('message', e => { if (e.data && e.data.nav) openFile(e.data.nav, 'preview'); });
+
+/* ---------- events ---------- */
+$('#drop').onclick = () => $('#file').click();
+$('#file').onchange = e => e.target.files[0] && loadZip(e.target.files[0]);
+$('#again').onclick = () => { $('#app').style.display = 'none'; $('#drop').style.display = ''; $('#again').style.display = 'none'; $('#file').value = ''; };
+$('#drop').ondragover = e => { e.preventDefault(); $('#drop').classList.add('over'); };
+$('#drop').ondragleave = () => $('#drop').classList.remove('over');
+$('#drop').ondrop = e => { e.preventDefault(); $('#drop').classList.remove('over'); e.dataTransfer.files[0] && loadZip(e.dataTransfer.files[0]); };
+$('#q').oninput = renderList;
+$('#tCode').onclick = showCode;
+$('#tPrev').onclick = () => showPreview(current);
+$('#site').onclick = () => {
+  const html = files.map(f => f.name).filter(n => /\.html?$/i.test(n));
+  const idx = html.find(n => /(^|\/)index\.html?$/i.test(n)) || html[0]; openFile(idx, 'preview');
+};
+$('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })); a.download = current.split('/').pop(); a.click(); };
+$('#copy').onclick = async () => {
+  const t = $('#code').textContent;
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast('Code copied');
+};
 </script></body></html>
