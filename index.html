@@ -804,11 +804,11 @@ if(!stage||!btn||!heroEl)return;
 var BASE="https://rexweb.web.app/games/";
 var TK=window.rexTank||null;
 var LIST=[
- {n:"05",name:"Tank Battle",href:BASE+"tank-battle.html",c:"#b6f562",ms:1900,tank:true},
- {n:"07",name:"Dragon Fury",href:BASE+"dragon-fury.html",c:"#ff6a3a",ms:1550,init:function(){return{fa:0,p:[]}},draw:dragon},
- {n:"10",name:"Sky Combat",href:BASE+"sky-combat.html",c:"#4e9bff",ms:1550,init:function(){return{e:{x:W+20,y:40,alive:true},rt:0,py:50,m:null,p:[],f:0}},draw:sky},
- {n:"08",name:"Superhero Showdown",href:BASE+"superhero-showdown.html",c:"#ffd05a",ms:1550,init:function(){return{vx:W+30,vy:50,st:0,vt:1.2,pw:0,bm:0,sp:[],p:[]}},draw:hero},
- {n:"01",name:"Shadow Ninja",href:BASE+"shadow-ninja.html",c:"#a56aff",ms:1550,init:function(){return{a:0,b:.4,sh:[],en:[],p:[],d:0,ct:.2,clones:[]}},draw:ninja}
+ {n:"05",name:"Tank Battle",href:BASE+"tank-battle.html",c:"#b6f562",ms:3800,tank:true},
+ {n:"07",name:"Dragon Fury",href:BASE+"dragon-fury.html",c:"#ff6a3a",ms:3300,init:function(){return{fa:0,p:[]}},draw:dragon},
+ {n:"10",name:"Sky Combat",href:BASE+"sky-combat.html",c:"#4e9bff",ms:3300,init:function(){return{e:{x:W+20,y:40,alive:true},rt:0,py:50,m:null,p:[],f:0}},draw:sky},
+ {n:"08",name:"Superhero Showdown",href:BASE+"superhero-showdown.html",c:"#ffd05a",ms:3300,init:function(){return{vx:W+30,vy:50,st:0,vt:1.2,pw:0,bm:0,sp:[],p:[]}},draw:hero},
+ {n:"01",name:"Shadow Ninja",href:BASE+"shadow-ninja.html",c:"#a56aff",ms:3300,init:function(){return{a:0,b:.4,sh:[],en:[],p:[],d:0,ct:.2,clones:[]}},draw:ninja}
 ];
 /* Keep the existing Three.js war-tank animation as the first scene. */
 
@@ -822,6 +822,14 @@ var dots=document.createElement("div");dots.className="gs-dots";dots.setAttribut
 var dotEls=LIST.map(function(g){var i=document.createElement("i");i.style.setProperty("--c",g.c);dots.appendChild(i);return i});
 
 /* ---- helpers ---- */
+var shk=0,vg=null;
+function finish(g,t){
+ if(!vg||vg.h!==H){var q=ctx.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.62);q.addColorStop(0,"rgba(0,0,0,0)");q.addColorStop(1,"rgba(0,0,0,.55)");vg={g:q,h:H}}
+ ctx.fillStyle=vg.g;ctx.fillRect(0,0,W,H+2);
+ if(t<.5){ctx.fillStyle="rgba(0,0,0,"+(1-t/.5)+")";ctx.fillRect(0,0,W,H+2)}
+ var a=Math.min(1,Math.max(0,(t-.35)/.4))*Math.min(1,Math.max(0,(4.9-t)/.5));
+ if(a>0){ctx.globalAlpha=a;ctx.font='italic 800 9px Arial,sans-serif';ctx.textAlign="left";ctx.textBaseline="middle";ctx.fillStyle=g.c;ctx.shadowColor=g.c;ctx.shadowBlur=6;ctx.fillText(g.n+"  "+g.name.toUpperCase(),10,14);ctx.shadowBlur=0;ctx.globalAlpha=1}
+}
 function md(a,b){return((a%b)+b)%b}
 function rnd(i){var x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
 function bg(a,b){var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,a);g.addColorStop(1,b);ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
@@ -831,8 +839,8 @@ function poly(pts,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(pts[0][0],pt
 function star4(x,y,r,rot,col){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();for(var i=0;i<8;i++){var rr=i%2?r*.38:r,a=i*Math.PI/4;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();ctx.fill();ctx.restore()}
 function stars(t,n,sp,col,streak){ctx.fillStyle=col;for(var i=0;i<n;i++){var k=.4+(i%3)*.4,x=md(rnd(i)*W-t*sp*k,W),y=rnd(i+99)*H;if(streak){ctx.globalAlpha=.3+k*.4;ctx.fillRect(x,y,streak*k,1)}else{ctx.globalAlpha=.35+.65*Math.abs(Math.sin(t*2+i));ctx.fillRect(x,y,1.3,1.3)}}ctx.globalAlpha=1}
 function skyline(t,sp,col,seed,gy,hmin,hmax,lights){var cw=44,n=8;for(var i=0;i<n;i++){var x=md(i*cw-t*sp,n*cw)-cw,h=hmin+rnd(i+seed)*(hmax-hmin);ctx.fillStyle=col;ctx.fillRect(x,gy-h,cw-3,h+2);if(lights){ctx.fillStyle=lights;for(var r=0;r<Math.floor(h/9);r++)for(var c=0;c<3;c++)if(rnd(i*31+r*7+c+seed)>.55)ctx.fillRect(x+5+c*11,gy-h+5+r*9,3,3)}}}
-function pb(a,x,y,n,cols,sp,life,r,g){if(a.length>160)return;for(var i=0;i<n;i++){var an=Math.random()*6.2832,v=sp*(.3+Math.random()*.7);a.push({x:x,y:y,vx:Math.cos(an)*v,vy:Math.sin(an)*v,l:life*(.6+Math.random()*.4),L:life,c:cols[i%cols.length],r:r*(.6+Math.random()*.6),g:g||0})}}
-function pu(a,dt){for(var i=a.length-1;i>=0;i--){var p=a[i];p.l-=dt;if(p.l<=0){a.splice(i,1);continue}p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=Math.max(0,p.l/p.L);circ(p.x,p.y,p.r*(.4+.6*p.l/p.L),p.c)}ctx.globalAlpha=1}
+function pb(a,x,y,n,cols,sp,life,r,g){if(a.length>160)return;if(n>=14)shk=Math.max(shk,2.2);for(var i=0;i<n;i++){var an=Math.random()*6.2832,v=sp*(.3+Math.random()*.7);a.push({x:x,y:y,vx:Math.cos(an)*v,vy:Math.sin(an)*v,l:life*(.6+Math.random()*.4),L:life,c:cols[i%cols.length],r:r*(.6+Math.random()*.6),g:g||0})}}
+function pu(a,dt){ctx.globalCompositeOperation="lighter";for(var i=a.length-1;i>=0;i--){var p=a[i];p.l-=dt;if(p.l<=0){a.splice(i,1);continue}p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=Math.max(0,p.l/p.L);circ(p.x,p.y,p.r*(.4+.6*p.l/p.L),p.c)}ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1}
 function ring(x,y,r,col,a){ctx.globalAlpha=a;ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r,0,6.2832);ctx.stroke();ctx.globalAlpha=1}
 function glow(c,b){ctx.shadowColor=c;ctx.shadowBlur=b}
 function noglow(){ctx.shadowBlur=0}
@@ -1040,7 +1048,7 @@ function hero(s,t,dt){
  s.vt-=dt;
  if(s.st===0&&s.vt<=0){s.st=1;s.vx=W+35;s.vy=hy-7;s.bm=0}
  if(s.st===1){s.vx-=125*dt;s.vy+=(hy-s.vy)*Math.min(1,dt*4);if(s.vx<183){s.st=2;s.bm=.18}}
- if(s.st===2){s.bm-=dt;if(s.bm<=0){s.st=3;s.vv=390;s.vr=0;pb(s.p,s.vx,s.vy,22,["#ffe27a","#fff","#ff784c","#75d9ff"],135,.55,2.2)}}
+ if(s.st===2){s.bm-=dt;if(s.bm<=0){s.st=3;s.vv=390;s.vr=0;s.pw=.45;pb(s.p,s.vx,s.vy,22,["#ffe27a","#fff","#ff784c","#75d9ff"],135,.55,2.2)}}
  if(s.st===3){s.vx+=s.vv*dt;s.vy+=(hy-8-s.vy)*Math.min(1,dt*2);s.vr+=dt*18;if(s.vx>W+38){s.st=0;s.vt=.48}}
  /* hero energy aura and motion trail */
  glow("#53baff",10);ctx.strokeStyle="rgba(115,205,255,.8)";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(hx,hy,24,9,0,0,6.2832);ctx.stroke();noglow();
@@ -1084,6 +1092,7 @@ function sky(s,t,dt){
  for(k=0;k<8;k++){var cx=md(k*58-t*(34+(k%3)*22),W+100)-50,cy=8+rnd(k+4)*(H-28);ctx.fillStyle="rgba(255,255,255,.55)";ctx.beginPath();ctx.ellipse(cx,cy,17,5,0,0,6.2832);ctx.ellipse(cx+10,cy-4,12,6,0,0,6.2832);ctx.ellipse(cx-10,cy-2,10,5,0,0,6.2832);ctx.fill()}
  glow("#fff4bd",9);circ(258,18,12,"#fff2bd");noglow();
  var e=s.e;
+ if(!e.alive){s.rt-=dt;if(s.rt<=0){e.alive=true;e.x=W+25;e.y=18+Math.random()*(H-45)}}
  if(e.alive){e.x-=92*dt;e.y+=Math.sin(t*7)*dt*12;if(e.x<120)e.x=W+25,e.y=18+Math.random()*(H-45)}
  s.py+=((e.alive?e.y:H*.48+Math.sin(t*3)*9)-s.py)*Math.min(1,dt*4.5);
  /* player's jet banks and leaves a bright contrail */
@@ -1120,8 +1129,8 @@ function frame(now){
  var dt=Math.min(.05,(now-last)/1000);last=now;
  if(!vis||document.hidden)return;
  ms+=dt*1000;
- var g=LIST[cur],fastDt=dt*2.15;tm+=fastDt;
- if(!g.tank){ctx.clearRect(0,0,W,H+2);g.draw(S,tm,fastDt)}
+ var g=LIST[cur],fastDt=dt*1.55;tm+=fastDt;
+ if(!g.tank){ctx.clearRect(0,0,W,H+2);ctx.save();if(shk>.08){ctx.translate((Math.random()-.5)*shk,(Math.random()-.5)*shk);shk*=.88}else shk=0;g.draw(S,tm,fastDt);ctx.restore();finish(g,tm)}
  if(!sw&&ms>g.ms)next()}
 if("IntersectionObserver" in window)new IntersectionObserver(function(en){vis=en[0].isIntersecting;if(TK&&LIST[cur].tank){vis?TK.resume():TK.pause()}},{threshold:.05}).observe(heroEl);
 btn.addEventListener("focus",function(){/* keep the link stable while it is being used */});
@@ -1179,5 +1188,18 @@ if(LIST[0].tank)enter(0);else enter(0);
 })();
 </script>
 
+<style id="rex-instant">
+.feature-card{opacity:1!important;transform:none!important;animation:none!important;transition:border-color .25s,box-shadow .25s!important;transition-delay:0s!important}
+.feature-card:hover{transform:translateY(-4px)!important}
+.card-image{animation:none!important}
+.feature-card .card-image img{animation:none!important;opacity:1!important}
+header,.quote-hero,.quote-content>*,footer{animation:none!important}
+.tank-stage canvas.gs-canvas{transform:scale(1.08);transition:opacity .35s ease,transform .6s cubic-bezier(.2,.8,.2,1)!important}
+.tank-stage canvas.gs-canvas.on{transform:scale(1)}
+</style>
+<script>
+document.querySelectorAll(".feature-card").forEach(function(c){c.classList.add("in-view")});
+document.querySelectorAll(".card-image img").forEach(function(i){i.loading="eager";i.fetchPriority="high"});
+</script>
 </body>
 </html>
