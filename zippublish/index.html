@@ -1,46 +1,65 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Zip Viewer</title>
+<title>Nexora Zip Extractor</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font:15px system-ui,sans-serif;background:#f6f7f9;color:#1b1f24}
-header{padding:12px 14px;background:#111827;color:#fff;display:flex;gap:10px;align-items:center}
-header h1{font-size:18px;margin:0;flex:1}
-button,.btn{border:0;border-radius:8px;padding:9px 13px;font-size:14px;background:#2563eb;color:#fff;cursor:pointer}
-button.g{background:#e5e7eb;color:#1b1f24}
-#drop{margin:14px;padding:34px 14px;border:2px dashed #8a94a3;border-radius:12px;text-align:center;background:#fff}
-#drop.over{border-color:#2563eb;background:#eff6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#6366f1}
+body{margin:0;font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:#f1f5f9;color:var(--ink)}
+header{position:sticky;top:0;z-index:20;padding:14px 16px;background:linear-gradient(135deg,#4f46e5,#7c3aed 60%,#db2777);color:#fff;display:flex;gap:10px;align-items:center;box-shadow:0 4px 18px #4f46e555}
+header h1{font-size:19px;margin:0;flex:1;letter-spacing:.2px}
+button{border:0;border-radius:12px;padding:10px 14px;font:600 14px system-ui;background:var(--acc);color:#fff;cursor:pointer;transition:transform .1s,opacity .2s}
+button:active{transform:scale(.96)}
+button.g{background:#eef2ff;color:#4338ca}
+header button{background:#ffffff26;color:#fff;backdrop-filter:blur(6px)}
+#drop{margin:18px 16px;padding:46px 16px;border:2px dashed #a5b4fc;border-radius:20px;text-align:center;background:#fff;color:var(--mut);box-shadow:0 6px 20px #6366f114}
+#drop b{display:block;font-size:19px;color:var(--ink);margin:8px 0 4px}#drop .ic{font-size:42px}
+#drop.over{border-color:var(--acc);background:#eef2ff}
 #app{display:none}
-#bar{display:flex;gap:8px;padding:10px 14px;align-items:center}
-#q{flex:1;padding:10px;border:1px solid #cbd2db;border-radius:8px;font-size:15px;min-width:0}
-#list{margin:0 14px 14px;background:#fff;border-radius:10px;max-height:38vh;overflow:auto}
-.row{padding:11px 12px;border-bottom:1px solid #eef0f3;display:flex;justify-content:space-between;gap:10px;cursor:pointer}
-.row:hover,.row.sel{background:#eff6ff}.row span:first-child{word-break:break-all}.row span:last-child{color:#6b7280;white-space:nowrap;font-size:13px}
-#view{margin:0 14px 20px;background:#fff;border-radius:10px;display:none;overflow:hidden}
-#vh{padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid #eef0f3}
-#vn{flex:1;font-weight:600;word-break:break-all;min-width:100%}
-pre{margin:0;padding:12px;overflow:auto;max-height:60vh;font:13px ui-monospace,Menlo,monospace;white-space:pre;tab-size:2}
-iframe{width:100%;height:65vh;border:0;background:#fff;display:block}
-#img{max-width:100%;display:block;margin:12px auto}
-.note{padding:16px;color:#6b7280}
-.tab.on{background:#111827;color:#fff}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:20px;display:none}
+#bar{display:flex;gap:8px;padding:14px 16px 8px}
+#q{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:#fff;outline:0}
+#q:focus{border-color:var(--acc);box-shadow:0 0 0 3px #6366f126}
+#count{padding:0 18px 6px;color:var(--mut);font-size:13px}
+#list{margin:0 16px 16px;display:grid;gap:8px;max-height:40vh;overflow:auto;padding:2px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 12px;background:#fff;border-radius:14px;box-shadow:0 1px 3px #0f172a14;cursor:pointer;border:2px solid transparent}
+.row.sel{border-color:var(--acc);background:#eef2ff}
+.badge{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:800 11px system-ui;color:#fff;letter-spacing:.3px}
+.fn{flex:1;min-width:0;font-weight:600;word-break:break-all}.sz{color:var(--mut);font-size:12px;white-space:nowrap}
+.grp{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:6px;background:#e0e7ff;color:#3730a3;border-radius:12px;cursor:pointer;position:sticky;top:0;z-index:1}
+.grp b{flex:1;word-break:break-all}.grp i{font-style:normal;font-size:12px;background:#fff;border-radius:10px;padding:2px 8px}
+#view{margin:0 16px 24px;background:#fff;border-radius:18px;display:none;overflow:hidden;box-shadow:0 8px 28px #0f172a1f}
+#vh{padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+#vn{width:100%;font-weight:700;word-break:break-all}#vn small{display:block;color:var(--mut);font-weight:500}
+pre{margin:0;padding:14px;overflow:auto;max-height:62vh;background:#0f172a;color:#e2e8f0;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
+#pv{background:#fff}
+#pvbar{display:none;align-items:center;gap:10px;padding:10px 12px;background:#0f172a;color:#fff}
+#pvbar span{flex:1;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pv.full{position:fixed;inset:0;z-index:100;display:flex!important;flex-direction:column;width:100vw;height:100vh;height:100dvh;background:#fff}
+#pv.full #pvbar{display:flex;flex:none}#pv.full iframe{flex:1 1 auto;height:auto;min-height:0;width:100%}
+iframe{width:100%;height:66vh;border:0;background:#fff;display:block}
+#img{max-width:100%;display:block;margin:14px auto;border-radius:10px}
+.note{padding:20px;color:var(--mut);text-align:center}
+.tab.on{background:var(--ink);color:#fff}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:24px;display:none;z-index:200;font-weight:600}
 </style></head><body>
-<header><h1>📂 Zip Viewer</h1><button class="g" id="again" style="display:none">New zip</button></header>
+<header><h1>📂 Nexora Zip Extractor</h1><button id="again" style="display:none">New zip</button></header>
 
-<div id="drop">Tap to choose a .zip file<br><small>or drop it here. Nothing is uploaded; it all stays on your phone.</small>
+<div id="drop"><div class="ic">🗂️</div><b>Choose a .zip file</b>Tap here or drop a zip.<br><small>Nothing is uploaded. It all stays on your phone.</small>
 <input id="file" type="file" accept=".zip,application/zip" hidden></div>
 
 <div id="app">
-  <div id="bar"><input id="q" placeholder="Search files…"><button id="site">▶ Preview site</button></div>
+  <div id="bar"><input id="q" placeholder="🔍 Search files…"><button id="site">▶ Preview site</button></div>
+  <div id="count"></div>
   <div id="list"></div>
   <div id="view">
     <div id="vh"><div id="vn"></div>
       <button class="tab g" id="tCode">Code</button><button class="tab g" id="tPrev">Preview</button>
-      <button id="copy">Copy code</button><button class="g" id="dl">Download</button></div>
-    <pre id="code"></pre><iframe id="frame" sandbox="allow-scripts"></iframe>
+      <button id="copy">📋 Copy code</button><button class="g" id="dl">⬇ Download</button></div>
+    <pre id="code"></pre>
+    <div id="pv"><div id="pvbar"><button class="g" id="exit">✕ Exit</button><span id="pvt"></span></div>
+      <iframe id="frame" sandbox="allow-scripts"></iframe></div>
     <img id="img" alt=""><div class="note" id="note"></div>
+    <div id="fsrow" style="display:none;padding:10px 14px"><button id="fs" style="width:100%">⛶ Full screen preview</button></div>
   </div>
 </div>
 <div id="toast"></div>
@@ -94,6 +113,10 @@ const ext = n => (n.split('.').pop() || '').toLowerCase();
 const mime = n => MIME[ext(n)] || 'application/octet-stream';
 const isText = n => TEXT.test(n) || /^[^.]+$/.test(n.split('/').pop());
 const fmt = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n > 1024 ? Math.round(n / 1024) + ' KB' : n + ' B';
+const base = n => n.split('/').pop();
+const shown = n => strip && n.startsWith(strip) ? n.slice(strip.length) : n;
+const COL = { html:'#f97316', htm:'#f97316', css:'#3b82f6', js:'#eab308', mjs:'#eab308', json:'#10b981', md:'#64748b', svg:'#ec4899',
+  png:'#ec4899', jpg:'#ec4899', jpeg:'#ec4899', gif:'#ec4899', webp:'#ec4899', py:'#0ea5e9', php:'#8b5cf6', txt:'#64748b' };
 function toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 1500); }
 function resolve(base, ref) {
   ref = ref.split('#')[0].split('?')[0];
@@ -105,7 +128,7 @@ function resolve(base, ref) {
 const isExternal = r => /^([a-z][a-z0-9+.-]*:|\/\/|#|data:|mailto:|tel:|javascript:)/i.test(r.trim());
 
 /* ---------- state ---------- */
-let files = [], byName = {}, cache = {}, current = null, currentBytes = null, blobUrls = {};
+let strip = '', files = [], byName = {}, cache = {}, current = null, currentBytes = null, blobUrls = {};
 
 async function bytesOf(f) { return cache[f.name] || (cache[f.name] = await f.read()); }
 
@@ -114,22 +137,42 @@ async function loadZip(file) {
     files = await unzip(await file.arrayBuffer());
   } catch (e) { return alert(e.message); }
   if (!files.length) return alert('The zip is empty.');
-  files.sort((a, b) => a.name.localeCompare(b.name));
+  files.sort((a, b) => base(a.name).localeCompare(base(b.name), undefined, { numeric: true, sensitivity: 'base' }) || a.name.localeCompare(b.name));
   byName = {}; cache = {}; blobUrls = {}; current = null;
+  collapsed.clear();
   files.forEach(f => byName[f.name] = f);
+  const tops = new Set(files.map(f => f.name.split('/')[0]));
+  strip = tops.size === 1 && files.every(f => f.name.includes('/')) ? [...tops][0] + '/' : '';
   $('#drop').style.display = 'none'; $('#app').style.display = 'block'; $('#again').style.display = '';
   $('#view').style.display = 'none'; $('#q').value = '';
   $('#site').style.display = files.some(f => /\.html?$/i.test(f.name)) ? '' : 'none';
   renderList();
 }
 
+const collapsed = new Set();
 function renderList() {
-  const q = $('#q').value.toLowerCase();
-  $('#list').innerHTML = '';
-  files.filter(f => f.name.toLowerCase().includes(q)).forEach(f => {
-    const r = document.createElement('div'); r.className = 'row' + (current === f.name ? ' sel' : '');
-    r.innerHTML = '<span></span><span>' + fmt(f.size) + '</span>'; r.firstChild.textContent = f.name;
-    r.onclick = () => openFile(f.name); $('#list').appendChild(r);
+  const q = $('#q').value.toLowerCase(), box = $('#list'); box.innerHTML = '';
+  const hit = files.filter(f => shown(f.name).toLowerCase().includes(q));
+  $('#count').textContent = hit.length + ' file' + (hit.length === 1 ? '' : 's');
+  const groups = {};
+  hit.forEach(f => { const p = shown(f.name), d = p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : ''; (groups[d] = groups[d] || []).push(f); });
+  Object.keys(groups).sort((x, y) => !x ? -1 : !y ? 1 : x.localeCompare(y, undefined, { numeric: true, sensitivity: 'base' })).forEach(d => {
+    const open = q || !collapsed.has(d);
+    if (d || Object.keys(groups).length > 1) {
+      const h = document.createElement('div'); h.className = 'grp';
+      h.innerHTML = '<span>' + (open ? '📂' : '📁') + '</span><b></b><i>' + groups[d].length + '</i>';
+      h.children[1].textContent = d || 'Main folder';
+      h.onclick = () => { collapsed.has(d) ? collapsed.delete(d) : collapsed.add(d); renderList(); };
+      box.appendChild(h);
+    }
+    if (!open) return;
+    groups[d].sort((a, b) => base(a.name).localeCompare(base(b.name), undefined, { numeric: true, sensitivity: 'base' })).forEach(f => {
+      const e = ext(f.name), r = document.createElement('div'); r.className = 'row' + (current === f.name ? ' sel' : '');
+      r.innerHTML = '<div class="badge"></div><div class="fn"></div><div class="sz">' + fmt(f.size) + '</div>';
+      r.children[0].textContent = (e || 'FILE').slice(0, 4).toUpperCase(); r.children[0].style.background = COL[e] || '#94a3b8';
+      r.children[1].textContent = base(f.name);
+      r.onclick = () => openFile(f.name); box.appendChild(r);
+    });
   });
 }
 
@@ -137,12 +180,13 @@ async function openFile(name, mode) {
   const f = byName[name]; if (!f) return;
   current = name; renderList();
   const b = await bytesOf(f); currentBytes = b;
-  $('#view').style.display = 'block'; $('#vn').textContent = name;
+  $('#view').style.display = 'block'; $('#vn').innerHTML = '<span></span><small></small>'; $('#vn').children[0].textContent = base(name);
+  $('#vn').children[1].textContent = shown(name).includes('/') ? shown(name) : '';
   const html = /\.html?$/i.test(name), text = isText(name), img = /^image\//.test(mime(name)) && ext(name) !== 'svg';
   $('#tPrev').style.display = html || ext(name) === 'svg' ? '' : 'none';
   $('#tCode').style.display = text ? '' : 'none';
   $('#copy').style.display = text ? '' : 'none';
-  $('#code').style.display = $('#frame').style.display = $('#img').style.display = $('#note').style.display = 'none';
+  exitFull(); $('#code').style.display = $('#pv').style.display = $('#fsrow').style.display = $('#img').style.display = $('#note').style.display = 'none';
   if (img) { $('#img').src = URL.createObjectURL(new Blob([b], { type: mime(name) })); $('#img').style.display = 'block'; }
   else if (text) {
     $('#code').textContent = new TextDecoder().decode(b);
@@ -150,7 +194,7 @@ async function openFile(name, mode) {
   } else { $('#note').textContent = 'This file type cannot be shown. Use Download.'; $('#note').style.display = 'block'; }
   $('#view').scrollIntoView({ behavior: 'smooth' });
 }
-function showCode() { $('#frame').style.display = 'none'; $('#code').style.display = 'block'; tabs('tCode'); }
+function showCode() { exitFull(); $('#pv').style.display = 'none'; $('#fsrow').style.display = 'none'; $('#code').style.display = 'block'; tabs('tCode'); }
 function tabs(id) { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === id)); }
 
 /* ---------- live preview ---------- */
@@ -192,11 +236,31 @@ async function buildHtml(name) {
 }
 async function showPreview(name) {
   tabs('tPrev'); $('#code').style.display = 'none';
-  const fr = $('#frame'); fr.style.display = 'block';
+  const fr = $('#frame'); $('#pv').style.display = 'block'; $('#fsrow').style.display = 'block'; $('#pvt').textContent = base(name);
   if (ext(name) === 'svg') fr.srcdoc = '<body style="margin:0">' + new TextDecoder().decode(await bytesOf(byName[name]));
   else fr.srcdoc = await buildHtml(name);
 }
-window.addEventListener('message', e => { if (e.data && e.data.nav) openFile(e.data.nav, 'preview'); });
+window.addEventListener('message', async e => {
+  if (!(e.data && e.data.nav)) return;
+  const was = $('#pv').classList.contains('full');
+  await openFile(e.data.nav, 'preview');
+  if (was) { $('#pv').classList.add('full'); document.body.style.overflow = 'hidden'; }
+});
+
+/* ---------- full screen ---------- */
+let apiFull = false;
+function enterFull() {
+  $('#pv').classList.add('full'); document.body.style.overflow = 'hidden';
+  const p = $('#pv').requestFullscreen && $('#pv').requestFullscreen();
+  if (p && p.then) p.then(() => apiFull = true).catch(() => {});
+}
+function exitFull() {
+  if (!$('#pv').classList.contains('full')) return;
+  $('#pv').classList.remove('full'); document.body.style.overflow = '';
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); apiFull = false;
+}
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && apiFull) exitFull(); });
+$('#fs').onclick = enterFull; $('#exit').onclick = exitFull;
 
 /* ---------- events ---------- */
 $('#drop').onclick = () => $('#file').click();
@@ -212,7 +276,7 @@ $('#site').onclick = () => {
   const html = files.map(f => f.name).filter(n => /\.html?$/i.test(n));
   const idx = html.find(n => /(^|\/)index\.html?$/i.test(n)) || html[0]; openFile(idx, 'preview');
 };
-$('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })); a.download = current.split('/').pop(); a.click(); };
+$('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })); a.download = base(current); a.click(); };
 $('#copy').onclick = async () => {
   const t = $('#code').textContent;
   try { await navigator.clipboard.writeText(t); }
