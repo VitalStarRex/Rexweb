@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Site Publisher</title>
+<style>
+*{box-sizing:border-box}body{font:16px system-ui,sans-serif;margin:0;background:#f6f7f9;color:#1b1f24}
+main{max-width:640px;margin:0 auto;padding:20px}
+h1{font-size:22px}
+#drop{border:2px dashed #8a94a3;border-radius:12px;padding:32px 16px;text-align:center;background:#fff;cursor:pointer}
+#drop.over{border-color:#2563eb;background:#eff6ff}
+#tok{width:100%;padding:10px;margin:12px 0;border:1px solid #cbd2db;border-radius:8px;display:none}
+#msg{min-height:22px;margin:10px 0;font-size:14px}.err{color:#b91c1c}.ok{color:#15803d}
+progress{width:100%;display:none}
+.f{background:#fff;border-radius:10px;padding:12px;margin:10px 0;box-shadow:0 1px 2px #0001}
+.f b{word-break:break-all}.m{font-size:13px;color:#5b6573;margin:4px 0 8px}
+button{border:0;border-radius:8px;padding:8px 12px;font-size:14px;background:#2563eb;color:#fff;margin-right:6px}
+button.d{background:#e5e7eb;color:#b91c1c}
+</style></head><body><main>
+<h1>🌐 Site Publisher</h1>
+<input id="tok" type="password" placeholder="Upload token">
+<div id="drop">Tap to choose or drop a website .zip here (needs index.html)<input id="file" type="file" accept=".zip" multiple hidden></div>
+<progress id="pg" max="100" value="0"></progress>
+<div id="msg"></div>
+<div id="list"></div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const tok=$('#tok');tok.value=localStorage.tok||'';
+tok.oninput=()=>localStorage.tok=tok.value;
+const msg=(t,c)=>{$('#msg').textContent=t;$('#msg').className=c||''};
+const size=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.ceil(n/1024)+' KB';
+async function refresh(){
+  const r=await (await fetch('/api/files')).json();
+  tok.style.display=r.auth?'block':'none';
+  $('#list').innerHTML=r.files.map(f=>`<div class="f"><b>${esc(f.name)}</b>
+  <div class="m">${size(f.size)} · ${new Date(f.time*1000).toLocaleString()}</div>
+  <button onclick="copy('${f.url}')">Copy link</button>
+  <a href="${f.url}" target="_blank"><button>Open site</button></a>
+  <button class="d" onclick="del('${f.id}')">Delete</button></div>`).join('')||'<p>No files yet.</p>';
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function copy(u){navigator.clipboard.writeText(location.origin+u);msg('Link copied','ok')}
+async function del(id){
+  if(!confirm('Delete this file?'))return;
+  const r=await fetch('/api/files/'+id,{method:'DELETE',headers:{'X-Token':tok.value}});
+  r.ok?refresh():msg((await r.json()).error,'err');
+}
+function up(file){return new Promise(res=>{
+  const x=new XMLHttpRequest();x.open('PUT','/api/upload');
+  x.setRequestHeader('X-Filename',encodeURIComponent(file.name));x.setRequestHeader('X-Token',tok.value);
+  $('#pg').style.display='block';
+  x.upload.onprogress=e=>$('#pg').value=e.loaded/e.total*100;
+  x.onload=()=>{$('#pg').style.display='none';
+    const j=JSON.parse(x.responseText);
+    x.status==201?msg('Published: '+location.origin+j.url,'ok'):msg(j.error,'err');res()};
+  x.onerror=()=>{msg('Network error','err');res()};
+  x.send(file)})}
+async function handle(files){for(const f of files)await up(f);refresh()}
+$('#drop').onclick=()=>$('#file').click();
+$('#file').onchange=e=>handle(e.target.files);
+$('#drop').ondragover=e=>{e.preventDefault();$('#drop').classList.add('over')};
+$('#drop').ondragleave=()=>$('#drop').classList.remove('over');
+$('#drop').ondrop=e=>{e.preventDefault();$('#drop').classList.remove('over');handle(e.dataTransfer.files)};
+refresh();
+</script></body></html>
