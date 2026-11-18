@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: zip-publisher
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: UPLOAD_TOKEN
+        sync: false
+      - key: PORT
+        value: "8000"
+    disk:
+      name: zips
+      mountPath: /data
+      sizeGB: 5
