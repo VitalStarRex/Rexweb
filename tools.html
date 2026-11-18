@@ -125,24 +125,8 @@ letter-spacing:0;
 <header>
 <div class="container topbar">
 <a class="brand" href="index.html">Rex<span>Web</span></a>
-<div class="actions">
-<button class="icon-btn" id="themeToggle" aria-label="Switch theme" type="button">☀️</button>
-<button class="icon-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false" type="button">☰</button>
-</div>
 </div>
 
-<nav class="category-nav" aria-label="Main navigation">
-<div class="container category-row">
-<a href="index.html">🏠 Home</a>
-<a href="tools.html">🛠️ Tools</a>
-<a href="templates.html">💻 Web Templates</a>
-<a href="video-editor.html">🎬 Video Editor</a>
-<a href="ebooks.html">📚 Ebooks</a>
-<a href="games.html">🎮 Games</a>
-<a href="marketplace.html">🛍️ Marketplace</a>
-</div>
-<div class="container nav-brand"><span>R</span> REXWEB DIGITAL</div>
-</nav>
 </header>
 
 <nav class="menu" id="sideMenu" aria-label="Additional navigation">
@@ -163,13 +147,6 @@ letter-spacing:0;
 <a href="terms.html">📄 Terms & Conditions</a>
 </nav>
 
-<section class="hero">
-<div class="container">
-<span class="badge">REXWEB DIGITAL TOOLKIT</span>
-<h1>Powerful Tools.<br><span class="gradient">Simpler Digital Life.</span></h1>
-<p>Calculate, create, convert, and code with useful browser-based tools. Expand only the tools you need to keep your workspace clean.</p>
-</div>
-</section>
 
 <main class="container section">
 <input class="search" type="search" id="toolSearch" placeholder="🔎 Search tools..." aria-label="Search tools">
@@ -548,7 +525,7 @@ document.documentElement.dataset.theme||
 function setTheme(theme){
 theme=theme==="light"?"light":"dark";
 document.documentElement.dataset.theme=theme;
-$("themeToggle").textContent=theme==="dark"?"☀️":"🌙";
+if($("themeToggle"))$("themeToggle").textContent=theme==="dark"?"☀️":"🌙";
 $("themeColor").content=theme==="dark"?"#050b19":"#f2f6ff";
 try{
 localStorage.setItem("rexweb-theme",theme);
@@ -556,7 +533,7 @@ localStorage.setItem("theme",theme);
 }catch(e){}
 }
 setTheme(getSharedTheme());
-$("themeToggle").onclick=()=>{
+if($("themeToggle"))$("themeToggle").onclick=()=>{
 const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
 setTheme(next);
 window.dispatchEvent(new CustomEvent("rexweb:themechange",{detail:{theme:next}}));
@@ -566,14 +543,14 @@ if(e.key==="rexweb-theme"||e.key==="theme")setTheme(e.newValue||"dark");
 });
 
 /* MENU */
-$("menuToggle").onclick=()=>{
+if($("menuToggle"))$("menuToggle").onclick=()=>{
 const menu=$("sideMenu");
 const opened=menu.classList.toggle("open");
 $("menuToggle").setAttribute("aria-expanded",String(opened));
 $("menuToggle").setAttribute("aria-label",opened?"Close menu":"Open menu");
 };
 document.addEventListener("click",e=>{
-if(!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle")){
+if($("menuToggle")&&!$("sideMenu").contains(e.target)&&e.target!==$("menuToggle")){
 $("sideMenu").classList.remove("open");
 $("menuToggle").setAttribute("aria-expanded","false");
 $("menuToggle").setAttribute("aria-label","Open menu");
@@ -1425,6 +1402,255 @@ $("fullscreenFrame").setAttribute("sandbox","allow-scripts allow-modals allow-fo
 document.querySelectorAll(".tool-card").forEach(c=>{if(c.querySelector("h3").textContent==="Image Format Converter")c.querySelector(".tool-icon").textContent="🖼️";});
 })();
 
+</script>
+
+<!-- RexWeb Nexora: paste this whole block into tools.html right before </body>, after the existing scripts -->
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const out=(id,t)=>{$(id).textContent=t;};
+const slug=c=>c.querySelector("h3").textContent.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+
+/* ===== FIX: search ignores the <style> text inside cards ===== */
+window.filterTools=function(){
+  toolCards.forEach(card=>{
+    if(!card.dataset.search)card.dataset.search=(card.dataset.name+" "+card.querySelector("h3").textContent+" "+(card.querySelector(".desc")?.textContent||"")).toLowerCase();
+    const okCat=activeCategory==="All"||(card.dataset.category||"Other")===activeCategory;
+    card.hidden=!(okCat&&card.dataset.search.includes(searchQuery));
+  });
+};
+
+/* ===== FIX: Title Case (apostrophes and accented letters) ===== */
+document.querySelectorAll('[data-case="title"]').forEach(b=>b.onclick=()=>{
+  $("caseInput").value=$("caseInput").value.toLowerCase().replace(/(^|[\s\-(\[])(\p{L})/gu,(m,a,l)=>a+l.toUpperCase());
+  out("caseResult","Text converted successfully.");
+});
+
+/* ===== FIX: calculator percent (50+10% = 55) ===== */
+const baseCalc=window.sciCalc;
+window.sciCalc=s=>baseCalc(s.replace(/(\d+\.?\d*)\s*([+\-])\s*(\d+\.?\d*)%(?![\d(a-z])/gi,"$1$2($1*$3/100)"));
+
+/* ===== FIX: distinct icons ===== */
+document.querySelectorAll(".tool-card").forEach(c=>{
+  const t=c.querySelector("h3").textContent,i=c.querySelector(".tool-icon");
+  if(t==="CSS Gradient-to-Code Generator")i.textContent="🖌️";
+  if(t==="Color Palette Generator")i.textContent="🎛️";
+});
+
+/* ===== UPGRADE: timer sound + notification ===== */
+let actx=null;
+$("timerStart").addEventListener("click",()=>{
+  try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();actx.resume();}catch(e){}
+  try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission();}catch(e){}
+});
+new MutationObserver(()=>{
+  if($("timerDisplay").textContent!=="Time's up!")return;
+  try{const o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);o.frequency.value=880;g.gain.setValueAtTime(.2,actx.currentTime);o.start();o.stop(actx.currentTime+.7);}catch(e){}
+  try{if(Notification.permission==="granted")new Notification("RexWeb Timer",{body:"Time's up!"});}catch(e){}
+}).observe($("timerDisplay"),{childList:true,characterData:true,subtree:true});
+
+/* ===== UPGRADE: Code Board - console, download, autosave ===== */
+const origBuild=window.buildPreview;
+const HOOK='<script>(function(){var s=function(k,a){parent.postMessage({rexConsole:k,msg:[].map.call(a,function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ")},"*")};["log","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){s(k,arguments);o.apply(console,arguments)}});addEventListener("error",function(e){s("error",[e.message])})})()<\/script>';
+window.buildPreview=function(){
+  const h=origBuild();
+  return /<head[^>]*>/i.test(h)?h.replace(/<head[^>]*>/i,m=>m+HOOK):/<html[^>]*>/i.test(h)?h.replace(/<html[^>]*>/i,m=>m+HOOK):HOOK+h;
+};
+$("codeStatus").insertAdjacentHTML("afterend",'<label>Console output</label><div class="result" id="codeConsole" style="max-height:140px;overflow:auto;font-family:monospace;font-size:12px">Console messages from your code appear here.</div>');
+$("runCode").parentElement.insertAdjacentHTML("beforeend",'<button class="btn alt" id="downloadCode" type="button">⬇ Download .html</button><button class="btn alt" id="clearConsole" type="button">Clear console</button>');
+const clearConsole=()=>out("codeConsole","");
+const origRun=window.runCodePreview;
+window.runCodePreview=function(){clearConsole();origRun();};
+$("runCode").onclick=window.runCodePreview;
+$("clearConsole").onclick=clearConsole;
+$("downloadCode").onclick=()=>{
+  const blob=new Blob([origBuild()],{type:"text/html"}),u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="project.html";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);
+  out("codeStatus","Downloaded project.html.");
+};
+window.addEventListener("message",e=>{
+  if(!e.data||!e.data.rexConsole)return;
+  if(e.source!==$("codePreview").contentWindow&&e.source!==$("fullscreenFrame").contentWindow)return;
+  const box=$("codeConsole"),line=document.createElement("div");
+  line.textContent=(e.data.rexConsole==="log"?"":e.data.rexConsole.toUpperCase()+": ")+e.data.msg;
+  if(e.data.rexConsole==="error")line.style.color="#ff6b81";else if(e.data.rexConsole==="warn")line.style.color="#ffb84d";
+  if(box.childElementCount>=200)box.firstChild.remove();
+  box.appendChild(line);
+});
+const DRAFT="rexweb_code_draft";
+try{const d=localStorage.getItem(DRAFT);if(d&&!$("codeInput").value){$("codeInput").value=d;window.runCodePreview();}}catch(e){}
+let saveT;$("codeInput").addEventListener("input",()=>{clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(DRAFT,$("codeInput").value);}catch(e){}},500);});
+
+/* ===== NEW TOOLS ===== */
+function addTool(o){
+  const c=document.createElement("article");
+  c.className="tool-card collapsed";c.dataset.name=o.keys;c.dataset.category=o.cat;
+  c.innerHTML='<div class="tool-heading"><span class="tool-icon">'+o.icon+'</span><h3>'+o.title+'</h3><button class="tool-toggle" type="button" aria-expanded="false" aria-label="Expand '+o.title+'">+</button></div><div class="tool-content"><p class="desc">'+o.desc+'</p>'+o.html+'</div>';
+  const b=c.querySelector(".tool-toggle");
+  b.onclick=()=>{
+    const col=c.classList.toggle("collapsed");
+    b.textContent=col?"+":"−";b.setAttribute("aria-expanded",String(!col));
+    b.setAttribute("aria-label",(col?"Expand ":"Collapse ")+o.title);
+    if(!col)saveRecentTool(c);
+  };
+  $("toolsGrid").appendChild(c);toolCards.push(c);o.init();return c;
+}
+const copyBtn=(id,src)=>{$(id).onclick=()=>copyValue($(src).textContent,src);};
+
+/* Base64 */
+addTool({icon:"🧬",title:"Base64 Encoder / Decoder",cat:"Coding",keys:"base64 encode decode text",desc:"Encode text to Base64 or decode it back. Handles emoji and accents (UTF-8).",
+html:'<textarea id="b64In" placeholder="Enter text or Base64..."></textarea><div class="row"><button class="btn" id="b64Enc">Encode</button><button class="btn" id="b64Dec">Decode</button><button class="btn alt" id="b64Copy">Copy</button></div><div class="result" id="b64Out">Your result appears here.</div>',
+init(){
+  $("b64Enc").onclick=()=>{let s="";for(const x of new TextEncoder().encode($("b64In").value))s+=String.fromCharCode(x);out("b64Out",btoa(s));};
+  $("b64Dec").onclick=()=>{try{const raw=atob($("b64In").value.trim().replace(/-/g,"+").replace(/_/g,"/"));out("b64Out",new TextDecoder("utf-8",{fatal:true}).decode(Uint8Array.from(raw,c=>c.charCodeAt(0))));}catch(e){out("b64Out","Not valid Base64 text.");}};
+  copyBtn("b64Copy","b64Out");
+}});
+
+/* Hash generator */
+addTool({icon:"#️⃣",title:"Hash Generator",cat:"Security",keys:"hash sha256 sha1 sha512 checksum digest",desc:"Create SHA-1, SHA-256 or SHA-512 hashes locally. Do not use these to store passwords.",
+html:'<textarea id="hashIn" placeholder="Text to hash..."></textarea><label>Algorithm</label><select id="hashAlg"><option>SHA-256</option><option>SHA-1</option><option>SHA-512</option></select><div class="row"><button class="btn" id="hashGo">Generate Hash</button><button class="btn alt" id="hashCopy">Copy</button></div><div class="result" id="hashOut">Your hash appears here.</div>',
+init(){
+  $("hashGo").onclick=async()=>{
+    try{const b=await crypto.subtle.digest($("hashAlg").value,new TextEncoder().encode($("hashIn").value));out("hashOut",[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""));}
+    catch(e){out("hashOut","Hashing needs a secure (https) page.");}
+  };
+  copyBtn("hashCopy","hashOut");
+}});
+
+/* UUID */
+addTool({icon:"🆔",title:"UUID Generator",cat:"Security",keys:"uuid guid random id unique",desc:"Generate random version 4 UUIDs.",
+html:'<label>How many (1-20)</label><input type="number" id="uuidN" value="5" min="1" max="20"><div class="row"><button class="btn" id="uuidGo">Generate</button><button class="btn alt" id="uuidCopy">Copy</button></div><div class="result" id="uuidOut">Your UUIDs appear here.</div>',
+init(){
+  $("uuidGo").onclick=()=>{
+    const n=Math.min(20,Math.max(1,parseInt($("uuidN").value)||1));
+    const mk=()=>crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=crypto.getRandomValues(new Uint8Array(1))[0]&15;return(c==="x"?r:(r&3)|8).toString(16);});
+    out("uuidOut",Array.from({length:n},mk).join("\n"));
+  };
+  copyBtn("uuidCopy","uuidOut");
+}});
+
+/* JWT decoder */
+addTool({icon:"🎫",title:"JWT Decoder",cat:"Coding",keys:"jwt json web token decode header payload",desc:"Read the header and payload of a JWT. This does not verify the signature, so never trust a token based on this view alone.",
+html:'<textarea id="jwtIn" placeholder="eyJhbGciOi..."></textarea><div class="row"><button class="btn" id="jwtGo">Decode</button></div><div class="result" id="jwtOut">Decoded token appears here.</div>',
+init(){
+  const part=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return JSON.stringify(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)))),null,2);};
+  $("jwtGo").onclick=()=>{
+    const p=$("jwtIn").value.trim().split(".");
+    if(p.length!==3){out("jwtOut","A JWT has three parts separated by dots.");return;}
+    try{
+      let t="Header:\n"+part(p[0])+"\n\nPayload:\n"+part(p[1]);
+      const exp=JSON.parse(part(p[1])).exp;
+      if(typeof exp==="number")t+="\n\n"+(exp*1000<Date.now()?"Expired on ":"Expires on ")+new Date(exp*1000).toLocaleString();
+      out("jwtOut",t);
+    }catch(e){out("jwtOut","Could not decode this token.");}
+  };
+}});
+
+/* Regex tester */
+addTool({icon:"🎯",title:"Regex Tester",cat:"Coding",keys:"regex regular expression tester match pattern",desc:"Test a JavaScript regular expression and list every match with its groups.",
+html:'<label>Pattern</label><input id="reP" placeholder="(\\d+)-(\\w+)"><label>Flags</label><input id="reF" value="g" maxlength="6"><label>Test text</label><textarea id="reT" placeholder="Text to search..."></textarea><div class="row"><button class="btn" id="reGo">Test</button></div><div class="result" id="reOut">Matches appear here.</div>',
+init(){
+  $("reGo").onclick=()=>{
+    let re;try{re=new RegExp($("reP").value,$("reF").value);}catch(e){out("reOut","Invalid pattern: "+e.message);return;}
+    if(!$("reP").value){out("reOut","Enter a pattern.");return;}
+    const t=$("reT").value,res=[];
+    if(re.global||re.sticky){for(const m of t.matchAll(re)){res.push(m);if(res.length>=200)break;}}
+    else{const m=re.exec(t);if(m)res.push(m);}
+    if(!res.length){out("reOut","No matches.");return;}
+    out("reOut",res.length+" match"+(res.length>1?"es":"")+(res.length>=200?" (showing first 200)":"")+":\n"+res.map((m,i)=>(i+1)+". \""+m[0]+"\" at "+m.index+(m.length>1?"  groups: "+m.slice(1).map(g=>g===undefined?"-":'"'+g+'"').join(", "):"")).join("\n"));
+  };
+}});
+
+/* Diff checker */
+addTool({icon:"🧾",title:"Diff Checker",cat:"Text",keys:"diff compare text difference lines changes",desc:"Compare two texts line by line. Lines starting with - were removed and + were added.",
+html:'<label>Original</label><textarea id="dfA"></textarea><label>Changed</label><textarea id="dfB"></textarea><div class="row"><button class="btn" id="dfGo">Compare</button><button class="btn alt" id="dfCopy">Copy</button></div><div class="result" id="dfOut" style="font-family:monospace;font-size:12px">Differences appear here.</div>',
+init(){
+  $("dfGo").onclick=()=>{
+    const a=$("dfA").value.split("\n"),b=$("dfB").value.split("\n");
+    if(a.length>1500||b.length>1500){out("dfOut","Please compare 1,500 lines or fewer at a time.");return;}
+    const n=a.length,m=b.length,L=Array.from({length:n+1},()=>new Uint16Array(m+1));
+    for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=a[i]===b[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+    const r=[];let i=0,j=0,ch=0;
+    while(i<n&&j<m){if(a[i]===b[j]){r.push("  "+a[i]);i++;j++;}else if(L[i+1][j]>=L[i][j+1]){r.push("- "+a[i++]);ch++;}else{r.push("+ "+b[j++]);ch++;}}
+    while(i<n){r.push("- "+a[i++]);ch++;}while(j<m){r.push("+ "+b[j++]);ch++;}
+    out("dfOut",(ch?ch+" changed line"+(ch>1?"s":"")+":":"The texts are identical.")+"\n\n"+r.join("\n"));
+  };
+  copyBtn("dfCopy","dfOut");
+}});
+
+/* Markdown previewer */
+addTool({icon:"📖",title:"Markdown Previewer",cat:"Text",keys:"markdown preview md editor render headings lists",desc:"Preview basic Markdown: headings, bold, italic, code, links and bullet lists.",
+html:'<textarea id="mdIn" style="min-height:130px" placeholder="# Title\n\nSome **bold** text and a [link](https://example.com)\n\n- item one\n- item two"></textarea><div class="result" id="mdOut" style="white-space:normal">Preview appears here.</div>',
+init(){
+  const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const inl=s=>esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>").replace(/\*([^*]+)\*/g,"<em>$1</em>").replace(/\[([^\]]+)\]\((https?:\/\/[^\s)"']+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer" style="color:var(--blue)">$1</a>');
+  const render=()=>{
+    let h="",list=false,m;
+    for(const raw of $("mdIn").value.split("\n")){
+      const l=raw.trimEnd();
+      if(m=l.match(/^(#{1,4})\s+(.*)/)){if(list){h+="</ul>";list=false;}h+="<h"+(m[1].length+1)+' style="margin:8px 0">'+inl(m[2])+"</h"+(m[1].length+1)+">";}
+      else if(m=l.match(/^[-*]\s+(.*)/)){if(!list){h+='<ul style="padding-left:20px">';list=true;}h+="<li>"+inl(m[1])+"</li>";}
+      else{if(list){h+="</ul>";list=false;}if(l.trim())h+='<p style="margin:6px 0">'+inl(l)+"</p>";}
+    }
+    $("mdOut").innerHTML=(h+(list?"</ul>":""))||"Preview appears here.";
+  };
+  $("mdIn").addEventListener("input",render);
+}});
+
+/* JSON <-> CSV */
+addTool({icon:"🔀",title:"JSON ⇄ CSV Converter",cat:"Converters",keys:"json csv convert spreadsheet table array",desc:"Turn a JSON array of objects into CSV, or CSV with a header row into JSON.",
+html:'<textarea id="jcIn" style="font-family:monospace" placeholder=\'[{"name":"Ana","age":30}]\'></textarea><div class="row"><button class="btn" id="j2c">JSON → CSV</button><button class="btn" id="c2j">CSV → JSON</button><button class="btn alt" id="jcCopy">Copy</button></div><div class="result" id="jcOut" style="font-family:monospace;font-size:12px">Your result appears here.</div>',
+init(){
+  const cell=v=>{v=v==null?"":typeof v==="object"?JSON.stringify(v):String(v);return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  $("j2c").onclick=()=>{
+    try{
+      const d=JSON.parse($("jcIn").value);
+      if(!Array.isArray(d)||!d.length||d.some(x=>x===null||typeof x!=="object"||Array.isArray(x)))throw Error("Use a non-empty array of objects.");
+      const keys=[...new Set(d.flatMap(Object.keys))];
+      out("jcOut",[keys.map(cell).join(","),...d.map(o=>keys.map(k=>cell(o[k])).join(","))].join("\n"));
+    }catch(e){out("jcOut","Error: "+e.message);}
+  };
+  $("c2j").onclick=()=>{
+    const t=$("jcIn").value,rows=[];let r=[],f="",q=false;
+    for(let i=0;i<t.length;i++){const c=t[i];
+      if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+      else if(c==='"')q=true;
+      else if(c===","){r.push(f);f="";}
+      else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;r.push(f);rows.push(r);r=[];f="";}
+      else f+=c;}
+    if(f||r.length){r.push(f);rows.push(r);}
+    const data=rows.filter(x=>x.some(v=>v!==""));
+    if(data.length<2){out("jcOut","Add a header row and at least one data row.");return;}
+    const h=data[0];
+    out("jcOut",JSON.stringify(data.slice(1).map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]??""]))),null,2));
+  };
+  copyBtn("jcCopy","jcOut");
+}});
+
+/* EMI calculator */
+addTool({icon:"🏦",title:"Loan / EMI Calculator",cat:"Calculators",keys:"loan emi mortgage interest monthly payment finance",desc:"Work out the monthly payment, total interest and total cost of a loan.",
+html:'<label>Loan amount</label><input type="number" id="emiP" min="0" placeholder="10000"><label>Yearly interest rate (%)</label><input type="number" id="emiR" min="0" step="0.01" placeholder="8.5"><label>Term (months)</label><input type="number" id="emiN" min="1" step="1" placeholder="24"><div class="row"><button class="btn" id="emiGo">Calculate</button></div><div class="result" id="emiOut">Your payment details appear here.</div>',
+init(){
+  $("emiGo").onclick=()=>{
+    const P=parseFloat($("emiP").value),R=parseFloat($("emiR").value),N=parseInt($("emiN").value);
+    if(!(P>0)||!(R>=0)||!(N>0)){out("emiOut","Enter a loan amount, a rate (0 or more) and a term in months.");return;}
+    const r=R/1200,emi=r===0?P/N:P*r*Math.pow(1+r,N)/(Math.pow(1+r,N)-1),total=emi*N,f=v=>v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    out("emiOut","Monthly payment: "+f(emi)+"\nTotal interest: "+f(total-P)+"\nTotal paid: "+f(total));
+  };
+}});
+
+filterTools();
+
+/* ===== Deep links: tools.html#password-generator opens that tool ===== */
+const open=()=>{
+  const h=decodeURIComponent(location.hash.slice(1)),c=toolCards.find(x=>slug(x)===h);
+  if(!c)return;
+  c.hidden=false;
+  if(c.classList.contains("collapsed"))c.querySelector(".tool-toggle").click();
+  c.scrollIntoView({behavior:"smooth",block:"start"});
+};
+window.addEventListener("hashchange",open);open();
+})();
 </script>
 
 </body>
