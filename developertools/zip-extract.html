@@ -541,9 +541,19 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---------- dark mode ---------- */
-function setDark(on) { document.body.classList.toggle('dark', on); $('#dark').textContent = on ? '☀️' : '🌙'; save('nzx-dark', on ? '1' : '0'); }
-$('#dark').onclick = () => setDark(!document.body.classList.contains('dark'));
-setDark(load('nzx-dark') === '1');
+/* Theme is controlled by the homepage (rexweb-theme in localStorage) */
+function applyTheme(){
+  let v='dark';
+  try{v=localStorage.getItem('rexweb-theme')||'dark'}catch(e){}
+  v=v==='light'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',v);
+  document.body.classList.toggle('dark',v==='dark');
+}
+$('#dark').style.display='none';
+applyTheme();
+addEventListener('storage',e=>{if(e.key==='rexweb-theme')applyTheme()});
+addEventListener('pageshow',applyTheme);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)applyTheme()});
 
 /* ---------- restore last session ---------- */
 (async () => {
