@@ -3314,5 +3314,23 @@ html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   $('#keyboard').addEventListener('contextmenu',e=>e.preventDefault());
 })();
 </script>
+<script>
+/* Theme is controlled by the homepage (rexweb-theme in localStorage) */
+(function(){
+  var btn=document.getElementById('themeBtn');
+  if(btn)btn.style.display='none';
+  function apply(){
+    var v='dark';
+    try{v=localStorage.getItem('rexweb-theme')||'dark'}catch(e){}
+    v=v==='light'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',v);
+    document.body.classList.toggle('light',v==='light');
+  }
+  apply();
+  addEventListener('storage',function(e){if(e.key==='rexweb-theme')apply()});
+  addEventListener('pageshow',apply);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)apply()});
+})();
+</script>
 </body>
 </html>
