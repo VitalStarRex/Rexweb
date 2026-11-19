@@ -90,7 +90,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
   <input type="file" id="rexFile" multiple accept=".html,.htm,.css,.js" hidden>
   <div class="drop" id="drop">or drop files here</div>
 
-  <div class="head"><b>Files</b><span id="summary">0 files</span></div>
+  <div class="head"><b>Files</b><span><span id="summary">0 files</span> · <a href="#" id="clearAll" style="color:var(--acc)">Clear all</a></span></div>
   <ul id="list"></ul>
 
   <div class="opts"><span>Compression</span>
@@ -158,6 +158,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
     var total=files.reduce(function(a,f){return a+f.size},0);
     $('summary').textContent=files.length+(files.length===1?' file':' files')+' · '+fmt(total);
     zipBtn.disabled=!files.length;
+    persist();
   }
 
   function addBlob(name,blob){
@@ -379,9 +380,14 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
         var blob=await buildZip(files);
         setProg(1); progEl.classList.remove('show');
         setStatus('Ready ('+fmt(blob.size)+'). Confirm the download…');
-        var dl=await claude.use('downloads');
-        if(!dl){setStatus('Downloads are not available in this view. Open this page in the Claude app or on claude.ai.','err');return}
-        await dl.save({filename:zname,data:blob});
+        var dl=null;
+        try{dl=(window.claude&&claude.use)?await claude.use('downloads'):null}catch(e){dl=null}
+        if(dl){await dl.save({filename:zname,data:blob})}
+        else{
+          var url=URL.createObjectURL(blob),a=document.createElement('a');
+          a.href=url;a.download=zname;document.body.appendChild(a);a.click();a.remove();
+          setTimeout(function(){URL.revokeObjectURL(url)},10000);
+        }
         setStatus('Saved '+zname+' ('+fmt(blob.size)+').','ok');
       }catch(err){
         if(err&&err.code==='cancelled')setStatus('Cancelled.');
@@ -443,7 +449,60 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
     render();setStatus(fl.length?'Added '+fl.length+' file'+(fl.length===1?'':'s')+' from REXWEB.':'','ok');
   };
 
+  /* ---------- survive a refresh (IndexedDB) ---------- */
+  var DB='nexora-zip-editor', ST='kv', saveT=null, restoring=true;
+  function idb(){
+    return new Promise(function(res,rej){
+      try{
+        var r=indexedDB.open(DB,1);
+        r.onupgradeneeded=function(){r.result.createObjectStore(ST)};
+        r.onsuccess=function(){res(r.result)};
+        r.onerror=function(){rej(r.error)};
+      }catch(e){rej(e)}
+    });
+  }
+  function persist(){
+    if(restoring)return;
+    clearTimeout(saveT);
+    saveT=setTimeout(async function(){
+      try{
+        var db=await idb();
+        var snap=files.map(function(f){return {id:f.id,name:f.name,blob:f.blob,size:f.size}});
+        var tx=db.transaction(ST,'readwrite');
+        tx.objectStore(ST).put(snap,'files');
+        tx.oncomplete=function(){db.close()};
+        tx.onerror=function(){db.close()};
+      }catch(e){}
+    },250);
+  }
+  async function restore(){
+    try{
+      var db=await idb();
+      var data=await new Promise(function(res,rej){
+        var q=db.transaction(ST,'readonly').objectStore(ST).get('files');
+        q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)};
+      });
+      db.close();
+      if(Array.isArray(data)&&data.length){
+        files=data.filter(function(f){return f&&f.blob&&typeof f.name==='string'});
+        nextId=files.reduce(function(m,f){return Math.max(m,f.id||0)},0)+1;
+        setStatus('Restored '+files.length+' file'+(files.length===1?'':'s')+' from your last session.','ok');
+      }
+    }catch(e){}
+    restoring=false;
+    render();
+  }
+  $('clearAll').onclick=function(ev){
+    ev.preventDefault();
+    if(!files.length)return;
+    openModal('<h2>Clear all files?</h2><p style="color:var(--mute);font-size:14px;margin:0">This removes all '+files.length+' files from the list and from saved storage.</p><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">Clear all</button></div>',function(){
+      $('mc').onclick=closeModal;
+      $('mo').onclick=function(){files=[];closeModal();render();setStatus('Cleared.')};
+    });
+  };
+
   render();
+  restore();
 })();
 </script>
 </body>
