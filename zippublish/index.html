@@ -4,61 +4,80 @@
 <title>Nexora Zip Extractor</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#6366f1}
-body{margin:0;font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:#f1f5f9;color:var(--ink)}
+:root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#6366f1;--bg:#fff;--card:#fff;--sel:#eef2ff;--grp:#e0e7ff;--grpt:#3730a3;--gt:#4338ca}
+body.dark{--ink:#e2e8f0;--mut:#94a3b8;--line:#334155;--bg:#0b1020;--card:#1e293b;--sel:#312e81;--grp:#312e81;--grpt:#c7d2fe;--gt:#c7d2fe}
+body{margin:0;font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
 header{position:sticky;top:0;z-index:20;padding:14px 16px;background:linear-gradient(135deg,#4f46e5,#7c3aed 60%,#db2777);color:#fff;display:flex;gap:10px;align-items:center;box-shadow:0 4px 18px #4f46e555}
 header h1{font-size:19px;margin:0;flex:1;letter-spacing:.2px}
 button{border:0;border-radius:12px;padding:10px 14px;font:600 14px system-ui;background:var(--acc);color:#fff;cursor:pointer;transition:transform .1s,opacity .2s}
 button:active{transform:scale(.96)}
-button.g{background:#eef2ff;color:#4338ca}
+button.g{background:var(--sel);color:var(--gt)}
+button.sm{padding:8px 11px;font-size:13px;border-radius:10px}
 header button{background:#ffffff26;color:#fff;backdrop-filter:blur(6px)}
-#drop{margin:18px 16px;padding:46px 16px;border:2px dashed #a5b4fc;border-radius:20px;text-align:center;background:#fff;color:var(--mut);box-shadow:0 6px 20px #6366f114}
+#drop{margin:18px 16px;padding:46px 16px;border:2px dashed #a5b4fc;border-radius:20px;text-align:center;background:var(--card);color:var(--mut);box-shadow:0 6px 20px #6366f114}
 #drop b{display:block;font-size:19px;color:var(--ink);margin:8px 0 4px}#drop .ic{font-size:42px}
-#drop.over{border-color:var(--acc);background:#eef2ff}
+#drop.over{border-color:var(--acc);background:var(--sel)}
 #app{display:none}
 #bar{display:flex;gap:8px;padding:14px 16px 8px}
-#q{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:#fff;outline:0}
-#q:focus{border-color:var(--acc);box-shadow:0 0 0 3px #6366f126}
+#bar2{display:flex;gap:8px;padding:0 16px 6px}
+#q,#ff,#sort{padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:var(--card);color:var(--ink);outline:0}
+#q{flex:1;min-width:0}
+#sort{padding:8px 10px;font-size:13px;flex:1;min-width:0}
+#q:focus,#ff:focus{border-color:var(--acc);box-shadow:0 0 0 3px #6366f126}
 #count{padding:0 18px 6px;color:var(--mut);font-size:13px}
 #list{margin:0 16px 16px;display:grid;gap:8px;max-height:40vh;overflow:auto;padding:2px}
-.row{display:flex;align-items:center;gap:12px;padding:11px 12px;background:#fff;border-radius:14px;box-shadow:0 1px 3px #0f172a14;cursor:pointer;border:2px solid transparent}
-.row.sel{border-color:var(--acc);background:#eef2ff}
+.row{display:flex;align-items:center;gap:12px;padding:11px 12px;background:var(--card);border-radius:14px;box-shadow:0 1px 3px #0f172a14;cursor:pointer;border:2px solid transparent}
+.row.sel{border-color:var(--acc);background:var(--sel)}
 .badge{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:800 11px system-ui;color:#fff;letter-spacing:.3px}
 .fn{flex:1;min-width:0;font-weight:600;word-break:break-all}.sz{color:var(--mut);font-size:12px;white-space:nowrap}
-.grp{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:6px;background:#e0e7ff;color:#3730a3;border-radius:12px;cursor:pointer;position:sticky;top:0;z-index:1}
-.grp b{flex:1;word-break:break-all}.grp i{font-style:normal;font-size:12px;background:#fff;border-radius:10px;padding:2px 8px}
-#view{margin:0 16px 24px;background:#fff;border-radius:18px;display:none;overflow:hidden;box-shadow:0 8px 28px #0f172a1f}
+.grp{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:6px;background:var(--grp);color:var(--grpt);border-radius:12px;cursor:pointer;position:sticky;top:0;z-index:1}
+.grp b{flex:1;word-break:break-all}.grp i{font-style:normal;font-size:12px;background:var(--card);border-radius:10px;padding:2px 8px}
+#view{margin:0 16px 24px;background:var(--card);border-radius:18px;display:none;overflow:hidden;box-shadow:0 8px 28px #0f172a1f}
 #vh{padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
 #vn{width:100%;font-weight:700;word-break:break-all}#vn small{display:block;color:var(--mut);font-weight:500}
-pre{margin:0;padding:14px;overflow:auto;max-height:62vh;background:#0f172a;color:#e2e8f0;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
-#pv{background:#fff}
+#find{display:none;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);align-items:center}
+#ff{flex:1;min-width:0;padding:8px 10px;font-size:14px}
+#cw{display:none;max-height:62vh;overflow:auto;background:#0f172a}
+#cw pre{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;font:var(--fs,13px)/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
+#gut{flex:none;text-align:right;color:#64748b;padding-right:10px!important;position:sticky;left:0;user-select:none;border-right:1px solid #1e293b}
+#code{flex:1 0 auto}
+#code.wrap{white-space:pre-wrap;overflow-wrap:anywhere;flex:1;min-width:0}
+::highlight(hit){background:#facc15;color:#000}
+#pv{background:var(--card);display:none}
 #pvbar{display:none;align-items:center;gap:10px;padding:10px 12px;background:#0f172a;color:#fff}
 #pvbar span{flex:1;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #pv.full{position:fixed;inset:0;z-index:100;display:flex!important;flex-direction:column;width:100vw;height:100vh;height:100dvh;background:#fff}
 #pv.full #pvbar{display:flex;flex:none}#pv.full iframe{flex:1 1 auto;height:auto;min-height:0;width:100%}
 iframe{width:100%;height:66vh;border:0;background:#fff;display:block}
-#img{max-width:100%;display:block;margin:14px auto;border-radius:10px}
-.note{padding:20px;color:var(--mut);text-align:center}
-.tab.on{background:var(--ink);color:#fff}
-#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:24px;display:none;z-index:200;font-weight:600}
+#imgw{display:none;overflow:auto;max-height:72vh}
+#img{max-width:100%;display:block;margin:14px auto;border-radius:10px;cursor:zoom-in}
+#img.zoom{max-width:none;margin:14px;cursor:zoom-out}
+#media{display:none;padding:14px}
+.note{padding:20px;color:var(--mut);text-align:center;display:none}
+.tab.on{background:var(--ink);color:var(--card)}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:11px 18px;border-radius:24px;display:none;z-index:200;font-weight:600}
 </style></head><body>
-<header><h1>📂 Nexora Zip Extractor</h1><button id="again" style="display:none">New zip</button></header>
+<header><h1>📂 Nexora Zip Extractor</h1><button id="dark" title="Dark mode">🌙</button><button id="again" style="display:none">New zip</button></header>
 
 <div id="drop"><div class="ic">🗂️</div><b>Choose a .zip file</b>Tap here or drop a zip.<br><small>Nothing is uploaded. It all stays on your phone.</small>
 <input id="file" type="file" accept=".zip,application/zip" hidden></div>
 
 <div id="app">
-  <div id="bar"><input id="q" placeholder="🔍 Search files…"><button id="site">▶ Preview site</button></div>
+  <div id="bar"><input id="q" placeholder="🔍 Search files…"><button class="g sm" id="sm" title="Search in names or inside file contents">Names</button><button id="site" class="sm">▶ Site</button></div>
+  <div id="bar2"><select id="sort"><option value="folder">Sort: By folder</option><option value="name">Sort: Name</option><option value="size">Sort: Largest first</option><option value="type">Sort: Type</option></select><button class="g sm" id="zipall">⬇ Zip these files</button></div>
   <div id="count"></div>
   <div id="list"></div>
   <div id="view">
     <div id="vh"><div id="vn"></div>
-      <button class="tab g" id="tCode">Code</button><button class="tab g" id="tPrev">Preview</button>
-      <button id="copy">📋 Copy code</button><button class="g" id="dl">⬇ Download</button></div>
-    <pre id="code"></pre>
+      <button class="g sm" id="prev">◀</button><button class="g sm" id="next">▶</button>
+      <button class="tab g sm" id="tCode">Code</button><button class="tab g sm" id="tPrev">Preview</button>
+      <button class="g sm" id="fmt">{ } Format</button>
+      <button class="g sm" id="copy">📋 Copy</button><button class="g sm" id="open">↗ Open</button><button class="g sm" id="dl">⬇ Download</button></div>
+    <div id="find"><input id="ff" placeholder="Find in file…"><button class="g sm" id="fn">↓</button><button class="g sm" id="wrap" title="Wrap lines">↩</button><button class="g sm" id="fm">A−</button><button class="g sm" id="fp">A+</button></div>
+    <div id="cw"><pre id="gut"></pre><pre id="code"></pre></div>
     <div id="pv"><div id="pvbar"><button class="g" id="exit">✕ Exit</button><span id="pvt"></span></div>
       <iframe id="frame" sandbox="allow-scripts"></iframe></div>
-    <img id="img" alt=""><div class="note" id="note"></div>
+    <div id="imgw"><img id="img" alt=""></div><div id="media"></div><div class="note" id="note"></div>
     <div id="fsrow" style="display:none;padding:10px 14px"><button id="fs" style="width:100%">⛶ Full screen preview</button></div>
   </div>
 </div>
@@ -92,6 +111,8 @@ async function unzip(buf) {
     out.push({
       name, size, method,
       async read() {
+        if (flags & 1) throw new Error('This file is password-protected and cannot be opened.');
+        if (csize === 0xFFFFFFFF || off === 0xFFFFFFFF) throw new Error('ZIP64 files are not supported.');
         const lnl = dv.getUint16(off + 26, true), lel = dv.getUint16(off + 28, true);
         const start = off + 30 + lnl + lel, data = u8.subarray(start, start + csize);
         if (method === 0) return data.slice();
@@ -103,12 +124,40 @@ async function unzip(buf) {
   return out;
 }
 
+/* ---------- minimal zip writer (store only) ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u) { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function makeZip(items) {
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  const d = new Date(), time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1),
+    date = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  for (const it of items) {
+    const nb = enc.encode(it.name), crc = crc32(it.data), sz = it.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+    lh.setUint16(10, time, true); lh.setUint16(12, date, true); lh.setUint32(14, crc, true); lh.setUint32(18, sz, true);
+    lh.setUint32(22, sz, true); lh.setUint16(26, nb.length, true); lh.setUint16(28, 0, true);
+    parts.push(lh.buffer, nb, it.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true);
+    ch.setUint16(10, 0, true); ch.setUint16(12, time, true); ch.setUint16(14, date, true); ch.setUint32(16, crc, true);
+    ch.setUint32(20, sz, true); ch.setUint32(24, sz, true); ch.setUint16(28, nb.length, true); ch.setUint32(42, off, true);
+    cen.push(ch.buffer, nb);
+    off += 30 + nb.length + sz;
+  }
+  let cs = 0; for (const c of cen) cs += c.byteLength;
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, items.length, true); e.setUint16(10, items.length, true);
+  e.setUint32(12, cs, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, e.buffer], { type: 'application/zip' });
+}
+
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
-const TEXT = /\.(html?|css|js|mjs|json|txt|md|xml|svg|csv|ts|tsx|jsx|php|py|java|c|cpp|h|cs|go|rb|rs|sh|yml|yaml|toml|ini|env|log|sql|vue|svelte|htaccess|webmanifest|map)$/i;
+const TEXT = /\.(html?|css|js|mjs|json|txt|md|markdown|xml|svg|csv|tsv|ts|tsx|jsx|php|py|java|c|cpp|h|cs|go|rb|rs|sh|yml|yaml|toml|ini|env|log|sql|vue|svelte|htaccess|webmanifest|map)$/i;
 const MIME = { html:'text/html', htm:'text/html', css:'text/css', js:'text/javascript', mjs:'text/javascript', json:'application/json',
-  svg:'image/svg+xml', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp', ico:'image/x-icon',
-  woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf', mp4:'video/mp4', webm:'video/webm', mp3:'audio/mpeg', wav:'audio/wav', pdf:'application/pdf' };
+  svg:'image/svg+xml', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp', ico:'image/x-icon', avif:'image/avif', bmp:'image/bmp',
+  woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf', mp4:'video/mp4', webm:'video/webm', mov:'video/quicktime', mp3:'audio/mpeg', wav:'audio/wav', ogg:'audio/ogg', m4a:'audio/mp4', pdf:'application/pdf' };
 const ext = n => (n.split('.').pop() || '').toLowerCase();
 const mime = n => MIME[ext(n)] || 'application/octet-stream';
 const isText = n => TEXT.test(n) || /^[^.]+$/.test(n.split('/').pop());
@@ -116,8 +165,9 @@ const fmt = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n > 1024 ? Mat
 const base = n => n.split('/').pop();
 const shown = n => strip && n.startsWith(strip) ? n.slice(strip.length) : n;
 const COL = { html:'#f97316', htm:'#f97316', css:'#3b82f6', js:'#eab308', mjs:'#eab308', json:'#10b981', md:'#64748b', svg:'#ec4899',
-  png:'#ec4899', jpg:'#ec4899', jpeg:'#ec4899', gif:'#ec4899', webp:'#ec4899', py:'#0ea5e9', php:'#8b5cf6', txt:'#64748b' };
-function toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 1500); }
+  png:'#ec4899', jpg:'#ec4899', jpeg:'#ec4899', gif:'#ec4899', webp:'#ec4899', py:'#0ea5e9', php:'#8b5cf6', txt:'#64748b',
+  csv:'#16a34a', pdf:'#dc2626', mp4:'#7c3aed', mp3:'#0891b2', wav:'#0891b2' };
+function toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = 'none', 1500); }
 function resolve(base, ref) {
   ref = ref.split('#')[0].split('?')[0];
   try { ref = decodeURIComponent(ref); } catch (e) {}
@@ -126,19 +176,35 @@ function resolve(base, ref) {
   return parts.join('/');
 }
 const isExternal = r => /^([a-z][a-z0-9+.-]*:|\/\/|#|data:|mailto:|tel:|javascript:)/i.test(r.trim());
+const save = (a, b) => { try { localStorage.setItem(a, b); } catch (e) {} };
+const load = a => { try { return localStorage.getItem(a); } catch (e) { return null; } };
+
+/* ---------- persistence (survives refresh) ---------- */
+const idb = () => new Promise((res, rej) => { const r = indexedDB.open('nzx', 1); r.onupgradeneeded = () => r.result.createObjectStore('z'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+async function idbSet(v) { try { const d = await idb(); await new Promise((res, rej) => { const t = d.transaction('z', 'readwrite'); v === null ? t.objectStore('z').delete('zip') : t.objectStore('z').put(v, 'zip'); t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch (e) {} }
+async function idbGet() { try { const d = await idb(); return await new Promise((res, rej) => { const r = d.transaction('z').objectStore('z').get('zip'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); } catch (e) { return null; } }
+function saveState() {
+  if (!files.length) return;
+  save('nzx-state', JSON.stringify({ cur: current, sort: sortMode, sm: searchMode, q: $('#q').value, col: [...collapsed], prev: $('#pv').style.display === 'block', wrap, fsz }));
+}
 
 /* ---------- state ---------- */
-let strip = '', files = [], byName = {}, cache = {}, current = null, currentBytes = null, blobUrls = {};
+let strip = '', files = [], byName = {}, cache = {}, textCache = {}, current = null, currentBytes = null, blobUrls = {};
+let sortMode = 'folder', searchMode = 'name', contentHits = null, contentQ = '', order = [];
+let rawText = '', isJson = false, jsonPretty = true, wrap = false, fsz = 13, findPos = 0;
+const collapsed = new Set();
 
 async function bytesOf(f) { return cache[f.name] || (cache[f.name] = await f.read()); }
+async function textOf(f) { return textCache[f.name] ?? (textCache[f.name] = new TextDecoder().decode(await bytesOf(f))); }
 
-async function loadZip(file) {
+async function loadZip(file, restoring) {
   try {
     files = await unzip(await file.arrayBuffer());
-  } catch (e) { return alert(e.message); }
-  if (!files.length) return alert('The zip is empty.');
+  } catch (e) { if (!restoring) alert(e.message); return false; }
+  if (!files.length) { if (!restoring) alert('The zip is empty.'); return false; }
+  if (!restoring) { idbSet(file); save('nzx-state', ''); }
   files.sort((a, b) => base(a.name).localeCompare(base(b.name), undefined, { numeric: true, sensitivity: 'base' }) || a.name.localeCompare(b.name));
-  byName = {}; cache = {}; blobUrls = {}; current = null;
+  byName = {}; cache = {}; textCache = {}; blobUrls = {}; current = null; contentHits = null;
   collapsed.clear();
   files.forEach(f => byName[f.name] = f);
   const tops = new Set(files.map(f => f.name.split('/')[0]));
@@ -147,13 +213,49 @@ async function loadZip(file) {
   $('#view').style.display = 'none'; $('#q').value = '';
   $('#site').style.display = files.some(f => /\.html?$/i.test(f.name)) ? '' : 'none';
   renderList();
+  return true;
 }
 
-const collapsed = new Set();
+/* ---------- list, search, sort ---------- */
+function filtered() {
+  const q = $('#q').value.toLowerCase();
+  if (!q) return files.slice();
+  if (searchMode === 'content' && contentHits && contentQ === q) return files.filter(f => contentHits.has(f.name));
+  return files.filter(f => shown(f.name).toLowerCase().includes(q));
+}
+let stok = 0;
+async function runContent() {
+  const q = $('#q').value.toLowerCase(), tok = ++stok;
+  if (searchMode !== 'content' || q.length < 2) { contentHits = null; renderList(); return; }
+  $('#count').textContent = 'Searching inside files…';
+  const hs = new Set();
+  for (const f of files) {
+    if (tok !== stok) return;
+    if (shown(f.name).toLowerCase().includes(q)) { hs.add(f.name); continue; }
+    if (!isText(f.name) || f.size > 2e6) continue;
+    try { if ((await textOf(f)).toLowerCase().includes(q)) hs.add(f.name); } catch (e) {}
+  }
+  if (tok !== stok) return;
+  contentHits = hs; contentQ = q; renderList();
+}
+const cmpName = (a, b) => base(a.name).localeCompare(base(b.name), undefined, { numeric: true, sensitivity: 'base' });
+function rowFor(f, flat) {
+  const e = ext(f.name), r = document.createElement('div'); r.className = 'row' + (current === f.name ? ' sel' : '');
+  r.innerHTML = '<div class="badge"></div><div class="fn"></div><div class="sz">' + fmt(f.size) + '</div>';
+  r.children[0].textContent = (e || 'FILE').slice(0, 4).toUpperCase(); r.children[0].style.background = COL[e] || '#94a3b8';
+  r.children[1].textContent = flat ? shown(f.name) : base(f.name);
+  r.onclick = () => openFile(f.name); order.push(f.name); return r;
+}
 function renderList() {
-  const q = $('#q').value.toLowerCase(), box = $('#list'); box.innerHTML = '';
-  const hit = files.filter(f => shown(f.name).toLowerCase().includes(q));
-  $('#count').textContent = hit.length + ' file' + (hit.length === 1 ? '' : 's');
+  const q = $('#q').value, box = $('#list'); box.innerHTML = ''; order = [];
+  const hit = filtered(), tot = hit.reduce((s, f) => s + f.size, 0);
+  $('#count').textContent = (q ? hit.length + ' of ' + files.length : hit.length) + ' file' + (hit.length === 1 ? '' : 's') + ' · ' + fmt(tot);
+  if (sortMode !== 'folder') {
+    const s = hit.slice();
+    s.sort(sortMode === 'size' ? (a, b) => b.size - a.size
+      : sortMode === 'type' ? (a, b) => ext(a.name).localeCompare(ext(b.name)) || cmpName(a, b) : cmpName);
+    s.forEach(f => box.appendChild(rowFor(f, true))); return;
+  }
   const groups = {};
   hit.forEach(f => { const p = shown(f.name), d = p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : ''; (groups[d] = groups[d] || []).push(f); });
   Object.keys(groups).sort((x, y) => !x ? -1 : !y ? 1 : x.localeCompare(y, undefined, { numeric: true, sensitivity: 'base' })).forEach(d => {
@@ -162,40 +264,103 @@ function renderList() {
       const h = document.createElement('div'); h.className = 'grp';
       h.innerHTML = '<span>' + (open ? '📂' : '📁') + '</span><b></b><i>' + groups[d].length + '</i>';
       h.children[1].textContent = d || 'Main folder';
-      h.onclick = () => { collapsed.has(d) ? collapsed.delete(d) : collapsed.add(d); renderList(); };
+      h.onclick = () => { collapsed.has(d) ? collapsed.delete(d) : collapsed.add(d); renderList(); saveState(); };
       box.appendChild(h);
     }
     if (!open) return;
-    groups[d].sort((a, b) => base(a.name).localeCompare(base(b.name), undefined, { numeric: true, sensitivity: 'base' })).forEach(f => {
-      const e = ext(f.name), r = document.createElement('div'); r.className = 'row' + (current === f.name ? ' sel' : '');
-      r.innerHTML = '<div class="badge"></div><div class="fn"></div><div class="sz">' + fmt(f.size) + '</div>';
-      r.children[0].textContent = (e || 'FILE').slice(0, 4).toUpperCase(); r.children[0].style.background = COL[e] || '#94a3b8';
-      r.children[1].textContent = base(f.name);
-      r.onclick = () => openFile(f.name); box.appendChild(r);
-    });
+    groups[d].sort(cmpName).forEach(f => box.appendChild(rowFor(f, false)));
   });
 }
 
+/* ---------- viewer ---------- */
+function hideAll() {
+  ['#cw', '#pv', '#fsrow', '#imgw', '#media', '#note', '#find'].forEach(s => $(s).style.display = 'none');
+  $('#media').replaceChildren(); $('#img').classList.remove('zoom');
+  if (window.CSS && CSS.highlights) CSS.highlights.delete('hit');
+}
+function hex(b) {
+  const n = Math.min(b.length, 2048), o = [];
+  for (let i = 0; i < n; i += 16) {
+    const s = b.subarray(i, Math.min(i + 16, n));
+    o.push(i.toString(16).padStart(6, '0') + '  ' + [...s].map(x => x.toString(16).padStart(2, '0')).join(' ').padEnd(47) + '  ' + [...s].map(x => x > 31 && x < 127 ? String.fromCharCode(x) : '.').join(''));
+  }
+  return o.join('\n');
+}
+function renderText() {
+  let t = rawText, extra = '';
+  if (isJson && jsonPretty) { try { t = JSON.stringify(JSON.parse(rawText), null, 2); } catch (e) {} }
+  if (t.length > 1e6) { t = t.slice(0, 1e6); extra = 'Showing the first 1 MB only. Use Download for the full file.'; }
+  $('#code').textContent = t;
+  const n = t.split('\n').length;
+  $('#gut').textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n');
+  $('#note').textContent = extra; $('#note').style.display = extra ? 'block' : 'none';
+  $('#fmt').classList.toggle('on', isJson && jsonPretty);
+}
+function applyView() {
+  $('#cw').style.setProperty('--fs', fsz + 'px');
+  $('#code').classList.toggle('wrap', wrap); $('#gut').style.display = wrap ? 'none' : '';
+  $('#wrap').classList.toggle('tab', true); $('#wrap').classList.toggle('on', wrap);
+}
 async function openFile(name, mode) {
   const f = byName[name]; if (!f) return;
   current = name; renderList();
-  const b = await bytesOf(f); currentBytes = b;
   $('#view').style.display = 'block'; $('#vn').innerHTML = '<span></span><small></small>'; $('#vn').children[0].textContent = base(name);
   $('#vn').children[1].textContent = shown(name).includes('/') ? shown(name) : '';
-  const html = /\.html?$/i.test(name), text = isText(name), img = /^image\//.test(mime(name)) && ext(name) !== 'svg';
-  $('#tPrev').style.display = html || ext(name) === 'svg' ? '' : 'none';
-  $('#tCode').style.display = text ? '' : 'none';
+  exitFull(); hideAll();
+  let b;
+  try { b = await bytesOf(f); } catch (e) {
+    ['#tPrev', '#tCode', '#copy', '#fmt', '#open'].forEach(s => $(s).style.display = 'none');
+    currentBytes = null; $('#note').textContent = e.message; $('#note').style.display = 'block'; return;
+  }
+  currentBytes = b;
+  const e = ext(name), m = mime(name), html = /\.html?$/i.test(name), md = e === 'md' || e === 'markdown', csv = e === 'csv' || e === 'tsv', svg = e === 'svg';
+  const img = /^image\//.test(m) && !svg, av = /^(audio|video)\//.test(m), pdf = e === 'pdf', text = isText(name);
+  const canPrev = html || svg || md || csv, hexable = !text && !img && !av && !pdf;
+  isJson = e === 'json' || e === 'webmanifest';
+  $('#tPrev').style.display = canPrev ? '' : 'none';
+  $('#tCode').style.display = text || hexable ? '' : 'none';
   $('#copy').style.display = text ? '' : 'none';
-  exitFull(); $('#code').style.display = $('#pv').style.display = $('#fsrow').style.display = $('#img').style.display = $('#note').style.display = 'none';
-  if (img) { $('#img').src = URL.createObjectURL(new Blob([b], { type: mime(name) })); $('#img').style.display = 'block'; }
-  else if (text) {
-    $('#code').textContent = new TextDecoder().decode(b);
-    if (mode === 'preview' && (html || ext(name) === 'svg')) showPreview(name); else showCode();
-  } else { $('#note').textContent = 'This file type cannot be shown. Use Download.'; $('#note').style.display = 'block'; }
+  $('#fmt').style.display = text && isJson ? '' : 'none';
+  $('#open').style.display = pdf ? '' : 'none';
+  if (img) {
+    $('#img').src = URL.createObjectURL(new Blob([b], { type: m })); $('#imgw').style.display = 'block'; tabs('');
+  } else if (av) {
+    const el = document.createElement(/^audio/.test(m) ? 'audio' : 'video'); el.controls = true;
+    el.src = URL.createObjectURL(new Blob([b], { type: m })); el.style.cssText = 'width:100%;display:block;border-radius:10px';
+    $('#media').appendChild(el); $('#media').style.display = 'block'; tabs('');
+  } else if (pdf) {
+    $('#note').textContent = 'PDF preview isn’t available inside this page. Tap Open to view it in a new tab.'; $('#note').style.display = 'block'; tabs('');
+  } else {
+    rawText = text ? await textOf(f) : hex(b); renderText(); applyView();
+    if (mode === 'preview' && canPrev) await showPreview(name); else showCode();
+    if (hexable) { $('#note').textContent = 'Binary file. Showing the first ' + Math.min(b.length, 2048) + ' bytes as hex.'; $('#note').style.display = 'block'; }
+    const q = $('#q').value.trim();
+    if (text && searchMode === 'content' && q.length >= 2 && $('#cw').style.display !== 'none') { $('#ff').value = q; findNext(true); } else $('#ff').value = '';
+  }
   $('#view').scrollIntoView({ behavior: 'smooth' });
+  saveState();
 }
-function showCode() { exitFull(); $('#pv').style.display = 'none'; $('#fsrow').style.display = 'none'; $('#code').style.display = 'block'; tabs('tCode'); }
-function tabs(id) { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === id)); }
+function showCode() { exitFull(); $('#pv').style.display = 'none'; $('#fsrow').style.display = 'none'; $('#cw').style.display = 'flex'; $('#find').style.display = 'flex'; tabs('tCode'); saveState(); }
+function tabs(id) { document.querySelectorAll('.tab').forEach(t => { if (t.id !== 'wrap') t.classList.toggle('on', t.id === id); }); }
+
+/* ---------- find in file ---------- */
+function findNext(fresh) {
+  const q = $('#ff').value, node = $('#code').firstChild;
+  if (window.CSS && CSS.highlights) CSS.highlights.delete('hit');
+  if (!q || !node) return;
+  const t = node.data.toLowerCase(), needle = q.toLowerCase();
+  if (fresh) findPos = 0;
+  let i = t.indexOf(needle, findPos);
+  if (i < 0 && findPos > 0) { i = t.indexOf(needle); if (i >= 0) toast('Wrapped to start'); }
+  if (i < 0) { toast('Not found'); return; }
+  findPos = i + q.length;
+  const r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + q.length);
+  if (window.CSS && CSS.highlights && window.Highlight) CSS.highlights.set('hit', new Highlight(r));
+  else { const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  const cw = $('#cw'), rr = r.getBoundingClientRect(), cr = cw.getBoundingClientRect();
+  cw.scrollTop += rr.top - cr.top - cw.clientHeight / 3;
+  if (rr.left < cr.left + 50 || rr.right > cr.right) cw.scrollLeft += rr.left - cr.left - 60;
+}
 
 /* ---------- live preview ---------- */
 async function blobFor(name, stack = []) {
@@ -215,8 +380,8 @@ async function rewriteCss(css, base, stack) {
   }
   return out + css.slice(last);
 }
-async function buildHtml(name) {
-  const doc = new DOMParser().parseFromString(new TextDecoder().decode(await bytesOf(byName[name])), 'text/html');
+async function processHtml(src, name) {
+  const doc = new DOMParser().parseFromString(src, 'text/html');
   for (const el of doc.querySelectorAll('[src],link[href],[poster]')) {
     for (const attr of ['src', 'href', 'poster']) {
       const v = el.getAttribute(attr); if (!v || isExternal(v) || (attr === 'href' && el.tagName !== 'LINK')) continue;
@@ -234,18 +399,75 @@ async function buildHtml(name) {
   doc.body.appendChild(s);
   return '<!DOCTYPE html>' + doc.documentElement.outerHTML;
 }
-async function showPreview(name) {
-  tabs('tPrev'); $('#code').style.display = 'none';
-  const fr = $('#frame'); $('#pv').style.display = 'block'; $('#fsrow').style.display = 'block'; $('#pvt').textContent = base(name);
-  if (ext(name) === 'svg') fr.srcdoc = '<body style="margin:0">' + new TextDecoder().decode(await bytesOf(byName[name]));
-  else fr.srcdoc = await buildHtml(name);
+async function buildHtml(name) { return processHtml(await textOf(byName[name]), name); }
+
+/* ---------- markdown + csv renderers ---------- */
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const safe = u => /^\s*(javascript|vbscript|data):/i.test(u) ? '#' : u.replace(/"/g, '&quot;');
+function inl(s) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (m, a, u) => '<img alt="' + a + '" src="' + safe(u) + '">');
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (m, t, u) => '<a href="' + safe(u) + '">' + t + '</a>');
+  return s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<i>$2</i>');
 }
-window.addEventListener('message', async e => {
-  if (!(e.data && e.data.nav)) return;
+function mdToHtml(src) {
+  const L = src.replace(/\r/g, '').split('\n'), out = []; let i = 0, list = null, para = [], m;
+  const fp = () => { if (para.length) { out.push('<p>' + inl(para.join(' ')) + '</p>'); para = []; } };
+  const cl = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+  while (i < L.length) {
+    const l = L[i];
+    if (/^```/.test(l)) { fp(); cl(); const buf = []; i++; while (i < L.length && !/^```/.test(L[i])) buf.push(L[i++]); i++; out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>'); continue; }
+    if ((m = l.match(/^(#{1,6})\s+(.*)$/))) { fp(); cl(); out.push('<h' + m[1].length + '>' + inl(m[2]) + '</h' + m[1].length + '>'); }
+    else if (/^\s*([-*_])(\s*\1){2,}\s*$/.test(l)) { fp(); cl(); out.push('<hr>'); }
+    else if ((m = l.match(/^\s*[-*+]\s+(.*)$/))) { fp(); if (list !== 'ul') { cl(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inl(m[1]) + '</li>'); }
+    else if ((m = l.match(/^\s*\d+[.)]\s+(.*)$/))) { fp(); if (list !== 'ol') { cl(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inl(m[1]) + '</li>'); }
+    else if ((m = l.match(/^>\s?(.*)$/))) { fp(); cl(); out.push('<blockquote>' + inl(m[1]) + '</blockquote>'); }
+    else if (!l.trim()) { fp(); cl(); }
+    else { cl(); para.push(l.trim()); }
+    i++;
+  }
+  fp(); cl(); return out.join('\n');
+}
+const MD_CSS = 'body{font:15px/1.6 system-ui,sans-serif;padding:16px;max-width:760px;margin:auto;color:#0f172a}pre{background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto}code{background:#eef2ff;padding:1px 5px;border-radius:4px}pre code{background:none;padding:0}img{max-width:100%}blockquote{border-left:3px solid #a5b4fc;margin:8px 0;padding-left:12px;color:#64748b}a{color:#4f46e5}';
+function parseCsv(t, d) {
+  const rows = []; let r = [], c = '', q = false;
+  for (let i = 0; i < t.length && rows.length < 502; i++) {
+    const ch = t[i];
+    if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++; } else q = false; } else c += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === d) { r.push(c); c = ''; }
+    else if (ch === '\n') { r.push(c); rows.push(r); r = []; c = ''; }
+    else if (ch !== '\r') c += ch;
+  }
+  if (c || r.length) { r.push(c); rows.push(r); }
+  return rows;
+}
+function csvHtml(t, d) {
+  const rows = parseCsv(t, d), more = rows.length > 500; if (more) rows.length = 500;
+  const row = (r, tag) => '<tr>' + r.map(c => '<' + tag + '>' + esc(c) + '</' + tag + '>').join('') + '</tr>';
+  return '<!DOCTYPE html><meta charset="utf-8"><style>body{margin:0;font:13px system-ui,sans-serif}table{border-collapse:collapse;min-width:100%}th,td{border:1px solid #e2e8f0;padding:6px 10px;white-space:nowrap;text-align:left}th{background:#eef2ff;position:sticky;top:0}tr:nth-child(even) td{background:#f8fafc}p{padding:8px 12px;color:#64748b}</style><table>' +
+    (rows.length ? '<thead>' + row(rows[0], 'th') + '</thead><tbody>' + rows.slice(1).map(r => row(r, 'td')).join('') + '</tbody>' : '') + '</table>' + (more ? '<p>Showing the first 500 rows.</p>' : '');
+}
+async function showPreview(name) {
+  tabs('tPrev'); $('#cw').style.display = 'none'; $('#find').style.display = 'none';
+  const fr = $('#frame'); $('#pv').style.display = 'block'; $('#fsrow').style.display = 'block'; $('#pvt').textContent = base(name);
+  const e = ext(name);
+  if (e === 'svg') fr.srcdoc = '<body style="margin:0">' + await textOf(byName[name]);
+  else if (e === 'md' || e === 'markdown') fr.srcdoc = await processHtml('<!DOCTYPE html><meta charset="utf-8"><style>' + MD_CSS + '</style><body>' + mdToHtml(await textOf(byName[name])), name);
+  else if (e === 'csv' || e === 'tsv') fr.srcdoc = csvHtml(await textOf(byName[name]), e === 'tsv' ? '\t' : ',');
+  else fr.srcdoc = await buildHtml(name);
+  saveState();
+}
+async function go(name, mode) {
   const was = $('#pv').classList.contains('full');
-  await openFile(e.data.nav, 'preview');
-  if (was) { $('#pv').classList.add('full'); document.body.style.overflow = 'hidden'; }
-});
+  await openFile(name, mode);
+  if (was && $('#pv').style.display === 'block') { $('#pv').classList.add('full'); document.body.style.overflow = 'hidden'; }
+}
+window.addEventListener('message', e => { if (e.data && e.data.nav) go(e.data.nav, 'preview'); });
+function step(d) {
+  const n = order[order.indexOf(current) + d]; if (n) go(n, $('#pv').style.display === 'block' ? 'preview' : undefined);
+}
 
 /* ---------- full screen ---------- */
 let apiFull = false;
@@ -265,22 +487,74 @@ $('#fs').onclick = enterFull; $('#exit').onclick = exitFull;
 /* ---------- events ---------- */
 $('#drop').onclick = () => $('#file').click();
 $('#file').onchange = e => e.target.files[0] && loadZip(e.target.files[0]);
-$('#again').onclick = () => { $('#app').style.display = 'none'; $('#drop').style.display = ''; $('#again').style.display = 'none'; $('#file').value = ''; };
+$('#again').onclick = () => { idbSet(null); save('nzx-state', ''); files = []; exitFull(); $('#app').style.display = 'none'; $('#drop').style.display = ''; $('#again').style.display = 'none'; $('#file').value = ''; };
 $('#drop').ondragover = e => { e.preventDefault(); $('#drop').classList.add('over'); };
 $('#drop').ondragleave = () => $('#drop').classList.remove('over');
 $('#drop').ondrop = e => { e.preventDefault(); $('#drop').classList.remove('over'); e.dataTransfer.files[0] && loadZip(e.dataTransfer.files[0]); };
-$('#q').oninput = renderList;
+let qt;
+$('#q').oninput = () => { saveState(); if (searchMode === 'content') { clearTimeout(qt); qt = setTimeout(runContent, 250); } else renderList(); };
+$('#sm').onclick = () => {
+  searchMode = searchMode === 'name' ? 'content' : 'name';
+  $('#sm').textContent = searchMode === 'name' ? 'Names' : 'Contents';
+  $('#q').placeholder = searchMode === 'name' ? '🔍 Search files…' : '🔍 Search inside files…';
+  saveState(); runContent(); toast(searchMode === 'name' ? 'Searching file names' : 'Searching inside text files');
+};
+$('#sort').onchange = e => { sortMode = e.target.value; renderList(); saveState(); };
 $('#tCode').onclick = showCode;
 $('#tPrev').onclick = () => showPreview(current);
+$('#prev').onclick = () => step(-1); $('#next').onclick = () => step(1);
 $('#site').onclick = () => {
   const html = files.map(f => f.name).filter(n => /\.html?$/i.test(n));
   const idx = html.find(n => /(^|\/)index\.html?$/i.test(n)) || html[0]; openFile(idx, 'preview');
 };
-$('#dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })); a.download = base(current); a.click(); };
+$('#dl').onclick = () => {
+  if (!currentBytes) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })); a.download = base(current); a.click();
+};
+$('#open').onclick = () => { if (currentBytes) window.open(URL.createObjectURL(new Blob([currentBytes], { type: mime(current) })), '_blank'); };
+$('#zipall').onclick = async () => {
+  const hit = filtered(); if (!hit.length) return toast('No files to zip');
+  toast('Packing ' + hit.length + ' files…');
+  try {
+    const items = []; for (const f of hit) items.push({ name: shown(f.name), data: await bytesOf(f) });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(items)); a.download = 'extracted-files.zip'; a.click();
+  } catch (e) { alert(e.message); }
+};
 $('#copy').onclick = async () => {
   const t = $('#code').textContent;
   try { await navigator.clipboard.writeText(t); }
   catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
   toast('Code copied');
 };
+$('#fmt').onclick = () => { jsonPretty = !jsonPretty; renderText(); };
+$('#wrap').onclick = () => { wrap = !wrap; applyView(); saveState(); };
+$('#fm').onclick = () => { fsz = Math.max(9, fsz - 1); applyView(); saveState(); };
+$('#fp').onclick = () => { fsz = Math.min(24, fsz + 1); applyView(); saveState(); };
+$('#ff').oninput = () => findNext(true);
+$('#ff').onkeydown = e => { if (e.key === 'Enter') findNext(false); };
+$('#fn').onclick = () => findNext(false);
+$('#img').onclick = () => $('#img').classList.toggle('zoom');
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') exitFull();
+  if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || !current) return;
+  if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1);
+});
+
+/* ---------- dark mode ---------- */
+function setDark(on) { document.body.classList.toggle('dark', on); $('#dark').textContent = on ? '☀️' : '🌙'; save('nzx-dark', on ? '1' : '0'); }
+$('#dark').onclick = () => setDark(!document.body.classList.contains('dark'));
+setDark(load('nzx-dark') === '1');
+
+/* ---------- restore last session ---------- */
+(async () => {
+  const blob = await idbGet(); if (!blob || !(await loadZip(blob, true))) return;
+  let st = {}; try { st = JSON.parse(load('nzx-state') || '{}'); } catch (e) {}
+  if (st.sort) { sortMode = st.sort; $('#sort').value = sortMode; }
+  if (st.sm === 'content') { searchMode = 'content'; $('#sm').textContent = 'Contents'; $('#q').placeholder = '🔍 Search inside files…'; }
+  if (st.wrap) wrap = true; if (st.fsz) fsz = st.fsz;
+  (st.col || []).forEach(d => collapsed.add(d));
+  if (st.q) { $('#q').value = st.q; if (searchMode === 'content') await runContent(); }
+  renderList();
+  if (st.cur && byName[st.cur]) await openFile(st.cur, st.prev ? 'preview' : undefined);
+})();
 </script></body></html>
