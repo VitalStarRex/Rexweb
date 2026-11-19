@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexora Zip Creator &amp; Editor</title>
+<style>
+:root{color-scheme:dark;--bg:#050a16;--card:#081326;--ink:#e8f4ff;--mute:#8ea5bf;--line:#145a8c;--acc:#21e7f5;--acc2:#168cff;--err:#ff7188;--btnink:#031018}
+:root[data-theme="light"]{--btnink:#fff}
+body{background:radial-gradient(ellipse at top,#10274b,#050a16 55%,#02050b) fixed;min-height:100vh}
+:root[data-theme="light"] body{background:var(--bg)}
+:root:not([data-theme="light"]) button:not(.primary),:root:not([data-theme="light"]) ul,:root:not([data-theme="light"]) .sheet,:root:not([data-theme="light"]) input[type=text],:root:not([data-theme="light"]) textarea{border-color:#168cff;box-shadow:0 0 8px #168cff33}
+:root:not([data-theme="light"]) button.primary{box-shadow:0 0 14px #21e7f566;color:var(--btnink)}
+:root:not([data-theme="light"]) h1{color:var(--acc);text-shadow:0 0 12px #21e7f566}
+:root:not([data-theme="light"]) .drop{border-color:#168cff}
+:root[data-theme="light"]{color-scheme:light;--bg:#faf9f5;--card:#fff;--ink:#1f1e1d;--mute:#6b6a68;--line:#e6e3da;--acc:#c96442;--acc2:#b0553a;--err:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;margin:4px 0 4px}
+p.sub{margin:0 0 18px;color:var(--mute);font-size:14px}
+.row{display:flex;gap:10px}
+button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 14px;min-height:44px}
+button.primary{background:var(--acc);border-color:var(--acc);color:var(--btnink);font-weight:600}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+button.primary:not(:disabled):active{background:var(--acc2)}
+.row button{flex:1}
+.drop{margin-top:12px;border:1.5px dashed var(--line);border-radius:12px;padding:12px;text-align:center;color:var(--mute);font-size:14px}
+.drop.over{border-color:var(--acc);color:var(--acc)}
+.head{display:flex;justify-content:space-between;align-items:baseline;margin:22px 2px 8px;font-size:14px;color:var(--mute)}
+.head b{color:var(--ink);font-size:16px}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+li{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li .main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:8px 0;border-radius:6px}
+li .name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+li .size{display:block;font-size:13px;color:var(--mute)}
+li .x{background:none;border:0;color:var(--mute);width:44px;font-size:20px}
+.empty{padding:22px;text-align:center;color:var(--mute);font-size:14px}
+.status{margin:14px 2px 0;font-size:14px;min-height:20px;color:var(--mute)}
+.status.err{color:var(--err)}
+.status.ok{color:var(--ink)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:10}
+.modal.show{display:flex}
+.sheet{background:var(--card);border-radius:18px;padding:18px;width:100%;max-width:520px;max-height:92vh;overflow:auto}
+.sheet h2{margin:0 0 12px;font-size:18px}
+.sheet label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+input[type=text],textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:140px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.sheet .row{margin-top:16px}
+.hint{font-size:13px;color:var(--err);min-height:18px;margin-top:6px}
+button{transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease,filter .15s ease}
+button:active:not(:disabled){transform:scale(.97)}
+@media(hover:hover){
+  button:hover:not(:disabled){border-color:var(--acc);transform:translateY(-1px);box-shadow:0 4px 14px color-mix(in srgb,var(--acc) 35%,transparent)}
+  button.primary:hover:not(:disabled){filter:brightness(1.12);box-shadow:0 0 18px color-mix(in srgb,var(--acc) 70%,transparent)}
+  li .main:hover,li .x:hover{box-shadow:none;transform:none;border-color:transparent;color:var(--acc)}
+}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.opts{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--mute)}
+.seg{display:flex;flex:1;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;min-height:40px;background:transparent;font-size:14px;padding:8px}
+.seg button.on{background:var(--acc);color:var(--btnink);font-weight:600}
+@media(hover:hover){.seg button:hover:not(:disabled){transform:none;box-shadow:none}}
+.prog{display:none;margin-top:12px;align-items:center;gap:10px}
+.prog.show{display:flex}
+.bar{flex:1;height:10px;border-radius:6px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .12s linear}
+.prog span{font-size:13px;color:var(--mute);min-width:38px;text-align:right}
+.prog button{min-height:36px;padding:6px 12px;font-size:14px}
+.import{width:100%;margin-top:8px}
+.plist button{width:100%;text-align:left;margin-bottom:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Nexora Zip Creator &amp; Editor</h1>
+  <p class="sub">Built on your device. Nothing is uploaded anywhere.</p>
+
+  <div class="row">
+    <button class="primary" id="btnUpload">Upload files</button>
+    <button id="btnPaste">Paste text</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button id="btnOpenZip">Open ZIP to edit</button>
+    <button id="btnRex">Import REXWEB</button>
+  </div>
+  <input type="file" id="zipFile" accept=".zip,application/zip" hidden>
+  <input type="file" id="file" multiple hidden>
+  <input type="file" id="rexFile" multiple accept=".html,.htm,.css,.js" hidden>
+  <div class="drop" id="drop">or drop files here</div>
+
+  <div class="head"><b>Files</b><span><span id="summary">0 files</span> · <a href="#" id="clearAll" style="color:var(--acc)">Clear all</a></span></div>
+  <ul id="list"></ul>
+
+  <div class="opts"><span>Compression</span>
+    <div class="seg" role="group" aria-label="Compression">
+      <button id="cmpOn" class="on">Compressed</button><button id="cmpOff">Store only</button>
+    </div>
+  </div>
+  <div class="prog" id="prog"><div class="bar"><i id="barFill"></i></div><span id="pct">0%</span><button id="btnCancel">Cancel</button></div>
+  <div class="status" id="status" role="status"></div>
+  <button class="primary" id="btnZip" style="width:100%;margin-top:12px" disabled>Create ZIP</button>
+</main>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/* Theme follows the saved "rexweb-theme" value (light or dark, default dark) */
+(function(){
+  function apply(){
+    var v='dark';
+    try{v=localStorage.getItem('rexweb-theme')||'dark'}catch(e){}
+    v=v==='light'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',v);
+    document.body&&document.body.classList.toggle('light',v==='light');
+  }
+  apply();
+  addEventListener('DOMContentLoaded',apply);
+  addEventListener('storage',function(e){if(e.key==='rexweb-theme')apply()});
+  addEventListener('pageshow',apply);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)apply()});
+})();
+</script>
+<script>
+(function(){
+  var files=[]; var nextId=1;
+  var $=function(id){return document.getElementById(id)};
+  var listEl=$('list'), statusEl=$('status'), zipBtn=$('btnZip');
+
+  function fmt(n){
+    if(n<1024) return n+' B';
+    if(n<1048576) return (n/1024).toFixed(n<10240?1:0)+' KB';
+    if(n<1073741824) return (n/1048576).toFixed(1)+' MB';
+    return (n/1073741824).toFixed(2)+' GB';
+  }
+  function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+  function setStatus(msg,cls){statusEl.textContent=msg||'';statusEl.className='status '+(cls||'')}
+
+  function uniqueName(name,ignoreId){
+    var taken=files.filter(function(f){return f.id!==ignoreId}).map(function(f){return f.name.toLowerCase()});
+    if(taken.indexOf(name.toLowerCase())<0) return name;
+    var dot=name.lastIndexOf('.'); var base=dot>0?name.slice(0,dot):name; var ext=dot>0?name.slice(dot):'';
+    var i=2; while(taken.indexOf((base+' ('+i+')'+ext).toLowerCase())>=0) i++;
+    return base+' ('+i+')'+ext;
+  }
+  /* keeps folders: "src/app.js" stays a path; ".." and leading slashes are removed */
+  function cleanName(n){
+    var parts=String(n||'').replace(/\\/g,'/').split('/').map(function(p){return p.replace(/[:*?"<>|\u0000-\u001f]/g,'_').trim()}).filter(function(p){return p&&p!=='.'&&p!=='..'});
+    return parts.join('/');
+  }
+
+  function render(){
+    if(!files.length){listEl.innerHTML='<div class="empty">No files yet. Upload or paste some text.</div>'}
+    else listEl.innerHTML=files.map(function(f){
+      return '<li><button class="main" data-r="'+f.id+'"><span class="name">'+esc(f.name)+'</span><span class="size">'+fmt(f.size)+' · tap to edit</span></button><button class="x" data-d="'+f.id+'" aria-label="Remove '+esc(f.name)+'">✕</button></li>';
+    }).join('');
+    var total=files.reduce(function(a,f){return a+f.size},0);
+    $('summary').textContent=files.length+(files.length===1?' file':' files')+' · '+fmt(total);
+    zipBtn.disabled=!files.length;
+    persist();
+  }
+
+  function addBlob(name,blob){
+    files.push({id:nextId++,name:uniqueName(cleanName(name)||'file'),blob:blob,size:blob.size});
+  }
+
+  /* ---------- modal ---------- */
+  var modal=$('modal'), sheet=$('sheet');
+  function openModal(html,onMount){
+    sheet.innerHTML=html; modal.classList.add('show');
+    var first=sheet.querySelector('input,textarea'); if(first) setTimeout(function(){first.focus();if(first.select&&first.tagName==='INPUT')first.select()},50);
+    if(onMount) onMount();
+  }
+  function closeModal(){modal.classList.remove('show');sheet.innerHTML=''}
+  modal.addEventListener('mousedown',function(e){if(e.target===modal)closeModal()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+
+  function promptName(opts){
+    openModal('<h2>'+esc(opts.title)+'</h2><label for="m1">'+esc(opts.label)+'</label><input type="text" id="m1" value="'+esc(opts.value||'').replace(/"/g,'&quot;')+'" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="hint" id="mh"></div><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">'+esc(opts.ok)+'</button></div>',function(){
+      var inp=$('m1');
+      function go(){var v=cleanName(inp.value);if(!v){$('mh').textContent='Please enter a name.';return}closeModal();opts.done(v)}
+      $('mc').onclick=closeModal; $('mo').onclick=go;
+      inp.onkeydown=function(e){if(e.key==='Enter')go()};
+    });
+  }
+
+  $('btnPaste').onclick=function(){
+    openModal('<h2>Paste text</h2><label for="pn">File name</label><input type="text" id="pn" value="notes.txt" autocomplete="off" autocapitalize="off" spellcheck="false"><label for="pt">Text</label><textarea id="pt" placeholder="Paste or type here"></textarea><div class="hint" id="mh"></div><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">Add file</button></div>',function(){
+      $('mc').onclick=closeModal;
+      $('mo').onclick=function(){
+        var n=cleanName($('pn').value), t=$('pt').value;
+        if(!n){$('mh').textContent='Please enter a file name.';return}
+        if(!t){$('mh').textContent='Text is empty.';return}
+        addBlob(n,new Blob([t],{type:'text/plain'}));
+        closeModal();render();setStatus('');
+      };
+    });
+  };
+
+  /* ---------- adding files ---------- */
+  var fileInput=$('file');
+  $('btnUpload').onclick=function(){fileInput.click()};
+  fileInput.onchange=function(){
+    Array.prototype.forEach.call(fileInput.files,function(f){addBlob(f.name,f)});
+    fileInput.value='';render();setStatus('');
+  };
+  var drop=$('drop');
+  ['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('over')})});
+  document.addEventListener('drop',function(e){
+    if(!e.dataTransfer)return;
+    Array.prototype.forEach.call(e.dataTransfer.files,function(f){addBlob(f.name,f)});
+    render();setStatus('');
+  });
+
+  /* ---------- list actions ---------- */
+  listEl.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    if(b.dataset.d){var id=+b.dataset.d;files=files.filter(function(f){return f.id!==id});render();setStatus('');}
+    else if(b.dataset.r){
+      var id2=+b.dataset.r, f=files.filter(function(x){return x.id===id2})[0]; if(!f)return;
+      openItem(f);
+    }
+  });
+
+  /* ---------- item menu: edit / rename / remove ---------- */
+  var TEXT_MAX=1.5*1048576;
+  async function readText(f){
+    if(f.size>TEXT_MAX)return null;
+    try{
+      var buf=await f.blob.arrayBuffer();
+      var t=new TextDecoder('utf-8',{fatal:true}).decode(buf);
+      return t.indexOf('\u0000')>=0?null:t;
+    }catch(e){return null}
+  }
+  function renameItem(f){
+    promptName({title:'Rename file',label:'File name (use / for folders)',value:f.name,ok:'Save',done:function(v){f.name=uniqueName(v,f.id);render()}});
+  }
+  async function editItem(f){
+    var text=await readText(f);
+    if(text===null){setStatus('This file can’t be edited as text (binary or over 1.5 MB).','err');return}
+    openModal('<h2>Edit '+esc(f.name)+'</h2><textarea id="et" spellcheck="false" style="min-height:48vh;white-space:pre"></textarea><div class="hint" id="mh"></div><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">Save changes</button></div>',function(){
+      var ta=$('et');ta.value=text;
+      $('mc').onclick=closeModal;
+      $('mo').onclick=function(){
+        f.blob=new Blob([ta.value],{type:'text/plain'});f.size=f.blob.size;
+        closeModal();render();setStatus('Saved changes to '+f.name+'.','ok');
+      };
+    });
+  }
+  async function openItem(f){
+    var canEdit=(await readText(f))!==null;
+    openModal('<h2 style="word-break:break-all">'+esc(f.name)+'</h2><p style="margin:0 0 4px;color:var(--mute);font-size:14px">'+fmt(f.size)+'</p><div class="plist" style="margin-top:12px">'+(canEdit?'<button id="ie" class="primary">Edit contents</button>':'')+'<button id="ir">Rename</button><button id="id">Remove</button></div><div class="row"><button id="mc">Close</button></div>',function(){
+      $('mc').onclick=closeModal;
+      if(canEdit)$('ie').onclick=function(){closeModal();editItem(f)};
+      $('ir').onclick=function(){closeModal();renameItem(f)};
+      $('id').onclick=function(){closeModal();files=files.filter(function(x){return x.id!==f.id});render();setStatus('')};
+    });
+  }
+
+  /* ---------- open an existing zip ---------- */
+  function rd16(d,o){return d.getUint16(o,true)}
+  function rd32(d,o){return d.getUint32(o,true)}
+  async function inflateRaw(bytes){
+    var ds=new DecompressionStream('deflate-raw');
+    var out=new Blob([bytes]).stream().pipeThrough(ds);
+    return new Uint8Array(await new Response(out).arrayBuffer());
+  }
+  async function parseZip(file){
+    var buf=await file.arrayBuffer(), d=new DataView(buf), u8=new Uint8Array(buf), n=buf.byteLength;
+    var e=-1;
+    for(var i=n-22;i>=Math.max(0,n-22-65535);i--){if(rd32(d,i)===0x06054b50){e=i;break}}
+    if(e<0)throw new Error('This does not look like a valid zip file.');
+    var count=rd16(d,e+10), cdOff=rd32(d,e+16);
+    if(count===0xFFFF||cdOff===0xFFFFFFFF)throw new Error('Zip64 archives are not supported.');
+    var out=[], skipped=0, p=cdOff;
+    for(var k=0;k<count;k++){
+      if(rd32(d,p)!==0x02014b50)throw new Error('The zip directory is damaged.');
+      var flags=rd16(d,p+8), method=rd16(d,p+10), csize=rd32(d,p+20), usize=rd32(d,p+24);
+      var nl=rd16(d,p+28), el=rd16(d,p+30), cl=rd16(d,p+32), lo=rd32(d,p+42);
+      var raw=u8.subarray(p+46,p+46+nl), name;
+      try{name=new TextDecoder('utf-8',{fatal:true}).decode(raw)}catch(x){name=new TextDecoder('latin1').decode(raw)}
+      p+=46+nl+el+cl;
+      if(name.charAt(name.length-1)==='/')continue;
+      if((flags&1)||(method!==0&&method!==8)){skipped++;continue}
+      var lnl=rd16(d,lo+26), lel=rd16(d,lo+28), start=lo+30+lnl+lel;
+      var chunk=u8.subarray(start,start+csize), data;
+      if(method===0)data=chunk;
+      else{
+        if(typeof DecompressionStream==='undefined'){skipped++;continue}
+        try{data=await inflateRaw(chunk)}catch(x){skipped++;continue}
+      }
+      out.push({name:name,data:data});
+    }
+    return {entries:out,skipped:skipped};
+  }
+  $('btnOpenZip').onclick=function(){$('zipFile').click()};
+  $('zipFile').onchange=async function(){
+    var f=this.files[0];this.value='';if(!f)return;
+    setStatus('Opening '+f.name+'…');
+    try{
+      var r=await parseZip(f);
+      r.entries.forEach(function(en){var nm=cleanName(en.name);if(nm)addBlob(nm,new Blob([en.data]))});
+      if(!pref.name){pref.name=f.name.replace(/\.zip$/i,'');savePref()}
+      render();
+      setStatus('Opened '+f.name+': '+r.entries.length+' file'+(r.entries.length===1?'':'s')+(r.skipped?' ('+r.skipped+' skipped: encrypted or unsupported)':'')+'. Tap a file to edit it.',r.skipped?'':'ok');
+    }catch(err){setStatus((err&&err.message)||'Could not open that zip.','err')}
+  };
+
+  /* ---------- zip writer ---------- */
+  var crcTable=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+  function crcUpdate(crc,buf){for(var i=0;i<buf.length;i++)crc=crcTable[(crc^buf[i])&255]^(crc>>>8);return crc}
+  function dosTime(d){
+    var y=Math.max(d.getFullYear(),1980);
+    return {t:(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1), d:((y-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate()};
+  }
+  async function deflate(buf){
+    if(typeof CompressionStream==='undefined')return null;
+    try{
+      var cs=new CompressionStream('deflate-raw');
+      var out=new Blob([buf]).stream().pipeThrough(cs);
+      var res=new Uint8Array(await new Response(out).arrayBuffer());
+      return res.length<buf.length?res:null;
+    }catch(e){return null}
+  }
+  function u16(v,n){v.push(n&255,(n>>>8)&255)}
+  function u32(v,n){v.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
+
+  var cancelled=false, compress=true;
+  var progEl=$('prog'), fillEl=$('barFill'), pctEl=$('pct');
+  function setProg(p){var v=Math.max(0,Math.min(100,Math.round(p*100)));fillEl.style.width=v+'%';pctEl.textContent=v+'%'}
+  var tick=function(){return new Promise(function(r){setTimeout(r,0)})};
+  async function readChunks(blob,onBytes){
+    var CH=4*1048576, out=new Uint8Array(blob.size), pos=0;
+    while(pos<blob.size){
+      if(cancelled)throw {code:'cancelled'};
+      var buf=new Uint8Array(await blob.slice(pos,pos+CH).arrayBuffer());
+      out.set(buf,pos); pos+=buf.length; onBytes(buf.length); await tick();
+    }
+    return out;
+  }
+  async function buildZip(list){
+    var enc=new TextEncoder(), parts=[], central=[], offset=0, stamp=dosTime(new Date());
+    var total=list.reduce(function(a,f){return a+f.size},0)*(compress?2:1)||1, done=0;
+    var bump=function(n){done+=n;setProg(done/total)};
+    for(var i=0;i<list.length;i++){
+      var f=list[i];
+      if(cancelled)throw {code:'cancelled'};
+      var data=await readChunks(f.blob,bump);
+      var crc=crcUpdate(0xFFFFFFFF,data)^0xFFFFFFFF; crc>>>=0;
+      var comp=(compress&&data.length>0)?await deflate(data):null;
+      if(compress)bump(data.length);
+      var method=comp?8:0, body=comp||data;
+      var nameBytes=enc.encode(f.name);
+      var h=[]; u32(h,0x04034b50);u16(h,20);u16(h,0x0800);u16(h,method);u16(h,stamp.t);u16(h,stamp.d);
+      u32(h,crc);u32(h,body.length);u32(h,data.length);u16(h,nameBytes.length);u16(h,0);
+      parts.push(new Uint8Array(h),nameBytes,body);
+      var c=[]; u32(c,0x02014b50);u16(c,20);u16(c,20);u16(c,0x0800);u16(c,method);u16(c,stamp.t);u16(c,stamp.d);
+      u32(c,crc);u32(c,body.length);u32(c,data.length);u16(c,nameBytes.length);u16(c,0);u16(c,0);u16(c,0);u16(c,0);u32(c,0);u32(c,offset);
+      central.push(new Uint8Array(c),nameBytes);
+      offset+=h.length+nameBytes.length+body.length;
+      setStatus('Compressing '+(i+1)+' of '+list.length+'…');
+    }
+    var cdSize=0; central.forEach(function(p){cdSize+=p.length});
+    var e=[]; u32(e,0x06054b50);u16(e,0);u16(e,0);u16(e,list.length);u16(e,list.length);u32(e,cdSize);u32(e,offset);u16(e,0);
+    return new Blob(parts.concat(central,[new Uint8Array(e)]),{type:'application/zip'});
+  }
+
+  /* ---------- create + download ---------- */
+  zipBtn.onclick=function(){
+    var tooBig=files.some(function(f){return f.size>=0xFFFFFFFF})||files.reduce(function(a,f){return a+f.size},0)>=0xFFFFFFFF;
+    if(tooBig){setStatus('Files total over 4 GB, which this simple zip format cannot hold.','err');return}
+    promptName({title:'Name your ZIP',label:'ZIP name',value:pref.name||'archive',ok:'Create',done:async function(v){
+      v=v.replace(/\//g,'_');
+      var zname=v.replace(/\.zip$/i,'')+'.zip';
+      pref.name=v.replace(/\.zip$/i,''); savePref();
+      zipBtn.disabled=true; cancelled=false; setProg(0); progEl.classList.add('show');
+      try{
+        var blob=await buildZip(files);
+        setProg(1); progEl.classList.remove('show');
+        setStatus('Ready ('+fmt(blob.size)+'). Confirm the download…');
+        var dl=null;
+        try{dl=(window.claude&&claude.use)?await claude.use('downloads'):null}catch(e){dl=null}
+        if(dl){await dl.save({filename:zname,data:blob})}
+        else{
+          var url=URL.createObjectURL(blob),a=document.createElement('a');
+          a.href=url;a.download=zname;document.body.appendChild(a);a.click();a.remove();
+          setTimeout(function(){URL.revokeObjectURL(url)},10000);
+        }
+        setStatus('Saved '+zname+' ('+fmt(blob.size)+').','ok');
+      }catch(err){
+        if(err&&err.code==='cancelled')setStatus('Cancelled.');
+        else if(err&&err.code==='declined')setStatus('Download cancelled. Tap Create ZIP to try again.');
+        else setStatus('Could not create the zip: '+((err&&err.message)||'unknown error'),'err');
+      }finally{progEl.classList.remove('show');zipBtn.disabled=!files.length}
+    }});
+  };
+  $('btnCancel').onclick=function(){cancelled=true};
+
+  /* ---------- remembered settings ---------- */
+  var pref={name:'',compress:true};
+  try{var p=JSON.parse(localStorage.getItem('zipcreator:pref')||'{}');if(p&&typeof p==='object'){pref.name=String(p.name||'');pref.compress=p.compress!==false}}catch(e){}
+  function savePref(){try{localStorage.setItem('zipcreator:pref',JSON.stringify(pref))}catch(e){}}
+  function setCmp(on){
+    compress=on;pref.compress=on;savePref();
+    $('cmpOn').classList.toggle('on',on);$('cmpOff').classList.toggle('on',!on);
+  }
+  $('cmpOn').onclick=function(){setCmp(true)};
+  $('cmpOff').onclick=function(){setCmp(false)};
+  setCmp(pref.compress);
+
+  /* ---------- import from REXWEB (Nexora Code Studio) ---------- */
+  function addProject(name,pj){
+    var base=cleanName(name)||'project';
+    var set=[['index.html',pj.html],['style.css',pj.css],['script.js',pj.js]];
+    var added=0;
+    set.forEach(function(x){
+      if(typeof x[1]==='string'&&x[1].length){addBlob(x[0],new Blob([x[1]],{type:'text/plain'}));added++}
+    });
+    if(!pref.name){pref.name=base;savePref()}
+    return added;
+  }
+  $('btnRex').onclick=function(){
+    var projects=null;
+    try{projects=JSON.parse(localStorage.getItem('rexweb:projects')||'null')}catch(e){}
+    var ids=projects?Object.keys(projects):[];
+    if(ids.length){
+      var h='<h2>Choose a REXWEB project</h2><div class="plist">'+ids.map(function(id){return '<button data-id="'+esc(id)+'">'+esc(projects[id].name||'Project')+'</button>'}).join('')+'</div><div class="row"><button id="mc">Cancel</button></div>';
+      openModal(h,function(){
+        $('mc').onclick=closeModal;
+        Array.prototype.forEach.call(sheet.querySelectorAll('.plist button'),function(b){
+          b.onclick=function(){
+            var pj=projects[b.dataset.id];var n=addProject(pj.name,pj);
+            closeModal();render();setStatus('Added '+n+' file'+(n===1?'':'s')+' from '+(pj.name||'project')+'.','ok');
+          };
+        });
+      });
+    }else{
+      openModal('<h2>Import from REXWEB</h2><p style="color:var(--mute);font-size:14px;margin:0 0 6px">This page can’t read your REXWEB projects directly. In REXWEB tap ⋯ → <b>Download all files</b>, then choose the three files here (index.html, style.css, script.js).</p><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">Choose files</button></div>',function(){
+        $('mc').onclick=closeModal;
+        $('mo').onclick=function(){closeModal();$('rexFile').click()};
+      });
+    }
+  };
+  $('rexFile').onchange=function(){
+    var fl=Array.prototype.slice.call(this.files);this.value='';
+    fl.forEach(function(f){addBlob(f.name,f)});
+    render();setStatus(fl.length?'Added '+fl.length+' file'+(fl.length===1?'':'s')+' from REXWEB.':'','ok');
+  };
+
+  /* ---------- survive a refresh (IndexedDB) ---------- */
+  var DB='nexora-zip-editor', ST='kv', saveT=null, restoring=true;
+  function idb(){
+    return new Promise(function(res,rej){
+      try{
+        var r=indexedDB.open(DB,1);
+        r.onupgradeneeded=function(){r.result.createObjectStore(ST)};
+        r.onsuccess=function(){res(r.result)};
+        r.onerror=function(){rej(r.error)};
+      }catch(e){rej(e)}
+    });
+  }
+  function persist(){
+    if(restoring)return;
+    clearTimeout(saveT);
+    saveT=setTimeout(async function(){
+      try{
+        var db=await idb();
+        var snap=files.map(function(f){return {id:f.id,name:f.name,blob:f.blob,size:f.size}});
+        var tx=db.transaction(ST,'readwrite');
+        tx.objectStore(ST).put(snap,'files');
+        tx.oncomplete=function(){db.close()};
+        tx.onerror=function(){db.close()};
+      }catch(e){}
+    },250);
+  }
+  async function restore(){
+    try{
+      var db=await idb();
+      var data=await new Promise(function(res,rej){
+        var q=db.transaction(ST,'readonly').objectStore(ST).get('files');
+        q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)};
+      });
+      db.close();
+      if(Array.isArray(data)&&data.length){
+        files=data.filter(function(f){return f&&f.blob&&typeof f.name==='string'});
+        nextId=files.reduce(function(m,f){return Math.max(m,f.id||0)},0)+1;
+        setStatus('Restored '+files.length+' file'+(files.length===1?'':'s')+' from your last session.','ok');
+      }
+    }catch(e){}
+    restoring=false;
+    render();
+  }
+  $('clearAll').onclick=function(ev){
+    ev.preventDefault();
+    if(!files.length)return;
+    openModal('<h2>Clear all files?</h2><p style="color:var(--mute);font-size:14px;margin:0">This removes all '+files.length+' files from the list and from saved storage.</p><div class="row"><button id="mc">Cancel</button><button class="primary" id="mo">Clear all</button></div>',function(){
+      $('mc').onclick=closeModal;
+      $('mo').onclick=function(){files=[];closeModal();render();setStatus('Cleared.')};
+    });
+  };
+
+  render();
+  restore();
+})();
+</script>
+</body>
+</html>
